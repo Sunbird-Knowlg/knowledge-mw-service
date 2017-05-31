@@ -13,6 +13,8 @@ var LOG = require('sb_logger_util').logger;
 
 var messageUtils = require('./messageUtil');
 
+var proxy = require('express-http-proxy');
+
 var utilsMessage = messageUtils.UTILS;
 var responseCode = messageUtils.RESPONSE_CODE;
 

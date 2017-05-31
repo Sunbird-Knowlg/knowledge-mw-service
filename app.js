@@ -46,6 +46,7 @@ app.use(function(req, res, next) {
     next();
 });
 
+require('./middlewares/proxy.middleware')(app);
 require('./routes/courseRoutes')(app);
 require('./routes/contentRoutes')(app);
 require('./routes/utilsRoute')(app);
