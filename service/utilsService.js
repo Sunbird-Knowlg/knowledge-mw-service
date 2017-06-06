@@ -18,6 +18,11 @@ var proxy = require('express-http-proxy');
 var utilsMessage = messageUtils.UTILS;
 var responseCode = messageUtils.RESPONSE_CODE;
 
+/**
+ * This function helps to upload file or media
+ * @param {Object} req
+ * @param {Object} response
+ */
 function uploadMediaAPI(req, response) {
 
     var data = req.body;
@@ -69,4 +74,49 @@ function uploadMediaAPI(req, response) {
     });
 }
 
+/**
+ * This function helps to get resourse buldle for language
+ * @param {Object} request
+ * @param {Object} response
+ */
+function resourcebundlesAPI(request, response) {
+    
+    var data = {};
+    var rspObj = request.rspObj;
+
+    data.body = request.body;
+    data.language = request.params.language;
+
+    if (!data.language) {
+        rspObj.errCode = utilsMessage.RESOURCE_BUNDLE.FAILED_CODE;
+        rspObj.errMsg = utilsMessage.RESOURCE_BUNDLE.FAILED_MESSAGE;
+        rspObj.responseCode = responseCode.CLIENT_ERROR;
+        response.status(400).send(respUtil.errorResponse(rspObj));
+    }
+
+    async.waterfall([
+
+        function(CBW) {
+            ekStepUtil.resourseBundleForLanguage(data.language, function(err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    rspObj.errCode = utilsMessage.RESOURCE_BUNDLE.FAILED_CODE;
+                    rspObj.errMsg = utilsMessage.RESOURCE_BUNDLE.FAILED_MESSAGE;
+                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+
+        function(res) {
+            rspObj.result = res.result;
+            return response.status(200).send(respUtil.successResponse(rspObj));
+        }
+    ]);
+    
+}
+
 module.exports.uploadMediaAPI = uploadMediaAPI;
+module.exports.resourcebundlesAPI = resourcebundlesAPI;
