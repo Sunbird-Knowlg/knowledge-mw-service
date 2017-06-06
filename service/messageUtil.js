@@ -181,6 +181,12 @@ exports.UTILS = {
         MISSING_MESSAGE: "Required files for upload media are missing",
         FAILED_CODE: "ERR_MEDIA_UPLOAD_FAILED",
         FAILED_MESSAGE: "Upload media failed"
+    },
+    RESOURCE_BUNDLE: {
+        MISSING_CODE: "ERR_GET_RESOURCE_BUNDLE_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for get resource language are missing",
+        FAILED_CODE: "ERR_GET_RESOURCE_BUNDLE_FAILED",
+        FAILED_MESSAGE: "Get resource bundle failed"
     }
 };
 
