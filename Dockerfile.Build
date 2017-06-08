@@ -1,0 +1,11 @@
+FROM ubuntu:16.04
+MAINTAINER "Manojvv" "manojv@ilimi.in"
+RUN apt-get update && apt-get install -y git \
+  unzip \
+  zip \
+  build-essential \
+  curl
+RUN mkdir -p /opt/mw
+COPY * /opt/mw/
+WORKDIR /opt
+RUN zip -r sunbird-mw.zip mw
