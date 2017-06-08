@@ -1,3 +1,4 @@
+# TODO: move to alpine
 FROM ubuntu:16.04
 MAINTAINER "Manojvv" "manojv@ilimi.in"
 RUN apt-get update && apt-get install -y git \
@@ -10,8 +11,5 @@ WORKDIR /opt/mw
 COPY sunbird-mw.zip  /opt/mw/
 RUN unzip /opt/mw/sunbird-mw.zip
 WORKDIR /opt/mw/sunbird-mw/services/js-services/content_service
-RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash - \
-    && apt-get install --yes nodejs \
     && npm install --unsafe-perm
     && node app.js
-
