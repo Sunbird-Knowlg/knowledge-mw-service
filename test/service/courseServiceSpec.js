@@ -1,8 +1,8 @@
 var request = require('request');
-describe("Course services", function () {
+var host = "http://localhost:5000";
+var base_url = host + "/api/sb/v1/course";
 
-    var host = "http://localhost:5000";
-    var base_url = host + "/api/sb/v1/course";
+describe("Course Search services", function () {
 
     it('should search courses failed due to missing cid in headers', function (done) {
         request.post({
@@ -68,7 +68,7 @@ describe("Course services", function () {
             uri: base_url + '/search',
             body: {
                 "request": {
-                    "query" : "Test",
+                    "query": "Test",
                     "filters": {}
                 }
             },
@@ -81,6 +81,9 @@ describe("Course services", function () {
             done();
         });
     });
+});
+
+describe("Create course service", function () {
 
     it('should failed create courses due to missing cid in headers', function (done) {
         request.post({
@@ -147,7 +150,7 @@ describe("Course services", function () {
             done();
         });
     });
-    
+
     it('should create course failed due to missing required field name', function (done) {
         request.post({
             headers: {'Content-Type': 'application/json', 'cid': '12'},
@@ -212,7 +215,164 @@ describe("Course services", function () {
         });
     });
 
+});
 
+describe("Update COurse Service", function () {
+    var courseId = "do_112240785235501056165";
+    it('Failed due to missing cid in headers', function (done) {
 
+        request.patch({
+            headers: {'Content-Type': 'application/json'},
+            uri: base_url + '/update/' + courseId,
+            body: {
+                "request": {
+                    "course": {
+                        "name": "Course Name Update",
+                        "description": "Course Description update"
+                    }
+                }
+            },
+            json: true
+        }, function (error, response, body) {
+            expect(response.statusCode).toBe(400);
+            expect(body).toBeDefined();
+            expect(body.responseCode).toBe("CLIENT_ERROR");
+            expect(body.result).toBeDefined();
+            done();
+        });
+    });
 
-})
+    it('Failed due to missing request object', function (done) {
+        request.patch({
+            headers: {'Content-Type': 'application/json', 'cid': '12'},
+            uri: base_url + '/update/' + courseId,
+            body: {
+                "request1": {
+                    "course": {
+                        "name": "Course Name Update",
+                        "description": "Course Description update"
+                    }
+                }
+            },
+            json: true
+        }, function (error, response, body) {
+            expect(response.statusCode).toBe(400);
+            expect(body).toBeDefined();
+            expect(body.responseCode).toBe("CLIENT_ERROR");
+            expect(body.result).toBeDefined();
+            done();
+        });
+    });
+
+    it('Failed due to missing course object', function (done) {
+        request.patch({
+            headers: {'Content-Type': 'application/json', 'cid': '12'},
+            uri: base_url + '/update/' + courseId,
+            body: {
+                "request": {
+                    "course1": {
+                        "name": "Course Name Update",
+                        "description": "Course Description update"
+                    }
+                }
+            },
+            json: true
+        }, function (error, response, body) {
+            expect(response.statusCode).toBe(400);
+            expect(body).toBeDefined();
+            expect(body.responseCode).toBe("CLIENT_ERROR");
+            expect(body.result).toBeDefined();
+            done();
+        });
+    });
+
+    it('Failed due to missing required field versionKey', function (done) {
+        request.patch({
+            headers: {'Content-Type': 'application/json', 'cid': '12'},
+            uri: base_url + '/update/' + courseId,
+            body: {
+                "request": {
+                    "course": {
+                        "name": "Course Name"
+                    }
+                }
+            },
+            json: true
+        }, function (error, response, body) {
+            expect(response.statusCode).toBe(400);
+            expect(body).toBeDefined();
+            expect(body.responseCode).toBe("CLIENT_ERROR");
+            expect(body.result).toBeDefined();
+            done();
+        });
+    });
+
+    xit('Update course success', function (done) {
+        request.patch({
+            headers: {'Content-Type': 'application/json', 'cid': '12'},
+            uri: base_url + '/update/' + courseId,
+            body: {
+                "request": {
+                    "course": {
+                        "name": "Course Name Update",
+                        "versionKey": "12123123212"
+                    }
+                }
+            },
+            json: true
+        }, function (error, response, body) {
+            expect(response.statusCode).toBe(200);
+            expect(body).toBeDefined();
+            expect(body.responseCode).toBe("OK");
+            expect(body.result).toBeDefined();
+            done();
+        });
+    });
+});
+
+describe("Get Course Service", function () {
+    var courseId = "do_112240785235501056165";
+    it('Failed due to missing cid in headers', function (done) {
+
+        request.get({
+            headers: {'Content-Type': 'application/json'},
+            uri: base_url + '/get/' + courseId,
+            json: true
+        }, function (error, response, body) {
+            expect(response.statusCode).toBe(400);
+            expect(body).toBeDefined();
+            expect(body.responseCode).toBe("CLIENT_ERROR");
+            expect(body.result).toBeDefined();
+            done();
+        });
+    });
+
+    it('Failed due to missing or invalid course ID', function (done) {
+        request.get({
+            headers: {'Content-Type': 'application/json', 'cid': '12'},
+            uri: base_url + '/get/' + courseId + 'dssdf',
+            json: true
+        }, function (error, response, body) {
+            expect(response.statusCode).toBe(404);
+            expect(body).toBeDefined();
+            expect(body.responseCode).toBe("RESOURCE_NOT_FOUND");
+            expect(body.result).toBeDefined();
+            done();
+        });
+    });
+    
+    it('Success', function (done) {
+        request.get({
+            headers: {'Content-Type': 'application/json', 'cid': '12'},
+            uri: base_url + '/get/' + courseId,
+            json: true
+        }, function (error, response, body) {
+            expect(response.statusCode).toBe(200);
+            expect(body).toBeDefined();
+            expect(body.responseCode).toBe("OK");
+            expect(body.result).toBeDefined();
+            expect(body.result.course).toBeDefined();
+            done();
+        });
+    });
+});
