@@ -108,7 +108,7 @@ function searchCourseAPI(req, response) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     rspObj.errCode = courseMessage.SEARCH.FAILED_CODE;
                     rspObj.errMsg = courseMessage.SEARCH.FAILED_MESSAGE;
-                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
                     var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
@@ -161,7 +161,7 @@ function createCourseAPI(req, response) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     rspObj.errCode = courseMessage.CREATE.MISSING_CODE;
                     rspObj.errMsg = courseMessage.CREATE.MISSING_MESSAGE;
-                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
                     var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
@@ -211,7 +211,7 @@ function updateCourseAPI(req, response) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     rspObj.errCode = courseMessage.UPDATE.FAILED_CODE;
                     rspObj.errMsg = courseMessage.UPDATE.FAILED_MESSAGE;
-                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
                     var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
@@ -226,7 +226,7 @@ function updateCourseAPI(req, response) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     rspObj.errCode = courseMessage.UPDATE.FAILED_CODE;
                     rspObj.errMsg = courseMessage.UPDATE.FAILED_MESSAGE;
-                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
                     var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
@@ -266,7 +266,7 @@ function reviewCourseAPI(req, response) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     rspObj.errCode = courseMessage.REVIEW.FAILED_CODE;
                     rspObj.errMsg = courseMessage.REVIEW.FAILED_MESSAGE;
-                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
                     var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
@@ -303,7 +303,7 @@ function publishCourseAPI(req, response) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     rspObj.errCode = courseMessage.PUBLISH.FAILED_CODE;
                     rspObj.errMsg = courseMessage.PUBLISH.FAILED_MESSAGE;
-                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
                     var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
@@ -349,7 +349,7 @@ function getCourseAPI(req, response) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     rspObj.errCode = courseMessage.GET.FAILED_CODE;
                     rspObj.errMsg = courseMessage.GET.FAILED_MESSAGE;
-                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
                     var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
@@ -393,7 +393,7 @@ function getMyCourseAPI(req, response) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     rspObj.errCode = courseMessage.GET_MY.FAILED_CODE;
                     rspObj.errMsg = courseMessage.GET_MY.FAILED_MESSAGE;
-                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
                     var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
@@ -443,7 +443,7 @@ function getCourseHierarchyAPI(req, response) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE;
                     rspObj.errMsg = courseMessage.HIERARCHY.FAILED_MESSAGE;
-                    rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
                     var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
