@@ -14,7 +14,4 @@ module.exports = function(app) {
     app.route(BASE_URL_V1 + '/upload/media')
         .post(requestMiddleware.createAndValidateRequestBody, contentService.uploadMediaAPI);
 
-    app.route(BASE_URL_V1 + '/resourcebundle/:language')
-        .get(requestMiddleware.createAndValidateRequestBody, contentService.resourcebundlesAPI);
-
 };
