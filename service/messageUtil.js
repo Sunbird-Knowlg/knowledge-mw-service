@@ -110,13 +110,10 @@ exports.CONTENT = {
         "Story",
         "Worksheet",
         "Game",
+        "TextBook",
         "Simulation",
         "Puzzle",
         "Diagnostic",
-        "Template",
-        "Plugin",
-        "ContentTemplate",
-        "ItemTemplate",
         "Collection"
     ],
 

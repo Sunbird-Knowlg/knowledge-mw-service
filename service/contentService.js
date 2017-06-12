@@ -109,6 +109,8 @@ function createContentAPI(req, response) {
 
     //Tranform request for Ekstep
     data.request.content.code = getCode();
+    data.request.content.createdFor = configUtil.getConfig('CREATED_FOR');
+    data.request.content.channel = configUtil.getConfig('CONTENT_CHANNEL');
     var ekStepReqData = { request: data.request };
 
     async.waterfall([
@@ -351,8 +353,7 @@ function getMyContentAPI(req, response) {
         "filters": {
             // "createdBy": req.userId  
             "createdBy": req.params.createdBy,
-            "contentType": getContentTypeForContent(),
-            "mimeType": getMimeTypeForContent()
+            "contentType": getContentTypeForContent()
         }
 
     };
