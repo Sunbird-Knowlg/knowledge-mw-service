@@ -12,7 +12,13 @@ var responseCode = messageUtil.RESPONSE_CODE;
 var apiVersions = messageUtil.API_VERSION;
 
 const port = 5000;
-const dbName = "mongodb://localhost/sunbird";
+var dbName = '';
+
+if (process.env.sunbird_mongo_ip && process.env.sunbird_mongo_port) {
+    dbName = "mongodb://" + process.env.sunbird_mongo_ip + ":" + process.env.sunbird_mongo_port + "/sunbird";
+} else {
+    dbName = "mongodb://localhost/sunbird";
+}
 
 var app = express();
 
