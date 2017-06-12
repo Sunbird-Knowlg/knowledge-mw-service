@@ -198,7 +198,7 @@ function searchNoteAPI(request, response) {
     var data = request.body;
     var rspObj = request.rspObj;
 
-    if (!data.request) {
+    if (!data.request || !data.request.filters) {
         rspObj.errCode = notesMessage.SEARCH.MISSING_CODE;
         rspObj.errMsg = notesMessage.SEARCH.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
