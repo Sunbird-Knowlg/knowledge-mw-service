@@ -10,6 +10,8 @@ RUN mkdir -p /opt/mw
 WORKDIR /opt/mw
 COPY content-service.zip  /opt/mw/
 RUN unzip /opt/mw/content-service.zip
-WORKDIR /opt/mw/content-service/services/js-services/content_service \
-    && npm install --unsafe-perm \
+ENV sunbird_mongo_ip 52.172.34.94
+ENV sunbird_mongo_port 27017
+WORKDIR /opt/mw/content-service/services/js-services/content_service
+RUN npm install --unsafe-perm \
     && node app.js
