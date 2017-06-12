@@ -5,7 +5,11 @@ RUN apt-get update && apt-get install -y git \
   zip \
   build-essential \
   curl
-RUN mkdir -p /opt/mw
-COPY * /opt/mw/
+RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash - \
+    && apt-get install --yes nodejs
+RUN mkdir -p /opt/content-service/
+ADD content_service /opt/content-service/
+WORKDIR /opt/content-service/services/js-services/content_service/
+RUN npm install
 WORKDIR /opt
-RUN zip -r sunbird-mw.zip mw
+CMD ["zip", "-r", "content-service.zip", "content-service"]
