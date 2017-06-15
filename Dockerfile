@@ -8,10 +8,10 @@ RUN apt-get update && apt-get install -y git \
   curl
 RUN mkdir -p /opt/mw
 WORKDIR /opt/mw
-COPY content-service.zip  /opt/mw/
-RUN unzip /opt/mw/content-service.zip
+COPY content_service.zip  /opt/mw/
+RUN unzip /opt/mw/content_service.zip
 ENV sunbird_mongo_ip 52.172.34.94
 ENV sunbird_mongo_port 27017
-WORKDIR /opt/mw/content-service/services/js-services/content_service
+WORKDIR /opt/mw/content_service/services/js-services/content_service
 RUN npm install --unsafe-perm \
     && node app.js
