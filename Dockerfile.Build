@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y git \
 RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install --yes nodejs
 RUN mkdir -p /opt/content-service/
-ADD . /opt/content-service/
+ADD content-service /opt/content-service/
 WORKDIR /opt/content-service/services/js-services/content_service/
 RUN npm install
 WORKDIR /opt
