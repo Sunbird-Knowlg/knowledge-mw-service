@@ -10,6 +10,6 @@ RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash - \
 RUN mkdir -p /opt/content
 ADD content /opt/content/
 WORKDIR /opt/content/services/js-services/content_service/
-RUN npm install
+RUN npm install --unsafe-perm
 WORKDIR /opt
 CMD ["zip", "-r", "content_service.zip", "content"]
