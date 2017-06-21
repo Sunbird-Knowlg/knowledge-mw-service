@@ -1,4 +1,3 @@
-# TODO: move to alpine
 FROM ubuntu:16.04
 MAINTAINER "Manojvv" "manojv@ilimi.in"
 RUN apt-get update && apt-get install -y git \
@@ -18,5 +17,5 @@ ENV sunbird_mongo_port 27017
 ENV sunbird_content_service_port 5000
 EXPOSE 27017 
 EXPOSE 5000
-WORKDIR /opt/mw/content_service/
+WORKDIR /opt/mw/content_service/services/js-services/content_service
 CMD ["node", "app.js", "&"]
