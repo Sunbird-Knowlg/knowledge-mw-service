@@ -5,8 +5,8 @@ RUN apt-get update && apt-get install -y git \
   zip \
   build-essential \
   curl
-RUN mkdir -p /opt/mw
-RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash - \
+RUN mkdir -p /opt/mw \
+    && curl --silent --location https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install --yes nodejs
 WORKDIR /opt/mw
 COPY content_service.zip  /opt/mw/
