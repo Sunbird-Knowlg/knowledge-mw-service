@@ -6,8 +6,8 @@ RUN apt-get update && apt-get install -y git \
   build-essential \
   curl
 RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash - \
-    && apt-get install --yes nodejs
-RUN mkdir -p /opt/content
+    && apt-get install --yes nodejs \
+    && mkdir -p /opt/content
 ADD content /opt/content/
 WORKDIR /opt/content/services/js-services/content_service/
 RUN npm install --unsafe-perm
