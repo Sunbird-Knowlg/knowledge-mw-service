@@ -1,12 +1,7 @@
-FROM ubuntu:16.04
+FROM mhart/alpine-node:6
 MAINTAINER "Manojvv" "manojv@ilimi.in"
-RUN apt-get update && apt-get install -y git \
-  unzip \
-  zip \
-  build-essential \
-  curl
-RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash - \
-    && apt-get install --yes nodejs \
+RUN apk update \
+    && apk add zip \ 
     && mkdir -p /opt/content
 ADD content /opt/content/
 WORKDIR /opt/content/services/js-services/content_service/
