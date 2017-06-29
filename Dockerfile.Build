@@ -1,10 +1,12 @@
 FROM mhart/alpine-node:6
 MAINTAINER "Manojvv" "manojv@ilimi.in"
 RUN apk update \
-    && apk add zip \ 
-    && mkdir -p /opt/content
-ADD content /opt/content/
-WORKDIR /opt/content/services/js-services/content_service/
+    && apk add zip 
+RUN useradd -ms /bin/bash sunbird
+USER sunbird
+RUN mkdir -p /home/sunbird/content
+ADD content /home/sunbird/content/
+WORKDIR /home/sunbird/content/services/js-services/content_service/
 RUN npm install --unsafe-perm
-WORKDIR /opt
+WORKDIR /home/sunbird/
 CMD ["zip", "-r", "content_service.zip", "content"]
