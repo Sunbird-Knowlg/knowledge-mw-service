@@ -2,7 +2,7 @@ FROM mhart/alpine-node:6
 MAINTAINER "Manojvv" "manojv@ilimi.in"
 RUN apk update \
     && apk add zip 
-RUN useradd -ms /bin/bash sunbird
+RUN adduser -u 1001 -h /home/sunbird/ -D sunbird
 USER sunbird
 RUN mkdir -p /home/sunbird/content
 ADD content /home/sunbird/content/
