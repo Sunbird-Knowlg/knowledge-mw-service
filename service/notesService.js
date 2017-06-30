@@ -194,7 +194,7 @@ function createSearchQuery(reqData) {
  * @param {Object} response
  */
 function searchNoteAPI(request, response) {
-
+    
     var data = request.body;
     var rspObj = request.rspObj;
 
