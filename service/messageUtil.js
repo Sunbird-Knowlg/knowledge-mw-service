@@ -157,6 +157,10 @@ exports.REQUEST = {
     PARAMS: {
         MISSING_CID_CODE: "ERR_REQUEST_FIELDS_CID_MISSING",
         MISSING_CID_MESSAGE: "Required fields consumer id is missing"
+    },
+    DB_ERROR: {
+        DB_ERROR_CODE: "DB_CONNECTION_FAILED",
+        DB_ERROR_MESSAGE: "MongoDB not connected"
     }
 
 };

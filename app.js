@@ -4,21 +4,13 @@ var methodOverride = require('method-override');
 var http = require('http');
 var messageUtil = require('./service/messageUtil');
 var respUtil = require('response_util');
-var mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
+var mongoDB = require('./mongoConnection');
 
 var reqMsg = messageUtil.REQUEST;
 var responseCode = messageUtil.RESPONSE_CODE;
 var apiVersions = messageUtil.API_VERSION;
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000;
-var dbName = '';
-
-if (process.env.sunbird_mongo_ip && process.env.sunbird_mongo_port) {
-    dbName = "mongodb://" + process.env.sunbird_mongo_ip + ":" + process.env.sunbird_mongo_port + "/sunbird";
-} else {
-    dbName = "mongodb://localhost/sunbird";
-}
 
 var app = express();
 
@@ -41,13 +33,7 @@ app.use(function(req, res, next) {
     };
 });
 
-mongoose.connect(dbName);
-
-mongoose.connection.on('connected', function () {
-    console.info('Mongoose connected to ' + dbName);
-});
-
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.setHeader('Connection', 'close');
     next();
 });
