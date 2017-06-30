@@ -7,7 +7,7 @@ var responseCode = messageUtil.RESPONSE_CODE;
 var apiVersions = messageUtil.API_VERSION;
 
 function createAndValidateRequestBody(req, res, next) {
-
+    
     req.body.ts = new Date();
     req.body.url = req.url;
     req.body.path = req.route.path;

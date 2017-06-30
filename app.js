@@ -56,6 +56,7 @@ require('./routes/courseRoutes')(app);
 require('./routes/contentRoutes')(app);
 require('./routes/utilsRoute')(app);
 require('./routes/notesRoutes')(app);
+require('./routes/domainRoutes')(app);
 //last this middle in last
 require('./middlewares/proxy.middleware')(app);
 
