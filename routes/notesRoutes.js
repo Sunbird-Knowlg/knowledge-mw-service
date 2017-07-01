@@ -15,15 +15,15 @@ module.exports = function(app) {
         .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.createNotesAPI);
 
     app.route(BASE_URL_V1 + '/get/:noteId')
-        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.getNoteAPI);
+        .get(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.getNoteAPI);
 
     app.route(BASE_URL_V1 + '/update/:noteId')
-        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.updateNoteAPI);
+        .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.updateNoteAPI);
 
     app.route(BASE_URL_V1 + '/search/')
         .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.searchNoteAPI);
 
     app.route(BASE_URL_V1 + '/delete/:noteId')
-        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.deleteNoteAPI);
+        .delete(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.deleteNoteAPI);
 
 };

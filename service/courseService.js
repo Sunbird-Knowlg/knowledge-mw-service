@@ -8,7 +8,7 @@ var async = require('async');
 var randomString = require('randomstring');
 var ekStepUtil = require('sb-ekstep-util');
 var respUtil = require('response_util');
-var LOG = require('sb_logger_util').logger;
+//var LOG = require('sb_logger_util').logger;
 var configUtil = require('sb-config-util');
 var validatorUtil = require('sb_req_validator_util');
 var courseModel = require('../models/courseModel').COURSE;
@@ -343,7 +343,7 @@ function getCourseAPI(req, response) {
         rspObj.errCode = courseMessage.GET.FAILED_CODE;
         rspObj.errMsg = courseMessage.GET.FAILED_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
-        response.status(400).send(respUtil.errorResponse(rspObj));
+        return response.status(400).send(respUtil.errorResponse(rspObj));
     }
 
     async.waterfall([
@@ -438,7 +438,7 @@ function getCourseHierarchyAPI(req, response) {
         rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE;
         rspObj.errMsg = courseMessage.HIERARCHY.FAILED_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
-        response.status(400).send(respUtil.errorResponse(rspObj));
+        return response.status(400).send(respUtil.errorResponse(rspObj));
     }
 
     async.waterfall([

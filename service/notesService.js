@@ -118,7 +118,7 @@ function createNoteDataForUpdate(reqData) {
  * @param {Object} response
  */
 function updateNoteAPI(request, response) {
-
+    
     var data = request.body;
     data.noteId = request.params.noteId;
 

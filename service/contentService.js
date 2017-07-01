@@ -11,7 +11,7 @@ var randomString = require('randomstring');
 var ekStepUtil = require('sb-ekstep-util');
 var respUtil = require('response_util');
 var configUtil = require('sb-config-util');
-var LOG = require('sb_logger_util').logger;
+//var LOG = require('sb_logger_util').logger;
 var validatorUtil = require('sb_req_validator_util');
 var contentModel = require('../models/contentModel').CONTENT;
 var messageUtils = require('./messageUtil');
@@ -320,7 +320,7 @@ function getContentAPI(req, response) {
         rspObj.errCode = contentMessage.GET.FAILED_CODE;
         rspObj.errMsg = contentMessage.GET.FAILED_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
-        response.status(400).send(respUtil.errorResponse(rspObj));
+        return response.status(400).send(respUtil.errorResponse(rspObj));
     }
 
     var rspObj = req.rspObj;

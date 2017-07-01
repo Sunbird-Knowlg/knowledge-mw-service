@@ -9,7 +9,7 @@ var multiparty = require('multiparty');
 var fs = require('fs');
 var ekStepUtil = require('sb-ekstep-util');
 var respUtil = require('response_util');
-var LOG = require('sb_logger_util').logger;
+//var LOG = require('sb_logger_util').logger;
 
 var messageUtils = require('./messageUtil');
 

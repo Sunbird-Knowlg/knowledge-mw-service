@@ -286,7 +286,7 @@ function updateObjectTypeAPI(req, response) {
         rspObj.errCode = domainMessage.UPDATE_OBJECT_TYPE.MISSING_CODE;
         rspObj.errMsg = domainMessage.UPDATE_OBJECT_TYPE.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
-        response.status(400).send(respUtil.errorResponse(rspObj));
+        return response.status(400).send(respUtil.errorResponse(rspObj));
     }
     
     var ekStepReqData = { request: data.request };
@@ -326,7 +326,7 @@ function retireObjectTypeAPI(req, response) {
         rspObj.errCode = domainMessage.RETIRE_OBJECT_TYPE.MISSING_CODE;
         rspObj.errMsg = domainMessage.RETIRE_OBJECT_TYPE.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
-        response.status(400).send(respUtil.errorResponse(rspObj));
+        return response.status(400).send(respUtil.errorResponse(rspObj));
     }
     
     var ekStepReqData = { };
