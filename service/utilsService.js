@@ -9,14 +9,26 @@ var multiparty = require('multiparty');
 var fs = require('fs');
 var ekStepUtil = require('sb-ekstep-util');
 var respUtil = require('response_util');
-//var LOG = require('sb_logger_util').logger;
+var LOG = require('sb_logger_util');
 
 var messageUtils = require('./messageUtil');
 
-var proxy = require('express-http-proxy');
-
 var utilsMessage = messageUtils.UTILS;
 var responseCode = messageUtils.RESPONSE_CODE;
+
+/**
+ * this function helps to create apiId for error and success responseresponse
+ * @param {String} path
+ * @returns {getAppIDForRESP.appId|String}
+ */
+function getIDFORLOGGER(path) {
+
+    var arr = path.split(":")[0].split('/').filter(function(n) {
+        return n !== "";
+    });
+    var appId = 'api.' + arr[arr.length - 2] + '.' + arr[arr.length - 1];
+    return appId;
+}
 
 /**
  * This function helps to upload file or media
@@ -31,9 +43,9 @@ function uploadMediaAPI(req, response) {
 
     var form = new multiparty.Form();
 
-    form.parse(req, function(err, fields, files) {
+    form.parse(req, function (err, fields, files) {
         if (err || (files && Object.keys(files).length === 0)) {
-            
+
             rspObj.errCode = utilsMessage.UPLOAD.MISSING_CODE;
             rspObj.errMsg = utilsMessage.UPLOAD.MISSING_MESSAGE;
             rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -41,7 +53,7 @@ function uploadMediaAPI(req, response) {
         }
     });
 
-    form.on('file', function(name, file) {
+    form.on('file', function (name, file) {
         var formData = {
             file: {
                 value: fs.createReadStream(file.path),
@@ -52,9 +64,9 @@ function uploadMediaAPI(req, response) {
         };
         async.waterfall([
 
-            function(CBW) {
+            function (CBW) {
 
-                ekStepUtil.uploadMedia(formData, function(err, res) {
+                ekStepUtil.uploadMedia(formData, function (err, res) {
                     if (err || res.responseCode !== responseCode.SUCCESS) {
                         rspObj.errCode = utilsMessage.UPLOAD.FAILED_CODE;
                         rspObj.errMsg = utilsMessage.UPLOAD.FAILED_MESSAGE;
@@ -66,7 +78,7 @@ function uploadMediaAPI(req, response) {
                     }
                 });
             },
-            function(res) {
+            function (res) {
                 rspObj.result = res.result;
                 return response.status(200).send(respUtil.successResponse(rspObj));
             }
@@ -74,4 +86,34 @@ function uploadMediaAPI(req, response) {
     });
 }
 
+function getLoggerData(version, mid, api, level, file, method, message, data, stacktrace) {
+
+    var data = {
+        "eid": "BE_LOG",
+        "ets": Date.now(),
+        "ver": "1.0",
+        "mid": mid,
+        "context": {
+            "pdata": {
+                "id": api,
+                "ver": version
+            }
+        },
+        "edata": {
+            "eks": {
+                "level": level,
+                "class": file,
+                "method": method,
+                "message": message,
+                "data": data,
+                "stacktrace": stacktrace
+            }
+        }
+    };
+    
+    return data;
+}
+
 module.exports.uploadMediaAPI = uploadMediaAPI;
+module.exports.getLoggerData = getLoggerData;
+module.exports.getIDFORLOGGER = getIDFORLOGGER;
