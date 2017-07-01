@@ -10,6 +10,10 @@ var notesReqModel = require('../models/notesModel.js').NOTES;
 var validatorUtil = require('sb_req_validator_util');
 var messageUtils = require('./messageUtil');
 var respUtil = require('response_util');
+var LOG = require('sb_logger_util');
+var utilsService = require('../service/utilsService');
+var path = require('path');
+var filename = path.basename(__filename);
 
 var notesMessage = messageUtils.NOTES;
 var responseCode = messageUtils.RESPONSE_CODE;
@@ -24,8 +28,9 @@ function createNotesAPI(request, response) {
     var data = request.body;
     var noteData = data.request ? data.request.note : {};
     var rspObj = request.rspObj;
-
+    
     if (!data.request || !noteData || !validatorUtil.validate(noteData, notesReqModel.CREATE) || !(noteData.courseId || noteData.contentId)) {
+        LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "createNotesAPI", "Error due to required params are missing", data));
         rspObj.errCode = notesMessage.CREATE.MISSING_CODE;
         rspObj.errMsg = notesMessage.CREATE.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -43,6 +48,7 @@ function createNotesAPI(request, response) {
 
     newNote.save(function(err) {
         if (err) {
+            LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "createNotesAPI", "Failed to save note in mongoDB", err));
             rspObj.errCode = notesMessage.CREATE.FAILED_CODE;
             rspObj.errMsg = notesMessage.CREATE.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.SERVER_ERROR;
@@ -50,6 +56,7 @@ function createNotesAPI(request, response) {
         }
         rspObj.result = {};
         rspObj.result.note = newNote;
+        LOG.info(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "INFO", filename, "createNotesAPI", "Note created successfully", rspObj));
         return response.status(200).send(respUtil.successResponse(rspObj));
     });
 }

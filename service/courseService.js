@@ -86,7 +86,7 @@ function getContentTypeForCourse() {
  * @returns {Object} object with error or success response with http status code
  */
 function searchCourseAPI(req, response) {
-
+    
     var data = req.body;
     var rspObj = req.rspObj;
 

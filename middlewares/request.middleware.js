@@ -2,10 +2,14 @@ var uuidV1 = require('uuid/v1');
 var respUtil = require('response_util');
 var messageUtil = require('../service/messageUtil');
 var mongoConnection = require('../mongoConnection');
+var LOG = require('sb_logger_util');
+var utilsService = require('../service/utilsService');
+var path = require('path');
 
 var reqMsg = messageUtil.REQUEST;
 var responseCode = messageUtil.RESPONSE_CODE;
 var apiVersions = messageUtil.API_VERSION;
+var filename = path.basename(__filename);
 
 /**
  * This function helps to validate the request body and create response body
@@ -34,9 +38,14 @@ function createAndValidateRequestBody(req, res, next) {
         msgid: req.body.params.msgid,
         result: {}
     };
+    
+    req.body.pDataId = utilsService.getIDFORLOGGER(req.body.path);
+    var requestedData = {body : req.body, params: req.body.params, headers : req.headers};
+    LOG.info(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, req.body.pDataId, "INFO", filename, "createAndValidateRequestBody", "API request come", requestedData));
 
     //Check consumer id for all api
     if (!req.body.params.cid) {
+        LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, req.body.pDataId, "ERROR", filename, "createAndValidateRequestBody", "API failed due to missing consumer id", requestedData));
         rspObj.errCode = reqMsg.PARAMS.MISSING_CID_CODE;
         rspObj.errMsg = reqMsg.PARAMS.MISSING_CID_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -67,6 +76,7 @@ function checkMongooseConnection(req, res, next) {
     } else {
         mongoConnection.stablishMongoDBConnection(function (err, isConnected) {
             if (err) {
+                LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, req.body.pDataId, "ERROR", filename, "checkMongooseConnection", "MongoDB in not connected", err));
                 rspObj.errCode = reqMsg.DB_ERROR.DB_ERROR_CODE;
                 rspObj.errMsg = reqMsg.DB_ERROR.DB_ERROR_MESSAGE;
                 rspObj.responseCode = responseCode.SERVER_ERROR;
