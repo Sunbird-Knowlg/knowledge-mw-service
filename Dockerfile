@@ -1,8 +1,8 @@
-FROM mhart/alpine-node:6
+FROM node:6-alpine
 MAINTAINER "Manojvv" "manojv@ilimi.in"
 RUN apk update \
-    && apk add unzip
-RUN adduser -u 1001 -h /home/sunbird/ -D sunbird
+    && apk add unzip \
+    && adduser -u 1001 -h /home/sunbird/ -D sunbird
 USER sunbird
 RUN mkdir -p /home/sunbird/mw
 WORKDIR /home/sunbird/mw
