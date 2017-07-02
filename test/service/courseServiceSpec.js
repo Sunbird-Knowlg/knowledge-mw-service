@@ -76,7 +76,10 @@ describe("Course", function () {
                 expect(body).toBeDefined();
                 expect(body.responseCode).toBe("OK");
                 expect(body.result).toBeDefined();
-                expect(body.result.course).toBeDefined();
+                expect(body.result.count).toBeDefined();
+                if(body.result.count > 0) {
+                    expect(body.result.course).toBeDefined();
+                }
                 done();
             });
         });
@@ -495,7 +498,10 @@ describe("Course", function () {
                 expect(body).toBeDefined();
                 expect(body.responseCode).toBe("OK");
                 expect(body.result).toBeDefined();
-                expect(body.result.course).toBeDefined();
+                expect(body.result.count).toBeDefined();
+                if(body.result.count > 0) {
+                    expect(body.result.course).toBeDefined();
+                }
                 done();
             });
         });
