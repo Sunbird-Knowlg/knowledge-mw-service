@@ -30,7 +30,7 @@ function createNotesAPI(request, response) {
     var rspObj = request.rspObj;
 
     if (!data.request || !noteData || !validatorUtil.validate(noteData, notesReqModel.CREATE) || !(noteData.courseId || noteData.contentId)) {
-        LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "createNotesAPI", "Error due to required params are missing", data));
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createNotesAPI", "Error due to required params are missing", noteData));
         rspObj.errCode = notesMessage.CREATE.MISSING_CODE;
         rspObj.errMsg = notesMessage.CREATE.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -48,7 +48,7 @@ function createNotesAPI(request, response) {
 
     newNote.save(function (err) {
         if (err) {
-            LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "createNotesAPI", "Failed to save note in mongoDB", err));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createNotesAPI", "Failed to save note in mongoDB", err));
             rspObj.errCode = notesMessage.CREATE.FAILED_CODE;
             rspObj.errMsg = notesMessage.CREATE.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.SERVER_ERROR;
@@ -56,7 +56,7 @@ function createNotesAPI(request, response) {
         }
         rspObj.result = {};
         rspObj.result.note = newNote;
-        LOG.info(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "INFO", filename, "createNotesAPI", "Note created successfully", rspObj));
+        LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createNotesAPI", "Note created successfully", rspObj));
         return response.status(200).send(respUtil.successResponse(rspObj));
     });
 }
@@ -74,7 +74,7 @@ function getNoteAPI(request, response) {
     var rspObj = request.rspObj;
 
     if (!data.noteId) {
-        LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "getNoteAPI", "Error due to required params note ID is missing in params", data));
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getNoteAPI", "Error due to required params note ID is missing in params", data));
         rspObj.errCode = notesMessage.GET.MISSING_CODE;
         rspObj.errMsg = notesMessage.GET.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -83,14 +83,14 @@ function getNoteAPI(request, response) {
 
     notesMongoModel.findOne({_id: data.noteId}, function (err, note) {
         if (err && err.name !== "CastError") {
-            LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "getNoteAPI", "Error due to mongodb cast error", err));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getNoteAPI", "Error due to mongodb cast error", err));
             rspObj.errCode = notesMessage.GET.FAILED_CODE;
             rspObj.errMsg = notesMessage.GET.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.SERVER_ERROR;
             return response.status(500).send(respUtil.errorResponse(rspObj));
         }
         if ((err && err.name === "CastError") || !note) {
-            LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "getNoteAPI", "Invalid note id", {noteId: data.noteId}));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getNoteAPI", "Invalid note id", {noteId: data.noteId}));
             rspObj.errCode = notesMessage.GET.FAILED_CODE;
             rspObj.errMsg = notesMessage.GET.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.RESOURSE_NOT_FOUND;
@@ -98,7 +98,7 @@ function getNoteAPI(request, response) {
         }
         rspObj.result = {};
         rspObj.result.note = note;
-        LOG.info(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "INFO", filename, "getNoteAPI", "Notes get successfully", rspObj));
+        LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getNoteAPI", "Notes get successfully", rspObj));
         return response.status(200).send(respUtil.successResponse(rspObj));
     });
 }
@@ -136,7 +136,7 @@ function updateNoteAPI(request, response) {
     var rspObj = request.rspObj;
 
     if (!data.request || !data.request.note || !data.noteId) {
-        LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "updateNoteAPI", "Failed due to required params are missing", data));
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateNoteAPI", "Failed due to required params are missing", data));
         rspObj.errCode = notesMessage.UPDATE.MISSING_CODE;
         rspObj.errMsg = notesMessage.UPDATE.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -147,14 +147,14 @@ function updateNoteAPI(request, response) {
 
     notesMongoModel.findOneAndUpdate({_id: data.noteId}, updateNodeData, {new : true}, function (err, note) {
         if (err && err.name !== "CastError") {
-            LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "updateNoteAPI", "Failed due to mongoDB model error", err));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateNoteAPI", "Failed due to mongoDB model error", err));
             rspObj.errCode = notesMessage.UPDATE.FAILED_CODE;
             rspObj.errMsg = notesMessage.UPDATE.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.SERVER_ERROR;
             return response.status(500).send(respUtil.errorResponse(rspObj));
         }
         if ((err && err.name === "CastError") || !note) {
-            LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "updateNoteAPI", "Failed due to invalied noteID", {noteId: data.noteId}));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateNoteAPI", "Failed due to invalied noteID", {noteId: data.noteId}));
             rspObj.errCode = notesMessage.UPDATE.FAILED_CODE;
             rspObj.errMsg = notesMessage.UPDATE.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.RESOURSE_NOT_FOUND;
@@ -162,7 +162,7 @@ function updateNoteAPI(request, response) {
         }
         rspObj.result = {};
         rspObj.result.note = note;
-        LOG.info(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "INFO", filename, "updateNoteAPI", "Note updated successfully", rspObj));
+        LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateNoteAPI", "Note updated successfully", rspObj));
         return response.status(200).send(respUtil.successResponse(rspObj));
     });
 }
@@ -214,7 +214,7 @@ function searchNoteAPI(request, response) {
     var rspObj = request.rspObj;
 
     if (!data.request || !data.request.filters) {
-        LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "searchNoteAPI", "Failed due to required params are missing", data));
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchNoteAPI", "Failed due to required params are missing", data));
         rspObj.errCode = notesMessage.SEARCH.MISSING_CODE;
         rspObj.errMsg = notesMessage.SEARCH.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -237,7 +237,7 @@ function searchNoteAPI(request, response) {
 
     searchNoteModel.exec(function (err, notes) {
         if (err) {
-            LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "searchNoteAPI", "Failed due to mongoDb error", err));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchNoteAPI", "Failed due to mongoDb error", err));
             rspObj.errCode = notesMessage.SEARCH.FAILED_CODE;
             rspObj.errMsg = notesMessage.SEARCH.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.SERVER_ERROR;
@@ -248,7 +248,7 @@ function searchNoteAPI(request, response) {
         if (notes.length > 0) {
             rspObj.result.note = notes;
         }
-        LOG.info(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "INFO", filename, "searchNoteAPI", "Note seached successfully, We got " +rspObj.result.count+ " results", {notesCount: rspObj.result.count}));
+        LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchNoteAPI", "Note searched successfully, We got " +rspObj.result.count+ " results", {notesCount: rspObj.result.count}));
         return response.status(200).send(respUtil.successResponse(rspObj));
     });
 }
@@ -265,7 +265,7 @@ function deleteNoteAPI(request, response) {
     var rspObj = request.rspObj;
 
     if (!data.noteId) {
-        LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "deleteNoteAPI", "Failed due to noteId is missing", data));
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "deleteNoteAPI", "Failed due to noteId is missing", data));
         rspObj.errCode = notesMessage.DELETE.MISSING_CODE;
         rspObj.errMsg = notesMessage.DELETE.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -274,21 +274,21 @@ function deleteNoteAPI(request, response) {
 
     notesMongoModel.findOneAndRemove({_id: data.noteId}, function (err, note) {
         if (err && err.name !== "CastError") {
-            LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "deleteNoteAPI", "Failed due to mongoDb error", err));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "deleteNoteAPI", "Failed due to mongoDb error", err));
             rspObj.errCode = notesMessage.DELETE.FAILED_CODE;
             rspObj.errMsg = notesMessage.DELETE.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.SERVER_ERROR;
             return response.status(500).send(respUtil.errorResponse(rspObj));
         }
         if ((err && err.name === "CastError") || !note) {
-            LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "ERROR", filename, "deleteNoteAPI", "Failed due to noteId is invalid", {noteId: data.noteId}));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "deleteNoteAPI", "Failed due to noteId is invalid", {noteId: data.noteId}));
             rspObj.errCode = notesMessage.DELETE.FAILED_CODE;
             rspObj.errMsg = notesMessage.DELETE.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.RESOURSE_NOT_FOUND;
             return response.status(404).send(respUtil.errorResponse(rspObj));
         }
         rspObj.result = {};
-        LOG.info(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, data.pDataId, "INFO", filename, "searchNoteAPI", "Note deleted successfully", {noteId: data.noteId}));
+        LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchNoteAPI", "Note deleted successfully", {noteId: data.noteId}));
         return response.status(200).send(respUtil.successResponse(rspObj));
     });
 }

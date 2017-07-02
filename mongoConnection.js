@@ -28,7 +28,7 @@ var getConnectionStatus = function () {
 
 var stablishMongoDBConnection = function (callback) {
     
-    mongoose.connect(dbName).then(function () {
+    mongoose.connect(dbName, {auto_reconnect: false}).then(function () {
         isMongooseConnected = true;
         return callback(null, isMongooseConnected);
     }).catch(function (err) {

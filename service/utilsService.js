@@ -10,9 +10,10 @@ var fs = require('fs');
 var ekStepUtil = require('sb-ekstep-util');
 var respUtil = require('response_util');
 var LOG = require('sb_logger_util');
-
+var path = require('path');
 var messageUtils = require('./messageUtil');
 
+var filename = path.basename(__filename);
 var utilsMessage = messageUtils.UTILS;
 var responseCode = messageUtils.RESPONSE_CODE;
 
@@ -21,7 +22,7 @@ var responseCode = messageUtils.RESPONSE_CODE;
  * @param {String} path
  * @returns {getAppIDForRESP.appId|String}
  */
-function getIDFORLOGGER(path) {
+function getAppIDForRESP(path) {
 
     var arr = path.split(":")[0].split('/').filter(function(n) {
         return n !== "";
@@ -45,7 +46,7 @@ function uploadMediaAPI(req, response) {
 
     form.parse(req, function (err, fields, files) {
         if (err || (files && Object.keys(files).length === 0)) {
-
+            LOG.error(getLoggerData(rspObj, "ERROR", filename, "uploadMediaAPI", "Error due to missing or invalid file", {contentId : data.contentId}));
             rspObj.errCode = utilsMessage.UPLOAD.MISSING_CODE;
             rspObj.errMsg = utilsMessage.UPLOAD.MISSING_MESSAGE;
             rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -65,9 +66,10 @@ function uploadMediaAPI(req, response) {
         async.waterfall([
 
             function (CBW) {
-
+                LOG.info(getLoggerData(rspObj, "INFO", filename, "uploadMediaAPI", "Request to ekstep for upload media file", {contentId : data.contentId}));
                 ekStepUtil.uploadMedia(formData, function (err, res) {
                     if (err || res.responseCode !== responseCode.SUCCESS) {
+                        LOG.error(getLoggerData(rspObj, "ERROR", filename, "uploadMediaAPI", "Getting error from ekstep", res));
                         rspObj.errCode = utilsMessage.UPLOAD.FAILED_CODE;
                         rspObj.errMsg = utilsMessage.UPLOAD.FAILED_MESSAGE;
                         rspObj.responseCode = res ? res.responseCode : responseCode.SERVER_ERROR;
@@ -80,23 +82,24 @@ function uploadMediaAPI(req, response) {
             },
             function (res) {
                 rspObj.result = res.result;
+                LOG.info(getLoggerData(rspObj, "INFO", filename, "uploadMediaAPI", "Sending response back to user", rspObj));
                 return response.status(200).send(respUtil.successResponse(rspObj));
             }
         ]);
     });
 }
 
-function getLoggerData(version, mid, api, level, file, method, message, data, stacktrace) {
+function getLoggerData(rspObj, level, file, method, message, data, stacktrace) {
 
     var data = {
         "eid": "BE_LOG",
         "ets": Date.now(),
         "ver": "1.0",
-        "mid": mid,
+        "mid": rspObj.msgid,
         "context": {
             "pdata": {
-                "id": api,
-                "ver": version
+                "id": rspObj.apiId,
+                "ver": rspObj.apiVersion
             }
         },
         "edata": {
@@ -116,4 +119,4 @@ function getLoggerData(version, mid, api, level, file, method, message, data, st
 
 module.exports.uploadMediaAPI = uploadMediaAPI;
 module.exports.getLoggerData = getLoggerData;
-module.exports.getIDFORLOGGER = getIDFORLOGGER;
+module.exports.getAppIDForRESP = getAppIDForRESP;

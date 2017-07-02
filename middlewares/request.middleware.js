@@ -33,19 +33,19 @@ function createAndValidateRequestBody(req, res, next) {
     req.body.params.sid = req.headers['sid'] || req.body.params.sid;
 
     var rspObj = {
+        apiId: utilsService.getAppIDForRESP(req.body.path),
         path: req.body.path,
         apiVersion: apiVersions.V1,
         msgid: req.body.params.msgid,
         result: {}
     };
     
-    req.body.pDataId = utilsService.getIDFORLOGGER(req.body.path);
     var requestedData = {body : req.body, params: req.body.params, headers : req.headers};
-    LOG.info(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, req.body.pDataId, "INFO", filename, "createAndValidateRequestBody", "API request come", requestedData));
+    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createAndValidateRequestBody", "API request come", requestedData));
 
     //Check consumer id for all api
     if (!req.body.params.cid) {
-        LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, req.body.pDataId, "ERROR", filename, "createAndValidateRequestBody", "API failed due to missing consumer id", requestedData));
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createAndValidateRequestBody", "API failed due to missing consumer id", requestedData));
         rspObj.errCode = reqMsg.PARAMS.MISSING_CID_CODE;
         rspObj.errMsg = reqMsg.PARAMS.MISSING_CID_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -76,7 +76,7 @@ function checkMongooseConnection(req, res, next) {
     } else {
         mongoConnection.stablishMongoDBConnection(function (err, isConnected) {
             if (err) {
-                LOG.error(utilsService.getLoggerData(rspObj.apiVersion, rspObj.msgid, req.body.pDataId, "ERROR", filename, "checkMongooseConnection", "MongoDB in not connected", err));
+                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "checkMongooseConnection", "MongoDB in not connected", err));
                 rspObj.errCode = reqMsg.DB_ERROR.DB_ERROR_CODE;
                 rspObj.errMsg = reqMsg.DB_ERROR.DB_ERROR_MESSAGE;
                 rspObj.responseCode = responseCode.SERVER_ERROR;
