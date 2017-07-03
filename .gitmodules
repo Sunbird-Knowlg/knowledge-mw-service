@@ -1,0 +1,3 @@
+[submodule "sunbird-js-utils"]
+	path = sunbird-js-utils
+	url = https://github.com/project-sunbird/sunbird-js-utils.git
