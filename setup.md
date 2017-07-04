@@ -9,6 +9,6 @@
 ##Setup Instructions
 * Clone the project.
 * Run "git submodule foreach git pull origin master" to pull the latest sunbird-js-utils sub module
-* Change to "service" folder.
+* Change to "src" folder.
 * Run `npm install`
 * Run `node app.js`
