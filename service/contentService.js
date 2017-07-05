@@ -47,6 +47,10 @@ function getContentTypeForContent() {
     return contentMessage.CONTENT_TYPE;
 }
 
+function checkHealth(req, response) {
+    return response.status(200).send("ok");   
+}
+
 
 function searchContentAPI(req, response) {
 
