@@ -430,3 +430,4 @@ module.exports.reviewContentAPI = reviewContentAPI;
 module.exports.publishContentAPI = publishContentAPI;
 module.exports.getContentAPI = getContentAPI;
 module.exports.getMyContentAPI = getMyContentAPI;
+module.exports.checkHealth = checkHealth;
