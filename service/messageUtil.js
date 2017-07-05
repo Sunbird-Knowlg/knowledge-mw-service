@@ -109,12 +109,10 @@ exports.CONTENT = {
     CONTENT_TYPE: [
         "Story",
         "Worksheet",
-        "Game",
         "TextBook",
         "Simulation",
         "Puzzle",
-        "Diagnostic",
-        "Collection"
+        "Diagnostic"
     ],
 
     MIME_TYPE: [
