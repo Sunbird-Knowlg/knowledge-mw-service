@@ -2,6 +2,7 @@ FROM node:6-alpine
 MAINTAINER "Manojvv" "manojv@ilimi.in"
 RUN apk update \
     && apk add unzip \
+    && apk add curl \
     && adduser -u 1001 -h /home/sunbird/ -D sunbird
 USER sunbird
 RUN mkdir -p /home/sunbird/mw
