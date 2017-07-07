@@ -109,7 +109,6 @@ exports.CONTENT = {
     CONTENT_TYPE: [
         "Story",
         "Worksheet",
-        "TextBook",
         "Simulation",
         "Puzzle",
         "Diagnostic"
