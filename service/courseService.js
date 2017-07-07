@@ -103,8 +103,8 @@ function searchCourseAPI(req, response) {
     }
 
     data.request.filters.contentType = getContentTypeForCourse();
-    data.request.filters.createdFor = configUtil.getConfig('CREATED_FOR');
-    data.request.filters.channel = configUtil.getConfig('CONTENT_CHANNEL');
+    //data.request.filters.createdFor = configUtil.getConfig('CREATED_FOR');
+    //data.request.filters.channel = configUtil.getConfig('CONTENT_CHANNEL');
     var ekStepReqData = { request: data.request };
     
     async.waterfall([
