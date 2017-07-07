@@ -3,8 +3,8 @@ var proxy = require('express-http-proxy');
 
 module.exports = function (app) {
 
-    var ekstep = "https://dev.ekstep.in";
-    var ceUrl = 'https://s3.ap-south-1.amazonaws.com/ekstep-public-dev';
+    var ekstep = "https://qa.ekstep.in";
+    var ceUrl = 'https://s3.ap-south-1.amazonaws.com/ekstep-public-qa';
 
     app.use('/api/*', proxy(ekstep, {
 
