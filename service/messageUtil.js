@@ -51,7 +51,7 @@ exports.COURSE = {
     },
 
     MIME_TYPE: "application/vnd.ekstep.content-collection",
-    CONTENT_TYPE: "TextBook"
+    CONTENT_TYPE: "Course"
 };
 
 exports.CONTENT = {
