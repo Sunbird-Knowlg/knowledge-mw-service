@@ -349,6 +349,7 @@ function getContentAPI(req, response) {
     var data = {};
     data.body = req.body;
     data.contentId = req.params.contentId;
+    data.queryParams = req.query;
     if (!data.contentId) {
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getContentAPI", "Error due to required params are missing", {contentId: data.contentId}));
         rspObj.errCode = contentMessage.GET.FAILED_CODE;
@@ -361,8 +362,8 @@ function getContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getContentAPI", "Request to ekstep for get content meta data", {contentId: data.contentId}));
-            ekStepUtil.getContent(data.contentId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getContentAPI", "Request to ekstep for get content meta data", {contentId: data.contentId, qs: data.queryParams}));
+            ekStepUtil.getContentUsingQuery(data.contentId, data.queryParams, function(err, res) {
                 //After check response, we perform other operation
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getContentAPI", "Getting error from ekstep", res));
