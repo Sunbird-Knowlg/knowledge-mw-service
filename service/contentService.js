@@ -266,7 +266,9 @@ function uploadContentAPI(req, response) {
             function(res) {
                 rspObj.result = res.result;
                 LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentAPI", "Sending response back to user", rspObj));
-                return response.status(200).send(respUtil.successResponse(rspObj));
+                var modifyRsp = respUtil.successResponse(rspObj);
+                modifyRsp.success = true;
+                return response.status(200).send(modifyRsp);
             }
         ]);
     });
