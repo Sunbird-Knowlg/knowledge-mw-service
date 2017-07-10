@@ -15,7 +15,7 @@ module.exports = function(app) {
     app.route(BASE_URL_V1 + '/create')
         .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.createNotesAPI);
 
-    app.route(BASE_URL_V1 + '/get/:noteId')
+    app.route(BASE_URL_V1 + '/read/:noteId')
         .get(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkMongooseConnection, notesService.getNoteAPI);
 
     app.route(BASE_URL_V1 + '/update/:noteId')

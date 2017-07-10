@@ -21,10 +21,11 @@ app.use(bodyParser.urlencoded({
 
 app.use(methodOverride());
 
+//Cache-Control, X-Requested-With these two headers required for upload file through fine-upload library
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, cid, user-id, x-auth, *');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, cid, user-id, x-auth, Cache-Control, X-Requested-With, *');
 
     if ('OPTIONS' === req.method) {
         res.sendStatus(200);
