@@ -30,7 +30,7 @@ module.exports = function(app) {
         .post(requestMiddleware.createAndValidateRequestBody, contentService.reviewContentAPI);
 
     app.route(BASE_URL_V1 + '/publish/:contentId')
-        .get(requestMiddleware.createAndValidateRequestBody, contentService.publishContentAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, contentService.publishContentAPI);
 
     app.route(BASE_URL_V1 + '/get/:contentId')
         .get(requestMiddleware.createAndValidateRequestBody, contentService.getContentAPI);

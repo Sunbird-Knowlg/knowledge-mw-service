@@ -316,16 +316,24 @@ function reviewCourseAPI(req, response) {
  */
 function publishCourseAPI(req, response) {
 
-    var data = {};
-    data.courseId = req.params.courseId;
-
+    var data = req.body;
     var rspObj = req.rspObj;
+    data.courseId = req.params.courseId;   
+
+    if (!data.request || !data.request.course || !data.request.course.lastPublishedBy) {
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishCourseAPI", "Error due to required params are missing", data.request));
+        rspObj.errCode = courseMessage.PUBLISH.MISSING_CODE;
+        rspObj.errMsg = courseMessage.PUBLISH.MISSING_MESSAGE;
+        rspObj.responseCode = responseCode.CLIENT_ERROR;
+        return response.status(400).send(respUtil.errorResponse(rspObj));
+    }
+    var ekStepReqData = transformReqBody(data.request, 'course', 'content');
 
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishCourseAPI", "Request to ekstep for published the course", {courseId: data.courseId}));
-            ekStepUtil.publishContent(data.courseId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishCourseAPI", "Request to ekstep for published the course", {courseId: data.courseId, reqData: ekStepReqData}));
+            ekStepUtil.publishContent(ekStepReqData, data.courseId, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishCourseAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.PUBLISH.FAILED_CODE;

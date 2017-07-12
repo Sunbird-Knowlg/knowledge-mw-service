@@ -313,14 +313,23 @@ function reviewContentAPI(req, response) {
 
 function publishContentAPI(req, response) {
 
-    var data = {};
-    data.contentId = req.params.contentId;
+    var data = req.body;
     var rspObj = req.rspObj;
+    data.contentId = req.params.contentId;
+    var ekStepReqData = { request: data.request };
+
+    if (!data.request || !data.request.content || !data.request.content.lastPublishedBy) {
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishContentAPI", "Error due to required params are missing", data.request));
+        rspObj.errCode = contentMessage.PUBLISH.MISSING_CODE;
+        rspObj.errMsg = contentMessage.PUBLISH.MISSING_MESSAGE;
+        rspObj.responseCode = responseCode.CLIENT_ERROR;
+        return response.status(400).send(respUtil.errorResponse(rspObj));
+    }
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishContentAPI", "Request to ekstep for published the content", {contentId: data.contentId}));
-            ekStepUtil.publishContent(data.contentId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishContentAPI", "Request to ekstep for published the content", {contentId: data.contentId, reqData: ekStepReqData}));
+            ekStepUtil.publishContent(ekStepReqData, data.contentId, function(err, res) {
                 //After check response, we perform other operation
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishContentAPI", "Getting error from ekstep", res));
