@@ -30,11 +30,6 @@ node('docker') {
 
       }
 
-      stage('Deploy to Dev'){
-        sh('chmod 777 ./content/services/js-services/content_service/deploy.sh')
-        sh 'ARTIFACT_LABEL=bronze ENV=dev ./content/services/js-services/content_service/deploy.sh'
-
-      }
     }
     catch (err) {
         currentBuild.result = "FAILURE"
