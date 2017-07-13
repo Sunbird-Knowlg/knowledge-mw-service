@@ -27,7 +27,8 @@ node('docker') {
         sh 'ls -al ~/'
 
         dir('./content/services/js-services/content_service') {
-          sh('chmod 777 ./dockerPushToRepo.sh)
+
+          sh('chmod 777 ./dockerPushToRepo.sh')
           sh 'ARTIFACT_LABEL=bronze ./dockerPushToRepo.sh'
           sh './metadata.sh > metadata.json'
           sh 'cat metadata.json'
