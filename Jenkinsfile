@@ -24,10 +24,15 @@ node('docker') {
       stage('Publish'){
 
         echo 'Push to Repo'
-         sh 'ls -al ~/'
-         sh('chmod 777 ./content/services/js-services/content_service/dockerPushToRepo.sh')
-         sh 'ARTIFACT_LABEL=bronze ./content/services/js-services/content_service/dockerPushToRepo.sh'
+        sh 'ls -al ~/'
 
+        dir('./content/services/js-services/content_service') {
+          sh('chmod 777 ./dockerPushToRepo.sh)
+          sh 'ARTIFACT_LABEL=bronze ./dockerPushToRepo.sh'
+          sh './metadata.sh > metadata.json'
+          sh 'cat metadata.json'
+          archive includes: "metadata.json"
+        }
       }
 
     }
