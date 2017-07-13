@@ -1,36 +1,36 @@
 #!groovy
 
-node(‘docker’) {
+node('docker') {
 
    currentBuild.result = “SUCCESS”
 
    try {
 
-      stage(‘Checkout’){
+      stage('Checkout'){
 
          checkout scm
        }
 
-      stage(‘Build’){
+      stage('Build'){
 
         env.NODE_ENV = “build”
 
         print “Environment will be : ${env.NODE_ENV}”
-         sh(‘./content/services/js-services/content_service/build.sh’)
+         sh('./content/services/js-services/content_service/build.sh')
 
       }
 
-      stage(‘Publish’){
+      stage('Publish'){
 
-        echo ‘Push to Repo’
-         sh ‘ls -al ~/’
-         sh ‘ARTIFACT_LABEL=bronze ./content/services/js-services/content_service/dockerPushToRepo.sh’
+        echo 'Push to Repo'
+         sh 'ls -al ~/''
+         sh 'ARTIFACT_LABEL=bronze ./content/services/js-services/content_service/dockerPushToRepo.sh'
 
       }
 
-      stage(‘Deploy to Dev’){
+      stage('Deploy to Dev'){
 
-        sh ‘ARTIFACT_LABEL=bronze ENV=dev ./content/services/js-services/content_service/deploy.sh’
+        sh 'ARTIFACT_LABEL=bronze ENV=dev ./content/services/js-services/content_service/deploy.sh'
 
       }
     }
