@@ -433,6 +433,46 @@ function getMyContentAPI(req, response) {
     ]);
 }
 
+function retireContentAPI(req, response) {
+
+    var data = {};
+    data.body = req.body;
+    data.contentId = req.params.contentId;
+    data.queryParams = req.query;
+    if (!data.contentId) {
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Error due to required params are missing", {contentId: data.contentId}));
+        rspObj.errCode = contentMessage.GET.FAILED_CODE;
+        rspObj.errMsg = contentMessage.GET.FAILED_MESSAGE;
+        rspObj.responseCode = responseCode.CLIENT_ERROR;
+        return response.status(400).send(respUtil.errorResponse(rspObj));
+    }
+
+    var rspObj = req.rspObj;
+    async.waterfall([
+
+        function(CBW) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireContentAPI", "Request to ekstep for get content meta data", {contentId: data.contentId}));
+            ekStepUtil.retireContent(data.contentId, function(err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Getting error from ekstep", res));
+                    rspObj.errCode = contentMessage.GET.FAILED_CODE;
+                    rspObj.errMsg = contentMessage.GET.FAILED_MESSAGE;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+        function(res) {
+            rspObj.result = res.result;
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireContentAPI", "Sending response back to user"));
+            return response.status(200).send(respUtil.successResponse(rspObj));
+        }
+    ]);
+}
+
 
 module.exports.searchContentAPI = searchContentAPI;
 module.exports.createContentAPI = createContentAPI;
@@ -443,3 +483,4 @@ module.exports.publishContentAPI = publishContentAPI;
 module.exports.getContentAPI = getContentAPI;
 module.exports.getMyContentAPI = getMyContentAPI;
 module.exports.checkHealth = checkHealth;
+module.exports.retireContentAPI = retireContentAPI;

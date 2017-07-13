@@ -38,6 +38,9 @@ module.exports = function(app) {
     app.route(BASE_URL_V1 + '/get/mycontent/:createdBy')
         .get(requestMiddleware.createAndValidateRequestBody, contentService.getMyContentAPI);
 
+    app.route(BASE_URL_V1 + '/retire/:contentId')
+        .delete(requestMiddleware.createAndValidateRequestBody, contentService.retireContentAPI);
+
     app.route(BASE_URL + '/search')
         .post(requestMiddleware.createAndValidateRequestBody, contentService.searchContentAPI);
 
@@ -54,7 +57,10 @@ module.exports = function(app) {
         .post(requestMiddleware.createAndValidateRequestBody, contentService.reviewContentAPI);
 
     app.route(BASE_URL + '/publish/:contentId')
-        .get(requestMiddleware.createAndValidateRequestBody, contentService.publishContentAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, contentService.publishContentAPI);
+
+    app.route(BASE_URL + '/retire/:contentId')
+        .delete(requestMiddleware.createAndValidateRequestBody, contentService.retireContentAPI);
 
     app.route(BASE_URL + '/read/:contentId')
         .get(requestMiddleware.createAndValidateRequestBody, contentService.getContentAPI);
