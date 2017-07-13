@@ -2,7 +2,7 @@
 
 node('docker') {
 
-   currentBuild.result = “SUCCESS”
+   currentBuild.result = "SUCCESS"
 
    try {
 
@@ -13,9 +13,9 @@ node('docker') {
 
       stage('Build'){
 
-        env.NODE_ENV = “build”
+        env.NODE_ENV = "build"
 
-        print “Environment will be : ${env.NODE_ENV}”
+        print "Environment will be : ${env.NODE_ENV}"
          sh('./content/services/js-services/content_service/build.sh')
 
       }
@@ -35,7 +35,7 @@ node('docker') {
       }
     }
     catch (err) {
-        currentBuild.result = “FAILURE”
+        currentBuild.result = "FAILURE"
         throw err
     }
 
