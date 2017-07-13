@@ -16,6 +16,7 @@ node('docker') {
         env.NODE_ENV = "build"
 
         print "Environment will be : ${env.NODE_ENV}"
+         sh('chmod 777 ./content/services/js-services/content_service/build.sh')
          sh('./content/services/js-services/content_service/build.sh')
 
       }
@@ -24,12 +25,13 @@ node('docker') {
 
         echo 'Push to Repo'
          sh 'ls -al ~/'
+         sh('chmod 777 ./content/services/js-services/content_service/dockerPushToRepo.sh')
          sh 'ARTIFACT_LABEL=bronze ./content/services/js-services/content_service/dockerPushToRepo.sh'
 
       }
 
       stage('Deploy to Dev'){
-
+        sh('chmod 777 ./content/services/js-services/content_service/deploy.sh')
         sh 'ARTIFACT_LABEL=bronze ENV=dev ./content/services/js-services/content_service/deploy.sh'
 
       }
