@@ -23,7 +23,7 @@ node('docker') {
       stage('Publish'){
 
         echo 'Push to Repo'
-         sh 'ls -al ~/''
+         sh 'ls -al ~/'
          sh 'ARTIFACT_LABEL=bronze ./content/services/js-services/content_service/dockerPushToRepo.sh'
 
       }
