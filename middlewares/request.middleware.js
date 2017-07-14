@@ -44,13 +44,13 @@ function createAndValidateRequestBody(req, res, next) {
     LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createAndValidateRequestBody", "API request come", requestedData));
 
     //Check consumer id for all api
-    if (!req.body.params.cid) {
-        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createAndValidateRequestBody", "API failed due to missing consumer id", requestedData));
-        rspObj.errCode = reqMsg.PARAMS.MISSING_CID_CODE;
-        rspObj.errMsg = reqMsg.PARAMS.MISSING_CID_MESSAGE;
-        rspObj.responseCode = responseCode.CLIENT_ERROR;
-        return res.status(400).send(respUtil.errorResponse(rspObj));
-    }
+    // if (!req.body.params.cid) {
+    //     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createAndValidateRequestBody", "API failed due to missing consumer id", requestedData));
+    //     rspObj.errCode = reqMsg.PARAMS.MISSING_CID_CODE;
+    //     rspObj.errMsg = reqMsg.PARAMS.MISSING_CID_MESSAGE;
+    //     rspObj.responseCode = responseCode.CLIENT_ERROR;
+    //     return res.status(400).send(respUtil.errorResponse(rspObj));
+    // }
 
     req.rspObj = rspObj;
     next();

@@ -433,6 +433,75 @@ function retireObjectTypeAPI(req, response) {
     ]);
 }
 
+/**
+ * API to get terms list
+ * @param {Object} req
+ * @param {Object} response
+ */
+function listTermsAPI(req, response) {
+    var rspObj = req.rspObj;
+    async.waterfall([
+        function(CBW) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listTermsAPI", "Request to ekstep for terms list"));
+            ekStepUtil.listTerms(function(err, res) {
+                CBW(null, res);
+            });
+        },
+        function(res) {
+            rspObj.result = res.result;
+            var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listTermsAPI", "Sending response back to user"));
+            return response.status(httpStatus).send(respUtil.successResponse(rspObj));
+        }
+    ]);
+}
+
+/**
+ * API to get terms list
+ * @param {Object} req
+ * @param {Object} response
+ */
+function listResourceBundlesAPI(req, response) {
+    var rspObj = req.rspObj;
+    async.waterfall([
+        function(CBW) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listResourceBundlesAPI", "Request to ekstep for terms list"));
+            ekStepUtil.listResourceBundles(function(err, res) {
+                CBW(null, res);
+            });
+        },
+        function(res) {
+            rspObj.result = res.result;
+            var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listResourceBundlesAPI", "Sending response back to user"));
+            return response.status(httpStatus).send(respUtil.successResponse(rspObj));
+        }
+    ]);
+}
+
+/**
+ * API to get terms list
+ * @param {Object} req
+ * @param {Object} response
+ */
+function listOrdinalsAPI(req, response) {
+    var rspObj = req.rspObj;
+    async.waterfall([
+        function(CBW) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listOrdinalsAPI", "Request to ekstep for terms list"));
+            ekStepUtil.listOrdinals(function(err, res) {
+                CBW(null, res);
+            });
+        },
+        function(res) {
+            rspObj.result = res.result;
+            var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listOrdinalsAPI", "Sending response back to user"));
+            return response.status(httpStatus).send(respUtil.successResponse(rspObj));
+        }
+    ]);
+}
+
 module.exports.getDomainsAPI = getDomainsAPI;
 module.exports.getDomainByIDAPI = getDomainByIDAPI;
 module.exports.getObjectTypesAPI = getObjectTypesAPI;
@@ -442,3 +511,8 @@ module.exports.searchObjectTypeAPI = searchObjectTypeAPI;
 module.exports.createObjectTypeAPI = createObjectTypeAPI;
 module.exports.updateObjectTypeAPI = updateObjectTypeAPI;
 module.exports.retireObjectTypeAPI = retireObjectTypeAPI;
+module.exports.listTermsAPI = listTermsAPI;
+module.exports.listResourceBundlesAPI = listResourceBundlesAPI;
+module.exports.listOrdinalsAPI = listOrdinalsAPI;
+
+
