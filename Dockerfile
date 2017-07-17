@@ -16,5 +16,4 @@ ENV sunbird_content_service_port 5000
 EXPOSE 27017 
 EXPOSE 5000
 WORKDIR /home/sunbird/mw/content/services/js-services/content_service
-RUN ln -sf /dev/stdout /home/sunbird/mw/content/services/log
 CMD ["node", "app.js", "&"]
