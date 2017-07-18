@@ -65,7 +65,7 @@ function searchContentAPI(req, response) {
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
 
-    if (!data.request.filters.contentType) {
+    if (!data.request.filters.contentType && !data.request.filters.mimeType && !data.request.filters.identifier) {
         data.request.filters.contentType = getContentTypeForContent();
     }
     //    if(!data.request.filters.mimeType) {
