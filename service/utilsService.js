@@ -37,13 +37,13 @@ function getAppIDForRESP(path) {
  * @param {Object} response
  */
 function uploadMediaAPI(req, response) {
-
+    
     var data = req.body;
     data.contentId = req.params.contentId;
     var rspObj = req.rspObj;
 
     var form = new multiparty.Form();
-
+        
     form.parse(req, function (err, fields, files) {
         if (err || (files && Object.keys(files).length === 0)) {
             LOG.error(getLoggerData(rspObj, "ERROR", filename, "uploadMediaAPI", "Error due to missing or invalid file", {contentId : data.contentId}));

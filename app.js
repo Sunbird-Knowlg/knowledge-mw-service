@@ -9,12 +9,13 @@ var mongoDB = require('./mongoConnection');
 var reqMsg = messageUtil.REQUEST;
 var responseCode = messageUtil.RESPONSE_CODE;
 var apiVersions = messageUtil.API_VERSION;
+var reqDataLimitOfContentUplod = '30mb';
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000;
 
 var app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: reqDataLimitOfContentUplod}));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
