@@ -29,7 +29,7 @@ module.exports = function (app) {
         }
     }));
 
-    app.use('/assets/public/preview/*', proxy(ekstep_proxy, {
+    app.use('/assets/public/*', proxy(ekstep_proxy, {
         proxyReqPathResolver: function (req) {
             return require('url').parse(ekstep_proxy + req.originalUrl).path;
         }
