@@ -1,3 +1,14 @@
+exports.COMPOSITE = {
+
+    CONTENT_TYPE: [
+        "Story",
+        "Worksheet",
+        "TextBook",
+        "Collection",
+        "Course"
+    ]
+};
+
 exports.COURSE = {
 
     SEARCH: {

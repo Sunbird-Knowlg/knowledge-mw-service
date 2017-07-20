@@ -21,6 +21,7 @@ var utilsService = require('../service/utilsService');
 
 var filename = path.basename(__filename);
 var contentMessage = messageUtils.CONTENT;
+var compositeMessage = messageUtils.COMPOSITE;
 var responseCode = messageUtils.RESPONSE_CODE;
 
 /**
@@ -51,8 +52,15 @@ function checkHealth(req, response) {
     return response.status(200).send("ok");   
 }
 
+function searchAPI(req, response) {
+    return search(compositeMessage.CONTENT_TYPE, req, response);
+}
 
 function searchContentAPI(req, response) {
+    return search(getContentTypeForContent(), req, response);
+}
+
+function search(defaultContentTypes, req, response) {
 
     var data = req.body;
     var rspObj = req.rspObj;
@@ -66,7 +74,7 @@ function searchContentAPI(req, response) {
     }
 
     if (!data.request.filters.contentType && !data.request.filters.mimeType && !data.request.filters.identifier) {
-        data.request.filters.contentType = getContentTypeForContent();
+        data.request.filters.contentType = defaultContentTypes;
     }
     //    if(!data.request.filters.mimeType) {
     //        data.request.filters.mimeType = getMimeTypeForContent();
@@ -515,7 +523,7 @@ function rejectContentAPI(req, response) {
     ]);
 }
 
-
+module.exports.searchAPI = searchAPI;
 module.exports.searchContentAPI = searchContentAPI;
 module.exports.createContentAPI = createContentAPI;
 module.exports.updateContentAPI = updateContentAPI;
