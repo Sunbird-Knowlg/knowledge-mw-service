@@ -483,9 +483,8 @@ function getCourseHierarchyAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            var qs = { mode: "edit" };
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getCourseHierarchyAPI", "Request to ekstep for get user course", {courseId : data.courseId, query : qs}));
-            ekStepUtil.contentHierarchyUsingQuery(data.courseId, qs, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getCourseHierarchyAPI", "Request to ekstep for get user course", {courseId : data.courseId}));
+            ekStepUtil.contentHierarchy(data.courseId, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getCourseHierarchyAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE;

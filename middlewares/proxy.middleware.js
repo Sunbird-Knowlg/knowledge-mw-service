@@ -41,9 +41,13 @@ module.exports = function (app) {
         }
     }));
 
-    app.use('/action/*', proxy(ekstep_proxy, {
+    app.use('/action/*', proxy(ekstep_api, {
+        proxyReqOptDecorator: function(proxyReqOpts, srcReq) {
+            proxyReqOpts.headers['Authorization'] = 'Bearer ' + api_key;
+            return proxyReqOpts;
+        },
         proxyReqPathResolver: function (req) {
-            return require('url').parse(ekstep_proxy + req.originalUrl).path;
+            return require('url').parse(ekstep_api + req.originalUrl).path;
         }
     }));
 
