@@ -47,7 +47,9 @@ module.exports = function (app) {
             return proxyReqOpts;
         },
         proxyReqPathResolver: function (req) {
-            return require('url').parse(ekstep_api + req.originalUrl).path;
+            var originalUrl = req.originalUrl;
+            originalUrl = originalUrl.replace('action/', 'api/');
+            return require('url').parse(ekstep_api + originalUrl).path;
         }
     }));
 
