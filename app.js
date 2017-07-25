@@ -23,10 +23,25 @@ configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + global_ekstep_api_key);
 
 var app = express();
 
-app.use(bodyParser.json({limit: reqDataLimitOfContentUplod}));
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
+const isEkStepProxyRequest = function (req) {
+  let url = req.url;
+  return url && url.indexOf('/action/') > -1;
+};
+
+const bodyParserJsonMiddleware = function () {
+  return function (req, res, next) {
+    if (isEkStepProxyRequest(req)) {
+      return next();
+    } else {
+        return bodyParser.json({limit: reqDataLimitOfContentUplod})(req, res, next);
+    }
+  };
+};
+
+app.use(bodyParserJsonMiddleware());
+// app.use(bodyParser.urlencoded({
+//     extended: true
+// }));
 
 app.use(methodOverride());
 
