@@ -55,6 +55,7 @@ module.exports = function (app) {
 
     app.use('/v1/telemetry', proxy(ekstep_api, {
         proxyReqOptDecorator: function(proxyReqOpts, srcReq) {
+            console.log('telemetry req header: ', srcReq.headers);
             proxyReqOpts.headers['Authorization'] = 'Bearer ' + api_key;
             return proxyReqOpts;
         },
