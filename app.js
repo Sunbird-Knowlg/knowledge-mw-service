@@ -31,7 +31,6 @@ const isEkStepProxyRequest = function (req) {
 const bodyParserJsonMiddleware = function () {
   return function (req, res, next) {
     if (isEkStepProxyRequest(req)) {
-        console.log('EkStep proxy request...');
       return next();
     } else {
         return bodyParser.json({limit: reqDataLimitOfContentUplod})(req, res, next);
