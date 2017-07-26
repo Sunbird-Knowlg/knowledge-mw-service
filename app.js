@@ -25,7 +25,7 @@ var app = express();
 
 const isEkStepProxyRequest = function (req) {
   let url = req.url;
-  return url && url.indexOf('/action/') > -1;
+  return url && (url.indexOf('/action/') > -1 || url.indexOf('/telemetry') > -1);
 };
 
 const bodyParserJsonMiddleware = function () {
