@@ -90,7 +90,7 @@ function getContentTypeForCourse() {
  * @returns {Object} object with error or success response with http status code
  */
 function searchCourseAPI(req, response) {
-    
+
     var data = req.body;
     var rspObj = req.rspObj;
 
@@ -105,13 +105,15 @@ function searchCourseAPI(req, response) {
     data.request.filters.contentType = getContentTypeForCourse();
     //data.request.filters.createdFor = configUtil.getConfig('CREATED_FOR');
     //data.request.filters.channel = configUtil.getConfig('CONTENT_CHANNEL');
-    var ekStepReqData = { request: data.request };
-    
+    var ekStepReqData = {
+        request: data.request
+    };
+
     async.waterfall([
 
         function(CBW) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchCourseAPI", "Request to ekstep for search the course", ekStepReqData));
-            ekStepUtil.searchContent(ekStepReqData, function(err, res) {
+            ekStepUtil.searchContent(ekStepReqData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchCourseAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.SEARCH.FAILED_CODE;
@@ -131,7 +133,9 @@ function searchCourseAPI(req, response) {
                 rspObj.result = transformResBody(res.result, 'content', 'course');
                 rspObj.result.count = res.result.count;
             }
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchCourseAPI", "Course searched successfully, We got " +rspObj.result.count+ " results", {courseCount: rspObj.result.count}));
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchCourseAPI", "Course searched successfully, We got " + rspObj.result.count + " results", {
+                courseCount: rspObj.result.count
+            }));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
     ]);
@@ -170,7 +174,7 @@ function createCourseAPI(req, response) {
 
         function(CBW) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createCourseAPI", "Request to ekstep for create the course", ekStepReqData));
-            ekStepUtil.createContent(ekStepReqData, function(err, res) {
+            ekStepUtil.createContent(ekStepReqData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createCourseAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.CREATE.MISSING_CODE;
@@ -222,9 +226,14 @@ function updateCourseAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            var qs = { mode: "edit" };
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateCourseAPI", "Request to ekstep for get latest version key", {courseId : data.courseId, query : qs}));
-            ekStepUtil.getContentUsingQuery(data.courseId, qs, function(err, res) {
+            var qs = {
+                mode: "edit"
+            };
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateCourseAPI", "Request to ekstep for get latest version key", {
+                courseId: data.courseId,
+                query: qs
+            }));
+            ekStepUtil.getContentUsingQuery(data.courseId, qs, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateCourseAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.UPDATE.FAILED_CODE;
@@ -241,7 +250,7 @@ function updateCourseAPI(req, response) {
         function(CBW) {
             var ekStepReqData = transformReqBody(data.request, 'course', 'content');
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateCourseAPI", "Request to ekstep for update the course", ekStepReqData));
-            ekStepUtil.updateContent(ekStepReqData, data.courseId, function(err, res) {
+            ekStepUtil.updateContent(ekStepReqData, data.courseId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateCourseAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.UPDATE.FAILED_CODE;
@@ -278,14 +287,19 @@ function reviewCourseAPI(req, response) {
     var rspObj = req.rspObj;
 
     data.courseId = req.params.courseId;
-    var ekStepReqData = { request: data.request };
+    var ekStepReqData = {
+        request: data.request
+    };
 
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "reviewCourseAPI", "Request to ekstep for review the course", {req: ekStepReqData, courseId: data.courseId}));
-            
-            ekStepUtil.reviewContent(ekStepReqData, data.courseId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "reviewCourseAPI", "Request to ekstep for review the course", {
+                req: ekStepReqData,
+                courseId: data.courseId
+            }));
+
+            ekStepUtil.reviewContent(ekStepReqData, data.courseId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "reviewCourseAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.REVIEW.FAILED_CODE;
@@ -318,7 +332,7 @@ function publishCourseAPI(req, response) {
 
     var data = req.body;
     var rspObj = req.rspObj;
-    data.courseId = req.params.courseId;   
+    data.courseId = req.params.courseId;
 
     if (!data.request || !data.request.course || !data.request.course.lastPublishedBy) {
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishCourseAPI", "Error due to required params are missing", data.request));
@@ -332,8 +346,11 @@ function publishCourseAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishCourseAPI", "Request to ekstep for published the course", {courseId: data.courseId, reqData: ekStepReqData}));
-            ekStepUtil.publishContent(ekStepReqData, data.courseId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishCourseAPI", "Request to ekstep for published the course", {
+                courseId: data.courseId,
+                reqData: ekStepReqData
+            }));
+            ekStepUtil.publishContent(ekStepReqData, data.courseId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishCourseAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.PUBLISH.FAILED_CODE;
@@ -372,7 +389,9 @@ function getCourseAPI(req, response) {
     data.courseId = req.params.courseId;
 
     if (!data.courseId) {
-        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getCourseAPI", "Error due to required params are missing", {courseId: data.courseId}));
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getCourseAPI", "Error due to required params are missing", {
+            courseId: data.courseId
+        }));
         rspObj.errCode = courseMessage.GET.FAILED_CODE;
         rspObj.errMsg = courseMessage.GET.FAILED_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -382,8 +401,10 @@ function getCourseAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getCourseAPI", "Request to ekstep for get course meta data", {courseId: data.courseId}));
-            ekStepUtil.getContent(data.courseId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getCourseAPI", "Request to ekstep for get course meta data", {
+                courseId: data.courseId
+            }));
+            ekStepUtil.getContent(data.courseId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getCourseAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.GET.FAILED_CODE;
@@ -424,14 +445,16 @@ function getMyCourseAPI(req, response) {
 
     };
     req.body.request = request;
-    var ekStepReqData = { request: request };
+    var ekStepReqData = {
+        request: request
+    };
     var rspObj = req.rspObj;
 
     async.waterfall([
 
         function(CBW) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getMyCourseAPI", "Request to ekstep for get user course", ekStepReqData));
-            ekStepUtil.searchContent(ekStepReqData, function(err, res) {
+            ekStepUtil.searchContent(ekStepReqData, req.headers, function(err, res) {
 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getMyCourseAPI", "Getting error from ekstep", res));
@@ -452,7 +475,9 @@ function getMyCourseAPI(req, response) {
                 rspObj.result = transformResBody(res.result, 'content', 'course');
                 rspObj.result.count = res.result.count;
             }
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getMyCourseAPI", "My Course searched successfully, We got " +rspObj.result.count+ " results", {courseCount: rspObj.result.count}));
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getMyCourseAPI", "My Course searched successfully, We got " + rspObj.result.count + " results", {
+                courseCount: rspObj.result.count
+            }));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
     ]);
@@ -473,7 +498,9 @@ function getCourseHierarchyAPI(req, response) {
     data.courseId = req.params.courseId;
 
     if (!data.courseId) {
-        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getCourseHierarchyAPI", "Error due to required params are missing", {courseId: data.courseId}));
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getCourseHierarchyAPI", "Error due to required params are missing", {
+            courseId: data.courseId
+        }));
         rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE;
         rspObj.errMsg = courseMessage.HIERARCHY.FAILED_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -483,8 +510,10 @@ function getCourseHierarchyAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getCourseHierarchyAPI", "Request to ekstep for get user course", {courseId : data.courseId}));
-            ekStepUtil.contentHierarchy(data.courseId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getCourseHierarchyAPI", "Request to ekstep for get user course", {
+                courseId: data.courseId
+            }));
+            ekStepUtil.contentHierarchy(data.courseId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getCourseHierarchyAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE;
