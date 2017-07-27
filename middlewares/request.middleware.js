@@ -40,6 +40,21 @@ function createAndValidateRequestBody(req, res, next) {
         result: {}
     };
     
+    delete req.headers['host'];
+    delete req.headers['origin'];
+    delete req.headers['accept'];
+    delete req.headers['referer'];
+    delete req.headers['content-length'];
+    delete req.headers['user-agent'];
+    delete req.headers['accept-encoding'];
+    delete req.headers['accept-language'];
+    delete req.headers['accept-charset'];
+    delete req.headers['cookie'];
+    delete req.headers['dnt'];
+    delete req.headers['postman-token'];
+    delete req.headers['cache-control'];
+    delete req.headers['connection'];
+    
     var requestedData = {body : req.body, params: req.body.params, headers : req.headers};
     LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createAndValidateRequestBody", "API request come", requestedData));
 

@@ -27,12 +27,14 @@ function getDomainsAPI(req, response) {
     var data = {};
     var rspObj = req.rspObj;
     data.body = req.body;
-    
+
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getDomainsAPI", "Request to ekstep for get all domains"));
-            ekStepUtil.getDomains(function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getDomainsAPI", "Request to ekstep for get all domains",{
+                headers: req.headers
+            }));
+            ekStepUtil.getDomains(req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getDomainsAPI", "Getting error from ekstep", res));
                     rspObj.errCode = domainMessage.GET_DOMAINS.FAILED_CODE;
@@ -60,7 +62,7 @@ function getDomainsAPI(req, response) {
  * @param {Object} response
  */
 function getDomainByIDAPI(req, response) {
-    
+
     var data = {};
     var rspObj = req.rspObj;
 
@@ -73,12 +75,15 @@ function getDomainByIDAPI(req, response) {
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
-    
+
     async.waterfall([
-        
+
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getDomainByIDAPI", "Request to ekstep for get domain by id", data));
-            ekStepUtil.getDomainById(data.domainId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getDomainByIDAPI", "Request to ekstep for get domain by id", {
+                body : data, 
+                headers: req.headers
+            }));
+            ekStepUtil.getDomainById(data.domainId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getDomainByIDAPI", "Getting error from ekstep", res));
                     rspObj.errCode = domainMessage.GET_DOMAIN_BY_ID.FAILED_CODE;
@@ -106,7 +111,7 @@ function getDomainByIDAPI(req, response) {
  * @param {Object} response
  */
 function getObjectTypesAPI(req, response) {
-    
+
     var data = {};
     var rspObj = req.rspObj;
     data.domainId = req.params.domainId;
@@ -119,12 +124,15 @@ function getObjectTypesAPI(req, response) {
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
-    
+
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getObjectTypesAPI", "Request to ekstep for get object type", data));
-            ekStepUtil.getObjects(data.domainId, data.objectType, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getObjectTypesAPI", "Request to ekstep for get object type", {
+                body : data, 
+                headers: req.headers
+            }));
+            ekStepUtil.getObjects(data.domainId, data.objectType, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getObjectTypesAPI", "Getting error from ekstep", res));
                     rspObj.errCode = domainMessage.GET_OBJECTS.FAILED_CODE;
@@ -151,7 +159,7 @@ function getObjectTypesAPI(req, response) {
  * @param {Object} response
  */
 function getObjectTypeByIDAPI(req, response) {
-    
+
     var data = {};
     var rspObj = req.rspObj;
 
@@ -166,12 +174,15 @@ function getObjectTypeByIDAPI(req, response) {
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
-    
+
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getObjectTypeByIDAPI", "Request to ekstep for get object type using id", data));
-            ekStepUtil.getObjectById(data.domainId, data.objectType, data.objectId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getObjectTypeByIDAPI", "Request to ekstep for get object type using id", {
+                body : data, 
+                headers: req.headers
+            }));
+            ekStepUtil.getObjectById(data.domainId, data.objectType, data.objectId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getObjectTypeByIDAPI", "Getting error from ekstep", res));
                     rspObj.errCode = domainMessage.GET_OBJECT_BY_ID.FAILED_CODE;
@@ -199,7 +210,7 @@ function getObjectTypeByIDAPI(req, response) {
  * @param {Object} response
  */
 function getConceptByIdAPI(req, response) {
-    
+
     var data = {};
     var rspObj = req.rspObj;
     data.conceptId = req.params.conceptId;
@@ -211,12 +222,15 @@ function getConceptByIdAPI(req, response) {
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
-    
+
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getConceptByIdAPI", "Request to ekstep for get concept", data));
-            ekStepUtil.getConceptById(data.conceptId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getConceptByIdAPI", "Request to ekstep for get concept", {
+                body : data, 
+                headers: req.headers
+            }));
+            ekStepUtil.getConceptById(data.conceptId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getConceptByIdAPI", "Getting error from ekstep", res));
                     rspObj.errCode = domainMessage.GET_CONCEPT_BY_ID.FAILED_CODE;
@@ -244,12 +258,12 @@ function getConceptByIdAPI(req, response) {
  * @param {Object} response
  */
 function searchObjectTypeAPI(req, response) {
-    
+
     var rspObj = req.rspObj;
     var data = req.body;
     data.domainId = req.params.domainId;
     data.objectType = req.params.objectType;
-    
+
     if (!data.domainId || !data.objectType || !data.request || !data.request.search) {
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchObjectTypeAPI", "Error due to required params are missing", data));
         rspObj.errCode = domainMessage.SEARCH_OBJECT_TYPE.MISSING_CODE;
@@ -257,14 +271,19 @@ function searchObjectTypeAPI(req, response) {
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
-    
-    var ekStepReqData = { request: data.request };
-    
+
+    var ekStepReqData = {
+        request: data.request
+    };
+
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchObjectTypeAPI", "Request to ekstep for search object type", data));
-            ekStepUtil.searchObjectsType(ekStepReqData, data.domainId, data.objectType, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchObjectTypeAPI", "Request to ekstep for search object type", {
+                body : data, 
+                headers: req.headers
+            }));
+            ekStepUtil.searchObjectsType(ekStepReqData, data.domainId, data.objectType, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchObjectTypeAPI", "Getting error from ekstep", res));
                     rspObj.errCode = domainMessage.SEARCH_OBJECT_TYPE.FAILED_CODE;
@@ -292,28 +311,33 @@ function searchObjectTypeAPI(req, response) {
  * @param {Object} response
  */
 function createObjectTypeAPI(req, response) {
-    
+
     var rspObj = req.rspObj;
 
     var data = req.body;
     data.domainId = req.params.domainId;
     data.objectType = req.params.objectType;
 
-    if (!data.domainId || !data.objectType  || !data.request || !data.request.object) {
+    if (!data.domainId || !data.objectType || !data.request || !data.request.object) {
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createObjectTypeAPI", "Error due to required params are missing", data));
         rspObj.errCode = domainMessage.CREATE_OBJECT_TYPE.MISSING_CODE;
         rspObj.errMsg = domainMessage.CREATE_OBJECT_TYPE.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
-    
-    var ekStepReqData = { request: data.request };
-    
+
+    var ekStepReqData = {
+        request: data.request
+    };
+
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createObjectTypeAPI", "Request to ekstep for create object type", data));
-            ekStepUtil.createObjectType(ekStepReqData, data.domainId, data.objectType, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createObjectTypeAPI", "Request to ekstep for create object type", {
+                body : data, 
+                headers: req.headers
+            }));
+            ekStepUtil.createObjectType(ekStepReqData, data.domainId, data.objectType, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createObjectTypeAPI", "Getting error from ekstep", res));
                     rspObj.errCode = domainMessage.CREATE_OBJECT_TYPE.FAILED_CODE;
@@ -341,13 +365,13 @@ function createObjectTypeAPI(req, response) {
  * @param {Object} response
  */
 function updateObjectTypeAPI(req, response) {
-    
+
     var rspObj = req.rspObj;
     var data = req.body;
     data.domainId = req.params.domainId;
     data.objectType = req.params.objectType;
     data.objectId = req.params.objectId;
-    
+
     if (!data.domainId || !data.objectType || !data.objectId || !data.request || !data.request.object) {
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateObjectTypeAPI", "Error due to required params are missing", data));
         rspObj.errCode = domainMessage.UPDATE_OBJECT_TYPE.MISSING_CODE;
@@ -355,14 +379,19 @@ function updateObjectTypeAPI(req, response) {
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
-    
-    var ekStepReqData = { request: data.request };
-    
+
+    var ekStepReqData = {
+        request: data.request
+    };
+
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateObjectTypeAPI", "Request to ekstep for update object type", data));
-            ekStepUtil.updateObjectType(ekStepReqData, data.domainId, data.objectType, data.objectId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateObjectTypeAPI", "Request to ekstep for update object type", {
+                body : data, 
+                headers: req.headers
+            }));
+            ekStepUtil.updateObjectType(ekStepReqData, data.domainId, data.objectType, data.objectId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateObjectTypeAPI", "Getting error from ekstep", res));
                     rspObj.errCode = domainMessage.UPDATE_OBJECT_TYPE.FAILED_CODE;
@@ -390,7 +419,7 @@ function updateObjectTypeAPI(req, response) {
  * @param {Object} response
  */
 function retireObjectTypeAPI(req, response) {
-    
+
     var rspObj = req.rspObj;
     var data = req.body;
     data.domainId = req.params.domainId;
@@ -404,14 +433,17 @@ function retireObjectTypeAPI(req, response) {
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
-    
-    var ekStepReqData = { };
-    
+
+    var ekStepReqData = {};
+
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireObjectTypeAPI", "Request to ekstep for retire object type", data));
-            ekStepUtil.retireObjectType(ekStepReqData, data.domainId, data.objectType, data.objectId, function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireObjectTypeAPI", "Request to ekstep for retire object type", {
+                body : data, 
+                headers: req.headers
+            }));
+            ekStepUtil.retireObjectType(ekStepReqData, data.domainId, data.objectType, data.objectId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireObjectTypeAPI", "Getting error from ekstep", res));
                     rspObj.errCode = domainMessage.RETIRE_OBJECT_TYPE.FAILED_CODE;
@@ -442,8 +474,10 @@ function listTermsAPI(req, response) {
     var rspObj = req.rspObj;
     async.waterfall([
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listTermsAPI", "Request to ekstep for terms list"));
-            ekStepUtil.listTerms(function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listTermsAPI", "Request to ekstep for terms list",{
+                headers: req.headers
+            }));
+            ekStepUtil.listTerms(req.headers, function(err, res) {
                 CBW(null, res);
             });
         },
@@ -465,8 +499,10 @@ function listResourceBundlesAPI(req, response) {
     var rspObj = req.rspObj;
     async.waterfall([
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listResourceBundlesAPI", "Request to ekstep for terms list"));
-            ekStepUtil.listResourceBundles(function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listResourceBundlesAPI", "Request to ekstep for terms list", {
+                headers: req.headers
+            }));
+            ekStepUtil.listResourceBundles(req.headers, function(err, res) {
                 CBW(null, res);
             });
         },
@@ -488,8 +524,10 @@ function listOrdinalsAPI(req, response) {
     var rspObj = req.rspObj;
     async.waterfall([
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listOrdinalsAPI", "Request to ekstep for terms list"));
-            ekStepUtil.listOrdinals(function(err, res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listOrdinalsAPI", "Request to ekstep for terms list", {
+                headers: req.headers
+            }));
+            ekStepUtil.listOrdinals(req.headers, function(err, res) {
                 CBW(null, res);
             });
         },
@@ -514,5 +552,3 @@ module.exports.retireObjectTypeAPI = retireObjectTypeAPI;
 module.exports.listTermsAPI = listTermsAPI;
 module.exports.listResourceBundlesAPI = listResourceBundlesAPI;
 module.exports.listOrdinalsAPI = listOrdinalsAPI;
-
-
