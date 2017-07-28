@@ -137,8 +137,6 @@ function createContentAPI(req, response) {
 
     //Tranform request for Ekstep
     data.request.content.code = getCode();
-    data.request.content.createdFor = configUtil.getConfig('CREATED_FOR');
-    data.request.content.channelId = configUtil.getConfig('CONTENT_CHANNEL');
     var ekStepReqData = {
         request: data.request
     };
