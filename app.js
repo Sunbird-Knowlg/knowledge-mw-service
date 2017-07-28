@@ -14,7 +14,7 @@ var reqDataLimitOfContentUplod = '30mb';
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000;
 
-global_ekstep_api_base_url = process.env.ekstep_api_base_url ? process.env.ekstep_api_base_url : "https://qa.ekstep.in";
+global_ekstep_api_base_url = process.env.ekstep_api_base_url ? process.env.ekstep_api_base_url : "https://qa.ekstep.in/api";
 global_ekstep_proxy_base_url = process.env.ekstep_proxy_base_url ? process.env.ekstep_proxy_base_url : "https://qa.ekstep.in";
 global_ekstep_api_key = process.env.ekstep_api_key ? process.env.ekstep_api_key : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkNjNiMjgwZTQ1NDE0NDU4ODk4NzcwYzZhOGZiZjQ1MCJ9.Ji-22XcRrOiVy4dFAmE68wPxLkNmX4wKbTj_IB7fG6Y";
 

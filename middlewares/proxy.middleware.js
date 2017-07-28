@@ -13,7 +13,9 @@ module.exports = function (app) {
             return proxyReqOpts;
         },
         proxyReqPathResolver: function (req) {
-            return require('url').parse(ekstep_api + req.originalUrl).path;
+            var originalUrl = req.originalUrl;
+            originalUrl = originalUrl.replace('api/', '/');
+            return require('url').parse(ekstep_api + originalUrl).path;
         }
     }));
 
@@ -48,7 +50,7 @@ module.exports = function (app) {
         },
         proxyReqPathResolver: function (req) {
             var originalUrl = req.originalUrl;
-            originalUrl = originalUrl.replace('action/', 'api/');
+            originalUrl = originalUrl.replace('action/', '/');
             return require('url').parse(ekstep_api + originalUrl).path;
         }
     }));
@@ -59,7 +61,7 @@ module.exports = function (app) {
             return proxyReqOpts;
         },
         proxyReqPathResolver: function (req) {
-            return require('url').parse(ekstep_api + '/api/data/v3/telemetry').path;
+            return require('url').parse(ekstep_api + '/data/v3/telemetry').path;
         }
     }));
 };
