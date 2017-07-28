@@ -103,8 +103,6 @@ function searchCourseAPI(req, response) {
     }
 
     data.request.filters.contentType = getContentTypeForCourse();
-    //data.request.filters.createdFor = configUtil.getConfig('CREATED_FOR');
-    //data.request.filters.channel = configUtil.getConfig('CONTENT_CHANNEL');
     var ekStepReqData = {
         request: data.request
     };
@@ -165,8 +163,6 @@ function createCourseAPI(req, response) {
     data.request.course.code = getCode();
     data.request.course.mimeType = getMimeTypeForCourse();
     data.request.course.contentType = getContentTypeForCourse();
-    data.request.course.createdFor = configUtil.getConfig('CREATED_FOR');
-    data.request.course.channel = configUtil.getConfig('CONTENT_CHANNEL');
 
     var ekStepReqData = transformReqBody(data.request, 'course', 'content');
 
@@ -438,9 +434,7 @@ function getMyCourseAPI(req, response) {
         "filters": {
             // "createdBy": req.userId  
             "createdBy": req.params.createdBy,
-            "contentType": getContentTypeForCourse(),
-            "createdFor": configUtil.getConfig('CREATED_FOR'),
-            "channel": configUtil.getConfig('CONTENT_CHANNEL')
+            "contentType": getContentTypeForCourse()
         }
 
     };
