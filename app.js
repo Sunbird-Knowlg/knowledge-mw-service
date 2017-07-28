@@ -18,7 +18,7 @@ global_ekstep_api_base_url = process.env.ekstep_api_base_url ? process.env.ekste
 global_ekstep_proxy_base_url = process.env.ekstep_proxy_base_url ? process.env.ekstep_proxy_base_url : "https://qa.ekstep.in";
 global_ekstep_api_key = process.env.ekstep_api_key ? process.env.ekstep_api_key : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkNjNiMjgwZTQ1NDE0NDU4ODk4NzcwYzZhOGZiZjQ1MCJ9.Ji-22XcRrOiVy4dFAmE68wPxLkNmX4wKbTj_IB7fG6Y";
 
-configUtil.setConfig('EKSTEP_BASE_URL', global_ekstep_api_base_url + '/api');
+configUtil.setConfig('EKSTEP_BASE_URL', global_ekstep_api_base_url);
 configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + global_ekstep_api_key);
 
 var app = express();
