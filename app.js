@@ -10,7 +10,7 @@ var mongoDB = require('./mongoConnection');
 var reqMsg = messageUtil.REQUEST;
 var responseCode = messageUtil.RESPONSE_CODE;
 var apiVersions = messageUtil.API_VERSION;
-var reqDataLimitOfContentUplod = '30mb';
+var reqDataLimitOfContentUpload = '30mb';
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000;
 
@@ -33,7 +33,7 @@ const bodyParserJsonMiddleware = function () {
     if (isEkStepProxyRequest(req)) {
       return next();
     } else {
-        return bodyParser.json({limit: reqDataLimitOfContentUplod})(req, res, next);
+        return bodyParser.json({limit: reqDataLimitOfContentUpload})(req, res, next);
     }
   };
 };
