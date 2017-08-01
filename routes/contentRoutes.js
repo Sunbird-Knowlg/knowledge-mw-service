@@ -43,6 +43,9 @@ module.exports = function(app) {
     app.route(BASE_URL + '/read/mycontent/:createdBy')
         .get(requestMiddleware.createAndValidateRequestBody, contentService.getMyContentAPI);
 
+    app.route(BASE_URL + '/flag/:contentId')
+        .post(requestMiddleware.createAndValidateRequestBody, contentService.flagContentAPI);
+
     app.route(BASE_URL + '/retire')
         .get(contentService.checkHealth);
 };

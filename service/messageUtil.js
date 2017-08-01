@@ -108,6 +108,8 @@ exports.CONTENT = {
     },
 
     GET: {
+        MISSING_CODE: "ERR_CONTENT_GET_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for get content are missing",
         FAILED_CODE: "ERR_CONTENT_GET_FAILED",
         FAILED_MESSAGE: "Get content failed"
     },
@@ -115,6 +117,27 @@ exports.CONTENT = {
     GET_MY: {
         FAILED_CODE: "ERR_CONTENT_GET_MY_FAILED",
         FAILED_MESSAGE: "Get my content failed"
+    },
+
+    RETIRE: {
+        MISSING_CODE: "ERR_CONTENT_RETIRE_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for retire content are missing",
+        FAILED_CODE: "ERR_CONTENT_RETIRE_FAILED",
+        FAILED_MESSAGE: "Retire content failed"
+    },
+
+    REJECT: {
+        MISSING_CODE: "ERR_CONTENT_REJECT_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for reject content are missing",
+        FAILED_CODE: "ERR_CONTENT_REJECT_FAILED",
+        FAILED_MESSAGE: "Reject content failed"
+    },
+
+    FLAG: {
+        MISSING_CODE: "ERR_CONTENT_FLAG_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for flag content are missing",
+        FAILED_CODE: "ERR_CONTENT_FLAG_FAILED",
+        FAILED_MESSAGE: "Flag content failed"
     },
 
     CONTENT_TYPE: [
