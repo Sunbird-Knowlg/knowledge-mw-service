@@ -139,6 +139,20 @@ exports.CONTENT = {
         FAILED_CODE: "ERR_CONTENT_FLAG_FAILED",
         FAILED_MESSAGE: "Flag content failed"
     },
+    
+    ACCEPT_FLAG: {
+        MISSING_CODE: "ERR_CONTENT_ACCEPT_FLAG_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for accept flag are missing",
+        FAILED_CODE: "ERR_CONTENT_ACCEPT_FLAG_FAILED",
+        FAILED_MESSAGE: "Accept flag for content failed"
+    },
+    
+    REJECT_FLAG: {
+        MISSING_CODE: "ERR_CONTENT_REJECT_FLAG_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for reject flag are missing",
+        FAILED_CODE: "ERR_CONTENT_REJECT_FLAG_FAILED",
+        FAILED_MESSAGE: "Reject flag for content failed"
+    },
 
     CONTENT_TYPE: [
         "Story",
