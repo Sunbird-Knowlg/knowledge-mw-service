@@ -46,6 +46,12 @@ module.exports = function(app) {
     app.route(BASE_URL + '/flag/:contentId')
         .post(requestMiddleware.createAndValidateRequestBody, contentService.flagContentAPI);
 
+    app.route(BASE_URL + '/flag/accept/:contentId')
+        .post(requestMiddleware.createAndValidateRequestBody, contentService.acceptFlagContentAPI);
+
+    app.route(BASE_URL + '/flag/reject/:contentId')
+        .post(requestMiddleware.createAndValidateRequestBody, contentService.rejectFlagContentAPI);
+
     app.route(BASE_URL + '/retire')
         .get(contentService.checkHealth);
 };
