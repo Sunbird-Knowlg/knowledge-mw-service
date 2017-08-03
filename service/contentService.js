@@ -497,18 +497,16 @@ function getMyContentAPI(req, response) {
 
 function retireContentAPI(req, response) {
 
-    var data = {};
-    data.body = req.body;
-    data.contentId = req.params.contentId;
-    data.queryParams = req.query;
+    var data = req.body;
     var rspObj = req.rspObj;
+    var failedContent = [];
+    var errCode, errMsg, respCode, httpStatus;
 
-    if (!data.contentId) {
-        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Error due to required params are missing", {
-            contentId: data.contentId
-        }));
-        rspObj.errCode = contentMessage.RETIRE.FAILED_CODE;
-        rspObj.errMsg = contentMessage.RETIRE.FAILED_MESSAGE;
+    if (!data.request || !data.request.contentIds) {
+        //prepare
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Error due to required params are missing", data.request));
+        rspObj.errCode = contentMessage.CREATE.MISSING_CODE;
+        rspObj.errMsg = contentMessage.CREATE.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
@@ -516,25 +514,36 @@ function retireContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireContentAPI", "Request to ekstep for retire content meta data", {
-                contentId: data.contentId,
-                headers: req.headers
-            }));
-            ekStepUtil.retireContent(data.contentId, req.headers, function(err, res) {
-                if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Getting error from ekstep", res));
-                    rspObj.errCode = res && res.params ? res.params.err : contentMessage.RETIRE.FAILED_CODE;
-                    rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.RETIRE.FAILED_MESSAGE;
-                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
-                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+            async.each(data.request.contentIds, function(contentId, CBE) {
+                LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireContentAPI", "Request to ekstep for retire content meta data", {
+                    contentId: contentId,
+                    headers: req.headers
+                }));
+                ekStepUtil.retireContent(contentId, req.headers, function(err, res) {
+                    if (err || res.responseCode !== responseCode.SUCCESS) {
+                        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Getting error from ekstep", res));
+                        errCode = res && res.params ? res.params.err : contentMessage.GET_MY.FAILED_CODE;
+                        errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE;
+                        respCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                        httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                        failedContent.push({contentId : contentId, errCode : errCode, errMsg : errMsg});
+                    }
+                    CBE(null, null);
+                });
+            }, function() {
+                if(failedContent.length > 0) {
+                    rspObj.errCode = errCode;
+                    rspObj.errMsg = errMsg;
+                    rspObj.responseCode = respCode;
+                    rspObj.result = failedContent;
                     return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
                 } else {
-                    CBW(null, res);
+                    CBW();
                 }
             });
         },
-        function(res) {
-            rspObj.result = res.result;
+        function() {
+            rspObj.result = failedContent;
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireContentAPI", "Sending response back to user"));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
