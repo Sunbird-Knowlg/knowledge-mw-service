@@ -31,7 +31,7 @@ module.exports = function(app) {
     app.route(BASE_URL + '/publish/:contentId')
         .post(requestMiddleware.createAndValidateRequestBody, contentService.publishContentAPI);
 
-    app.route(BASE_URL + '/retire/:contentId')
+    app.route(BASE_URL + '/retire')
         .delete(requestMiddleware.createAndValidateRequestBody, contentService.retireContentAPI);
 
     app.route(BASE_URL + '/reject/:contentId')
