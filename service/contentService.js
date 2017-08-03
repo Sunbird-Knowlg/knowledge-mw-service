@@ -73,7 +73,7 @@ function search(defaultContentTypes, req, response) {
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
 
-    if (!data.request.filters.contentType && !data.request.filters.mimeType && !data.request.filters.identifier) {
+    if (!data.request.filters) {
         data.request.filters.contentType = defaultContentTypes;
     }
     //    if(!data.request.filters.mimeType) {
