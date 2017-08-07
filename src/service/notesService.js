@@ -46,7 +46,7 @@ function createNotesAPI(request, response) {
         tags: noteData.tags
     });
 
-    newNote.save(function (err) {
+    newNote.save(function(err) {
         if (err) {
             LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createNotesAPI", "Failed to save note in mongoDB", err));
             rspObj.errCode = notesMessage.CREATE.FAILED_CODE;
@@ -81,7 +81,9 @@ function getNoteAPI(request, response) {
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
 
-    notesMongoModel.findOne({_id: data.noteId}, function (err, note) {
+    notesMongoModel.findOne({
+        _id: data.noteId
+    }, function(err, note) {
         if (err && err.name !== "CastError") {
             LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getNoteAPI", "Error due to mongodb cast error", err));
             rspObj.errCode = notesMessage.GET.FAILED_CODE;
@@ -90,7 +92,9 @@ function getNoteAPI(request, response) {
             return response.status(500).send(respUtil.errorResponse(rspObj));
         }
         if ((err && err.name === "CastError") || !note) {
-            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getNoteAPI", "Invalid note id", {noteId: data.noteId}));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getNoteAPI", "Invalid note id", {
+                noteId: data.noteId
+            }));
             rspObj.errCode = notesMessage.GET.FAILED_CODE;
             rspObj.errMsg = notesMessage.GET.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.RESOURSE_NOT_FOUND;
@@ -145,7 +149,11 @@ function updateNoteAPI(request, response) {
 
     var updateNodeData = createNoteDataForUpdate(data.request.note);
 
-    notesMongoModel.findOneAndUpdate({_id: data.noteId}, updateNodeData, {new : true}, function (err, note) {
+    notesMongoModel.findOneAndUpdate({
+        _id: data.noteId
+    }, updateNodeData, {
+        new: true
+    }, function(err, note) {
         if (err && err.name !== "CastError") {
             LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateNoteAPI", "Failed due to mongoDB model error", err));
             rspObj.errCode = notesMessage.UPDATE.FAILED_CODE;
@@ -154,7 +162,9 @@ function updateNoteAPI(request, response) {
             return response.status(500).send(respUtil.errorResponse(rspObj));
         }
         if ((err && err.name === "CastError") || !note) {
-            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateNoteAPI", "Failed due to invalied noteID", {noteId: data.noteId}));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateNoteAPI", "Failed due to invalied noteID", {
+                noteId: data.noteId
+            }));
             rspObj.errCode = notesMessage.UPDATE.FAILED_CODE;
             rspObj.errMsg = notesMessage.UPDATE.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.RESOURSE_NOT_FOUND;
@@ -176,28 +186,54 @@ function createSearchQuery(reqData) {
     var query = [];
 
     if (reqData.query) {
-        var q1 = {$or: [{note: {$regex: reqData.query, $options: "$i"}}, {title: {$regex: reqData.query, $options: "$i"}}]};
+        var q1 = {
+            $or: [{
+                note: {
+                    $regex: reqData.query,
+                    $options: "$i"
+                }
+            }, {
+                title: {
+                    $regex: reqData.query,
+                    $options: "$i"
+                }
+            }]
+        };
         query.push(q1);
     }
     if (reqData.filters) {
         var filterData = reqData.filters;
         if (filterData.userId) {
-            query.push({userId: filterData.userId});
+            query.push({
+                userId: filterData.userId
+            });
         }
         if (filterData.courseId) {
-            query.push({courseId: filterData.courseId});
+            query.push({
+                courseId: filterData.courseId
+            });
         }
         if (filterData.contentId) {
-            query.push({contentId: filterData.contentId});
+            query.push({
+                contentId: filterData.contentId
+            });
         }
         if (filterData.note) {
-            query.push({note: filterData.note});
+            query.push({
+                note: filterData.note
+            });
         }
         if (filterData.title) {
-            query.push({title: filterData.title});
+            query.push({
+                title: filterData.title
+            });
         }
         if (filterData.tags) {
-            query.push({tags: {$all: filterData.tags}});
+            query.push({
+                tags: {
+                    $all: filterData.tags
+                }
+            });
         }
     }
     return query;
@@ -223,7 +259,9 @@ function searchNoteAPI(request, response) {
 
     var query = createSearchQuery(data.request);
 
-    var searchNoteModel = notesMongoModel.find({$and: query});
+    var searchNoteModel = notesMongoModel.find({
+        $and: query
+    });
 
     if (data.request.limit) {
         searchNoteModel = searchNoteModel.limit(data.request.limit);
@@ -235,7 +273,7 @@ function searchNoteAPI(request, response) {
         searchNoteModel = searchNoteModel.skip(data.request.offset);
     }
 
-    searchNoteModel.exec(function (err, notes) {
+    searchNoteModel.exec(function(err, notes) {
         if (err) {
             LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchNoteAPI", "Failed due to mongoDb error", err));
             rspObj.errCode = notesMessage.SEARCH.FAILED_CODE;
@@ -248,7 +286,9 @@ function searchNoteAPI(request, response) {
         if (notes.length > 0) {
             rspObj.result.note = notes;
         }
-        LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchNoteAPI", "Note searched successfully, We got " +rspObj.result.count+ " results", {notesCount: rspObj.result.count}));
+        LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchNoteAPI", "Note searched successfully, We got " + rspObj.result.count + " results", {
+            notesCount: rspObj.result.count
+        }));
         return response.status(200).send(respUtil.successResponse(rspObj));
     });
 }
@@ -272,7 +312,9 @@ function deleteNoteAPI(request, response) {
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
 
-    notesMongoModel.findOneAndRemove({_id: data.noteId}, function (err, note) {
+    notesMongoModel.findOneAndRemove({
+        _id: data.noteId
+    }, function(err, note) {
         if (err && err.name !== "CastError") {
             LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "deleteNoteAPI", "Failed due to mongoDb error", err));
             rspObj.errCode = notesMessage.DELETE.FAILED_CODE;
@@ -281,14 +323,18 @@ function deleteNoteAPI(request, response) {
             return response.status(500).send(respUtil.errorResponse(rspObj));
         }
         if ((err && err.name === "CastError") || !note) {
-            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "deleteNoteAPI", "Failed due to noteId is invalid", {noteId: data.noteId}));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "deleteNoteAPI", "Failed due to noteId is invalid", {
+                noteId: data.noteId
+            }));
             rspObj.errCode = notesMessage.DELETE.FAILED_CODE;
             rspObj.errMsg = notesMessage.DELETE.FAILED_MESSAGE;
             rspObj.responseCode = responseCode.RESOURSE_NOT_FOUND;
             return response.status(404).send(respUtil.errorResponse(rspObj));
         }
         rspObj.result = {};
-        LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchNoteAPI", "Note deleted successfully", {noteId: data.noteId}));
+        LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchNoteAPI", "Note deleted successfully", {
+            noteId: data.noteId
+        }));
         return response.status(200).send(respUtil.successResponse(rspObj));
     });
 }

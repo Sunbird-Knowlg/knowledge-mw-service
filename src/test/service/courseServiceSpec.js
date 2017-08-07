@@ -1,10 +1,10 @@
 var request = require('request');
 var host = "http://localhost:5000";
-var base_url = host + "/api/sb/v1/course";
+var base_url = host + "/v1/course";
 
-describe("Course", function () {
+xdescribe("Course", function () {
 
-    describe("Search Services", function () {
+    xdescribe("Search Services", function () {
 
         it('should search courses failed due to missing cid in headers', function (done) {
             request.post({
@@ -84,7 +84,7 @@ describe("Course", function () {
             });
         });
     });
-    describe("Create Service", function () {
+    xdescribe("Create Service", function () {
 
         it('should failed create courses due to missing cid in headers', function (done) {
             request.post({
@@ -211,7 +211,7 @@ describe("Course", function () {
             });
         });
     });
-    describe("Update Service", function () {
+    xdescribe("Update Service", function () {
         var courseId = "do_112240785235501056165";
         it('Failed due to missing cid in headers', function (done) {
 
@@ -319,7 +319,7 @@ describe("Course", function () {
             });
         });
     });
-    describe("Get Service", function () {
+    xdescribe("Get Service", function () {
         var courseId = "do_112240785235501056165";
         it('Failed due to missing cid in headers', function (done) {
 
@@ -363,7 +363,7 @@ describe("Course", function () {
             });
         });
     });
-    describe("Review Service", function () {
+    xdescribe("Review Service", function () {
         var courseId = "do_112240785235501056165";
         it('Failed due to missing cid in headers', function (done) {
 
@@ -409,7 +409,7 @@ describe("Course", function () {
             });
         });
     });
-    describe("Publish Service", function () {
+    xdescribe("Publish Service", function () {
         var courseId = "do_112240785235501056165";
         it('Failed due to missing cid in headers', function (done) {
 
@@ -455,7 +455,7 @@ describe("Course", function () {
             });
         });
     });
-    describe("Get User Service", function () {
+    xdescribe("Get User Service", function () {
         var userId = "263";
         it('Failed due to missing cid in headers', function (done) {
 
@@ -506,7 +506,7 @@ describe("Course", function () {
             });
         });
     });
-    describe("Get Hierarchy Course Service", function () {
+    xdescribe("Get Hierarchy Course Service", function () {
         var courseId = "do_112240785235501056165";
         it('Failed due to missing cid in headers', function (done) {
 
