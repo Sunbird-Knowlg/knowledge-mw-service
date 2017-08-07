@@ -7,7 +7,7 @@
 var contentService = require('../service/utilsService');
 var requestMiddleware = require('../middlewares/request.middleware');
 
-var BASE_URL_V1 = "/api/sb/v1";
+var BASE_URL_V1 = "/v1";
 
 module.exports = function(app) {
 

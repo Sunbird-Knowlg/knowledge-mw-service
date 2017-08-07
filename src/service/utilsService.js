@@ -44,9 +44,11 @@ function uploadMediaAPI(req, response) {
 
     var form = new multiparty.Form();
 
-    form.parse(req, function (err, fields, files) {
+    form.parse(req, function(err, fields, files) {
         if (err || (files && Object.keys(files).length === 0)) {
-            LOG.error(getLoggerData(rspObj, "ERROR", filename, "uploadMediaAPI", "Error due to missing or invalid file", {contentId : data.contentId}));
+            LOG.error(getLoggerData(rspObj, "ERROR", filename, "uploadMediaAPI", "Error due to missing or invalid file", {
+                contentId: data.contentId
+            }));
             rspObj.errCode = utilsMessage.UPLOAD.MISSING_CODE;
             rspObj.errMsg = utilsMessage.UPLOAD.MISSING_MESSAGE;
             rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -54,7 +56,7 @@ function uploadMediaAPI(req, response) {
         }
     });
 
-    form.on('file', function (name, file) {
+    form.on('file', function(name, file) {
         var formData = {
             file: {
                 value: fs.createReadStream(file.path),
@@ -65,9 +67,13 @@ function uploadMediaAPI(req, response) {
         };
         async.waterfall([
 
-            function (CBW) {
-                LOG.info(getLoggerData(rspObj, "INFO", filename, "uploadMediaAPI", "Request to ekstep for upload media file", {contentId : data.contentId}));
-                ekStepUtil.uploadMedia(formData, function (err, res) {
+            function(CBW) {
+                LOG.info(getLoggerData(rspObj, "INFO", filename, "uploadMediaAPI", "Request to ekstep for upload media file", {
+                    contentId: data.contentId,
+                    headers: req.headers
+                }));
+                delete req.headers['content-type'];
+                ekStepUtil.uploadMedia(formData, req.headers, function(err, res) {
                     if (err || res.responseCode !== responseCode.SUCCESS) {
                         LOG.error(getLoggerData(rspObj, "ERROR", filename, "uploadMediaAPI", "Getting error from ekstep", res));
                         rspObj.errCode = utilsMessage.UPLOAD.FAILED_CODE;
@@ -80,7 +86,7 @@ function uploadMediaAPI(req, response) {
                     }
                 });
             },
-            function (res) {
+            function(res) {
                 rspObj.result = res.result;
                 LOG.info(getLoggerData(rspObj, "INFO", filename, "uploadMediaAPI", "Sending response back to user", rspObj));
                 return response.status(200).send(respUtil.successResponse(rspObj));
@@ -113,7 +119,7 @@ function getLoggerData(rspObj, level, file, method, message, data, stacktrace) {
             }
         }
     };
-    
+
     return data;
 }
 

@@ -7,7 +7,7 @@
 var domainService = require('../service/conceptService');
 var requestMiddleware = require('../middlewares/request.middleware');
 
-var BASE_URL_V1 = "/api/sb/v1";
+var BASE_URL_V1 = "/v1";
 
 module.exports = function(app) {
 
@@ -37,5 +37,14 @@ module.exports = function(app) {
 
     app.route(BASE_URL_V1 + '/domains/:domainId/:objectType/:objectId/retire')
         .post(requestMiddleware.createAndValidateRequestBody, domainService.retireObjectTypeAPI);
+
+    app.route(BASE_URL_V1 + '/terms/list')
+        .get(requestMiddleware.createAndValidateRequestBody, domainService.listTermsAPI);
+
+    app.route(BASE_URL_V1 + '/resourcebundles/list')
+        .get(requestMiddleware.createAndValidateRequestBody, domainService.listResourceBundlesAPI);
+
+    app.route(BASE_URL_V1 + '/ordinals/list')
+        .get(requestMiddleware.createAndValidateRequestBody, domainService.listOrdinalsAPI);
 
 };
