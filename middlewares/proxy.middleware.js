@@ -21,6 +21,8 @@ module.exports = function (app) {
 
     app.use('/content-plugins/*', proxy(ekstep_proxy, {
         proxyReqPathResolver: function (req) {
+            var proxypath = ekstep_proxy + req.originalUrl;
+            console.log('plugins path: ', proxypath);
             return require('url').parse(ekstep_proxy + req.originalUrl).path;
         }
     }));
