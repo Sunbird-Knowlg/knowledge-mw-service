@@ -23,7 +23,7 @@ module.exports = function(app) {
         .patch(requestMiddleware.createAndValidateRequestBody, contentService.updateContentAPI);
 
     app.route(BASE_URL + '/upload/:contentId')
-        .post(requestMiddleware.createAndValidateRequestBody, contentService.uploadContentUrlAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, contentService.uploadContentAPI);
 
     app.route(BASE_URL + '/review/:contentId')
         .post(requestMiddleware.createAndValidateRequestBody, contentService.reviewContentAPI);
@@ -51,6 +51,9 @@ module.exports = function(app) {
 
     app.route(BASE_URL + '/flag/reject/:contentId')
         .post(requestMiddleware.createAndValidateRequestBody, contentService.rejectFlagContentAPI);
+
+    app.route(BASE_URL + '/upload/url/:contentId')
+        .post(requestMiddleware.createAndValidateRequestBody, contentService.uploadContentUrlAPI);
 
     app.route(BASE_URL + '/retire')
         .get(contentService.checkHealth);

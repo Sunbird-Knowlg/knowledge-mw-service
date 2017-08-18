@@ -252,32 +252,66 @@ function uploadContentAPI(req, response) {
 
     var data = req.body;
     data.contentId = req.params.contentId;
+    data.queryParams = req.query;
     var rspObj = req.rspObj;
+    
+    if(!data.queryParams.fileUrl) {
+        var form = new multiparty.Form();
 
-    var form = new multiparty.Form();
-
-    form.parse(req, function(err, fields, files) {
+        form.parse(req, function(err, fields, files) {
         if (err || (files && Object.keys(files).length === 0)) {
-            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Error due to upload files are missing", {
-                contentId: data.contentId,
-                files: files
-            }));
-            rspObj.errCode = contentMessage.UPLOAD.MISSING_CODE;
-            rspObj.errMsg = contentMessage.UPLOAD.MISSING_MESSAGE;
-            rspObj.responseCode = responseCode.CLIENT_ERROR;
-            return response.status(400).send(respUtil.errorResponse(rspObj));
-        }
-    });
-
-    form.on('file', function(name, file) {
-        var formData = {
-            file: {
-                value: fs.createReadStream(file.path),
-                options: {
-                    filename: file.originalFilename
-                }
+                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Error due to upload files are missing", {
+                    contentId: data.contentId,
+                    files: files
+                }));
+                rspObj.errCode = contentMessage.UPLOAD.MISSING_CODE;
+                rspObj.errMsg = contentMessage.UPLOAD.MISSING_MESSAGE;
+                rspObj.responseCode = responseCode.CLIENT_ERROR;
+                return response.status(400).send(respUtil.errorResponse(rspObj));
             }
-        };
+        });
+
+        form.on('file', function(name, file) {
+            var formData = {
+                file: {
+                    value: fs.createReadStream(file.path),
+                    options: {
+                        filename: file.originalFilename
+                    }
+                }
+            };
+            async.waterfall([
+
+                function(CBW) {
+                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentAPI", "Request to ekstep for upload the content file", {
+                        contentId: data.contentId,
+                        headers: req.headers
+                    }));
+                    delete req.headers['content-type'];
+                    ekStepUtil.uploadContent(formData, data.contentId, req.headers, function(err, res) {
+                        if (err || res.responseCode !== responseCode.SUCCESS) {
+                            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Getting error from ekstep", res));
+                            rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE;
+                            rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD.FAILED_MESSAGE;
+                            rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                            var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                            return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                        } else {
+                            CBW(null, res);
+                        }
+                    });  
+                },
+                function(res) {
+                    rspObj.result = res.result;
+                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentAPI", "Sending response back to user", rspObj));
+                    var modifyRsp = respUtil.successResponse(rspObj);
+                    modifyRsp.success = true;
+                    return response.status(200).send(modifyRsp);
+                }
+            ]);
+        });       
+    } else {
+        var queryString = {fileUrl : data.queryParams.fileUrl};
         async.waterfall([
 
             function(CBW) {
@@ -286,7 +320,7 @@ function uploadContentAPI(req, response) {
                     headers: req.headers
                 }));
                 delete req.headers['content-type'];
-                ekStepUtil.uploadContent(formData, data.contentId, req.headers, function(err, res) {
+                ekStepUtil.uploadContentWithFileUrl(data.contentId, queryString, req.headers, function(err, res) {
                     if (err || res.responseCode !== responseCode.SUCCESS) {
                         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Getting error from ekstep", res));
                         rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE;
@@ -307,7 +341,7 @@ function uploadContentAPI(req, response) {
                 return response.status(200).send(modifyRsp);
             }
         ]);
-    });
+    }
 }
 
 function reviewContentAPI(req, response) {
