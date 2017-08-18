@@ -154,6 +154,13 @@ exports.CONTENT = {
         FAILED_MESSAGE: "Reject flag for content failed"
     },
 
+    UPLOAD_URL: {
+        MISSING_CODE: "ERR_CONTENT_UPLOAD_URL_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for upload url are missing",
+        FAILED_CODE: "ERR_CONTENT_UPLOAD_URL_FAILED",
+        FAILED_MESSAGE: "Upload url for content failed"
+    },
+
     CONTENT_TYPE: [
         "Story",
         "Worksheet",
