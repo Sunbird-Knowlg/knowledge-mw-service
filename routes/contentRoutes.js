@@ -23,7 +23,7 @@ module.exports = function(app) {
         .patch(requestMiddleware.createAndValidateRequestBody, contentService.updateContentAPI);
 
     app.route(BASE_URL + '/upload/:contentId')
-        .post(requestMiddleware.createAndValidateRequestBody, contentService.uploadContentAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, contentService.uploadContentUrlAPI);
 
     app.route(BASE_URL + '/review/:contentId')
         .post(requestMiddleware.createAndValidateRequestBody, contentService.reviewContentAPI);

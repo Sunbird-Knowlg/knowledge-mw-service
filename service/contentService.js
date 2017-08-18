@@ -221,7 +221,7 @@ function updateContentAPI(req, response) {
             var ekStepReqData = {
                 request: data.request
             };
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateContentAPI", "Request to ekstep for update the course", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateContentAPI", "Request to ekstep for update the content", {
                 body : ekStepReqData, 
                 headers: req.headers
             }));
@@ -739,6 +739,56 @@ function rejectFlagContentAPI(req, response) {
     ]);
 }
 
+function uploadContentUrlAPI(req, response) {
+
+    var data = req.body;
+    data.contentId = req.params.contentId;
+    var rspObj = req.rspObj;
+    if (!data.contentId || !data.request || !data.request.content || !data.request.content.fileName) {
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentUrlAPI", "Error due to required params are missing", {
+            contentId: data.contentId,
+            body: data
+        }));
+        rspObj.errCode = contentMessage.UPLOAD_URL.MISSING_CODE;
+        rspObj.errMsg = contentMessage.UPLOAD_URL.MISSING_MESSAGE;
+        rspObj.responseCode = responseCode.CLIENT_ERROR;
+        return response.status(400).send(respUtil.errorResponse(rspObj));
+    }
+    var ekStepReqData = {
+        request: data.request
+    };
+
+    async.waterfall([
+
+        function(CBW) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentUrlAPI", "Request to ekstep for get upload content url", {
+                contentId: data.contentId,
+                body: ekStepReqData,
+                headers: req.headers
+            }));
+            ekStepUtil.uploadContentUrl(ekStepReqData, data.contentId, req.headers, function(err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentUrlAPI", "Getting error from ekstep", res));
+                    rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD_URL.FAILED_CODE;
+                    rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD_URL.FAILED_MESSAGE;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+        function(res) {
+            rspObj.result = res.result;
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentUrlAPI", "Sending response back to user"));
+            var modifyRsp = respUtil.successResponse(rspObj);
+            modifyRsp.success = true;
+            return response.status(200).send(modifyRsp);
+        }
+    ]);
+}
+
 module.exports.searchAPI = searchAPI;
 module.exports.searchContentAPI = searchContentAPI;
 module.exports.createContentAPI = createContentAPI;
@@ -754,3 +804,4 @@ module.exports.rejectContentAPI = rejectContentAPI;
 module.exports.flagContentAPI = flagContentAPI;
 module.exports.acceptFlagContentAPI = acceptFlagContentAPI;
 module.exports.rejectFlagContentAPI = rejectFlagContentAPI;
+module.exports.uploadContentUrlAPI = uploadContentUrlAPI;
