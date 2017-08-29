@@ -18,6 +18,7 @@ var validatorUtil = require('sb_req_validator_util');
 var contentModel = require('../models/contentModel').CONTENT;
 var messageUtils = require('./messageUtil');
 var utilsService = require('../service/utilsService');
+var emailService = require('./emailService');
 
 var filename = path.basename(__filename);
 var contentMessage = messageUtils.CONTENT;
@@ -673,6 +674,7 @@ function flagContentAPI(req, response) {
         },
         function(res) {
             rspObj.result = res.result;
+            emailService.createFlagContentEmail(req, function(){ });
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "flagContentAPI", "Sending response back to user"));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
@@ -720,6 +722,7 @@ function acceptFlagContentAPI(req, response) {
         },
         function(res) {
             rspObj.result = res.result;
+            emailService.acceptFlagContentEmail(req, function(){ });
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "acceptFlagContentAPI", "Sending response back to user"));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
@@ -767,6 +770,7 @@ function rejectFlagContentAPI(req, response) {
         },
         function(res) {
             rspObj.result = res.result;
+            emailService.rejectFlagContentEmail(req, function(){ });
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectFlagContentAPI", "Sending response back to user"));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
