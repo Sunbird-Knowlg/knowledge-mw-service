@@ -123,6 +123,35 @@ function getLoggerData(rspObj, level, file, method, message, data, stacktrace) {
     return data;
 }
 
+function getPerfLoggerData(rspObj, level, file, method, message, data, stacktrace) {
+
+    var data = {
+        "eid": "PERF_LOG",
+        "ets": Date.now(),
+        "ver": "1.0",
+        "mid": rspObj.msgid,
+        "context": {
+            "pdata": {
+                "id": rspObj.apiId,
+                "ver": rspObj.apiVersion
+            }
+        },
+        "edata": {
+            "eks": {
+                "level": level,
+                "class": file,
+                "method": method,
+                "message": message,
+                "data": data,
+                "stacktrace": stacktrace
+            }
+        }
+    };
+
+    return data;
+}
+
 module.exports.uploadMediaAPI = uploadMediaAPI;
 module.exports.getLoggerData = getLoggerData;
+module.exports.getPerfLoggerData = getPerfLoggerData;
 module.exports.getAppIDForRESP = getAppIDForRESP;
