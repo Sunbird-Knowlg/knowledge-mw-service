@@ -227,6 +227,10 @@ exports.API_VERSION = {
     V1: "1.0"
 };
 
+exports.SERVICE = {
+    NAME: "ContentService"
+};
+
 exports.UTILS = {
     UPLOAD: {
         MISSING_CODE: "ERR_MEDIA_UPLOAD_FILES_MISSING",
@@ -364,3 +368,21 @@ exports.EMAIL = {
         BODY: "Content marked as flag rejected"
     }
 };
+
+exports.HEALTH_CHECK = {
+    EK_STEP: {
+        NAME: "ekstep.api",
+        FAILED_CODE: "EK_STEP_HEALTH_FAILED",
+        FAILED_MESSAGE: "Ekstep service is not healthy"
+    },
+    LEARNER_SERVICE: {
+        NAME: "learnerservice.api",
+        FAILED_CODE: "LEARNER_SERVICE_HEALTH_FAILED",
+        FAILED_MESSAGE: "Learner service is not healthy"
+    },
+    MONGODB_CONNECTION: {
+        NAME: "mongodb",
+        FAILED_CODE: "MONGODB_CONNECTION_HEALTH_FAILED",
+        FAILED_MESSAGE: "MongoDb is not connected"
+    }
+}

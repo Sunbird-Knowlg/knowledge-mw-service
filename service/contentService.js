@@ -12,18 +12,20 @@ var path = require('path');
 var ekStepUtil = require('sb-ekstep-util');
 var respUtil = require('response_util');
 var configUtil = require('sb-config-util');
-var LOG = require('sb_logger_util')
+var LOG = require('sb_logger_util');
 var validatorUtil = require('sb_req_validator_util');
 
 var contentModel = require('../models/contentModel').CONTENT;
 var messageUtils = require('./messageUtil');
 var utilsService = require('../service/utilsService');
 var emailService = require('./emailService');
+var mongoConnection = require('../mongoConnection');
 
 var filename = path.basename(__filename);
 var contentMessage = messageUtils.CONTENT;
 var compositeMessage = messageUtils.COMPOSITE;
 var responseCode = messageUtils.RESPONSE_CODE;
+var hcMessages = messageUtils.HEALTH_CHECK;
 
 /**
  * This function helps to generate code for create course
@@ -49,8 +51,89 @@ function getContentTypeForContent() {
     return contentMessage.CONTENT_TYPE;
 }
 
+function getChecksObj(name, healthy, err, errMsg) {
+    return {
+        name: name,
+        healthy: healthy,
+        err: err,
+        errmsg: errMsg
+    }
+};
+
+function getHealthCheckResp(rsp, healthy, checksArrayObj) {
+    delete rsp.responseCode;
+    rsp.result = {}
+    rsp.result.name = messageUtils.SERVICE.NAME;
+    rsp.result.version = messageUtils.API_VERSION.V1;
+    rsp.result.healthy = healthy;
+    rsp.result.check = checksArrayObj;
+    return rsp;
+}
+
 function checkHealth(req, response) {
-    return response.status(200).send("ok");
+
+    var rspObj = req.rspObj;
+    var checksArrayObj = [];
+    var isEkStepHealthy, isLSHealthy, isDbConnected;
+    var csApiStart = Date.now();
+    async.parallel([
+        function(CB) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Call to ekstep for health check"));
+            var apiCallStart = Date.now();
+            ekStepUtil.ekStepHealthCheck(function(err, res) {
+                LOG.info(utilsService.getPerfLoggerData(rspObj, "INFO", filename, "checkHealth", "Time taken by ekstep health api in ms", {timeInMs: Date.now() - apiCallStart}));
+                if(res && res.result && res.result.healthy) {
+                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Ekstep api is healty"));
+                    isEkStepHealthy = true;
+                    checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, "", ""));
+                } else {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "checkHealth", "Ekstep api is not healty"));
+                    isEkStepHealthy = false;
+                    checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE));
+                }
+                CB();
+            })
+        },
+        function(CB) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Call to learner service for health check"));
+            var apiCallStart = Date.now();
+            ekStepUtil.leanerServiceHealthCheck(function(err, res) {
+                LOG.info(utilsService.getPerfLoggerData(rspObj, "INFO", filename, "checkHealth", "Time taken by learner service health api in ms", {timeInMs: Date.now() - apiCallStart}));
+                if(res && res.result && res.result.healthy) {
+                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Learner service api is healty"));
+                    isLSHealthy = true;
+                    checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, "", ""));
+                } else {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "checkHealth", "Learner service api is not healty"));
+                    isLSHealthy = false;
+                    checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE));
+                }
+                CB();
+            })
+        },
+        function(CB) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Check mongo db connection"));
+            if(mongoConnection.getConnectionStatus()) {
+                LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Mongo Db connected"));
+                isDbConnected = true;
+                checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, "", ""));
+            } else {
+                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "checkHealth", "Mongo Db is not connected"));
+                isDbConnected = false;
+                checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, hcMessages.MONGODB_CONNECTION.FAILED_CODE, hcMessages.MONGODB_CONNECTION.FAILED_MESSAGE));
+            }
+            CB();
+        },
+    ], function() {
+        LOG.info(utilsService.getPerfLoggerData(rspObj, "INFO", filename, "checkHealth", "Time taken by content service health api in ms", {timeInMs: Date.now() - csApiStart}));
+        if(isEkStepHealthy && isLSHealthy && isDbConnected) {
+            var rsp = respUtil.successResponse(rspObj);
+            return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj));
+        } else {
+            var rsp = respUtil.successResponse(rspObj);
+            return response.status(500).send(getHealthCheckResp(rsp, false, checksArrayObj));
+        }
+    });
 }
 
 function searchAPI(req, response) {
@@ -61,6 +144,13 @@ function searchContentAPI(req, response) {
     return search(getContentTypeForContent(), req, response);
 }
 
+function logs(isPLogs, startTime, rspObj, level, file, method, message, data, stacktrace) {
+    if(isPLogs)
+        LOG.info(utilsService.getPerfLoggerData(rspObj, "INFO", file, method, "Time taken in ms", {timeInMs: Date.now() - csApiStart}));
+
+
+}
+
 function search(defaultContentTypes, req, response) {
 
     var data = req.body;
@@ -68,6 +158,7 @@ function search(defaultContentTypes, req, response) {
 
     if (!data.request || !data.request.filters) {
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchContentAPI", "Error due to required params are missing", data.request));
+        
         rspObj.errCode = contentMessage.SEARCH.MISSING_CODE;
         rspObj.errMsg = contentMessage.SEARCH.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;

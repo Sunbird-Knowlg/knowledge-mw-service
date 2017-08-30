@@ -11,7 +11,7 @@ var BASE_URL = "/v1/content";
 
 module.exports = function(app) {
 
-    app.route('/health').get(contentService.checkHealth);
+    app.route('/health').get(requestMiddleware.createAndValidateRequestBody, contentService.checkHealth);
 
     app.route(BASE_URL + '/search')
         .post(requestMiddleware.createAndValidateRequestBody, contentService.searchContentAPI);
