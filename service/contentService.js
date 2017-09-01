@@ -78,16 +78,12 @@ function checkHealth(req, response) {
     var csApiStart = Date.now();
     async.parallel([
         function(CB) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Call to ekstep for health check"));
             var apiCallStart = Date.now();
             ekStepUtil.ekStepHealthCheck(function(err, res) {
-                LOG.info(utilsService.getPerfLoggerData(rspObj, "INFO", filename, "checkHealth", "Time taken by ekstep health api in ms", {timeInMs: Date.now() - apiCallStart}));
                 if(res && res.result && res.result.healthy) {
-                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Ekstep api is healty"));
                     isEkStepHealthy = true;
                     checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, "", ""));
                 } else {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "checkHealth", "Ekstep api is not healty"));
                     isEkStepHealthy = false;
                     checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE));
                 }
@@ -95,16 +91,12 @@ function checkHealth(req, response) {
             })
         },
         function(CB) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Call to learner service for health check"));
             var apiCallStart = Date.now();
             ekStepUtil.leanerServiceHealthCheck(function(err, res) {
-                LOG.info(utilsService.getPerfLoggerData(rspObj, "INFO", filename, "checkHealth", "Time taken by learner service health api in ms", {timeInMs: Date.now() - apiCallStart}));
                 if(res && res.result && res.result.healthy) {
-                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Learner service api is healty"));
                     isLSHealthy = true;
                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, "", ""));
                 } else {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "checkHealth", "Learner service api is not healty"));
                     isLSHealthy = false;
                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE));
                 }
@@ -112,20 +104,16 @@ function checkHealth(req, response) {
             })
         },
         function(CB) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Check mongo db connection"));
             if(mongoConnection.getConnectionStatus()) {
-                LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "checkHealth", "Mongo Db connected"));
                 isDbConnected = true;
                 checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, "", ""));
             } else {
-                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "checkHealth", "Mongo Db is not connected"));
                 isDbConnected = false;
                 checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, hcMessages.MONGODB_CONNECTION.FAILED_CODE, hcMessages.MONGODB_CONNECTION.FAILED_MESSAGE));
             }
             CB();
         },
     ], function() {
-        LOG.info(utilsService.getPerfLoggerData(rspObj, "INFO", filename, "checkHealth", "Time taken by content service health api in ms", {timeInMs: Date.now() - csApiStart}));
         if(isEkStepHealthy && isLSHealthy && isDbConnected) {
             var rsp = respUtil.successResponse(rspObj);
             return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj));
