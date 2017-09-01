@@ -10,13 +10,14 @@ var emailMessage = messageUtils.EMAIL;
 var responseCode = messageUtils.RESPONSE_CODE;
 
 
-function getEmailData(name, subject, body, downloadUrl, emailArray, idArray) {
+function getEmailData(name, subject, body, downloadUrl, actionName, emailArray, idArray) {
 
     var request = {
         name: name,
         subject: subject,
         body: body,
         downloadUrl: downloadUrl,
+        actionName: actionName,
         recipientEmails: emailArray,
         recipientUserIds: idArray
     };
@@ -49,8 +50,13 @@ function createFlagContentEmail(req, callback) {
         function(CBW) {
             var cData = data.request.contentData;
             var eData = emailMessage.CREATE_FLAG;
+            var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType).replace(/{{Content title}}/g, cData.name);
+            var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
+                                        .replace(/{{Content title}}/g, cData.name)
+                                        .replace(/{{Flag reason}}/g, cData.flagReasons.toString())
+                                        .replace(/{{Content status}}/g, cData.status);
             var lsEmailData = {
-                request: getEmailData(null, eData.SUBJECT, eData.BODY, null, null, [cData.createdBy])
+                request: getEmailData(null, subject, body, null, null, null, [cData.createdBy])
             };
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createFlagContentEmail", "Request to Leaner service for sending email", {
                 body : lsEmailData
@@ -98,8 +104,12 @@ function acceptFlagContentEmail(req, callback) {
         function(CBW) {
             var cData = data.request.contentData;
             var eData = emailMessage.ACCEPT_FLAG;
+            var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType);
+            var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
+                                        .replace(/{{Content title}}/g, cData.name)
+                                        .replace(/{{Flag reason}}/g, cData.flagReasons.toString());
             var lsEmailData = {
-                request: getEmailData(null, eData.SUBJECT, eData.BODY, null, null, [cData.createdBy])
+                request: getEmailData(null, subject, body, null, null, null, [cData.createdBy])
             };
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "acceptFlagContentEmail", "Request to Leaner service for sending email", {
                 body : lsEmailData
@@ -147,8 +157,12 @@ function rejectFlagContentEmail(req, callback) {
         function(CBW) {
             var cData = data.request.contentData;
             var eData = emailMessage.REJECT_FLAG;
+            var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType).replace(/{{Content title}}/g, cData.name);
+            var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
+                                        .replace(/{{Content title}}/g, cData.name)
+                                        .replace(/{{Content status}}/g, cData.status);
             var lsEmailData = {
-                request: getEmailData(null, eData.SUBJECT, eData.BODY, null, null, [cData.createdBy])
+                request: getEmailData(null, subject, body, null, null, null, [cData.createdBy])
             };
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectFlagContentEmail", "Request to Leaner service for sending email", {
                 body : lsEmailData

@@ -352,20 +352,30 @@ exports.EMAIL = {
     CREATE_FLAG: {
         FAILED_CODE: "ERR_SEND_CREATE_FLAG_EMAIL",
         FAILED_MESSAGE: "Sending email failed for create flag",
-        SUBJECT: "Content marked as flag",
-        BODY: "Content marked as flag"
+        SUBJECT: "Flag raised for your content: Content Type: {{Content type}}, Title: {{Content title}} ",
+        BODY: "Your content is flagged by another user. Details:<br><br>"+
+            "<b>Content Type: </b>{{Content type}}<br>"+
+            "<b>Title: </b>{{Content title}}<br>"+
+            "<b>Flag(s) Raised: </b>{{Flag reason}}<br>"+
+            "<b>Content Status: </b>{{Content status}}<br>"
     },
     ACCEPT_FLAG: {
         FAILED_CODE: "ERR_SEND_ACCEPT_FLAG_EMAIL",
         FAILED_MESSAGE: "Sending email failed for accept flag",
-        SUBJECT: "Content marked as flag accepted",
-        BODY: "Content marked as flag accepted"
+        SUBJECT: "Reviewer has flagged your content: {{Content type}} ",
+        BODY: "Your content has been flagged by the reviewer. Details:<br><br>"+
+            "<b>Content Type: </b>{{Content type}}<br>"+
+            "<b>Title: </b>{{Content title}}<br>"+
+            "<b>Flag(s) Raised: </b>{{Flag reason}}<br>"
     },
     REJECT_FLAG: {
         FAILED_CODE: "ERR_SEND_REJECT_FLAG_EMAIL",
         FAILED_MESSAGE: "Sending email failed for reject flag",
-        SUBJECT: "Content marked as flag rejected",
-        BODY: "Content marked as flag rejected"
+        SUBJECT: "Congratulations, your content is live! Content Type: {{Content type}}, Title: {{Content title}}",
+        BODY: "Congratulations! The content that you had submitted has been accepted for publication. It is now available through the Genie app. Details:<br>"+
+            "<b>Content Type: </b>{{Content type}}<br><br>"+
+            "<b>Title: </b>{{Content title}}<br>"+
+            "<b>Status: </b>{{Content status}}<br>"
     }
 };
 
