@@ -70,58 +70,60 @@ function getHealthCheckResp(rsp, healthy, checksArrayObj) {
     return rsp;
 }
 
-function checkHealth(req, response) {
+ function checkHealth(req, response) {
 
-    var rspObj = req.rspObj;
-    var checksArrayObj = [];
-    var isEkStepHealthy, isLSHealthy, isDbConnected;
-    var csApiStart = Date.now();
-    async.parallel([
-        function(CB) {
-            var apiCallStart = Date.now();
-            ekStepUtil.ekStepHealthCheck(function(err, res) {
-                if(res && res.result && res.result.healthy) {
-                    isEkStepHealthy = true;
-                    checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, "", ""));
-                } else {
-                    isEkStepHealthy = false;
-                    checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE));
-                }
-                CB();
-            })
-        },
-        function(CB) {
-            var apiCallStart = Date.now();
-            ekStepUtil.leanerServiceHealthCheck(function(err, res) {
-                if(res && res.result && res.result.healthy) {
-                    isLSHealthy = true;
-                    checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, "", ""));
-                } else {
-                    isLSHealthy = false;
-                    checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE));
-                }
-                CB();
-            })
-        },
-        function(CB) {
-            if(mongoConnection.getConnectionStatus()) {
-                isDbConnected = true;
-                checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, "", ""));
-            } else {
-                isDbConnected = false;
-                checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, hcMessages.MONGODB_CONNECTION.FAILED_CODE, hcMessages.MONGODB_CONNECTION.FAILED_MESSAGE));
-            }
-            CB();
-        },
-    ], function() {
-        if(isEkStepHealthy && isLSHealthy && isDbConnected) {
-            var rsp = respUtil.successResponse(rspObj);
-            return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj));
-        } else {
-            var rsp = respUtil.successResponse(rspObj);
-            return response.status(500).send(getHealthCheckResp(rsp, false, checksArrayObj));
-        }
-    });
+    return response.status(200).send("ok");
+//     var rspObj = req.rspObj;
+//     var checksArrayObj = [];
+//     var isEkStepHealthy, isLSHealthy, isDbConnected;
+//     var csApiStart = Date.now();
+//     async.parallel([
+//         function(CB) {
+//             var apiCallStart = Date.now();
+//             ekStepUtil.ekStepHealthCheck(function(err, res) {
+//                 if(res && res.result && res.result.healthy) {
+//                     isEkStepHealthy = true;
+//                     checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, "", ""));
+//                 } else {
+//                     isEkStepHealthy = false;
+//                     checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE));
+//                 }
+//                 CB();
+//             })
+//         },
+//         function(CB) {
+//             var apiCallStart = Date.now();
+//             ekStepUtil.leanerServiceHealthCheck(function(err, res) {
+//                 if(res && res.result && res.result.healthy) {
+//                     isLSHealthy = true;
+//                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, "", ""));
+//                 } else {
+//                     isLSHealthy = false;
+//                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE));
+//                 }
+//                 CB();
+//             })
+//         },
+//         function(CB) {
+//             if(mongoConnection.getConnectionStatus()) {
+//                 isDbConnected = true;
+//                 checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, "", ""));
+//             } else {
+//                 isDbConnected = false;
+//                 checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, hcMessages.MONGODB_CONNECTION.FAILED_CODE, hcMessages.MONGODB_CONNECTION.FAILED_MESSAGE));
+//             }
+//             CB();
+//         },
+//     ], function() {
+//         if(isEkStepHealthy && isLSHealthy && isDbConnected) {
+//             var rsp = respUtil.successResponse(rspObj);
+//             return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj));
+//         } else {
+//             var rsp = respUtil.successResponse(rspObj);
+//             return response.status(500).send(getHealthCheckResp(rsp, false, checksArrayObj));
+//         }
+//     });
+
 }
 
 function searchAPI(req, response) {
