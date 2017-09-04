@@ -15,5 +15,7 @@ ENV sunbird_mongo_port 27017
 ENV sunbird_content_service_port 5000
 EXPOSE 27017 
 EXPOSE 5000
+RUN rm ./content/services/js-services/content_service/content_service.zip
+RUN rm /home/sunbird/mw/content_service.zip
 WORKDIR /home/sunbird/mw/content/services/js-services/content_service
 CMD ["node", "app.js", "&"]
