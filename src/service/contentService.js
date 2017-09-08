@@ -12,17 +12,20 @@ var path = require('path');
 var ekStepUtil = require('sb-ekstep-util');
 var respUtil = require('response_util');
 var configUtil = require('sb-config-util');
-var LOG = require('sb_logger_util')
+var LOG = require('sb_logger_util');
 var validatorUtil = require('sb_req_validator_util');
 
 var contentModel = require('../models/contentModel').CONTENT;
 var messageUtils = require('./messageUtil');
 var utilsService = require('../service/utilsService');
+var emailService = require('./emailService');
+var mongoConnection = require('../mongoConnection');
 
 var filename = path.basename(__filename);
 var contentMessage = messageUtils.CONTENT;
 var compositeMessage = messageUtils.COMPOSITE;
 var responseCode = messageUtils.RESPONSE_CODE;
+var hcMessages = messageUtils.HEALTH_CHECK;
 
 /**
  * This function helps to generate code for create course
@@ -48,8 +51,79 @@ function getContentTypeForContent() {
     return contentMessage.CONTENT_TYPE;
 }
 
-function checkHealth(req, response) {
+function getChecksObj(name, healthy, err, errMsg) {
+    return {
+        name: name,
+        healthy: healthy,
+        err: err,
+        errmsg: errMsg
+    }
+};
+
+function getHealthCheckResp(rsp, healthy, checksArrayObj) {
+    delete rsp.responseCode;
+    rsp.result = {}
+    rsp.result.name = messageUtils.SERVICE.NAME;
+    rsp.result.version = messageUtils.API_VERSION.V1;
+    rsp.result.healthy = healthy;
+    rsp.result.check = checksArrayObj;
+    return rsp;
+}
+
+ function checkHealth(req, response) {
+
     return response.status(200).send("ok");
+//     var rspObj = req.rspObj;
+//     var checksArrayObj = [];
+//     var isEkStepHealthy, isLSHealthy, isDbConnected;
+//     var csApiStart = Date.now();
+//     async.parallel([
+//         function(CB) {
+//             var apiCallStart = Date.now();
+//             ekStepUtil.ekStepHealthCheck(function(err, res) {
+//                 if(res && res.result && res.result.healthy) {
+//                     isEkStepHealthy = true;
+//                     checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, "", ""));
+//                 } else {
+//                     isEkStepHealthy = false;
+//                     checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE));
+//                 }
+//                 CB();
+//             })
+//         },
+//         function(CB) {
+//             var apiCallStart = Date.now();
+//             ekStepUtil.leanerServiceHealthCheck(function(err, res) {
+//                 if(res && res.result && res.result.healthy) {
+//                     isLSHealthy = true;
+//                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, "", ""));
+//                 } else {
+//                     isLSHealthy = false;
+//                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE));
+//                 }
+//                 CB();
+//             })
+//         },
+//         function(CB) {
+//             if(mongoConnection.getConnectionStatus()) {
+//                 isDbConnected = true;
+//                 checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, "", ""));
+//             } else {
+//                 isDbConnected = false;
+//                 checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, hcMessages.MONGODB_CONNECTION.FAILED_CODE, hcMessages.MONGODB_CONNECTION.FAILED_MESSAGE));
+//             }
+//             CB();
+//         },
+//     ], function() {
+//         if(isEkStepHealthy && isLSHealthy && isDbConnected) {
+//             var rsp = respUtil.successResponse(rspObj);
+//             return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj));
+//         } else {
+//             var rsp = respUtil.successResponse(rspObj);
+//             return response.status(500).send(getHealthCheckResp(rsp, false, checksArrayObj));
+//         }
+//     });
+
 }
 
 function searchAPI(req, response) {
@@ -60,6 +134,13 @@ function searchContentAPI(req, response) {
     return search(getContentTypeForContent(), req, response);
 }
 
+function logs(isPLogs, startTime, rspObj, level, file, method, message, data, stacktrace) {
+    if(isPLogs)
+        LOG.info(utilsService.getPerfLoggerData(rspObj, "INFO", file, method, "Time taken in ms", {timeInMs: Date.now() - csApiStart}));
+
+
+}
+
 function search(defaultContentTypes, req, response) {
 
     var data = req.body;
@@ -67,6 +148,7 @@ function search(defaultContentTypes, req, response) {
 
     if (!data.request || !data.request.filters) {
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchContentAPI", "Error due to required params are missing", data.request));
+        
         rspObj.errCode = contentMessage.SEARCH.MISSING_CODE;
         rspObj.errMsg = contentMessage.SEARCH.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
@@ -221,7 +303,7 @@ function updateContentAPI(req, response) {
             var ekStepReqData = {
                 request: data.request
             };
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateContentAPI", "Request to ekstep for update the course", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateContentAPI", "Request to ekstep for update the content", {
                 body : ekStepReqData, 
                 headers: req.headers
             }));
@@ -252,32 +334,66 @@ function uploadContentAPI(req, response) {
 
     var data = req.body;
     data.contentId = req.params.contentId;
+    data.queryParams = req.query;
     var rspObj = req.rspObj;
+    
+    if(!data.queryParams.fileUrl) {
+        var form = new multiparty.Form();
 
-    var form = new multiparty.Form();
-
-    form.parse(req, function(err, fields, files) {
+        form.parse(req, function(err, fields, files) {
         if (err || (files && Object.keys(files).length === 0)) {
-            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Error due to upload files are missing", {
-                contentId: data.contentId,
-                files: files
-            }));
-            rspObj.errCode = contentMessage.UPLOAD.MISSING_CODE;
-            rspObj.errMsg = contentMessage.UPLOAD.MISSING_MESSAGE;
-            rspObj.responseCode = responseCode.CLIENT_ERROR;
-            return response.status(400).send(respUtil.errorResponse(rspObj));
-        }
-    });
-
-    form.on('file', function(name, file) {
-        var formData = {
-            file: {
-                value: fs.createReadStream(file.path),
-                options: {
-                    filename: file.originalFilename
-                }
+                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Error due to upload files are missing", {
+                    contentId: data.contentId,
+                    files: files
+                }));
+                rspObj.errCode = contentMessage.UPLOAD.MISSING_CODE;
+                rspObj.errMsg = contentMessage.UPLOAD.MISSING_MESSAGE;
+                rspObj.responseCode = responseCode.CLIENT_ERROR;
+                return response.status(400).send(respUtil.errorResponse(rspObj));
             }
-        };
+        });
+
+        form.on('file', function(name, file) {
+            var formData = {
+                file: {
+                    value: fs.createReadStream(file.path),
+                    options: {
+                        filename: file.originalFilename
+                    }
+                }
+            };
+            async.waterfall([
+
+                function(CBW) {
+                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentAPI", "Request to ekstep for upload the content file", {
+                        contentId: data.contentId,
+                        headers: req.headers
+                    }));
+                    delete req.headers['content-type'];
+                    ekStepUtil.uploadContent(formData, data.contentId, req.headers, function(err, res) {
+                        if (err || res.responseCode !== responseCode.SUCCESS) {
+                            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Getting error from ekstep", res));
+                            rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE;
+                            rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD.FAILED_MESSAGE;
+                            rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                            var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                            return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                        } else {
+                            CBW(null, res);
+                        }
+                    });  
+                },
+                function(res) {
+                    rspObj.result = res.result;
+                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentAPI", "Sending response back to user", rspObj));
+                    var modifyRsp = respUtil.successResponse(rspObj);
+                    modifyRsp.success = true;
+                    return response.status(200).send(modifyRsp);
+                }
+            ]);
+        });       
+    } else {
+        var queryString = {fileUrl : data.queryParams.fileUrl};
         async.waterfall([
 
             function(CBW) {
@@ -286,7 +402,7 @@ function uploadContentAPI(req, response) {
                     headers: req.headers
                 }));
                 delete req.headers['content-type'];
-                ekStepUtil.uploadContent(formData, data.contentId, req.headers, function(err, res) {
+                ekStepUtil.uploadContentWithFileUrl(data.contentId, queryString, req.headers, function(err, res) {
                     if (err || res.responseCode !== responseCode.SUCCESS) {
                         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Getting error from ekstep", res));
                         rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE;
@@ -307,7 +423,7 @@ function uploadContentAPI(req, response) {
                 return response.status(200).send(modifyRsp);
             }
         ]);
-    });
+    }
 }
 
 function reviewContentAPI(req, response) {
@@ -639,6 +755,7 @@ function flagContentAPI(req, response) {
         },
         function(res) {
             rspObj.result = res.result;
+            emailService.createFlagContentEmail(req, function(){ });
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "flagContentAPI", "Sending response back to user"));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
@@ -686,6 +803,7 @@ function acceptFlagContentAPI(req, response) {
         },
         function(res) {
             rspObj.result = res.result;
+            emailService.acceptFlagContentEmail(req, function(){ });
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "acceptFlagContentAPI", "Sending response back to user"));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
@@ -733,8 +851,59 @@ function rejectFlagContentAPI(req, response) {
         },
         function(res) {
             rspObj.result = res.result;
+            emailService.rejectFlagContentEmail(req, function(){ });
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectFlagContentAPI", "Sending response back to user"));
             return response.status(200).send(respUtil.successResponse(rspObj));
+        }
+    ]);
+}
+
+function uploadContentUrlAPI(req, response) {
+
+    var data = req.body;
+    data.contentId = req.params.contentId;
+    var rspObj = req.rspObj;
+    if (!data.contentId || !data.request || !data.request.content || !data.request.content.fileName) {
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentUrlAPI", "Error due to required params are missing", {
+            contentId: data.contentId,
+            body: data
+        }));
+        rspObj.errCode = contentMessage.UPLOAD_URL.MISSING_CODE;
+        rspObj.errMsg = contentMessage.UPLOAD_URL.MISSING_MESSAGE;
+        rspObj.responseCode = responseCode.CLIENT_ERROR;
+        return response.status(400).send(respUtil.errorResponse(rspObj));
+    }
+    var ekStepReqData = {
+        request: data.request
+    };
+
+    async.waterfall([
+
+        function(CBW) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentUrlAPI", "Request to ekstep for get upload content url", {
+                contentId: data.contentId,
+                body: ekStepReqData,
+                headers: req.headers
+            }));
+            ekStepUtil.uploadContentUrl(ekStepReqData, data.contentId, req.headers, function(err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentUrlAPI", "Getting error from ekstep", res));
+                    rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD_URL.FAILED_CODE;
+                    rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD_URL.FAILED_MESSAGE;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+        function(res) {
+            rspObj.result = res.result;
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentUrlAPI", "Sending response back to user"));
+            var modifyRsp = respUtil.successResponse(rspObj);
+            modifyRsp.success = true;
+            return response.status(200).send(modifyRsp);
         }
     ]);
 }
@@ -754,3 +923,4 @@ module.exports.rejectContentAPI = rejectContentAPI;
 module.exports.flagContentAPI = flagContentAPI;
 module.exports.acceptFlagContentAPI = acceptFlagContentAPI;
 module.exports.rejectFlagContentAPI = rejectFlagContentAPI;
+module.exports.uploadContentUrlAPI = uploadContentUrlAPI;
