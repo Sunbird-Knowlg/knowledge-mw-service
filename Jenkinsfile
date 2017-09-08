@@ -16,8 +16,8 @@ node('build-slave') {
         env.NODE_ENV = "build"
 
         print "Environment will be : ${env.NODE_ENV}"
-         sh('chmod 777 ./content/services/js-services/content_service/build.sh')
-         sh('./content/services/js-services/content_service/build.sh')
+         sh('chmod 777 build.sh')
+         sh('./build.sh')
 
       }
 
@@ -26,7 +26,7 @@ node('build-slave') {
         echo 'Push to Repo'
         sh 'ls -al ~/'
 
-        dir('./content/services/js-services/content_service') {
+        dir('.') {
 
           sh('chmod 777 ./dockerPushToRepo.sh')
           sh 'ARTIFACT_LABEL=bronze ./dockerPushToRepo.sh'
@@ -43,3 +43,4 @@ node('build-slave') {
     }
 
 }
+
