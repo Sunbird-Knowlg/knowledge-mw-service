@@ -4,7 +4,7 @@ RUN apk update \
     && apk add zip \
     && mkdir -p /opt/content
 ADD content /opt/content/
-WORKDIR /opt/content/services/js-services/content_service/
+WORKDIR /opt/content/src
 RUN npm install --unsafe-perm
 WORKDIR /opt
 CMD ["zip", "-r", "content_service.zip", "content"]
