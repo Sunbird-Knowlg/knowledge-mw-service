@@ -17,5 +17,5 @@ EXPOSE 27017
 EXPOSE 5000
 #RUN rm /home/sunbird/mw/content/services/js-services/content_service/content_service.zip
 #RUN rm /home/sunbird/mw/content_service.zip
-WORKDIR /home/sunbird/mw/content/src
+WORKDIR /home/sunbird/mw/content/
 CMD ["node", "app.js", "&"]

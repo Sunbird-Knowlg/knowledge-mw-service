@@ -3,8 +3,9 @@ MAINTAINER "Manojvv" "manojv@ilimi.in"
 RUN apk update \
     && apk add zip \
     && mkdir -p /opt/content
-ADD content /opt/content/
-WORKDIR /opt/content/src
+ADD src /opt/content/
+ADD sunbird-js-utils /opt/content/
+WORKDIR /opt/content/
 RUN npm install --unsafe-perm
 WORKDIR /opt
 CMD ["zip", "-r", "content_service.zip", "content"]
