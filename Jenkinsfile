@@ -16,8 +16,8 @@ node('build-slave') {
         env.NODE_ENV = "build"
 
         print "Environment will be : ${env.NODE_ENV}"
-         sh('chmod 777 build.sh')
-         sh('./build.sh')
+         sh('chmod 777 content/build.sh')
+         sh('./content/build.sh')
 
       }
 
@@ -28,9 +28,9 @@ node('build-slave') {
 
         dir('.') {
 
-          sh('chmod 777 ./dockerPushToRepo.sh')
-          sh 'ARTIFACT_LABEL=bronze ./dockerPushToRepo.sh'
-          sh './src/metadata.sh > metadata.json'
+          sh('chmod 777 ./content/dockerPushToRepo.sh')
+          sh 'ARTIFACT_LABEL=bronze ./content/dockerPushToRepo.sh'
+          sh './content/src/metadata.sh > metadata.json'
           sh 'cat metadata.json'
           archive includes: "metadata.json"
         }
