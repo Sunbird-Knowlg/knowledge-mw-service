@@ -4,11 +4,12 @@
 e () {
     echo $( echo ${1} | jq ".${2}" | sed 's/\"//g')
 }
-m=$(./content/src/metadata.sh)
+m=$(./src/metadata.sh)
 
 org=$(e "${m}" "org")
 name=$(e "${m}" "name")
 version=$(e "${m}" "version")
+
 
 docker build -f ./Dockerfile.Build -t ${org}/${name}:${version}-build . 
 docker run --name=${name}-${version}-build ${org}/${name}:${version}-build 
