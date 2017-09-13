@@ -16,9 +16,9 @@ const port = process.env.sunbird_content_service_port ? process.env.sunbird_cont
 
 global_ekstep_api_base_url = process.env.ekstep_api_base_url ? process.env.ekstep_api_base_url : "https://qa.ekstep.in/api";
 global_ekstep_proxy_base_url = process.env.ekstep_proxy_base_url ? process.env.ekstep_proxy_base_url : "https://qa.ekstep.in";
-global_ekstep_api_key = process.env.ekstep_api_key ? process.env.ekstep_api_key : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkNjNiMjgwZTQ1NDE0NDU4ODk4NzcwYzZhOGZiZjQ1MCJ9.Ji-22XcRrOiVy4dFAmE68wPxLkNmX4wKbTj_IB7fG6Y";
+global_ekstep_api_key = process.env.ekstep_api_key;
 
-global_leaner_service_api_key = process.env.leaner_service_api_key ? process.env.leaner_service_api_key : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkMTc1MDIwNDdlODc0ODZjOTM0ZDQ1ODdlYTQ4MmM3MyJ9.7LWocwCn5rrCScFQYOne8_Op2EOo-xTCK5JCFarHKSs";
+global_leaner_service_api_key = process.env.leaner_service_api_key;
 global_leaner_service_base_url = process.env.leaner_service_base_url ? process.env.leaner_service_base_url : "https://dev.open-sunbird.org/api";
 
 configUtil.setConfig('EKSTEP_BASE_URL', global_ekstep_api_base_url);
