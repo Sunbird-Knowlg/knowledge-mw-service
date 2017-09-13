@@ -5,8 +5,9 @@
   "main": "app.js",
   "scripts": {
     "test": "karma start karma.conf.js",
-    "preinstall": "npm install ./../sunbird-js-utils/sb-config-util && npm install ./../sunbird-js-utils/sb-http-util && npm install ./../sunbird-js-utils/sb-ekstep-util && npm install ./../sunbird-js-utils/sb_logger_util && npm install ./../sunbird-js-utils/sb_req_validator_util && npm install ./../sunbird-js-utils/response_util"
+    "preinstall": "npm install ./libs/sb-config-util && npm install ./libs/sb-http-util && npm install ./libs/sb-ekstep-util && npm install ./libs/sb_logger_util && npm install ./libs/sb_req_validator_util && npm install ./libs/response_util"
   },
+  
   "author": "Harish Kumar Gangula",
   "license": "ISC",
   "dependencies": {
