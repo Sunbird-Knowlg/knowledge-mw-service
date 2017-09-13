@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "karma start karma.conf.js",
-    "preinstall": "npm install ./sb-config-util && npm install ./sb-http-util && npm install ./sb-ekstep-util && npm install ./sb_logger_util && npm install ./sb_req_validator_util && npm install ./response_util"
+    "preinstall": "npm install ./libs/sb-config-util && npm install ./libs/sb-http-util && npm install ./libs/sb-ekstep-util && npm install ./libs/sb_logger_util && npm install ./libs/sb_req_validator_util && npm install ./libs/response_util"
   },
   
   "author": "Harish Kumar Gangula",
