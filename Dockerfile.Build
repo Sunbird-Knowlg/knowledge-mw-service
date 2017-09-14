@@ -4,7 +4,6 @@ RUN apk update \
     && apk add zip \
     && mkdir -p /opt/content
 ADD src /opt/content/
-ADD sunbird-js-utils /opt/content/
 WORKDIR /opt/content/
 RUN npm install --unsafe-perm
 WORKDIR /opt
