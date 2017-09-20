@@ -1,7 +1,6 @@
 var uuidV1 = require('uuid/v1');
 var respUtil = require('response_util');
 var messageUtil = require('../service/messageUtil');
-var mongoConnection = require('../mongoConnection');
 var LOG = require('sb_logger_util');
 var utilsService = require('../service/utilsService');
 var path = require('path');
@@ -71,37 +70,5 @@ function createAndValidateRequestBody(req, res, next) {
     next();
 }
 
-/**
- * This function helps to check the mongodb connection if mongodb not connected we retry.
- * This function works as a middleware which called before each mongodb based api
- * @param {type} req
- * @param {type} res
- * @param {type} next
- * @returns {undefined}
- */
-
-function checkMongooseConnection(req, res, next) {
-
-    var rspObj = req.rspObj;
-
-    var isMongoConnected = mongoConnection.getConnectionStatus();
-
-    if (isMongoConnected) {
-        next();
-    } else {
-        mongoConnection.stablishMongoDBConnection(function (err, isConnected) {
-            if (err) {
-                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "checkMongooseConnection", "MongoDB in not connected", err));
-                rspObj.errCode = reqMsg.DB_ERROR.DB_ERROR_CODE;
-                rspObj.errMsg = reqMsg.DB_ERROR.DB_ERROR_MESSAGE;
-                rspObj.responseCode = responseCode.SERVER_ERROR;
-                return res.status(500).send(respUtil.errorResponse(rspObj));
-            } else {
-                next();
-            }
-        });
-    }
-}
 
 module.exports.createAndValidateRequestBody = createAndValidateRequestBody;
-module.exports.checkMongooseConnection = checkMongooseConnection;

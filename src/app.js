@@ -5,7 +5,6 @@ var http = require('http');
 var messageUtil = require('./service/messageUtil');
 var respUtil = require('response_util');
 var configUtil = require('sb-config-util');
-var mongoDB = require('./mongoConnection');
 
 var reqMsg = messageUtil.REQUEST;
 var responseCode = messageUtil.RESPONSE_CODE;
@@ -71,7 +70,6 @@ app.use(function (req, res, next) {
 require('./routes/courseRoutes')(app);
 require('./routes/contentRoutes')(app);
 require('./routes/utilsRoute')(app);
-require('./routes/notesRoutes')(app);
 require('./routes/conceptRoutes')(app);
 require('./routes/searchRoutes')(app);
 //last this middle in last

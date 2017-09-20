@@ -40,6 +40,8 @@ exports.COURSE = {
     },
 
     PUBLISH: {
+        MISSING_CODE: "ERR_COURSE_PUBLISH_FIELDS_MISSING", 
+        MISSING_MESSAGE: "Required fields for publish course are missing", 
         FAILED_CODE: "ERR_COURSE_PUBLISH_FAILED",
         FAILED_MESSAGE: "Publish course failed"
     },
@@ -103,6 +105,8 @@ exports.CONTENT = {
     },
 
     PUBLISH: {
+        MISSING_CODE: "ERR_CONTENT_PUBLISH_FIELDS_MISSING", 
+        MISSING_MESSAGE: "Required fields for publish content are missing",
         FAILED_CODE: "ERR_CONTENT_PUBLISH_FAILED",
         FAILED_MESSAGE: "Publish content failed"
     },
@@ -220,7 +224,7 @@ exports.RESPONSE_CODE = {
     CLIENT_ERROR: "CLIENT_ERROR",
     SERVER_ERROR: "SERVER_ERROR",
     SUCCESS: "OK",
-    RESOURSE_NOT_FOUND: "RESOURCE_NOT_FOUND"
+    RESOURCE_NOT_FOUND: "RESOURCE_NOT_FOUND"
 };
 
 exports.API_VERSION = {
@@ -243,44 +247,6 @@ exports.UTILS = {
         MISSING_MESSAGE: "Required fields for get resource language are missing",
         FAILED_CODE: "ERR_GET_RESOURCE_BUNDLE_FAILED",
         FAILED_MESSAGE: "Get resource bundle failed"
-    }
-};
-
-exports.NOTES= {
-
-    CREATE: {
-        MISSING_CODE: "ERR_NOTE_CREATE_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for create notes are missing",
-        FAILED_CODE: "ERR_NOTE_CREATE_FAILED",
-        FAILED_MESSAGE: "Create notes failed"
-    },
-    
-    GET: {
-        MISSING_CODE: "ERR_NOTE_GET_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for get note detail are missing",
-        FAILED_CODE: "ERR_NOTE_GET_FAILED",
-        FAILED_MESSAGE: "Get note detail failed"
-    },
-    
-    UPDATE: {
-        MISSING_CODE: "ERR_NOTE_UPDATE_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for update note are missing",
-        FAILED_CODE: "ERR_NOTE_UPDATE_FAILED",
-        FAILED_MESSAGE: "Update note failed"
-    },
-    
-    SEARCH: {
-        MISSING_CODE: "ERR_NOTE_SEARCH_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for search note are missing",
-        FAILED_CODE: "ERR_NOTE_SEARCH_FAILED",
-        FAILED_MESSAGE: "Search note failed"
-    },
-    
-    DELETE: {
-        MISSING_CODE: "ERR_NOTE_DELETE_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for delete note are missing",
-        FAILED_CODE: "ERR_NOTE_DELETE_FAILED",
-        FAILED_MESSAGE: "Delete note failed"
     }
 };
 
@@ -389,10 +355,5 @@ exports.HEALTH_CHECK = {
         NAME: "learnerservice.api",
         FAILED_CODE: "LEARNER_SERVICE_HEALTH_FAILED",
         FAILED_MESSAGE: "Learner service is not healthy"
-    },
-    MONGODB_CONNECTION: {
-        NAME: "mongodb",
-        FAILED_CODE: "MONGODB_CONNECTION_HEALTH_FAILED",
-        FAILED_MESSAGE: "MongoDb is not connected"
     }
 }
