@@ -19,7 +19,6 @@ var contentModel = require('../models/contentModel').CONTENT;
 var messageUtils = require('./messageUtil');
 var utilsService = require('../service/utilsService');
 var emailService = require('./emailService');
-var mongoConnection = require('../mongoConnection');
 
 var filename = path.basename(__filename);
 var contentMessage = messageUtils.CONTENT;
@@ -103,17 +102,7 @@ function getHealthCheckResp(rsp, healthy, checksArrayObj) {
 //                 }
 //                 CB();
 //             })
-//         },
-//         function(CB) {
-//             if(mongoConnection.getConnectionStatus()) {
-//                 isDbConnected = true;
-//                 checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, "", ""));
-//             } else {
-//                 isDbConnected = false;
-//                 checksArrayObj.push(getChecksObj(hcMessages.MONGODB_CONNECTION.NAME, isDbConnected, hcMessages.MONGODB_CONNECTION.FAILED_CODE, hcMessages.MONGODB_CONNECTION.FAILED_MESSAGE));
-//             }
-//             CB();
-//         },
+//         }
 //     ], function() {
 //         if(isEkStepHealthy && isLSHealthy && isDbConnected) {
 //             var rsp = respUtil.successResponse(rspObj);
