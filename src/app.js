@@ -75,8 +75,12 @@ require('./routes/searchRoutes')(app);
 //last this middle in last
 require('./middlewares/proxy.middleware')(app);
 
+//Create server
+this.server = http.createServer(app).listen(port, function() {
+    console.log('server running at PORT [%d]', port);
+});
 
-
-http.createServer(app).listen(port);
-
-console.log('server running at PORT [%d]', port);
+//Close server, when we start for test cases
+exports.close = function() {
+  this.server.close();
+};

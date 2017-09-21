@@ -3,11 +3,49 @@ var request = require('request');
 var host = "http://localhost:5000";
 var base_url = host + "/v1/content";
 
+//This function used to create content and 
+function createContent() {
+    request.post({
+        headers: {'Content-Type': 'application/json'},
+        uri: base_url + '/create',
+        body: {
+            "request": {
+                "content": {
+                    "name": "Content Name",
+                    "description": "Content Description",
+                    "mimeType": "application/pdf",
+                    "contentType": "Story"
+                }
+            }
+        },
+        json: true
+    }, function (error, response, body) {
+        return body.result.content_id;
+    });
+}
+
+function getContentByStatus(status, callback) {
+    request.post({
+        headers: {'Content-Type': 'application/json'},
+        uri: base_url + '/search',
+        body: {
+            "request": {
+                "filters": {
+                    status : status
+                }
+            }
+        },
+        json: true
+    }, function (error, response, body) {
+        return callback(error, body.result.content[0]);
+    });
+}
+
 describe("Content", function () {
 
-    xdescribe("Search Services", function () {
+    describe("search services", function () {
 
-        it('should search content failed due to missing cid in headers', function (done) {
+        it('should search content failed due to invalid request object', function (done) {
             request.post({
                 headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/search',
@@ -26,13 +64,12 @@ describe("Content", function () {
             });
         });
 
-        it('Failedailed search content due to invalid request object', function (done) {
+        it('Failed search content due to missing filter object', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/search',
                 body: {
-                    "request1": {
-                        "filters": {}
+                    "request": {
                     }
                 },
                 json: true
@@ -45,13 +82,13 @@ describe("Content", function () {
             });
         });
 
-        it('Failedailed search content due to invalid request filter object', function (done) {
+        it('Failed search content due to invalid filter object', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/search',
                 body: {
                     "request": {
-                        "filter": {}
+                        "filter1": {}
                     }
                 },
                 json: true
@@ -67,7 +104,7 @@ describe("Content", function () {
 
         it('should search the contents', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/search',
                 body: {
                     "request": {
@@ -87,19 +124,14 @@ describe("Content", function () {
         });
     });
 
-    xdescribe("Create Service", function () {
+    describe("create service", function () {
 
-        it('Failed due to missing cid in headers', function (done) {
+        it('Failed due to missing request object in body', function (done) {
             request.post({
                 headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
-                    "request": {
-                        "content": {
-                            "name": "Content Name",
-                            "description": "Content Description"
-                        }
-                    }
+                    
                 },
                 json: true
             }, function (error, response, body) {
@@ -111,9 +143,9 @@ describe("Content", function () {
             });
         });
 
-        it('Failed due to missing request object', function (done) {
+        it('Failed due to missing or invalid request object', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request1": {
@@ -133,9 +165,9 @@ describe("Content", function () {
             });
         });
 
-        it('Failed due to missing content object', function (done) {
+        it('Failed due to missing or invalid content object', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
@@ -157,7 +189,7 @@ describe("Content", function () {
 
         it('Failed due to missing required field name', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
@@ -178,7 +210,7 @@ describe("Content", function () {
 
         it('Failed due to missing required field description', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
@@ -199,7 +231,7 @@ describe("Content", function () {
 
         it('Failed due to missing required field mimeType', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
@@ -222,14 +254,14 @@ describe("Content", function () {
 
         it('Failed due to missing required field contentType', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
                         "content": {
                             "name": "Content Name",
                             "description": "Content Description",
-                            "mimeType": "image/jpg"
+                            "mimeType": "application/pdf"
                         }
                     }
                 },
@@ -243,22 +275,23 @@ describe("Content", function () {
             });
         });
 
-        xit('should create content success', function (done) {
+        it('should create content success', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
                         "content": {
                             "name": "Content Name",
                             "description": "Content Description",
-                            "mimeType": "image/jpg",
-                            "contentType": "Collection"
+                            "mimeType": "application/pdf",
+                            "contentType": "Story"
                         }
                     }
                 },
                 json: true
             }, function (error, response, body) {
+                
                 expect(response.statusCode).toBe(200);
                 expect(body).toBeDefined();
                 expect(body.responseCode).toBe("OK");
@@ -269,34 +302,11 @@ describe("Content", function () {
 
     });
 
-    xdescribe("Update Service", function () {
-        var contentId = "do_1122649778690785281104";
-        it('Failed due to missing cid in headers', function (done) {
-
+    describe("update service", function () {
+        var contentId = "do_212327128776556544182";
+        it('Failed due to missing or invalid request object', function (done) {
             request.patch({
                 headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/update/' + contentId,
-                body: {
-                    "request": {
-                        "content": {
-                            "name": "Content Name Update",
-                            "description": "Content Description update"
-                        }
-                    }
-                },
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
-
-        it('Failed due to missing request object', function (done) {
-            request.patch({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
                 uri: base_url + '/update/' + contentId,
                 body: {
                     "request1": {
@@ -316,9 +326,9 @@ describe("Content", function () {
             });
         });
 
-        it('Failed due to missing content object', function (done) {
+        it('Failed due to missing or invalid content object', function (done) {
             request.patch({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/update/' + contentId,
                 body: {
                     "request": {
@@ -340,7 +350,7 @@ describe("Content", function () {
 
         it('Failed due to missing required field versionKey', function (done) {
             request.patch({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/update/' + contentId,
                 body: {
                     "request": {
@@ -359,9 +369,9 @@ describe("Content", function () {
             });
         });
 
-        xit('Update content success', function (done) {
+        it('Update content success', function (done) {
             request.patch({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/update/' + contentId,
                 body: {
                     "request": {
@@ -382,26 +392,12 @@ describe("Content", function () {
         });
     });
 
-    xdescribe("Get Service", function () {
-        var contentId = "do_1122649778690785281104";
-        it('Failed due to missing cid in headers', function (done) {
-
-            request.get({
-                headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/read/' + contentId,
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(404);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("RESOURCE_NOT_FOUND");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
-
+    describe("get service", function () {
+        var contentId = "do_212327128776556544182";
+        
         it('Failed due to missing or invalid content ID', function (done) {
             request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/read/' + contentId + 'dssdf',
                 json: true
             }, function (error, response, body) {
@@ -413,9 +409,9 @@ describe("Content", function () {
             });
         });
 
-        xit('Success', function (done) {
+        it('Success', function (done) {
             request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/read/' + contentId,
                 json: true
             }, function (error, response, body) {
@@ -429,27 +425,12 @@ describe("Content", function () {
         });
     });
 
-    describe("Review Service", function () {
-        var contentId = "do_1122649778690785281104";
-        it('Failed due to missing cid in headers', function (done) {
-
-            request.post({
-                headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/review/' + contentId,
-                body: {},
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
+    describe("review service", function () {
+        var contentId = "do_212327063701544960179";
 
         it('Failed due to missing or invalid content ID', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/review/' + contentId + 'dssdf',
                 body: {},
                 json: true
@@ -459,14 +440,13 @@ describe("Content", function () {
             });
         });
 
-        xit('Success', function (done) {
+        it('Success', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/review/' + contentId,
                 body: {},
                 json: true
             }, function (error, response, body) {
-                console.log(body)
                 expect(response.statusCode).toBe(200);
                 expect(body).toBeDefined();
                 expect(body.responseCode).toBe("OK");
@@ -476,14 +456,14 @@ describe("Content", function () {
         });
     });
 
-    xdescribe("Publish Service", function () {
-        var contentId = "do_1122649778690785281104";
-        it('Failed due to missing cid in headers', function (done) {
+    describe("publish service", function () {
+        var contentId = "do_212327063701544960179";
+        it('Failed due to missing or invalid request object', function (done) {
 
-            request.get({
+            request.post({
                 headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/publish/' + contentId,
-                body: {},
+                body: {request: {}},
                 json: true
             }, function (error, response, body) {
                 expect(response.statusCode).toBe(400);
@@ -495,10 +475,10 @@ describe("Content", function () {
         });
 
         it('Failed due to missing or invalid content ID', function (done) {
-            request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+            request.post({
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/publish/' + contentId + 'dssdf',
-                body: {},
+                body: {request: {lastPublishedBy : "349"}},
                 json: true
             }, function (error, response, body) {
                 expect(response.statusCode).toBe(400);
@@ -510,13 +490,12 @@ describe("Content", function () {
         });
 
         xit('Success', function (done) {
-            request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+            request.post({
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/publish/' + contentId,
-                body: {},
+                body: {request: {content : {lastPublishedBy : "349"}}},
                 json: true
             }, function (error, response, body) {
-                console.log(body);
                 expect(response.statusCode).toBe(200);
                 expect(body).toBeDefined();
                 expect(body.responseCode).toBe("OK");
@@ -526,34 +505,19 @@ describe("Content", function () {
         });
     });
 
-    xdescribe("Get MyContent Service", function () {
-        var userId = "263";
-        it('Failed due to missing cid in headers', function (done) {
+    describe("get myContent service", function () {
+        var userId = "e886f4a8-890e-4e73-adc2-5afebad93c08";
 
+        it('Count 0 due to invalid user Id', function (done) {
             request.get({
                 headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/get/mycontent/' + userId,
+                uri: base_url + '/read/mycontent/' + userId + 'fsdfdsff',
                 body: {},
                 json: true
             }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
+                expect(response.statusCode).toBe(200);
                 expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
-
-        it('Failed due to missing or invalid content ID', function (done) {
-            request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
-                uri: base_url + '/get/mycontent/',
-                body: {},
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(404);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe('RESOURCE_NOT_FOUND');
+                expect(body.responseCode).toBe('OK');
                 expect(body.result).toBeDefined();
                 done();
             });
@@ -561,8 +525,8 @@ describe("Content", function () {
 
         it('Success', function (done) {
             request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
-                uri: base_url + '/get/mycontent/' + userId,
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/read/mycontent/' + userId,
                 body: {},
                 json: true
             }, function (error, response, body) {
@@ -571,6 +535,321 @@ describe("Content", function () {
                 expect(body.responseCode).toBe("OK");
                 expect(body.result).toBeDefined();
                 expect(body.result.content).toBeDefined();
+                done();
+            });
+        });
+    });
+
+    describe("retire service", function () {
+        var contentIds = ["do_212327128776556544182ff"];
+
+        it('Failed due to missing or invalid request object', function (done) {
+            request.delete({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/retire',
+                body: {request : {}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(400);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("CLIENT_ERROR");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+        var contentIds = ["do_212327063701544960179"];
+        it('Failed due to missing or invalid contentIds key', function (done) {
+            request.delete({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/retire',
+                body: {request : {contentId : contentIds}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(400);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("CLIENT_ERROR");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        it('Success', function (done) {
+            request.delete({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/retire',
+                body: {request : {contentIds : contentIds}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(200);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("OK");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+    });
+
+    describe("reject service", function () {
+        var contentId = "do_212326355637837824131";
+
+        it('Failed due to missing or invalid contentId', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/reject/' + contentId + 'ff',
+                body: {request : {}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(404);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("RESOURCE_NOT_FOUND");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        xit('Success', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/reject/' + createContent(),
+                body: {request : {}},
+                json: true
+            }, function (error, response, body) {
+                
+                expect(response.statusCode).toBe(200);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("OK");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+    });
+
+    describe("create flag service", function () {
+        var contentId = "do_20043627";
+
+        it('Failed due to missing or invalid request object', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/flag/' + contentId + 'ff',
+                body: {request1 : {}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(400);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("CLIENT_ERROR");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        it('Failed due to missing required fields', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/flag/' + contentId,
+                body: {request : {flaggedReasons: ["Copyright Violation"], flaggedBy: "Test case", flags: ["Test case"] }},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(400);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("CLIENT_ERROR");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        it('Failed due to invalid contentId', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/flag/' + contentId + 'ff',
+                body: {request : {flaggedReasons: ["Copyright Violation"], flaggedBy: "Test case", flags: ["Test case"], versionKey: "31312314" }},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(404);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("RESOURCE_NOT_FOUND");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        it('Success', function (done) {
+                getContentByStatus("Live", function(err, content) {
+                    request.post({
+                    headers: {'Content-Type': 'application/json'},
+                    uri: base_url + '/flag/' + content.identifier,
+                    body: {request : {flagReasons: ["Copyright Violation"], flaggedBy: "Test case", flags: ["Test case"], versionKey: content.versionKey }},
+                    json: true
+                }, function (error, response, body) {
+                    
+                    expect(response.statusCode).toBe(200);
+                    expect(body).toBeDefined();
+                    expect(body.responseCode).toBe("OK");
+                    expect(body.result).toBeDefined();
+                    done();
+                });
+            })
+        });
+    });
+
+    describe("accept flag service", function () {
+        var contentId = "do_20043627";
+
+        it('Failed due to invalid request object', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/flag/accept/' + contentId,
+                body: {request : {}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(400);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("CLIENT_ERROR");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        it('Failed due to invalid contentId', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/flag/accept/' + contentId + '123',
+                body: {request : {versionKey : "23434234234"}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(404);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("RESOURCE_NOT_FOUND");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        xit('Success', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/flag/accept/' + contentId,
+                body: {request : {versionKey : "1504844754263"}},
+                json: true
+            }, function (error, response, body) {
+                
+                expect(response.statusCode).toBe(200);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("OK");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+    });
+
+    describe("reject flag service", function () {
+        var contentId = "do_20043627";
+
+        it('Failed due to invalid or missing request object', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/flag/reject/' + contentId,
+                body: {request1 : {}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(400);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("CLIENT_ERROR");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        it('Failed due to invalid contentId', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/flag/reject/' + contentId + '123',
+                body: {request : {versionKey : "23434234234"}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(404);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("RESOURCE_NOT_FOUND");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        xit('Success', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/flag/reject/' + contentId,
+                body: {request : {versionKey : "1504844754263"}},
+                json: true
+            }, function (error, response, body) {
+                
+                expect(response.statusCode).toBe(200);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("OK");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+    });
+
+    describe("get pre-signed url Service", function () {
+        var contentId = "do_20043627";
+
+        it('Failed due to invalid or missing request object', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/upload/url/' + contentId,
+                body: {request1 : {content: {}}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(400);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("CLIENT_ERROR");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        it('Failed due to invalid or missing content object', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/upload/url/' + contentId,
+                body: {request : {content1: {}}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(400);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("CLIENT_ERROR");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        it('Failed due to missing required fields', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/upload/url/' + contentId,
+                body: {request : {content: {fileName1: "test.pdf"}}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(400);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("CLIENT_ERROR");
+                expect(body.result).toBeDefined();
+                done();
+            });
+        });
+
+        it('Success', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/upload/url/' + contentId,
+                body: {request : {content: {fileName: "test.pdf"}}},
+                json: true
+            }, function (error, response, body) {
+                expect(response.statusCode).toBe(200);
+                expect(body).toBeDefined();
+                expect(body.responseCode).toBe("OK");
+                expect(body.result).toBeDefined();
                 done();
             });
         });
