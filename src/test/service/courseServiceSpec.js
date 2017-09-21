@@ -1,12 +1,14 @@
 var request = require('request');
 var host = "http://localhost:5000";
 var base_url = host + "/v1/course";
+var courseId = 'do_2123277638089523201167';
+var versionKey = '1504853980585';
 
-xdescribe("Course", function () {
+describe("Course", function () {
 
-    xdescribe("Search Services", function () {
+    describe("search service", function () {
 
-        it('should search courses failed due to missing cid in headers', function (done) {
+        it('should failed search courses due to invalid request object', function (done) {
             request.post({
                 headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/search',
@@ -24,27 +26,9 @@ xdescribe("Course", function () {
                 done();
             });
         });
-        it('should failed search courses due to invalid request object', function (done) {
-            request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
-                uri: base_url + '/search',
-                body: {
-                    "request1": {
-                        "filters": {}
-                    }
-                },
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
         it('should failed search courses due to invalid request filter object', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/search',
                 body: {
                     "request": {
@@ -62,7 +46,7 @@ xdescribe("Course", function () {
         });
         it('should search the courses', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/search',
                 body: {
                     "request": {
@@ -84,32 +68,11 @@ xdescribe("Course", function () {
             });
         });
     });
-    xdescribe("Create Service", function () {
+    describe("create service", function () {
 
-        it('should failed create courses due to missing cid in headers', function (done) {
+        it('should failed due to missing request object', function (done) {
             request.post({
                 headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/create',
-                body: {
-                    "request": {
-                        "course": {
-                            "name": "Course Name",
-                            "description": "Course Description"
-                        }
-                    }
-                },
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
-        it('should create course failed due to missing request object', function (done) {
-            request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
                 uri: base_url + '/create',
                 body: {
                     "request1": {
@@ -128,9 +91,9 @@ xdescribe("Course", function () {
                 done();
             });
         });
-        it('should create course failed due to missing course object', function (done) {
+        it('should failed due to missing course object', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
@@ -149,9 +112,9 @@ xdescribe("Course", function () {
                 done();
             });
         });
-        it('should create course failed due to missing required field name', function (done) {
+        it('should failed due to missing required field name', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
@@ -169,9 +132,9 @@ xdescribe("Course", function () {
                 done();
             });
         });
-        it('should create course failed due to missing required field description', function (done) {
+        it('should failed due to missing required field description', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
@@ -189,9 +152,9 @@ xdescribe("Course", function () {
                 done();
             });
         });
-        xit('should create course success', function (done) {
+        it('should success', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/create',
                 body: {
                     "request": {
@@ -207,37 +170,18 @@ xdescribe("Course", function () {
                 expect(body).toBeDefined();
                 expect(body.responseCode).toBe("OK");
                 expect(body.result).toBeDefined();
+                courseId = body.result.course_id;
+                versionKey = body.result.versionKey;
+                console.log(courseId, versionKey);
                 done();
             });
         });
     });
-    xdescribe("Update Service", function () {
-        var courseId = "do_112240785235501056165";
-        it('Failed due to missing cid in headers', function (done) {
+    describe("update service", function () {
 
-            request.patch({
-                headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/update/' + courseId,
-                body: {
-                    "request": {
-                        "course": {
-                            "name": "Course Name Update",
-                            "description": "Course Description update"
-                        }
-                    }
-                },
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
         it('Failed due to missing request object', function (done) {
             request.patch({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/update/' + courseId,
                 body: {
                     "request1": {
@@ -249,6 +193,7 @@ xdescribe("Course", function () {
                 },
                 json: true
             }, function (error, response, body) {
+                console.log(body);
                 expect(response.statusCode).toBe(400);
                 expect(body).toBeDefined();
                 expect(body.responseCode).toBe("CLIENT_ERROR");
@@ -258,7 +203,7 @@ xdescribe("Course", function () {
         });
         it('Failed due to missing course object', function (done) {
             request.patch({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/update/' + courseId,
                 body: {
                     "request": {
@@ -279,7 +224,7 @@ xdescribe("Course", function () {
         });
         it('Failed due to missing required field versionKey', function (done) {
             request.patch({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/update/' + courseId,
                 body: {
                     "request": {
@@ -299,13 +244,13 @@ xdescribe("Course", function () {
         });
         it('Update course success', function (done) {
             request.patch({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/update/' + courseId,
                 body: {
                     "request": {
                         "course": {
                             "name": "Course Name Update",
-                            "versionKey": "12123123212"
+                            "versionKey": versionKey
                         }
                     }
                 },
@@ -319,26 +264,12 @@ xdescribe("Course", function () {
             });
         });
     });
-    xdescribe("Get Service", function () {
-        var courseId = "do_112240785235501056165";
-        it('Failed due to missing cid in headers', function (done) {
-
+    describe("get service", function () {
+        
+        it('Failed due to invalid course ID', function (done) {
             request.get({
                 headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/get/' + courseId,
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
-        it('Failed due to missing or invalid course ID', function (done) {
-            request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
-                uri: base_url + '/get/' + courseId + 'dssdf',
+                uri: base_url + '/read/' + courseId + 'dssdf',
                 json: true
             }, function (error, response, body) {
                 expect(response.statusCode).toBe(404);
@@ -350,8 +281,8 @@ xdescribe("Course", function () {
         });
         it('Success', function (done) {
             request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
-                uri: base_url + '/get/' + courseId,
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/read/' + courseId,
                 json: true
             }, function (error, response, body) {
                 expect(response.statusCode).toBe(200);
@@ -363,13 +294,11 @@ xdescribe("Course", function () {
             });
         });
     });
-    xdescribe("Review Service", function () {
-        var courseId = "do_112240785235501056165";
-        it('Failed due to missing cid in headers', function (done) {
-
+    describe("Review Service", function () {
+        it('Failed due to missing or invalid course ID', function (done) {
             request.post({
                 headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/review/' + courseId,
+                uri: base_url + '/review/' + courseId + 'dssdf',
                 body: {},
                 json: true
             }, function (error, response, body) {
@@ -380,23 +309,9 @@ xdescribe("Course", function () {
                 done();
             });
         });
-        it('Failed due to missing or invalid course ID', function (done) {
+        it('Success', function (done) {
             request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
-                uri: base_url + '/review/' + courseId + 'dssdf',
-                body: {},
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(404);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("SERVER_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
-        xit('Success', function (done) {
-            request.post({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/review/' + courseId,
                 body: {},
                 json: true
@@ -410,43 +325,28 @@ xdescribe("Course", function () {
         });
     });
     xdescribe("Publish Service", function () {
-        var courseId = "do_112240785235501056165";
-        it('Failed due to missing cid in headers', function (done) {
-
-            request.get({
-                headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/publish/' + courseId,
-                body: {},
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
         it('Failed due to missing or invalid course ID', function (done) {
-            request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+            request.post({
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/publish/' + courseId + 'dssdf',
                 body: {},
                 json: true
             }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
+                expect(response.statusCode).toBe(404);
                 expect(body).toBeDefined();
                 expect(body.responseCode).toBe("CLIENT_ERROR");
                 expect(body.result).toBeDefined();
                 done();
             });
         });
-        it('Success', function (done) {
-            request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+        xit('Success', function (done) {
+            request.post({
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/publish/' + courseId,
-                body: {},
+                body: {request: {course: { lastPublishedBy : "test"}}},
                 json: true
             }, function (error, response, body) {
+                console.log(body)
                 expect(response.statusCode).toBe(200);
                 expect(body).toBeDefined();
                 expect(body.responseCode).toBe("OK");
@@ -455,42 +355,12 @@ xdescribe("Course", function () {
             });
         });
     });
-    xdescribe("Get User Service", function () {
+    describe("Get User Service", function () {
         var userId = "263";
-        it('Failed due to missing cid in headers', function (done) {
-
-            request.get({
-                headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/get/mycourse/' + userId,
-                body: {},
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
-        it('Failed due to missing or invalid course ID', function (done) {
-            request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
-                uri: base_url + '/get/mycourse/',
-//            uri: base_url + '/publish/' + userId + 'dssdf',
-                body: {},
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(404);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe('RESOURCE_NOT_FOUND');
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
         it('Success', function (done) {
             request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
-                uri: base_url + '/get/mycourse/' + userId,
+                headers: {'Content-Type': 'application/json'},
+                uri: base_url + '/read/mycourse/' + userId,
                 body: {},
                 json: true
             }, function (error, response, body) {
@@ -506,26 +376,10 @@ xdescribe("Course", function () {
             });
         });
     });
-    xdescribe("Get Hierarchy Course Service", function () {
-        var courseId = "do_112240785235501056165";
-        it('Failed due to missing cid in headers', function (done) {
-
-            request.get({
-                headers: {'Content-Type': 'application/json'},
-                uri: base_url + '/hierarchy/' + courseId,
-                body: {},
-                json: true
-            }, function (error, response, body) {
-                expect(response.statusCode).toBe(400);
-                expect(body).toBeDefined();
-                expect(body.responseCode).toBe("CLIENT_ERROR");
-                expect(body.result).toBeDefined();
-                done();
-            });
-        });
+    describe("Get Hierarchy Course Service", function () {
         it('Failed due to missing or invalid course ID', function (done) {
             request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/hierarchy/' + courseId + 'dssdf',
                 body: {},
                 json: true
@@ -539,7 +393,7 @@ xdescribe("Course", function () {
         });
         it('Success', function (done) {
             request.get({
-                headers: {'Content-Type': 'application/json', 'cid': '12'},
+                headers: {'Content-Type': 'application/json'},
                 uri: base_url + '/hierarchy/' + courseId,
                 body: {},
                 json: true
