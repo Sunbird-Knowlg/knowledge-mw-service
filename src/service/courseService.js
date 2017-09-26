@@ -111,7 +111,7 @@ function searchCourseAPI(req, response) {
 
         function(CBW) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchCourseAPI", "Request to ekstep for search the course", ekStepReqData));
-            ekStepUtil.searchContent(ekStepReqData, req.headers, function(err, res) {
+            ekStepUtil.compositeSearch(ekStepReqData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchCourseAPI", "Getting error from ekstep", res));
                     rspObj.errCode = courseMessage.SEARCH.FAILED_CODE;
@@ -448,7 +448,7 @@ function getMyCourseAPI(req, response) {
 
         function(CBW) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getMyCourseAPI", "Request to ekstep for get user course", ekStepReqData));
-            ekStepUtil.searchContent(ekStepReqData, req.headers, function(err, res) {
+            ekStepUtil.compositeSearch(ekStepReqData, req.headers, function(err, res) {
 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getMyCourseAPI", "Getting error from ekstep", res));

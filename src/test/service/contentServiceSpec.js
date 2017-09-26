@@ -41,6 +41,46 @@ function getContentByStatus(status, callback) {
     });
 }
 
+describe("Composite search services", function () { 
+ 
+    it('Failed due to empty body', function (done) { 
+        request.post({ 
+            headers: {'Content-Type': 'application/json'}, 
+            uri: base_url + '/search', 
+            json: true 
+        }, function (error, response, body) { 
+            expect(response.statusCode).toBe(400); 
+            expect(body).toBeDefined(); 
+            expect(body.responseCode).toBe("CLIENT_ERROR"); 
+            expect(body.result).toBeDefined(); 
+            done(); 
+        }); 
+    }); 
+ 
+ 
+    it('should search the contents', function (done) { 
+        request.post({ 
+            headers: {'Content-Type': 'application/json'}, 
+            uri: base_url + '/search', 
+            body: { 
+                "request": { 
+                    "query": "Test", 
+                    "filters": {} 
+                } 
+            }, 
+            json: true 
+        }, function (error, response, body) { 
+            expect(response.statusCode).toBe(200); 
+            expect(body).toBeDefined(); 
+            expect(body.responseCode).toBe("OK"); 
+            expect(body.result).toBeDefined(); 
+            expect(body.result.content).toBeDefined(); 
+            done(); 
+        }); 
+    }); 
+}); 
+
+
 describe("Content", function () {
 
     describe("search services", function () {
@@ -285,7 +325,8 @@ describe("Content", function () {
                             "name": "Content Name",
                             "description": "Content Description",
                             "mimeType": "application/pdf",
-                            "contentType": "Story"
+                            "contentType": "Story",
+                            "createdBy" : "Test"
                         }
                     }
                 },
@@ -302,7 +343,7 @@ describe("Content", function () {
 
     });
 
-    describe("update service", function () {
+    xdescribe("update service", function () {
         var contentId = "do_212327128776556544182";
         it('Failed due to missing or invalid request object', function (done) {
             request.patch({
@@ -392,7 +433,7 @@ describe("Content", function () {
         });
     });
 
-    describe("get service", function () {
+    xdescribe("get service", function () {
         var contentId = "do_212327128776556544182";
         
         it('Failed due to missing or invalid content ID', function (done) {
@@ -425,7 +466,7 @@ describe("Content", function () {
         });
     });
 
-    describe("review service", function () {
+    xdescribe("review service", function () {
         var contentId = "do_212327063701544960179";
 
         it('Failed due to missing or invalid content ID', function (done) {
@@ -456,7 +497,7 @@ describe("Content", function () {
         });
     });
 
-    describe("publish service", function () {
+    xdescribe("publish service", function () {
         var contentId = "do_212327063701544960179";
         it('Failed due to missing or invalid request object', function (done) {
 
@@ -540,7 +581,7 @@ describe("Content", function () {
         });
     });
 
-    describe("retire service", function () {
+    xdescribe("retire service", function () {
         var contentIds = ["do_212327128776556544182ff"];
 
         it('Failed due to missing or invalid request object', function (done) {
@@ -589,7 +630,7 @@ describe("Content", function () {
         });
     });
 
-    describe("reject service", function () {
+    xdescribe("reject service", function () {
         var contentId = "do_212326355637837824131";
 
         it('Failed due to missing or invalid contentId', function (done) {
@@ -691,7 +732,7 @@ describe("Content", function () {
         });
     });
 
-    describe("accept flag service", function () {
+    xdescribe("accept flag service", function () {
         var contentId = "do_20043627";
 
         it('Failed due to invalid request object', function (done) {
@@ -741,7 +782,7 @@ describe("Content", function () {
         });
     });
 
-    describe("reject flag service", function () {
+    xdescribe("reject flag service", function () {
         var contentId = "do_20043627";
 
         it('Failed due to invalid or missing request object', function (done) {
@@ -791,7 +832,7 @@ describe("Content", function () {
         });
     });
 
-    describe("get pre-signed url Service", function () {
+    xdescribe("get pre-signed url Service", function () {
         var contentId = "do_20043627";
 
         it('Failed due to invalid or missing request object', function (done) {

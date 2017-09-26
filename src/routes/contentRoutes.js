@@ -20,22 +20,22 @@ module.exports = function(app) {
         .post(requestMiddleware.createAndValidateRequestBody, contentService.createContentAPI);
 
     app.route(BASE_URL + '/update/:contentId')
-        .patch(requestMiddleware.createAndValidateRequestBody, contentService.updateContentAPI);
+        .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.apiAccessForCreatorUser, contentService.updateContentAPI);
 
     app.route(BASE_URL + '/upload/:contentId')
-        .post(requestMiddleware.createAndValidateRequestBody, contentService.uploadContentAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.apiAccessForCreatorUser, contentService.uploadContentAPI);
 
     app.route(BASE_URL + '/review/:contentId')
-        .post(requestMiddleware.createAndValidateRequestBody, contentService.reviewContentAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.apiAccessForCreatorUser, contentService.reviewContentAPI);
 
     app.route(BASE_URL + '/publish/:contentId')
-        .post(requestMiddleware.createAndValidateRequestBody, contentService.publishContentAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.apiAccessForReviewerUser, contentService.publishContentAPI);
 
     app.route(BASE_URL + '/retire')
-        .delete(requestMiddleware.createAndValidateRequestBody, contentService.retireContentAPI);
+        .delete(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, contentService.retireContentAPI);
 
     app.route(BASE_URL + '/reject/:contentId')
-        .post(requestMiddleware.createAndValidateRequestBody, contentService.rejectContentAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.apiAccessForReviewerUser, contentService.rejectContentAPI);
 
     app.route(BASE_URL + '/read/:contentId')
         .get(requestMiddleware.createAndValidateRequestBody, contentService.getContentAPI);
@@ -47,13 +47,13 @@ module.exports = function(app) {
         .post(requestMiddleware.createAndValidateRequestBody, contentService.flagContentAPI);
 
     app.route(BASE_URL + '/flag/accept/:contentId')
-        .post(requestMiddleware.createAndValidateRequestBody, contentService.acceptFlagContentAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.apiAccessForReviewerUser, contentService.acceptFlagContentAPI);
 
     app.route(BASE_URL + '/flag/reject/:contentId')
-        .post(requestMiddleware.createAndValidateRequestBody, contentService.rejectFlagContentAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.apiAccessForReviewerUser, contentService.rejectFlagContentAPI);
 
     app.route(BASE_URL + '/upload/url/:contentId')
-        .post(requestMiddleware.createAndValidateRequestBody, contentService.uploadContentUrlAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.apiAccessForCreatorUser, contentService.uploadContentUrlAPI);
 
     app.route(BASE_URL + '/retire')
         .get(contentService.checkHealth);

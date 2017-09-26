@@ -211,11 +211,13 @@ exports.REQUEST = {
 
     PARAMS: {
         MISSING_CID_CODE: "ERR_REQUEST_FIELDS_CID_MISSING",
-        MISSING_CID_MESSAGE: "Required fields consumer id is missing"
+        MISSING_CID_MESSAGE: "Required field consumer id is missing"
     },
-    DB_ERROR: {
-        DB_ERROR_CODE: "DB_CONNECTION_FAILED",
-        DB_ERROR_MESSAGE: "MongoDB not connected"
+    TOKEN : {
+        MISSING_CODE: "ERR_TOKEN_FIELD_MISSING",
+        MISSING_MESSAGE: "Required field token is missing",
+        INVALID_CODE: "ERR_TOKEN_INVALID",
+        INVALID_MESSAGE: "Invalid token"
     }
 
 };
@@ -224,7 +226,8 @@ exports.RESPONSE_CODE = {
     CLIENT_ERROR: "CLIENT_ERROR",
     SERVER_ERROR: "SERVER_ERROR",
     SUCCESS: "OK",
-    RESOURCE_NOT_FOUND: "RESOURCE_NOT_FOUND"
+    RESOURCE_NOT_FOUND: "RESOURCE_NOT_FOUND",
+    UNAUTHORIZED_ACCESS: "UNAUTHORIZED_ACCESS"
 };
 
 exports.API_VERSION = {
