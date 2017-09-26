@@ -35,10 +35,7 @@ function createFlagContentEmail(req, callback) {
     }
     async.waterfall([
         function(CBW) {
-            var qs = {
-                mode: "edit"
-            };
-            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {
@@ -50,10 +47,11 @@ function createFlagContentEmail(req, callback) {
         function(CBW) {
             var cData = data.request.contentData;
             var eData = emailMessage.CREATE_FLAG;
+            var flagReaons = cData.flagReasons ? cData.flagReasons.toString() : '';
             var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType).replace(/{{Content title}}/g, cData.name);
             var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
                                         .replace(/{{Content title}}/g, cData.name)
-                                        .replace(/{{Flag reason}}/g, cData.flagReasons.toString())
+                                        .replace(/{{Flag reason}}/g, flagReaons) 
                                         .replace(/{{Content status}}/g, cData.status);
             var lsEmailData = {
                 request: getEmailData(null, subject, body, null, null, null, [cData.createdBy])
@@ -89,10 +87,7 @@ function acceptFlagContentEmail(req, callback) {
     }
     async.waterfall([
         function(CBW) {
-            var qs = {
-                mode: "edit"
-            };
-            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) { 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {
@@ -103,11 +98,12 @@ function acceptFlagContentEmail(req, callback) {
         },
         function(CBW) {
             var cData = data.request.contentData;
+            var flagReaons = cData.flagReasons ? cData.flagReasons.toString() : '';
             var eData = emailMessage.ACCEPT_FLAG;
             var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType);
             var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
                                         .replace(/{{Content title}}/g, cData.name)
-                                        .replace(/{{Flag reason}}/g, cData.flagReasons.toString());
+                                        .replace(/{{Flag reason}}/g, flagReaons); 
             var lsEmailData = {
                 request: getEmailData(null, subject, body, null, null, null, [cData.createdBy])
             };
@@ -142,10 +138,7 @@ function rejectFlagContentEmail(req, callback) {
     }
     async.waterfall([
         function(CBW) {
-            var qs = {
-                mode: "edit"
-            };
-            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) { 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {

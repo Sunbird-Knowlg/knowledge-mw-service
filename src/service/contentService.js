@@ -14,6 +14,7 @@ var respUtil = require('response_util');
 var configUtil = require('sb-config-util');
 var LOG = require('sb_logger_util');
 var validatorUtil = require('sb_req_validator_util');
+var _ = require('underscore');
 
 var contentModel = require('../models/contentModel').CONTENT;
 var messageUtils = require('./messageUtil');
@@ -25,6 +26,7 @@ var contentMessage = messageUtils.CONTENT;
 var compositeMessage = messageUtils.COMPOSITE;
 var responseCode = messageUtils.RESPONSE_CODE;
 var hcMessages = messageUtils.HEALTH_CHECK;
+var reqMsg = messageUtils.REQUEST;
 
 /**
  * This function helps to generate code for create course
@@ -162,7 +164,7 @@ function search(defaultContentTypes, req, response) {
                 body : ekStepReqData, 
                 headers: req.headers
             }));
-            ekStepUtil.searchContent(ekStepReqData, req.headers, function(err, res) {
+            ekStepUtil.compositeSearch(ekStepReqData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchContentAPI", "Getting error from ekstep", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE;
@@ -194,8 +196,8 @@ function search(defaultContentTypes, req, response) {
  */
 function createContentAPI(req, response) {
 
-    var data = req.body;
-    var rspObj = req.rspObj;
+    var data = req.body,
+        rspObj = req.rspObj;
 
     if (!data.request || !data.request.content || !validatorUtil.validate(data.request.content, contentModel.CREATE)) {
         //prepare
@@ -267,7 +269,8 @@ function updateContentAPI(req, response) {
 
         function(CBW) {
             var qs = {
-                mode: "edit"
+                mode: "edit",
+                fields: "versionKey"
             };
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateContentAPI", "Request to ekstep for get latest version key", {
                 contentId: data.contentId,
@@ -576,7 +579,7 @@ function getMyContentAPI(req, response) {
                 body : ekStepReqData, 
                 headers: req.headers
             }));
-            ekStepUtil.searchContent(ekStepReqData, req.headers, function(err, res) {
+            ekStepUtil.compositeSearch(ekStepReqData, req.headers, function(err, res) {
 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getMyContentAPI", "Getting error from ekstep", res));
@@ -605,6 +608,7 @@ function retireContentAPI(req, response) {
     var data = req.body;
     var rspObj = req.rspObj;
     var failedContent = [];
+    var userId = req.headers['x-authenticated-userid'];
     var errCode, errMsg, respCode, httpStatus;
 
     if (!data.request || !data.request.contentIds) {
@@ -617,6 +621,42 @@ function retireContentAPI(req, response) {
     }
 
     async.waterfall([
+
+        function(CBW) {
+            var ekStepReqData = {
+                request : {
+                    search : {
+                        identifier : data.request.contentIds
+                    }
+                }
+            };
+            ekStepUtil.searchContent(ekStepReqData, req.headers, function(err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchContentAPI", "Getting error from ekstep", res));
+                    rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE;
+                    rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+
+        function(res, CBW) {
+
+            var createdByOfContents = _.uniq(_.pluck(res.result.content, 'createdBy'));
+            if(createdByOfContents.length === 1 && createdByOfContents[0] === userId) {
+                CBW();
+            } else {
+                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Content createdBy and userId field not matched"));
+                rspObj.errCode = reqMsg.TOKEN.INVALID_CODE;
+                rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE;
+                rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS;
+                return response.status(401).send(respUtil.errorResponse(rspObj));
+            }
+        },
 
         function(CBW) {
             async.each(data.request.contentIds, function(contentId, CBE) {

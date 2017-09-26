@@ -1,14 +1,30 @@
+var async = require('async');
 var uuidV1 = require('uuid/v1');
 var respUtil = require('response_util');
 var messageUtil = require('../service/messageUtil');
 var LOG = require('sb_logger_util');
 var utilsService = require('../service/utilsService');
 var path = require('path');
+var ekStepUtil = require('sb-ekstep-util');
+var ApiInterceptor = require('sb_api_interceptor');
 
 var reqMsg = messageUtil.REQUEST;
 var responseCode = messageUtil.RESPONSE_CODE;
 var apiVersions = messageUtil.API_VERSION;
 var filename = path.basename(__filename);
+
+var keyCloak_config = {
+    "authServerUrl": process.env.sb_keycloak_authServerUrl ? process.env.sb_keycloak_authServerUrl : "https://dev.open-sunbird.org/auth",
+    "realm": process.env.sb_keycloak_realm ? process.env.sb_keycloak_realm : "sunbird",
+    "clientId": process.env.sb_keycloak_clientId ? process.env.sb_keycloak_clientId : "portal",
+    "public": process.env.sb_keycloak_public ? process.env.sb_keycloak_public : "true"
+};
+
+var cache_config = {
+    stroe : process.env.sb_cache_store ? process.env.sb_cache_store : 'memory',
+    ttl : process.env.sb_cache_ttl ? process.env.sb_cache_ttl : 1800
+}
+var apiInterceptor = new ApiInterceptor(keyCloak_config, cache_config);
 
 /**
  * This function helps to validate the request body and create response body
@@ -18,7 +34,6 @@ var filename = path.basename(__filename);
  * @param {type} next
  * @returns {unresolved}
  */
-
 function createAndValidateRequestBody(req, res, next) {
 
     req.body.ts = new Date();
@@ -26,11 +41,7 @@ function createAndValidateRequestBody(req, res, next) {
     req.body.path = req.route.path;
     req.body.params = req.body.params ? req.body.params : {};
     req.body.params.msgid = req.headers['msgid'] || req.body.params.msgid || uuidV1();
-    req.body.params.did = req.headers['did'] || req.body.params.did;
-    req.body.params.cid = req.headers['cid'] || req.body.params.cid;
-    req.body.params.uid = req.headers['uid'] || req.body.params.uid;
-    req.body.params.sid = req.headers['sid'] || req.body.params.sid;
-
+    
     var rspObj = {
         apiId: utilsService.getAppIDForRESP(req.body.path),
         path: req.body.path,
@@ -38,37 +49,157 @@ function createAndValidateRequestBody(req, res, next) {
         msgid: req.body.params.msgid,
         result: {}
     };
-    
-    delete req.headers['host'];
-    delete req.headers['origin'];
-    delete req.headers['accept'];
-    delete req.headers['referer'];
-    delete req.headers['content-length'];
-    delete req.headers['user-agent'];
-    delete req.headers['accept-encoding'];
-    delete req.headers['accept-language'];
-    delete req.headers['accept-charset'];
-    delete req.headers['cookie'];
-    delete req.headers['dnt'];
-    delete req.headers['postman-token'];
-    delete req.headers['cache-control'];
-    delete req.headers['connection'];
+
+    var removedHeaders = ['host', 'origin', 'accept', 'referer', 'content-length', 'user-agent', 'accept-encoding',
+     'accept-language', 'accept-charset', 'cookie', 'dnt', 'postman-token', 'cache-control', 'connection'];
+
+    removedHeaders.forEach(function(e) {
+        delete req.headers[e];
+    });
     
     var requestedData = {body : req.body, params: req.body.params, headers : req.headers};
     LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createAndValidateRequestBody", "API request come", requestedData));
-
-    //Check consumer id for all api
-    // if (!req.body.params.cid) {
-    //     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createAndValidateRequestBody", "API failed due to missing consumer id", requestedData));
-    //     rspObj.errCode = reqMsg.PARAMS.MISSING_CID_CODE;
-    //     rspObj.errMsg = reqMsg.PARAMS.MISSING_CID_MESSAGE;
-    //     rspObj.responseCode = responseCode.CLIENT_ERROR;
-    //     return res.status(400).send(respUtil.errorResponse(rspObj));
-    // }
 
     req.rspObj = rspObj;
     next();
 }
 
+/**
+ * [validateToken - Used to validate the token and add userid into headers]
+ * @param  {[type]}   req  
+ * @param  {[type]}   res  
+ * @param  {Function} next
+ */
+function validateToken(req, res,next) {
 
+    var token = req.headers['x-authenticated-user-token'];
+    var rspObj = req.rspObj;
+
+    if (!token) {
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "validateToken", "API failed due to missing token"));
+        rspObj.errCode = reqMsg.TOKEN.MISSING_CODE;
+        rspObj.errMsg = reqMsg.TOKEN.MISSING_MESSAGE;
+        rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS;
+        return res.status(401).send(respUtil.errorResponse(rspObj));
+    }
+
+    apiInterceptor.validateToken(token, function(err, tokenData) {
+        if(err) {
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "validateToken", "Invalid token"));
+            rspObj.errCode = reqMsg.TOKEN.INVALID_CODE;
+            rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE;
+            rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS;
+            return res.status(401).send(respUtil.errorResponse(rspObj));
+        } else {
+            delete req.headers['x-authenticated-userid'];
+            delete req.headers['x-authenticated-user-token'];
+            req.headers['x-authenticated-userid'] = tokenData.userId;
+            req.rspObj = rspObj;
+            next();
+        }
+    });
+}
+
+/**
+ * [apiAccessForCreatorUser - Check api access for creator user]
+ * @param  {[type]}   req      
+ * @param  {[type]}   response 
+ * @param  {Function} next        
+ */
+function apiAccessForCreatorUser(req, response, next) {
+
+    var userId = req.headers['x-authenticated-userid'],
+        data = {},
+        rspObj = req.rspObj,
+        qs = {
+            fields : "createdBy"
+        },
+        contentMessage = messageUtil.CONTENT;
+
+    data.contentId = req.params.contentId;
+
+    async.waterfall([
+
+        function(CBW) {
+            
+            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForCreatorUser", "Getting error from ekstep", res));
+                    rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE;
+                    rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+        function(res) {
+            if(res.result.content.createdBy !== userId) {
+                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForCreatorUser", "Content createdBy and userId not matched", {createBy : res.result.content.createdBy, userId : userId}));
+                rspObj.errCode = reqMsg.TOKEN.INVALID_CODE;
+                rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE;
+                rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS;
+                return response.status(401).send(respUtil.errorResponse(rspObj));
+            } else {
+                next();
+            }
+        }
+    ]);
+}
+
+/**
+ * [apiAccessForReviewerUser - check api access for reviewer user]
+ * @param  {[type]}   req      
+ * @param  {[type]}   response 
+ * @param  {Function} next     
+ */
+function apiAccessForReviewerUser(req, response, next) {
+
+    var userId = req.headers['x-authenticated-userid'],
+        data = {},
+        rspObj = req.rspObj,
+        qs = {
+            fields : "createdBy"
+        },
+        contentMessage = messageUtil.CONTENT;
+
+    data.contentId = req.params.contentId;
+
+    async.waterfall([
+
+        function(CBW) {
+            
+            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForReviewerUser", "Getting error from ekstep", res));
+                    rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE;
+                    rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+        function(res) {
+            if(res.result.content.createdBy === userId) {
+                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForReviewerUser", "Content createdBy and userId are matched"));
+                rspObj.errCode = reqMsg.TOKEN.INVALID_CODE;
+                rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE;
+                rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS;
+                return response.status(401).send(respUtil.errorResponse(rspObj));
+            } else {
+                next();
+            }
+        }
+    ]);
+}
+
+//Exports required function
+module.exports.validateToken = validateToken;
 module.exports.createAndValidateRequestBody = createAndValidateRequestBody;
+module.exports.apiAccessForReviewerUser = apiAccessForReviewerUser;
+module.exports.apiAccessForCreatorUser = apiAccessForCreatorUser;

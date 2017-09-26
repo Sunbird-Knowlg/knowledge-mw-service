@@ -69,7 +69,6 @@ app.use(function (req, res, next) {
 
 require('./routes/courseRoutes')(app);
 require('./routes/contentRoutes')(app);
-require('./routes/utilsRoute')(app);
 require('./routes/conceptRoutes')(app);
 require('./routes/searchRoutes')(app);
 //last this middle in last
