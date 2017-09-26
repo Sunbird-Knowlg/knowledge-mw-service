@@ -326,7 +326,8 @@ exports.EMAIL = {
             "<b>Content Type: </b>{{Content type}}<br>"+
             "<b>Title: </b>{{Content title}}<br>"+
             "<b>Flag(s) Raised: </b>{{Flag reason}}<br>"+
-            "<b>Content Status: </b>{{Content status}}<br>"
+            "<b>Content Status: </b>{{Content status}}<br>",
+        TEMPLATE: "contentFlagged"
     },
     ACCEPT_FLAG: {
         FAILED_CODE: "ERR_SEND_ACCEPT_FLAG_EMAIL",
@@ -335,7 +336,8 @@ exports.EMAIL = {
         BODY: "Your content has been flagged by the reviewer. Details:<br><br>"+
             "<b>Content Type: </b>{{Content type}}<br>"+
             "<b>Title: </b>{{Content title}}<br>"+
-            "<b>Flag(s) Raised: </b>{{Flag reason}}<br>"
+            "<b>Flag(s) Raised: </b>{{Flag reason}}<br>",
+        TEMPLATE: "acceptFlag"
     },
     REJECT_FLAG: {
         FAILED_CODE: "ERR_SEND_REJECT_FLAG_EMAIL",
@@ -344,7 +346,8 @@ exports.EMAIL = {
         BODY: "Congratulations! The content that you had submitted has been accepted for publication. It is now available through the Genie app. Details:<br>"+
             "<b>Content Type: </b>{{Content type}}<br><br>"+
             "<b>Title: </b>{{Content title}}<br>"+
-            "<b>Status: </b>{{Content status}}<br>"
+            "<b>Status: </b>{{Content status}}<br>",
+        TEMPLATE: "rejectFlag"
     }
 };
 
