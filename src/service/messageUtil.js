@@ -332,7 +332,7 @@ exports.EMAIL = {
     ACCEPT_FLAG: {
         FAILED_CODE: "ERR_SEND_ACCEPT_FLAG_EMAIL",
         FAILED_MESSAGE: "Sending email failed for accept flag",
-        SUBJECT: "Reviewer has flagged your content: {{Content type}} ",
+        SUBJECT: "Reviewer has accepted the flag for your content: {{Content type}} ",
         BODY: "Your content has been flagged by the reviewer. Details:<br><br>"+
             "<b>Content Type: </b>{{Content type}}<br>"+
             "<b>Title: </b>{{Content title}}<br>"+
@@ -343,11 +343,32 @@ exports.EMAIL = {
         FAILED_CODE: "ERR_SEND_REJECT_FLAG_EMAIL",
         FAILED_MESSAGE: "Sending email failed for reject flag",
         SUBJECT: "Congratulations, your content is live! Content Type: {{Content type}}, Title: {{Content title}}",
-        BODY: "Congratulations! The content that you had submitted has been accepted for publication. It is now available through the Genie app. Details:<br>"+
-            "<b>Content Type: </b>{{Content type}}<br><br>"+
+        BODY: "Congratulations! The content that you had submitted has been accepted for publication. It is now available through the Genie app. Details:<br><br>"+
+            "<b>Content Type: </b>{{Content type}}<br>"+
             "<b>Title: </b>{{Content title}}<br>"+
             "<b>Status: </b>{{Content status}}<br>",
         TEMPLATE: "rejectFlag"
+    },
+    PUBLISHED_CONTENT: {
+        FAILED_CODE: "ERR_SEND_PUBLISHED_CONTENT_EMAIL",
+        FAILED_MESSAGE: "Sending email failed for published content",
+        SUBJECT: "Congratulations, your content is live! Content Type: {{Content type}}, Title: {{Content title}}",
+        BODY: "Congratulations! The content that you had submitted has been accepted for publication. It is now available through the Genie app. Details:<br><br>"+
+            "<b>Content Type: </b>{{Content type}}<br>  "+
+            "<b>Title: </b>{{Content title}}<br>"+
+            "<b>Status: </b>{{Content status}}<br>",
+        TEMPLATE: "publishContent"
+    },
+    REJECT_CONTENT: {
+        FAILED_CODE: "ERR_SEND_REJECT_CONTENT_EMAIL",
+        FAILED_MESSAGE: "Sending email failed for reject content",
+        SUBJECT: "Our sincere apologies! Content Type: {{Content type}}, Title: {{Content title}}",
+        BODY: "We acknowledge your contribution and effort in creating content for us. However, we are unable to accept the content that you submitted.<br>"+
+            "We look forward to a more meaningful relationship with you, the next time around. Details:<br><br>"+
+            "<b>Content Type: </b>{{Content type}}<br>"+
+            "<b>Title: </b>{{Content title}}<br>"+
+            "<b>Status: </b>{{Content status}}<br>",
+        TEMPLATE: "rejectContent"
     }
 };
 

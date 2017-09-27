@@ -503,6 +503,7 @@ function publishContentAPI(req, response) {
             rspObj.result.content_id = res.result.node_id;
             rspObj.result.versionKey = res.result.versionKey;
             rspObj.result.publishStatus = res.result.publishStatus;
+            emailService.publishedContentEmail(req, function() { });
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishContentAPI", "Sending response back to user", rspObj));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
@@ -614,8 +615,8 @@ function retireContentAPI(req, response) {
     if (!data.request || !data.request.contentIds) {
         //prepare
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Error due to required params are missing", data.request));
-        rspObj.errCode = contentMessage.CREATE.MISSING_CODE;
-        rspObj.errMsg = contentMessage.CREATE.MISSING_MESSAGE;
+        rspObj.errCode = contentMessage.RETIRE.MISSING_CODE;
+        rspObj.errMsg = contentMessage.RETIRE.MISSING_MESSAGE;
         rspObj.responseCode = responseCode.CLIENT_ERROR;
         return response.status(400).send(respUtil.errorResponse(rspObj));
     }
@@ -737,6 +738,7 @@ function rejectContentAPI(req, response) {
         },
         function(res) {
             rspObj.result = res.result;
+            emailService.rejectContentEmail(req, function() { });
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectContentAPI", "Sending response back to user"));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
