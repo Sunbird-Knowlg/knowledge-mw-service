@@ -94,7 +94,7 @@ function getHealthCheckResp(rsp, healthy, checksArrayObj) {
 //         },
 //         function(CB) {
 //             var apiCallStart = Date.now();
-//             ekStepUtil.leanerServiceHealthCheck(function(err, res) {
+//             ekStepUtil.learnerServiceHealthCheck(function(err, res) {
 //                 if(res && res.result && res.result.healthy) {
 //                     isLSHealthy = true;
 //                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, "", ""));
