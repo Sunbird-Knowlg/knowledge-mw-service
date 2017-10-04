@@ -1,11 +1,7 @@
 exports.COMPOSITE = {
 
     CONTENT_TYPE: [
-        "Story",
-        "Worksheet",
-        "TextBook",
-        "Collection",
-        "Course"
+        "Collection", "LessonPlan", "Resource", "TextBook"
     ]
 };
 
