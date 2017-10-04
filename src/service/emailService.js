@@ -278,13 +278,13 @@ function rejectContentEmail(req, callback) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {
-                    data.request.contentData = res.result.content;
+                    data.contentData = res.result.content;
                     CBW();
                 }
             });
         },
         function(CBW) {
-            var cData = data.request.contentData;
+            var cData = data.contentData;
             var eData = emailMessage.REJECT_CONTENT;
             var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType).replace(/{{Content title}}/g, cData.name);
             var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
