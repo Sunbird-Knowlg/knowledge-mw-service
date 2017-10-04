@@ -17,13 +17,13 @@ global_ekstep_api_base_url = process.env.ekstep_api_base_url ? process.env.ekste
 global_ekstep_proxy_base_url = process.env.ekstep_proxy_base_url ? process.env.ekstep_proxy_base_url : "https://qa.ekstep.in";
 global_ekstep_api_key = process.env.ekstep_api_key;
 
-global_leaner_service_api_key = process.env.leaner_service_api_key;
-global_leaner_service_base_url = process.env.leaner_service_base_url ? process.env.leaner_service_base_url : "https://dev.open-sunbird.org/api";
+global_learner_service_api_key = process.env.learner_service_api_key;
+global_learner_service_base_url = process.env.learner_service_base_url ? process.env.learner_service_base_url : "https://dev.open-sunbird.org/api";
 
 configUtil.setConfig('EKSTEP_BASE_URL', global_ekstep_api_base_url);
 configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + global_ekstep_api_key);
-configUtil.setConfig('LEARNER_SERVICE_BASE_URL', global_leaner_service_base_url);
-configUtil.setConfig('LEARNER_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + global_leaner_service_api_key);
+configUtil.setConfig('LEARNER_SERVICE_BASE_URL', global_learner_service_base_url);
+configUtil.setConfig('LEARNER_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + global_learner_service_api_key);
 
 var app = express();
 
