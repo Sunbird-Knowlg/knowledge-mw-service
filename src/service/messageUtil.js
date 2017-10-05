@@ -213,7 +213,7 @@ exports.REQUEST = {
         MISSING_CODE: "ERR_TOKEN_FIELD_MISSING",
         MISSING_MESSAGE: "Required field token is missing",
         INVALID_CODE: "ERR_TOKEN_INVALID",
-        INVALID_MESSAGE: "Invalid token"
+        INVALID_MESSAGE: "Access denied"
     }
 
 };
@@ -339,7 +339,7 @@ exports.EMAIL = {
         FAILED_CODE: "ERR_SEND_REJECT_FLAG_EMAIL",
         FAILED_MESSAGE: "Sending email failed for reject flag",
         SUBJECT: "Congratulations, your content is live! Content Type: {{Content type}}, Title: {{Content title}}",
-        BODY: "Congratulations! The content that you had submitted has been accepted for publication. It is now available through the Genie app. Details:<br><br>"+
+        BODY: "Congratulations! The content that you had submitted has been accepted for publication. It is now available for usage. Details:<br><br>"+
             "<b>Content Type: </b>{{Content type}}<br>"+
             "<b>Title: </b>{{Content title}}<br>"+
             "<b>Status: </b>{{Content status}}<br>",
@@ -349,10 +349,9 @@ exports.EMAIL = {
         FAILED_CODE: "ERR_SEND_PUBLISHED_CONTENT_EMAIL",
         FAILED_MESSAGE: "Sending email failed for published content",
         SUBJECT: "Congratulations, your content is live! Content Type: {{Content type}}, Title: {{Content title}}",
-        BODY: "Congratulations! The content that you had submitted has been accepted for publication. It is now available through the Genie app. Details:<br><br>"+
+        BODY: "Congratulations! The content that you had submitted has been accepted for publication. It will be available for usage shortly. Details:<br><br>"+
             "<b>Content Type: </b>{{Content type}}<br>  "+
-            "<b>Title: </b>{{Content title}}<br>"+
-            "<b>Status: </b>{{Content status}}<br>",
+            "<b>Title: </b>{{Content title}}<br>",
         TEMPLATE: "publishContent"
     },
     REJECT_CONTENT: {
@@ -379,4 +378,4 @@ exports.HEALTH_CHECK = {
         FAILED_CODE: "LEARNER_SERVICE_HEALTH_FAILED",
         FAILED_MESSAGE: "Learner service is not healthy"
     }
-}
+};
