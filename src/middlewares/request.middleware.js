@@ -14,16 +14,17 @@ var apiVersions = messageUtil.API_VERSION;
 var filename = path.basename(__filename);
 
 var keyCloak_config = {
-    "authServerUrl": process.env.sb_keycloak_authServerUrl ? process.env.sb_keycloak_authServerUrl : "https://dev.open-sunbird.org/auth",
-    "realm": process.env.sb_keycloak_realm ? process.env.sb_keycloak_realm : "sunbird",
-    "clientId": process.env.sb_keycloak_clientId ? process.env.sb_keycloak_clientId : "portal",
-    "public": process.env.sb_keycloak_public ? process.env.sb_keycloak_public : "true"
+    "authServerUrl": process.env.sunbird_keycloak_authServerUrl ? process.env.sunbird_keycloak_authServerUrl : "https://dev.open-sunbird.org/auth",
+    "realm": process.env.sunbird_keycloak_realm ? process.env.sunbird_keycloak_realm : "sunbird",
+    "clientId": process.env.sunbird_keycloak_clientId ? process.env.sunbird_keycloak_clientId : "portal",
+    "public": process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true
 };
 
 var cache_config = {
-    stroe : process.env.sb_cache_store ? process.env.sb_cache_store : 'memory',
-    ttl : process.env.sb_cache_ttl ? process.env.sb_cache_ttl : 1800
-}
+    stroe : process.env.sunbird_cache_store ? process.env.sunbird_cache_store : "memory",
+    ttl : process.env.sunbird_cache_ttl ? process.env.sunbird_cache_ttl : 1800
+};
+
 var apiInterceptor = new ApiInterceptor(keyCloak_config, cache_config);
 
 /**
