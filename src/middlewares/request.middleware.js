@@ -16,7 +16,7 @@ var filename = path.basename(__filename);
 var keyCloak_config = {
     "authServerUrl": process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : "https://staging.open-sunbird.org/auth",
     "realm": process.env.sunbird_keycloak_realm ? process.env.sunbird_keycloak_realm : "sunbird",
-    "clientId": process.env.sunbird_keycloak_clientId ? process.env.sunbird_keycloak_clientId : "portal",
+    "clientId": process.env.sunbird_keycloak_client_id ? process.env.sunbird_keycloak_client_id : "portal",
     "public": process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true
 };
 
