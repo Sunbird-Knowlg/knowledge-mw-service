@@ -11,7 +11,7 @@
 * learner_service_api_key: API key for learner service (string)
 * sunbird_keycloak_auth_server_url: Sunbird keycloak auth server url e.g.: https://dev.open-sunbird.org/auth (string)
 * sunbird_keycloak_realm: Sunbird keycloak realm e.g.: sunbird (string)
-* sunbird_keycloak_clientId: Sunbird keycloak client id e.g: portal (string)
+* sunbird_keycloak_client_id: Sunbird keycloak client id e.g: portal (string)
 * sunbird_keycloak_public: Sunbird keycloak public e.g.: true (boolean)
 * sunbird_cache_store: Sunbird cache store e.g.: memory (string)
 * sunbird_cache_ttl: Sunbird cachec time to live e.g.: 1800(number)
