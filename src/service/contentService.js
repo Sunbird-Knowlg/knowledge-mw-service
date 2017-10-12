@@ -798,7 +798,7 @@ function acceptFlagContentAPI(req, response) {
     var data = req.body;
     data.contentId = req.params.contentId;
     var rspObj = req.rspObj;
-    if (!data.contentId || !data.request || !data.request.versionKey) {
+    if (!data.contentId || !data.request) {
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "acceptFlagContentAPI", "Error due to required params are missing", {
             contentId: data.contentId
         }));
