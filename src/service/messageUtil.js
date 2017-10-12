@@ -161,6 +161,11 @@ exports.CONTENT = {
         FAILED_MESSAGE: "Upload url for content failed"
     },
 
+    HIERARCHY_UPDATE: {
+        MISSING_CODE: "ERR_CONTENT_HIERARCHY_UPDATE_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for update hierarchy are missing"
+    },
+
     CONTENT_TYPE: [
         "Story",
         "Worksheet",

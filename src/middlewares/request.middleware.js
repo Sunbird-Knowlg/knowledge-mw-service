@@ -7,8 +7,11 @@ var utilsService = require('../service/utilsService');
 var path = require('path');
 var ekStepUtil = require('sb-ekstep-util');
 var ApiInterceptor = require('sb_api_interceptor');
+var _ = require('underscore');
+var configUtil = require('sb-config-util');
 
 var reqMsg = messageUtil.REQUEST;
+var contentMessage = messageUtil.CONTENT;
 var responseCode = messageUtil.RESPONSE_CODE;
 var apiVersions = messageUtil.API_VERSION;
 var filename = path.basename(__filename);
@@ -199,8 +202,67 @@ function apiAccessForReviewerUser(req, response, next) {
     ]);
 }
 
+/**
+ * [hierarchyUpdateApiAccess - Check api access for heirarchy update
+ * @param  {[type]}   req      
+ * @param  {[type]}   response 
+ * @param  {Function} next        
+ */
+function hierarchyUpdateApiAccess(req, response, next) {
+
+    var userId = req.headers['x-authenticated-userid'],
+        data = req.body,
+        rspObj = req.rspObj,
+        qs = {
+            fields : "createdBy"
+        },
+        contentMessage = messageUtil.CONTENT;
+
+    if (!data.request || !data.request.data || !data.request.data.hierarchy) {
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "hierarchyUpdateApiAccess", "Error due to required params are missing", data.request));
+        rspObj.errCode = contentMessage.HIERARCHY_UPDATE.MISSING_CODE;
+        rspObj.errMsg = contentMessage.HIERARCHY_UPDATE.MISSING_MESSAGE;
+        rspObj.responseCode = responseCode.CLIENT_ERROR;
+        return response.status(400).send(respUtil.errorResponse(rspObj));
+    }
+
+    var hierarchy = data.request.data.hierarchy;
+    data.contentId = _.findKey(hierarchy, function(item) {
+                        if(item.root === true) return item;
+                    });
+
+    async.waterfall([
+        function(CBW) {
+            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForCreatorUser", "Getting error from ekstep", res));
+                    rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE;
+                    rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+        function(res) {
+            if(res.result.content.createdBy !== userId) {
+                LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForCreatorUser", "Content createdBy and userId not matched", {createBy : res.result.content.createdBy, userId : userId}));
+                rspObj.errCode = reqMsg.TOKEN.INVALID_CODE;
+                rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE;
+                rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS;
+                return response.status(401).send(respUtil.errorResponse(rspObj));
+            } else {
+                next();
+            }
+        }
+    ]);
+}
+
 //Exports required function
 module.exports.validateToken = validateToken;
 module.exports.createAndValidateRequestBody = createAndValidateRequestBody;
 module.exports.apiAccessForReviewerUser = apiAccessForReviewerUser;
 module.exports.apiAccessForCreatorUser = apiAccessForCreatorUser;
+module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess;
