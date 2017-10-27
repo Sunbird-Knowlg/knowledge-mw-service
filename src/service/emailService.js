@@ -313,8 +313,66 @@ function rejectContentEmail(req, callback) {
     ]);
 }
 
+/**
+ * Below function is used for send email when unlist publish content api called
+ * @param {object} req 
+ * @param {function} callback 
+ */
+function unlistedPublishContentEmail(req, callback) {
+    
+    var data = req.body;
+    data.contentId = req.params.contentId;
+    var rspObj = req.rspObj;
+    var shareUrl = data.request && data.request.content && data.request.content.shareUrl ? data.request.content.shareUrl : "";
+
+    if (data.contentId) {
+        callback(true, null);
+    }
+    async.waterfall([
+        function(CBW) {
+            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) { 
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    callback(true, null);
+                } else {
+                    data.request.contentData = res.result.content;
+                    CBW();
+                }
+            });
+        },
+        function(CBW) {
+            var cData = data.request.contentData;
+            var eData = emailMessage.UNLISTED_PUBLISH_CONTENT;
+            var subject = eData.SUBJECT.replace(/{{Content title}}/g, cData.name);
+            var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
+                                        .replace(/{{Content title}}/g, cData.name)
+                                        .replace(/{{Share url}}/g, shareUrl)
+                                        .replace(/{{Share url}}/g, shareUrl);
+            var lsEmailData = {
+                request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
+            };
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "unlistedPublishContentEmail", "Request to Leaner service for sending email", {
+                body : lsEmailData
+            }));
+            ekStepUtil.sendEmail(lsEmailData, req.headers, function(err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "unlistedPublishContentEmail", "Sending email failed", res));
+                    callback(true, null);
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+
+        function(res) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "unlistedPublishContentEmail", "Email sent successfully", rspObj));
+            callback(null, true);
+        }
+    ]);
+}
+
 module.exports.createFlagContentEmail = createFlagContentEmail;
 module.exports.acceptFlagContentEmail = acceptFlagContentEmail;
 module.exports.rejectFlagContentEmail = rejectFlagContentEmail;
 module.exports.publishedContentEmail = publishedContentEmail;
 module.exports.rejectContentEmail = rejectContentEmail;
+module.exports.unlistedPublishContentEmail = unlistedPublishContentEmail;

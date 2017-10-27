@@ -70,6 +70,8 @@ module.exports = function (app) {
     app.route('/action' + configUtil.getConfig('EKSTEP_CONTENT_HIERARCHY_UPDATE_URI') + '/')
         .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.hierarchyUpdateApiAccess);
 
+    app.route('/action' + configUtil.getConfig('EKSTEP_UNLISTED_PUBLISH_CONTENT_URI') + '/:contentId')
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, requestMiddleware.apiAccessForCreatorUser, contentService.unlistedPublishContentAPI);
 
     app.use('/action/*', proxy(ekstep_api, {
         proxyReqOptDecorator: function(proxyReqOpts, srcReq) {

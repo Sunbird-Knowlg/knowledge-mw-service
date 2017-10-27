@@ -939,6 +939,55 @@ function uploadContentUrlAPI(req, response) {
     ]);
 }
 
+function unlistedPublishContentAPI(req, response) {
+
+    var data = req.body;
+    var rspObj = req.rspObj;
+    data.contentId = req.params.contentId;
+    var ekStepReqData = {
+        request: data.request
+    };
+
+    if (!data.request || !data.request.content || !data.request.content.lastPublishedBy) {
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "unlistedPublishContentAPI", "Error due to required params are missing", data.request));
+        rspObj.errCode = contentMessage.UNLISTED_PUBLISH.MISSING_CODE;
+        rspObj.errMsg = contentMessage.UNLISTED_PUBLISH.MISSING_MESSAGE;
+        rspObj.responseCode = responseCode.CLIENT_ERROR;
+        return response.status(400).send(respUtil.errorResponse(rspObj));
+    }
+    async.waterfall([
+
+        function(CBW) {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "unlistedPublishContentAPI", "Request to ekstep for unlisted published the content", {
+                contentId: data.contentId,
+                reqData: ekStepReqData,
+                headers: req.headers
+            }));
+            ekStepUtil.unlistedPublishContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
+                //After check response, we perform other operation
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "unlistedPublishContentAPI", "Getting error from ekstep", res));
+                    rspObj.errCode = res && res.params ? res.params.err : contentMessage.UNLISTED_PUBLISH.FAILED_CODE;
+                    rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UNLISTED_PUBLISH.FAILED_MESSAGE;
+                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
+                } else {
+                    CBW(null, res);
+                }
+            });
+        },
+        function(res) {
+            rspObj.result.content_id = res.result.node_id;
+            rspObj.result.versionKey = res.result.versionKey;
+            rspObj.result.publishStatus = res.result.publishStatus;
+            emailService.unlistedPublishContentEmail(req, function() { });
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "unlistedPublishContentAPI", "Sending response back to user", rspObj));
+            return response.status(200).send(respUtil.successResponse(rspObj));
+        }
+    ]);
+}
+
 module.exports.searchAPI = searchAPI;
 module.exports.searchContentAPI = searchContentAPI;
 module.exports.createContentAPI = createContentAPI;
@@ -955,3 +1004,4 @@ module.exports.flagContentAPI = flagContentAPI;
 module.exports.acceptFlagContentAPI = acceptFlagContentAPI;
 module.exports.rejectFlagContentAPI = rejectFlagContentAPI;
 module.exports.uploadContentUrlAPI = uploadContentUrlAPI;
+module.exports.unlistedPublishContentAPI = unlistedPublishContentAPI;
