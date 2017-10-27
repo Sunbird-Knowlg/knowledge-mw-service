@@ -166,6 +166,13 @@ exports.CONTENT = {
         MISSING_MESSAGE: "Required fields for update hierarchy are missing"
     },
 
+    UNLISTED_PUBLISH: {
+        MISSING_CODE: "ERR_UNLISTED_PUBLISH_FIELDS_MISSING", 
+        MISSING_MESSAGE: "Required fields for unlisted publish content are missing", 
+        FAILED_CODE: "ERR_UNLISTED_PUBLISH_FIELDS_FAILED",
+        FAILED_MESSAGE: "Unlisted publish content failed"
+    },
+
     CONTENT_TYPE: [
         "Story",
         "Worksheet",
@@ -369,7 +376,16 @@ exports.EMAIL = {
             "<b>Title: </b>{{Content title}}<br>"+
             "<b>Status: </b>{{Content status}}<br>",
         TEMPLATE: "rejectContent"
-    }
+    },
+    UNLISTED_PUBLISH_CONTENT: {
+        FAILED_CODE: "ERR_SEND_PUNLISTED_PUBLISH_CONTENT_EMAIL",
+        FAILED_MESSAGE: "Sending email failed for unlist publish content",
+        SUBJECT: "Congratulations, your content {{Content title}} is live!",
+        BODY: "Congratulations! The content is now ready for limited sharing. You can share it using <a href='{{Share url}}'>{{Share url}}</a>. Details:<br><br>"+
+            "<b>Content Type: </b>{{Content type}}<br>  "+
+            "<b>Title: </b>{{Content title}}<br>",
+        TEMPLATE: "unlistedPublishContent"
+    },
 };
 
 exports.HEALTH_CHECK = {
