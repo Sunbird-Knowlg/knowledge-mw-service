@@ -314,6 +314,23 @@ function rejectContentEmail(req, callback) {
 }
 
 /**
+ * [getUnlistedShareUrl Return share url for unlisted content]
+ * @param  {[Object]} cData   [content data]
+ * @param  {[String]} baseUri [base url]
+ * @return {[String]}         [share url]
+ */
+var getUnlistedShareUrl = function (cData, baseUri) {
+    this.baseUrl = baseUri + messageUtils.SHARE_URL.baseUri
+    if (cData.contentType === 'Course') {
+        return this.baseUrl + 'course' + '/' + cData.identifier + '/' + messageUtils.SHARE_URL.type
+    } else if (cData.mimeType === 'application/vnd.ekstep.content-collection') {
+        return this.baseUrl + 'content' + '/' + cData.identifier + '/' + messageUtils.SHARE_URL.type + '/'
+    } else {
+        return this.baseUrl + 'content' + '/' + cData.identifier + '/' + messageUtils.SHARE_URL.type
+    }
+}
+
+/**
  * Below function is used for send email when unlist publish content api called
  * @param {object} req 
  * @param {function} callback 
@@ -323,7 +340,7 @@ function unlistedPublishContentEmail(req, callback) {
     var data = req.body;
     data.contentId = req.params.contentId;
     var rspObj = req.rspObj;
-    var shareUrl = data.request && data.request.content && data.request.content.shareUrl ? data.request.content.shareUrl : "";
+    var baseUrl = data.request && data.request.content && data.request.content.baseUrl ? data.request.content.baseUrl : "";
 
     if (data.contentId) {
         callback(true, null);
@@ -343,6 +360,7 @@ function unlistedPublishContentEmail(req, callback) {
             var cData = data.request.contentData;
             var eData = emailMessage.UNLISTED_PUBLISH_CONTENT;
             var subject = eData.SUBJECT.replace(/{{Content title}}/g, cData.name);
+            var shareUrl = getUnlistedShareUrl(cData, baseUrl)
             var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
                                         .replace(/{{Content title}}/g, cData.name)
                                         .replace(/{{Share url}}/g, shareUrl)
