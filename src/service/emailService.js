@@ -314,19 +314,28 @@ function rejectContentEmail(req, callback) {
 }
 
 /**
+ * [getBase64Url Return base64 url for unlisted content share]
+ * @param  {[String]} type   [content type]
+ * @param  {[String]} identifier [contentID]
+ * @return {[String]}         [base64 string]
+ */
+var getBase64Url = function (type, identifier) {
+    return new Buffer(type + '/' + identifier).toString('base64')
+}
+
+/**
  * [getUnlistedShareUrl Return share url for unlisted content]
  * @param  {[Object]} cData   [content data]
  * @param  {[String]} baseUri [base url]
  * @return {[String]}         [share url]
  */
 var getUnlistedShareUrl = function (cData, baseUri) {
-    this.baseUrl = baseUri + messageUtils.SHARE_URL.baseUri
     if (cData.contentType === 'Course') {
-        return this.baseUrl + 'course' + '/' + cData.identifier + '/' + messageUtils.SHARE_URL.type
+        return baseUri + '/unlisted' + '/' + getBase64Url('course', cData.identifier)
     } else if (cData.mimeType === 'application/vnd.ekstep.content-collection') {
-        return this.baseUrl + 'content' + '/' + cData.identifier + '/' + messageUtils.SHARE_URL.type + '/'
+        return baseUri + '/unlisted' + '/' + getBase64Url('collection', cData.identifier)
     } else {
-        return this.baseUrl + 'content' + '/' + cData.identifier + '/' + messageUtils.SHARE_URL.type
+        return baseUri + '/unlisted' + '/' + getBase64Url('content', cData.identifier)
     }
 }
 

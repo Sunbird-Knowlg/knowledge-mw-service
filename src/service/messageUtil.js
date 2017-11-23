@@ -388,11 +388,6 @@ exports.EMAIL = {
     },
 };
 
-exports.SHARE_URL = {
-    baseUri : '/public/#!/',
-    type: 'Unlisted'
-}
-
 exports.HEALTH_CHECK = {
     EK_STEP: {
         NAME: "ekstep.api",
