@@ -17,8 +17,8 @@ global_ekstep_api_base_url = process.env.ekstep_api_base_url ? process.env.ekste
 global_ekstep_proxy_base_url = process.env.ekstep_proxy_base_url ? process.env.ekstep_proxy_base_url : "https://qa.ekstep.in";
 global_ekstep_api_key = process.env.ekstep_api_key;
 
-global_learner_service_api_key = process.env.learner_service_api_key;
-global_learner_service_base_url = process.env.learner_service_base_url ? process.env.learner_service_base_url : "https://dev.open-sunbird.org/api";
+global_learner_service_api_key = process.env.sunbird_learner_service_api_key;
+global_learner_service_base_url = process.env.sunbird_learner_service_base_url ? process.env.sunbird_learner_service_base_url : "https://dev.open-sunbird.org/api";
 
 configUtil.setConfig('EKSTEP_BASE_URL', global_ekstep_api_base_url);
 configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + global_ekstep_api_key);
