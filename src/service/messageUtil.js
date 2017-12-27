@@ -400,3 +400,41 @@ exports.HEALTH_CHECK = {
         FAILED_MESSAGE: "Learner service is not healthy"
     }
 };
+
+exports.DIALCODE = {
+
+    GENERATE: {
+        MISSING_CODE: "ERR_DIALCODE_GENERATE_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for generate dialcode are missing",
+        FAILED_CODE: "ERR_DIALCODE_GENERATE_FAILED",
+        FAILED_MESSAGE: "Generate dialcode failed"
+    },
+
+    LIST: {
+        MISSING_CODE: "ERR_DIALCODE_LIST_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for getting dialcode list are missing",
+        FAILED_CODE: "ERR_DIALCODE_LIST_FAILED",
+        FAILED_MESSAGE: "Getting dialcode list failed"
+    },
+
+    UPDATE: {
+        MISSING_CODE: "ERR_DIALCODE_UPDATE_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for update dialcode are missing",
+        FAILED_CODE: "ERR_DIALCODE_UPDATE_FAILED",
+        FAILED_MESSAGE: "Update dialcode failed"
+    },
+
+    GET: {
+        MISSING_CODE: "ERR_DIALCODE_GET_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for get dialcode are missing",
+        FAILED_CODE: "ERR_DIALCODE_GET_FAILED",
+        FAILED_MESSAGE: "Get dialcode failed"
+    },
+
+    CONTENT_LINK: {
+        MISSING_CODE: "ERR_DIALCODE_CONTENT_LINK_FIELDS_MISSING",
+        MISSING_MESSAGE: "Required fields for content link dialcode are missing",
+        FAILED_CODE: "ERR_DIALCODE_CONTENT_LINK_FAILED",
+        FAILED_MESSAGE: "Content link dialcode failed"
+    },
+};

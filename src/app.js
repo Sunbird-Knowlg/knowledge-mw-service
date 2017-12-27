@@ -71,6 +71,7 @@ require('./routes/courseRoutes')(app);
 require('./routes/contentRoutes')(app);
 require('./routes/conceptRoutes')(app);
 require('./routes/searchRoutes')(app);
+require('./routes/dialCodeRoutes')(app);
 //last this middle in last
 require('./middlewares/proxy.middleware')(app);
 
