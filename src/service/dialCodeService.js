@@ -84,7 +84,7 @@ function dialCodeListAPI(req, response) {
     var data = req.body,
         rspObj = req.rspObj;
 
-    if (!data.request || !data.request.publisher || !data.request.channel) {
+    if (!data.request || !data.request.search) {
         LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "dialCodeListAPI", "Error due to required params are missing", data.request));
         rspObj.errCode = dialCodeMessage.LIST.MISSING_CODE;
         rspObj.errMsg = dialCodeMessage.LIST.MISSING_MESSAGE;
