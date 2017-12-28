@@ -5,6 +5,8 @@ var http = require('http');
 var messageUtil = require('./service/messageUtil');
 var respUtil = require('response_util');
 var configUtil = require('sb-config-util');
+var fs = require('fs');
+var apiConfig = JSON.parse(fs.readFileSync(__dirname + '/config/apiConfig.json', 'utf8'));
 
 var reqMsg = messageUtil.REQUEST;
 var responseCode = messageUtil.RESPONSE_CODE;
@@ -13,15 +15,16 @@ var reqDataLimitOfContentUpload = '30mb';
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000;
 
-global_ekstep_api_base_url = process.env.ekstep_api_base_url ? process.env.ekstep_api_base_url : "https://qa.ekstep.in/api";
-global_ekstep_proxy_base_url = process.env.ekstep_proxy_base_url ? process.env.ekstep_proxy_base_url : "https://qa.ekstep.in";
-global_ekstep_api_key = process.env.ekstep_api_key;
+global_content_provider_base_url = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : "https://qa.ekstep.in/api";
+global_ekstep_proxy_base_url = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : "https://qa.ekstep.in";
+global_content_provider_api_key = process.env.sunbird_content_provider_api_key;
 
 global_learner_service_api_key = process.env.sunbird_learner_service_api_key;
 global_learner_service_base_url = process.env.sunbird_learner_service_base_url ? process.env.sunbird_learner_service_base_url : "https://dev.open-sunbird.org/api";
 
-configUtil.setConfig('EKSTEP_BASE_URL', global_ekstep_api_base_url);
-configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + global_ekstep_api_key);
+configUtil.setApiConfig(apiConfig.API)
+configUtil.setConfig('BASE_URL', global_content_provider_base_url);
+configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + global_content_provider_api_key);
 configUtil.setConfig('LEARNER_SERVICE_BASE_URL', global_learner_service_base_url);
 configUtil.setConfig('LEARNER_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + global_learner_service_api_key);
 
@@ -29,7 +32,9 @@ var app = express();
 
 const isEkStepProxyRequest = function (req) {
   let url = req.url;
-  return url && ((url.indexOf('content/v3/upload') > -1 && !(url.indexOf('content/v3/upload/url') > -1)) || url.indexOf('/telemetry') > -1);
+  const uploadAPI = configUtil.getConfig('UPLOAD_CONTENT_URI');
+  const uploadUrlAPI = configUtil.getConfig('CONTENT_UPLOAD_URL_URI')
+  return url && ((url.indexOf(uploadAPI) > -1 && !(url.indexOf(uploadUrlAPI) > -1)) || url.indexOf('/telemetry') > -1);
 };
 
 const bodyParserJsonMiddleware = function () {

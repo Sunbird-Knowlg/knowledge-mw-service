@@ -7,7 +7,7 @@
 var async = require('async');
 var path = require('path');
 var respUtil = require('response_util');
-var ekStepUtil = require('sb-ekstep-util');
+var contentProvider = require('sb_content_provider_util');
 var LOG = require('sb_logger_util');
 
 var messageUtils = require('./messageUtil');
@@ -18,7 +18,7 @@ var domainMessage = messageUtils.DOMAIN;
 var responseCode = messageUtils.RESPONSE_CODE;
 
 /**
- * This function helps to get all domain from ekstep
+ * This function helps to get all domain from content provider
  * @param {Object} req
  * @param {Object} response
  */
@@ -31,12 +31,12 @@ function getDomainsAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getDomainsAPI", "Request to ekstep for get all domains",{
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getDomainsAPI", "Request to content provider for get all domains",{
                 headers: req.headers
             }));
-            ekStepUtil.getDomains(req.headers, function(err, res) {
+            contentProvider.getDomains(req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getDomainsAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getDomainsAPI", "Getting error from content provider", res));
                     rspObj.errCode = domainMessage.GET_DOMAINS.FAILED_CODE;
                     rspObj.errMsg = domainMessage.GET_DOMAINS.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -57,7 +57,7 @@ function getDomainsAPI(req, response) {
 }
 
 /**
- * This function helps to get domain from ekstep by domainId 
+ * This function helps to get domain from content provider by domainId 
  * @param {Object} req
  * @param {Object} response
  */
@@ -79,13 +79,13 @@ function getDomainByIDAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getDomainByIDAPI", "Request to ekstep for get domain by id", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getDomainByIDAPI", "Request to content provider for get domain by id", {
                 body : data, 
                 headers: req.headers
             }));
-            ekStepUtil.getDomainById(data.domainId, req.headers, function(err, res) {
+            contentProvider.getDomainById(data.domainId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getDomainByIDAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getDomainByIDAPI", "Getting error from content provider", res));
                     rspObj.errCode = domainMessage.GET_DOMAIN_BY_ID.FAILED_CODE;
                     rspObj.errMsg = domainMessage.GET_DOMAIN_BY_ID.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -128,13 +128,13 @@ function getObjectTypesAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getObjectTypesAPI", "Request to ekstep for get object type", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getObjectTypesAPI", "Request to content provider for get object type", {
                 body : data, 
                 headers: req.headers
             }));
-            ekStepUtil.getObjects(data.domainId, data.objectType, req.headers, function(err, res) {
+            contentProvider.getObjects(data.domainId, data.objectType, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getObjectTypesAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getObjectTypesAPI", "Getting error from content provider", res));
                     rspObj.errCode = domainMessage.GET_OBJECTS.FAILED_CODE;
                     rspObj.errMsg = domainMessage.GET_OBJECTS.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -178,13 +178,13 @@ function getObjectTypeByIDAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getObjectTypeByIDAPI", "Request to ekstep for get object type using id", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getObjectTypeByIDAPI", "Request to content provider for get object type using id", {
                 body : data, 
                 headers: req.headers
             }));
-            ekStepUtil.getObjectById(data.domainId, data.objectType, data.objectId, req.headers, function(err, res) {
+            contentProvider.getObjectById(data.domainId, data.objectType, data.objectId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getObjectTypeByIDAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getObjectTypeByIDAPI", "Getting error from content provider", res));
                     rspObj.errCode = domainMessage.GET_OBJECT_BY_ID.FAILED_CODE;
                     rspObj.errMsg = domainMessage.GET_OBJECT_BY_ID.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -226,13 +226,13 @@ function getConceptByIdAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getConceptByIdAPI", "Request to ekstep for get concept", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getConceptByIdAPI", "Request to content provider for get concept", {
                 body : data, 
                 headers: req.headers
             }));
-            ekStepUtil.getConceptById(data.conceptId, req.headers, function(err, res) {
+            contentProvider.getConceptById(data.conceptId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getConceptByIdAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getConceptByIdAPI", "Getting error from content provider", res));
                     rspObj.errCode = domainMessage.GET_CONCEPT_BY_ID.FAILED_CODE;
                     rspObj.errMsg = domainMessage.GET_CONCEPT_BY_ID.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -279,13 +279,13 @@ function searchObjectTypeAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchObjectTypeAPI", "Request to ekstep for search object type", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchObjectTypeAPI", "Request to content provider for search object type", {
                 body : data, 
                 headers: req.headers
             }));
-            ekStepUtil.searchObjectsType(ekStepReqData, data.domainId, data.objectType, req.headers, function(err, res) {
+            contentProvider.searchObjectsType(ekStepReqData, data.domainId, data.objectType, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchObjectTypeAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchObjectTypeAPI", "Getting error from content provider", res));
                     rspObj.errCode = domainMessage.SEARCH_OBJECT_TYPE.FAILED_CODE;
                     rspObj.errMsg = domainMessage.SEARCH_OBJECT_TYPE.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -333,13 +333,13 @@ function createObjectTypeAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createObjectTypeAPI", "Request to ekstep for create object type", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createObjectTypeAPI", "Request to content provider for create object type", {
                 body : data, 
                 headers: req.headers
             }));
-            ekStepUtil.createObjectType(ekStepReqData, data.domainId, data.objectType, req.headers, function(err, res) {
+            contentProvider.createObjectType(ekStepReqData, data.domainId, data.objectType, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createObjectTypeAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createObjectTypeAPI", "Getting error from content provider", res));
                     rspObj.errCode = domainMessage.CREATE_OBJECT_TYPE.FAILED_CODE;
                     rspObj.errMsg = domainMessage.CREATE_OBJECT_TYPE.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -387,13 +387,13 @@ function updateObjectTypeAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateObjectTypeAPI", "Request to ekstep for update object type", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateObjectTypeAPI", "Request to content provider for update object type", {
                 body : data, 
                 headers: req.headers
             }));
-            ekStepUtil.updateObjectType(ekStepReqData, data.domainId, data.objectType, data.objectId, req.headers, function(err, res) {
+            contentProvider.updateObjectType(ekStepReqData, data.domainId, data.objectType, data.objectId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateObjectTypeAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateObjectTypeAPI", "Getting error from content provider", res));
                     rspObj.errCode = domainMessage.UPDATE_OBJECT_TYPE.FAILED_CODE;
                     rspObj.errMsg = domainMessage.UPDATE_OBJECT_TYPE.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -439,13 +439,13 @@ function retireObjectTypeAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireObjectTypeAPI", "Request to ekstep for retire object type", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireObjectTypeAPI", "Request to content provider for retire object type", {
                 body : data, 
                 headers: req.headers
             }));
-            ekStepUtil.retireObjectType(ekStepReqData, data.domainId, data.objectType, data.objectId, req.headers, function(err, res) {
+            contentProvider.retireObjectType(ekStepReqData, data.domainId, data.objectType, data.objectId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireObjectTypeAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireObjectTypeAPI", "Getting error from content provider", res));
                     rspObj.errCode = domainMessage.RETIRE_OBJECT_TYPE.FAILED_CODE;
                     rspObj.errMsg = domainMessage.RETIRE_OBJECT_TYPE.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -474,10 +474,10 @@ function listTermsAPI(req, response) {
     var rspObj = req.rspObj;
     async.waterfall([
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listTermsAPI", "Request to ekstep for terms list",{
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listTermsAPI", "Request to content provider for terms list",{
                 headers: req.headers
             }));
-            ekStepUtil.listTerms(req.headers, function(err, res) {
+            contentProvider.listTerms(req.headers, function(err, res) {
                 CBW(null, res);
             });
         },
@@ -499,10 +499,10 @@ function listResourceBundlesAPI(req, response) {
     var rspObj = req.rspObj;
     async.waterfall([
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listResourceBundlesAPI", "Request to ekstep for terms list", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listResourceBundlesAPI", "Request to content provider for terms list", {
                 headers: req.headers
             }));
-            ekStepUtil.listResourceBundles(req.headers, function(err, res) {
+            contentProvider.listResourceBundles(req.headers, function(err, res) {
                 CBW(null, res);
             });
         },
@@ -524,10 +524,10 @@ function listOrdinalsAPI(req, response) {
     var rspObj = req.rspObj;
     async.waterfall([
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listOrdinalsAPI", "Request to ekstep for terms list", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "listOrdinalsAPI", "Request to content provider for terms list", {
                 headers: req.headers
             }));
-            ekStepUtil.listOrdinals(req.headers, function(err, res) {
+            contentProvider.listOrdinals(req.headers, function(err, res) {
                 CBW(null, res);
             });
         },

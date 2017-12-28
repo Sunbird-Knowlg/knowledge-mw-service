@@ -5,7 +5,7 @@ var messageUtil = require('../service/messageUtil');
 var LOG = require('sb_logger_util');
 var utilsService = require('../service/utilsService');
 var path = require('path');
-var ekStepUtil = require('sb-ekstep-util');
+var contentProvider = require('sb_content_provider_util');
 var ApiInterceptor = require('sb_api_interceptor');
 var _ = require('underscore');
 var configUtil = require('sb-config-util');
@@ -89,7 +89,7 @@ function validateToken(req, res,next) {
 
     apiInterceptor.validateToken(token, function(err, tokenData) {
         if(err) {
-            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "validateToken", "Invalid token"));
+            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "validateToken", "Invalid token", err));
             rspObj.errCode = reqMsg.TOKEN.INVALID_CODE;
             rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE;
             rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS;
@@ -126,9 +126,9 @@ function apiAccessForCreatorUser(req, response, next) {
 
         function(CBW) {
             
-            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+            contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForCreatorUser", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForCreatorUser", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -175,9 +175,9 @@ function apiAccessForReviewerUser(req, response, next) {
 
         function(CBW) {
             
-            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+            contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForReviewerUser", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForReviewerUser", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -233,9 +233,9 @@ function hierarchyUpdateApiAccess(req, response, next) {
 
     async.waterfall([
         function(CBW) {
-            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+            contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForCreatorUser", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "apiAccessForCreatorUser", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;

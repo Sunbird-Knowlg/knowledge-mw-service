@@ -1,6 +1,6 @@
 var async = require('async');
 var path = require('path');
-var ekStepUtil = require('sb-ekstep-util');
+var contentProvider = require('sb_content_provider_util');
 var utilsService = require('./utilsService');
 var respUtil = require('response_util');
 var filename = path.basename(__filename);
@@ -51,7 +51,7 @@ function createFlagContentEmail(req, callback) {
     }
     async.waterfall([
         function(CBW) {
-            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) {
+            contentProvider.getContent(data.contentId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {
@@ -75,7 +75,7 @@ function createFlagContentEmail(req, callback) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createFlagContentEmail", "Request to Leaner service for sending email", {
                 body : lsEmailData
             }));
-            ekStepUtil.sendEmail(lsEmailData, req.headers, function(err, res) {
+            contentProvider.sendEmail(lsEmailData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createFlagContentEmail", "Sending email failed", res));
                     callback(true, null);
@@ -108,7 +108,7 @@ function acceptFlagContentEmail(req, callback) {
     }
     async.waterfall([
         function(CBW) {
-            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) { 
+            contentProvider.getContent(data.contentId, req.headers, function(err, res) { 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {
@@ -131,7 +131,7 @@ function acceptFlagContentEmail(req, callback) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "acceptFlagContentEmail", "Request to Leaner service for sending email", {
                 body : lsEmailData
             }));
-            ekStepUtil.sendEmail(lsEmailData, req.headers, function(err, res) {
+            contentProvider.sendEmail(lsEmailData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "acceptFlagContentEmail", "Sending email failed", res));
                     callback(true, null);
@@ -164,7 +164,7 @@ function rejectFlagContentEmail(req, callback) {
     }
     async.waterfall([
         function(CBW) {
-            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) { 
+            contentProvider.getContent(data.contentId, req.headers, function(err, res) { 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {
@@ -186,7 +186,7 @@ function rejectFlagContentEmail(req, callback) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectFlagContentEmail", "Request to Leaner service for sending email", {
                 body : lsEmailData
             }));
-            ekStepUtil.sendEmail(lsEmailData, req.headers, function(err, res) {
+            contentProvider.sendEmail(lsEmailData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "rejectFlagContentEmail", "Sending email failed", res));
                     callback(true, null);
@@ -219,7 +219,7 @@ function publishedContentEmail(req, callback) {
     }
     async.waterfall([
         function(CBW) {
-            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) { 
+            contentProvider.getContent(data.contentId, req.headers, function(err, res) { 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {
@@ -241,7 +241,7 @@ function publishedContentEmail(req, callback) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishedContentEmail", "Request to Leaner service for sending email", {
                 body : lsEmailData
             }));
-            ekStepUtil.sendEmail(lsEmailData, req.headers, function(err, res) {
+            contentProvider.sendEmail(lsEmailData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishedContentEmail", "Sending email failed", res));
                     callback(true, null);
@@ -274,7 +274,7 @@ function rejectContentEmail(req, callback) {
     }
     async.waterfall([
         function(CBW) {
-            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) { 
+            contentProvider.getContent(data.contentId, req.headers, function(err, res) { 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {
@@ -296,7 +296,7 @@ function rejectContentEmail(req, callback) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectContentEmail", "Request to Leaner service for sending email", {
                 body : lsEmailData
             }));
-            ekStepUtil.sendEmail(lsEmailData, req.headers, function(err, res) {
+            contentProvider.sendEmail(lsEmailData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "rejectContentEmail", "Sending email failed", res));
                     callback(true, null);
@@ -356,7 +356,7 @@ function unlistedPublishContentEmail(req, callback) {
     }
     async.waterfall([
         function(CBW) {
-            ekStepUtil.getContent(data.contentId, req.headers, function(err, res) { 
+            contentProvider.getContent(data.contentId, req.headers, function(err, res) { 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     callback(true, null);
                 } else {
@@ -380,7 +380,7 @@ function unlistedPublishContentEmail(req, callback) {
             LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "unlistedPublishContentEmail", "Request to Leaner service for sending email", {
                 body : lsEmailData
             }));
-            ekStepUtil.sendEmail(lsEmailData, req.headers, function(err, res) {
+            contentProvider.sendEmail(lsEmailData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "unlistedPublishContentEmail", "Sending email failed", res));
                     callback(true, null);

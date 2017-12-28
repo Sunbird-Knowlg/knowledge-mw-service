@@ -4,7 +4,7 @@
   "description": "This service used to perform CRUD operations on content",
   "main": "app.js",
   "scripts": {
-    "preinstall": "npm install ./libs/sb-config-util && npm install ./libs/sb-http-util && npm install ./libs/sb-ekstep-util && npm install ./libs/sb_logger_util && npm install ./libs/sb_req_validator_util && npm install ./libs/response_util && npm install ./libs/sb_api_interceptor && npm install ./libs/sb_cache_manager"
+    "preinstall": "npm install ./libs/sb-config-util && npm install ./libs/sb-http-util && npm install ./libs/sb_content_provider_util && npm install ./libs/sb_logger_util && npm install ./libs/sb_req_validator_util && npm install ./libs/response_util && npm install ./libs/sb_api_interceptor && npm install ./libs/sb_cache_manager"
   },
   "author": "Harish Kumar Gangula",
   "license": "ISC",

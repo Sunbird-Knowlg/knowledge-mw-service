@@ -9,7 +9,7 @@ var multiparty = require('multiparty');
 var fs = require('fs');
 var randomString = require('randomstring');
 var path = require('path');
-var ekStepUtil = require('sb-ekstep-util');
+var contentProvider = require('sb_content_provider_util');
 var respUtil = require('response_util');
 var configUtil = require('sb-config-util');
 var LOG = require('sb_logger_util');
@@ -33,7 +33,7 @@ var reqMsg = messageUtils.REQUEST;
  * @returns {String}
  */
 function getCode() {
-    return configUtil.getConfig('PREFIX_CODE') + randomString.generate(6);
+    return contentMessage.PREFIX_CODE + randomString.generate(6);
 }
 
 /**
@@ -81,7 +81,7 @@ function getHealthCheckResp(rsp, healthy, checksArrayObj) {
 //     async.parallel([
 //         function(CB) {
 //             var apiCallStart = Date.now();
-//             ekStepUtil.ekStepHealthCheck(function(err, res) {
+//             contentProvider.ekStepHealthCheck(function(err, res) {
 //                 if(res && res.result && res.result.healthy) {
 //                     isEkStepHealthy = true;
 //                     checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, "", ""));
@@ -94,7 +94,7 @@ function getHealthCheckResp(rsp, healthy, checksArrayObj) {
 //         },
 //         function(CB) {
 //             var apiCallStart = Date.now();
-//             ekStepUtil.learnerServiceHealthCheck(function(err, res) {
+//             contentProvider.learnerServiceHealthCheck(function(err, res) {
 //                 if(res && res.result && res.result.healthy) {
 //                     isLSHealthy = true;
 //                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, "", ""));
@@ -160,13 +160,13 @@ function search(defaultContentTypes, req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchContentAPI", "Request to ekstep for search the content", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchContentAPI", "Request to content provider for search the content", {
                 body : ekStepReqData, 
                 headers: req.headers
             }));
-            ekStepUtil.compositeSearch(ekStepReqData, req.headers, function(err, res) {
+            contentProvider.compositeSearch(ekStepReqData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -217,13 +217,13 @@ function createContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createContentAPI", "Request to ekstep for create the content", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createContentAPI", "Request to content provider for create the content", {
                 body : ekStepReqData, 
                 headers: req.headers
             }));
-            ekStepUtil.createContent(ekStepReqData, req.headers, function(err, res) {
+            contentProvider.createContent(ekStepReqData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.CREATE.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.CREATE.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -272,14 +272,14 @@ function updateContentAPI(req, response) {
                 mode: "edit",
                 fields: "versionKey"
             };
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateContentAPI", "Request to ekstep for get latest version key", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateContentAPI", "Request to content provider for get latest version key", {
                 contentId: data.contentId,
                 query: qs,
                 headers: req.headers
             }));
-            ekStepUtil.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
+            contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -295,13 +295,13 @@ function updateContentAPI(req, response) {
             var ekStepReqData = {
                 request: data.request
             };
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateContentAPI", "Request to ekstep for update the content", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updateContentAPI", "Request to content provider for update the content", {
                 body : ekStepReqData, 
                 headers: req.headers
             }));
-            ekStepUtil.updateContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.updateContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -357,14 +357,14 @@ function uploadContentAPI(req, response) {
             async.waterfall([
 
                 function(CBW) {
-                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentAPI", "Request to ekstep for upload the content file", {
+                    LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentAPI", "Request to content provider for upload the content file", {
                         contentId: data.contentId,
                         headers: req.headers
                     }));
                     delete req.headers['content-type'];
-                    ekStepUtil.uploadContent(formData, data.contentId, req.headers, function(err, res) {
+                    contentProvider.uploadContent(formData, data.contentId, req.headers, function(err, res) {
                         if (err || res.responseCode !== responseCode.SUCCESS) {
-                            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Getting error from ekstep", res));
+                            LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Getting error from content provider", res));
                             rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE;
                             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD.FAILED_MESSAGE;
                             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -389,14 +389,14 @@ function uploadContentAPI(req, response) {
         async.waterfall([
 
             function(CBW) {
-                LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentAPI", "Request to ekstep for upload the content file", {
+                LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentAPI", "Request to content provider for upload the content file", {
                     contentId: data.contentId,
                     headers: req.headers
                 }));
                 delete req.headers['content-type'];
-                ekStepUtil.uploadContentWithFileUrl(data.contentId, queryString, req.headers, function(err, res) {
+                contentProvider.uploadContentWithFileUrl(data.contentId, queryString, req.headers, function(err, res) {
                     if (err || res.responseCode !== responseCode.SUCCESS) {
-                        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Getting error from ekstep", res));
+                        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentAPI", "Getting error from content provider", res));
                         rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE;
                         rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD.FAILED_MESSAGE;
                         rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -432,15 +432,15 @@ function reviewContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "reviewContentAPI", "Request to ekstep for review the content", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "reviewContentAPI", "Request to content provider for review the content", {
                 req: ekStepReqData,
                 contentId: data.contentId,
                 headers: req.headers
             }));
-            ekStepUtil.reviewContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.reviewContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
                 //After check response, we perform other operation
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "reviewContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "reviewContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.REVIEW.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REVIEW.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -480,15 +480,15 @@ function publishContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishContentAPI", "Request to ekstep for published the content", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishContentAPI", "Request to content provider for published the content", {
                 contentId: data.contentId,
                 reqData: ekStepReqData,
                 headers: req.headers
             }));
-            ekStepUtil.publishContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.publishContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
                 //After check response, we perform other operation
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.PUBLISH.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.PUBLISH.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -531,15 +531,15 @@ function getContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getContentAPI", "Request to ekstep for get content meta data", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getContentAPI", "Request to content provider for get content meta data", {
                 contentId: data.contentId,
                 qs: data.queryParams, 
                 headers: req.headers
             }));
-            ekStepUtil.getContentUsingQuery(data.contentId, data.queryParams, req.headers, function(err, res) {
+            contentProvider.getContentUsingQuery(data.contentId, data.queryParams, req.headers, function(err, res) {
                 //After check response, we perform other operation
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -576,14 +576,14 @@ function getMyContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getMyContentAPI", "Request to ekstep for get user content", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getMyContentAPI", "Request to content provider for get user content", {
                 body : ekStepReqData, 
                 headers: req.headers
             }));
-            ekStepUtil.compositeSearch(ekStepReqData, req.headers, function(err, res) {
+            contentProvider.compositeSearch(ekStepReqData, req.headers, function(err, res) {
 
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getMyContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getMyContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET_MY.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -631,9 +631,9 @@ function retireContentAPI(req, response) {
                     }
                 }
             };
-            ekStepUtil.searchContent(ekStepReqData, req.headers, function(err, res) {
+            contentProvider.searchContent(ekStepReqData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -661,13 +661,13 @@ function retireContentAPI(req, response) {
 
         function(CBW) {
             async.each(data.request.contentIds, function(contentId, CBE) {
-                LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireContentAPI", "Request to ekstep for retire content meta data", {
+                LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "retireContentAPI", "Request to content provider for retire content meta data", {
                     contentId: contentId,
                     headers: req.headers
                 }));
-                ekStepUtil.retireContent(contentId, req.headers, function(err, res) {
+                contentProvider.retireContent(contentId, req.headers, function(err, res) {
                     if (err || res.responseCode !== responseCode.SUCCESS) {
-                        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Getting error from ekstep", res));
+                        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "retireContentAPI", "Getting error from content provider", res));
                         errCode = res && res.params ? res.params.err : contentMessage.GET_MY.FAILED_CODE;
                         errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE;
                         respCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -719,13 +719,13 @@ function rejectContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectContentAPI", "Request to ekstep for reject content meta data", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectContentAPI", "Request to content provider for reject content meta data", {
                 contentId: data.contentId,
                 headers: req.headers
             }));
-            ekStepUtil.rejectContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.rejectContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "rejectContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "rejectContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.REJECT.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REJECT.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -766,14 +766,14 @@ function flagContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "flagContentAPI", "Request to ekstep for flag the content meta data", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "flagContentAPI", "Request to content provider for flag the content meta data", {
                 contentId: data.contentId,
                 body: ekStepReqData,
                 headers: req.headers
             }));
-            ekStepUtil.flagContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.flagContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "flagContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "flagContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.FLAG.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.FLAG.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -814,14 +814,14 @@ function acceptFlagContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "acceptFlagContentAPI", "Request to ekstep for accept flag", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "acceptFlagContentAPI", "Request to content provider for accept flag", {
                 contentId: data.contentId,
                 body: ekStepReqData,
                 headers: req.headers
             }));
-            ekStepUtil.acceptFlagContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.acceptFlagContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "acceptFlagContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "acceptFlagContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.ACCEPT_FLAG.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.ACCEPT_FLAG.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -862,14 +862,14 @@ function rejectFlagContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectFlagContentAPI", "Request to ekstep for reject flag", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "rejectFlagContentAPI", "Request to content provider for reject flag", {
                 contentId: data.contentId,
                 body: ekStepReqData,
                 headers: req.headers
             }));
-            ekStepUtil.rejectFlagContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.rejectFlagContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "rejectFlagContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "rejectFlagContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.REJECT_FLAG.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REJECT_FLAG.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -911,14 +911,14 @@ function uploadContentUrlAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentUrlAPI", "Request to ekstep for get upload content url", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "uploadContentUrlAPI", "Request to content provider for get upload content url", {
                 contentId: data.contentId,
                 body: ekStepReqData,
                 headers: req.headers
             }));
-            ekStepUtil.uploadContentUrl(ekStepReqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.uploadContentUrl(ekStepReqData, data.contentId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentUrlAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "uploadContentUrlAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD_URL.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD_URL.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
@@ -958,15 +958,15 @@ function unlistedPublishContentAPI(req, response) {
     async.waterfall([
 
         function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "unlistedPublishContentAPI", "Request to ekstep for unlisted published the content", {
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "unlistedPublishContentAPI", "Request to content provider for unlisted published the content", {
                 contentId: data.contentId,
                 reqData: ekStepReqData,
                 headers: req.headers
             }));
-            ekStepUtil.unlistedPublishContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.unlistedPublishContent(ekStepReqData, data.contentId, req.headers, function(err, res) {
                 //After check response, we perform other operation
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "unlistedPublishContentAPI", "Getting error from ekstep", res));
+                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "unlistedPublishContentAPI", "Getting error from content provider", res));
                     rspObj.errCode = res && res.params ? res.params.err : contentMessage.UNLISTED_PUBLISH.FAILED_CODE;
                     rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UNLISTED_PUBLISH.FAILED_MESSAGE;
                     rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;

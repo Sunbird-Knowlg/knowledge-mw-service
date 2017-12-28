@@ -4,9 +4,9 @@
 1. Node
 
 ##Environment Variables:
-* ekstep_api_base_url: ekstep API base url. e.g.: https://qa.ekstep.in or https://api.ekstep.in
-* ekstep_api_key: API key for the above ekstep URL
-* ekstep_proxy_base_url: ekstep proxy base url. e.g.: https://qa.ekstep.in or https://community.ekstep.in
+* sunbird_content_provider_api_base_url: content provider API base url. e.g.: https://qa.ekstep.in or https://api.ekstep.in
+* sunbird_content_provider_api_key: API key for the above content provider URL
+* sunbird_content_plugin_base_url: Content plugin base url. e.g.: https://qa.ekstep.in or https://community.ekstep.in
 * sunbird_learner_service_base_url: Learner service API base url e.g.: https://dev.open-sunbird.org/api (string)
 * sunbird_learner_service_api_key: API key for learner service (string)
 * sunbird_keycloak_auth_server_url: Sunbird keycloak auth server url e.g.: https://dev.open-sunbird.org/auth (string)

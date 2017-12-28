@@ -6,7 +6,7 @@
 
 var async = require('async');
 var path = require('path');
-var ekStepUtil = require('sb-ekstep-util');
+var contentProvider = require('sb_content_provider_util');
 var respUtil = require('response_util');
 var configUtil = require('sb-config-util');
 var LOG = require('sb_logger_util');
@@ -52,7 +52,7 @@ function generateDialCodeAPI(req, response) {
                 body : reqData, 
                 headers: req.headers
             }));
-            ekStepUtil.generateDialCode(reqData, req.headers, function(err, res) {
+            contentProvider.generateDialCode(reqData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "generateDialCodeAPI", "Getting error", res));
                     rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GENERATE.FAILED_CODE;
@@ -104,7 +104,7 @@ function dialCodeListAPI(req, response) {
                 body : reqData, 
                 headers: req.headers
             }));
-            ekStepUtil.dialCodeList(reqData, req.headers, function(err, res) {
+            contentProvider.dialCodeList(reqData, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "dialCodeListAPI", "Getting error", res));
                     rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.LIST.FAILED_CODE;
@@ -119,7 +119,7 @@ function dialCodeListAPI(req, response) {
         },
         function(res) {
             rspObj.result = res.result;
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "dialCodeListAPI", "Return response back to user", rspObj));
+            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "dialCodeListAPI", "Return response back to user"));
             return response.status(200).send(respUtil.successResponse(rspObj));
         }
     ]);
@@ -157,7 +157,7 @@ function updateDialCodeAPI(req, response) {
                 body : reqData, 
                 headers: req.headers
             }));
-            ekStepUtil.updateDialCode(reqData, data.dialCodeId, req.headers, function(err, res) {
+            contentProvider.updateDialCode(reqData, data.dialCodeId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updateDialCodeAPI", "Getting error", res));
                     rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.UPDATE.FAILED_CODE;
@@ -209,7 +209,7 @@ function getDialCodeAPI(req, response) {
                 qs: data.queryParams, 
                 headers: req.headers
             }));
-            ekStepUtil.getDialCode(data.dialCodeId, req.headers, function(err, res) {
+            contentProvider.getDialCode(data.dialCodeId, req.headers, function(err, res) {
                 //After check response, we perform other operation
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getDialCodeAPI", "Getting error", res));
@@ -263,7 +263,7 @@ function contentLinkDialCodeAPI(req, response) {
                 body : reqData, 
                 headers: req.headers
             }));
-            ekStepUtil.contentLinkDialCode(reqData, data.contentId, req.headers, function(err, res) {
+            contentProvider.contentLinkDialCode(reqData, data.contentId, req.headers, function(err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                     LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "contentLinkDialCodeAPI", "Getting error", res));
                     rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.CONTENT_LINK.FAILED_CODE;

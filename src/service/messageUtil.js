@@ -60,7 +60,8 @@ exports.COURSE = {
     },
 
     MIME_TYPE: "application/vnd.ekstep.content-collection",
-    CONTENT_TYPE: "Course"
+    CONTENT_TYPE: "Course",
+    PREFIX_CODE: 'org.sunbird.'
 };
 
 exports.CONTENT = {
@@ -212,7 +213,8 @@ exports.CONTENT = {
         "audio/webm",
         "audio/x-wav",
         "audio/wav"
-    ]
+    ],
+    PREFIX_CODE: 'org.sunbird.'
 };
 
 exports.REQUEST = {
