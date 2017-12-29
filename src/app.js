@@ -6,7 +6,7 @@ var messageUtil = require('./service/messageUtil');
 var respUtil = require('response_util');
 var configUtil = require('sb-config-util');
 var fs = require('fs');
-var apiConfig = JSON.parse(fs.readFileSync(__dirname + '/config/apiConfig.json', 'utf8'));
+var contentProviderApiConfig = JSON.parse(fs.readFileSync(__dirname + '/config/contentProviderApiConfig.json', 'utf8'));
 
 var reqMsg = messageUtil.REQUEST;
 var responseCode = messageUtil.RESPONSE_CODE;
@@ -22,7 +22,7 @@ global_content_provider_api_key = process.env.sunbird_content_provider_api_key;
 global_learner_service_api_key = process.env.sunbird_learner_service_api_key;
 global_learner_service_base_url = process.env.sunbird_learner_service_base_url ? process.env.sunbird_learner_service_base_url : "https://dev.open-sunbird.org/api";
 
-configUtil.setApiConfig(apiConfig.API)
+configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('BASE_URL', global_content_provider_base_url);
 configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + global_content_provider_api_key);
 configUtil.setConfig('LEARNER_SERVICE_BASE_URL', global_learner_service_base_url);
