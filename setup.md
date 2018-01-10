@@ -2,6 +2,7 @@
 
 ##Pre Requirements
 1. Node
+2. Install imagemagick, graphicsmagick ref:https://www.npmjs.com/package/gm
 
 ##Environment Variables:
 * sunbird_content_provider_api_base_url: content provider API base url. e.g.: https://qa.ekstep.in or https://api.ekstep.in

@@ -26,10 +26,10 @@ configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + global_content_provider_
 configUtil.setConfig('LEARNER_SERVICE_BASE_URL', global_learner_service_base_url)
 configUtil.setConfig('LEARNER_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + global_learner_service_api_key)
 
-process.env.sunbird_image_storage_url = process.env.sunbird_image_storage_url || 'https://sunbirddev.blob.core.windows.net/dial/'
-process.env.sunbird_azure_account_name = process.env.sunbird_azure_account_name || 'sunbirddev'
-process.env.sunbird_azure_account_key = process.env.sunbird_azure_account_key || 'zl8q5yA4fxG5PAha2rc6rRWQ8vQlKMGKb79YlQN1br7EOOD8jmVhBOlTP3J7KqKTj3J2TxkJArQR8IrXV551Fg=='
-process.env.sunbird_dial_code_registry_url = process.env.sunbird_dial_code_registry_url || 'https://dev.open-sunbird.org/dial/'
+process.env.sunbird_image_storage_url = process.env.sunbird_image_storage_url
+process.env.sunbird_azure_account_name = process.env.sunbird_azure_account_name
+process.env.sunbird_azure_account_key = process.env.sunbird_azure_account_key
+process.env.sunbird_dial_code_registry_url = process.env.sunbird_dial_code_registry_url
 process.env.sunbird_cassandra_ips = process.env.sunbird_cassandra_ips || '127.0.0.1'
 process.env.sunbird_cassandra_port = process.env.sunbird_cassandra_port || 9042
 process.env.dial_code_image_temp_folder = 'temp'
