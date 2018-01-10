@@ -15,6 +15,12 @@
 * sunbird_keycloak_public: Sunbird keycloak public e.g.: true (boolean)
 * sunbird_cache_store: Sunbird cache store e.g.: memory (string)
 * sunbird_cache_ttl: Sunbird cachec time to live e.g.: 1800(number)
+* process.env.sunbird_image_storage_url
+* process.env.sunbird_azure_account_name 
+* process.env.sunbird_azure_account_key 
+* process.env.sunbird_dial_code_registry_url eg: staging.open-sunbird.org/dial/
+* process.env.sunbird_cassandra_ips  e.g : 127.0.0.1,127.0.0.2
+* process.env.sunbird_cassandra_port e.g: 9042
 
 ##Setup Instructions
 * Clone the project.
