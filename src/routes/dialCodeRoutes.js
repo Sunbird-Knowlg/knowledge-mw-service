@@ -29,7 +29,8 @@ module.exports = function (app) {
   app.route(BASE_URL + '/content/link/:contentId')
         .patch(requestMiddleware.createAndValidateRequestBody, dialCodeService.contentLinkDialCodeAPI)
         // .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.contentLinkDialCodeAPI);
-  app.route(BASE_URL + '/process/:processId')
+
+  app.route(BASE_URL + '/process/status/:processId')
         // .get(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.getDialCodeAPI);
         .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.getProcessIdStatusAPI)
 }
