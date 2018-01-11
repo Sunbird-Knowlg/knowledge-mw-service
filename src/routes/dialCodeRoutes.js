@@ -20,16 +20,16 @@ module.exports = function(app) {
         .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID, dialCodeService.dialCodeListAPI);
         // .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.dialCodeListAPI);
 
-  app.route(BASE_URL + '/read')
-        // .get(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.getDialCodeAPI);
-        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID, dialCodeService.getDialCodeAPI);
+    app.route(BASE_URL + '/read')
+            // .get(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.getDialCodeAPI);
+            .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID, dialCodeService.getDialCodeAPI);
 
-  app.route(BASE_URL + '/update/:dialCodeId')
+    app.route(BASE_URL + '/update/:dialCodeId')
         // .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.updateDialCodeAPI);
         .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID, dialCodeService.updateDialCodeAPI);
 
     app.route(BASE_URL + '/content/link')
-        .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID, dialCodeService.contentLinkDialCodeAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID, dialCodeService.contentLinkDialCodeAPI);
         // .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.contentLinkDialCodeAPI);
 
     app.route(BASE_URL + '/search')

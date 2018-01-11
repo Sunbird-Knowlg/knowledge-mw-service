@@ -320,13 +320,17 @@ function getDialCodeAPI (req, response) {
   ])
 }
 
+/**
+ * This function helps to check content link api request data
+ * @param {type} data
+ * @returns {boolean} return response boolean value true or false
+ */
 function checkContentLinkRequest(data) {
-    var dialcodesLength = data.request.content.dialcode.length;
-    var identifiersLength = data.request.content.identifier.length;
-
-    if (!data.request || !data.request.content || !data.content.identifier || !data.content.dialcode) {
+    if (!data.request || !data.request.content || !data.request.content.identifier || !data.request.content.dialcode) {
         return false;
     }
+    var dialcodesLength = data.request.content.dialcode.length;
+    var identifiersLength = data.request.content.identifier.length;
     if(dialcodesLength < 1 || identifiersLength < 1 || (dialcodesLength > 1 && identifiersLength > 1)) {
         return false;
     } else {
@@ -363,7 +367,7 @@ function contentLinkDialCodeAPI (req, response) {
         body: reqData,
         headers: req.headers
       }))
-      contentProvider.contentLinkDialCode(reqData, data.contentId, req.headers, function (err, res) {
+      contentProvider.contentLinkDialCode(reqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'contentLinkDialCodeAPI', 'Getting error', res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.CONTENT_LINK.FAILED_CODE
