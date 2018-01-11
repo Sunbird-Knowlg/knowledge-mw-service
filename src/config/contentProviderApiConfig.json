@@ -29,6 +29,11 @@
         "GET_DIALCODE_URI": "/dialcode/v3/read",
         "UPDATE_DIALCODE_URI": "/dialcode/v3/update",
         "LIST_DIALCODE_URI": "/dialcode/v3/list",
-        "CONTENT_LINK_DIALCODE_URI": "/dialcode/v3/content/link"
+        "CONTENT_LINK_DIALCODE_URI": "/dialcode/v3/content/link",
+        "SEARCH_DIALCODE_URI": "/dialcode/v3/search",
+        "PUBLISH_DIALCODE_URI": "/dialcode/v3/publish",
+        "CREATE_PUBLISHER_URI": "/dialcode/v3/publisher/create",
+        "GET_PUBLISHER_URI": "/dialcode/v3/publisher/read",
+        "UPDATE_PUBLISHER_URI": "/dialcode/v3/publisher/update"
     }
 }    

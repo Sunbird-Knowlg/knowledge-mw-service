@@ -260,9 +260,31 @@ function hierarchyUpdateApiAccess(req, response, next) {
     ]);
 }
 
+/**
+ * [validateToken - Used to check channed id in request headers.
+ * @param  {[type]}   req  
+ * @param  {[type]}   res  
+ * @param  {Function} next
+ */
+function checkChannelID(req, res,next) {
+
+    var channelID = req.headers['x-channel-id'];
+    var rspObj = req.rspObj;
+
+    if (!channelID) {
+        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "checkChannelID", "API failed due to missing channelID"));
+        rspObj.errCode = reqMsg.PARAMS.MISSING_CHANNELID_CODE;
+        rspObj.errMsg = reqMsg.PARAMS.MISSING_CHANNELID_MESSAGE;
+        rspObj.responseCode = responseCode.CLIENT_ERROR;
+        return res.status(400).send(respUtil.errorResponse(rspObj));
+    }
+    next();
+}
+
 //Exports required function
 module.exports.validateToken = validateToken;
 module.exports.createAndValidateRequestBody = createAndValidateRequestBody;
 module.exports.apiAccessForReviewerUser = apiAccessForReviewerUser;
 module.exports.apiAccessForCreatorUser = apiAccessForCreatorUser;
 module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess;
+module.exports.checkChannelID = checkChannelID;
