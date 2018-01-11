@@ -22,7 +22,7 @@ module.exports = function(app) {
 
   app.route(BASE_URL + '/read')
         // .get(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.getDialCodeAPI);
-        .get(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID, dialCodeService.getDialCodeAPI);
+        .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID, dialCodeService.getDialCodeAPI);
 
   app.route(BASE_URL + '/update/:dialCodeId')
         // .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.updateDialCodeAPI);
