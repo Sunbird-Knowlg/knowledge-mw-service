@@ -8,12 +8,18 @@ var dbModel = require('./../../utils/cassandraUtil')
 var task = null
 
 function addUnproccessedItems () {
-  var query = {
-    status: 0,
-    $limit: 100
-  }
+  dbModel.instance.dialcode_batch.find({status: 0, $limit: 100}, {allow_filtering: true, raw: true}, function (error, batches) {
+    if (error) {
+      LOG.error({filename, 'error while getting data from db for scheduled process ': error})
+    } else {
+      LOG.info({filename, status: 'successfully queried data for for schedule process', data: JSON.stringify(batches)})
+      _.forEach(batches, function (batch) {
+        global.imageBatchProcess.send({processId: batch.processid.toString()})
+      })
+    }
+  })
 
-  dbModel.instance.dialcode_batch.find(query, {allow_filtering: true, raw: true}, function (error, batches) {
+  dbModel.instance.dialcode_batch.find({status: 1, $limit: 100}, {allow_filtering: true, raw: true}, function (error, batches) {
     if (error) {
       LOG.error({filename, 'error while getting data from db for scheduled process ': error})
     } else {

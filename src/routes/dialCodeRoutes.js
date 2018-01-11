@@ -18,9 +18,9 @@ module.exports = function (app) {
         .post(requestMiddleware.createAndValidateRequestBody, dialCodeService.dialCodeListAPI)
         // .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.dialCodeListAPI);
 
-  app.route(BASE_URL + '/read/:dialCodeId')
+  app.route(BASE_URL + '/read')
         // .get(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.getDialCodeAPI);
-        .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.getDialCodeAPI)
+        .post(requestMiddleware.createAndValidateRequestBody, dialCodeService.getDialCodeAPI)
 
   app.route(BASE_URL + '/update/:dialCodeId')
         // .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken, dialCodeService.updateDialCodeAPI);

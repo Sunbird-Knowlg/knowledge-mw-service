@@ -19,7 +19,7 @@ function BatchImageService (config) {
   this.margin = config && config.margin ? config.margin : '2'
   this.border = config && (config.border === 'false') ? '0' : '20'
   this.showText = config && (config.showText === 'false') ? '0' : '1'
-  this.errCorrectionLevel = config && config.quality && _.indexOf(errorCorrectionLevels, config.quality) ? config.quality : 'H'
+  this.errCorrectionLevel = (config && config.errCorrectionLevel && _.indexOf(errorCorrectionLevels, config.errCorrectionLevel) !== -1) ? config.errCorrectionLevel : 'H'
 }
 
 BatchImageService.prototype.createRequest = function (dialcodes, channel, publisher, callback) {

@@ -22,12 +22,13 @@ function ImageService (config) {
   this.margin = config && config.margin ? config.margin : '2'
   this.border = config && (config.border === 'false') ? '0' : '20'
   this.showText = config && (config.showText === 'false') ? '0' : '1'
-  this.errCorrectionLevel = config && config.quality && _.indexOf(errorCorrectionLevels, config.quality) ? config.quality : 'H'
+  this.errCorrectionLevel = (config && config.errCorrectionLevel && _.indexOf(errorCorrectionLevels, config.errCorrectionLevel) !== -1) ? config.errCorrectionLevel : 'H'
 }
 
 ImageService.prototype.getImage = function generateImage (dialcode, channel, publisher, localFilePath, uploadFilePath, deleteLocalFileFlag, cb) {
   var self = this
   var config = self.getConfig()
+
   var localFileLocation = localFilePath || path.join(process.env.dial_code_image_temp_folder, channel, publisher)
   var uploadFileLocaton = uploadFilePath || path.join(channel, publisher)
   if (deleteLocalFileFlag !== false) {
@@ -51,7 +52,7 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
           var text = process.env.sunbird_dial_code_registry_url + dialcode
           var color = config.color
           var bgColor = config.backgroundColor
-          var errorCorrectionLevel = config.errorCorrectionLevel
+          var errCorrectionLevel = config.errCorrectionLevel
           var margin = config.margin
           try {
             if (!fs.existsSync(localFileLocation)) {
@@ -61,7 +62,7 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
             LOG.error({currentFile, 'unable create directory': e, directoryPath: localFileLocation})
           }
 
-          qrCodeUtil.generate(path.join(localFileLocation, fileName + '.png'), text, color, bgColor, errorCorrectionLevel, margin, callback)
+          qrCodeUtil.generate(path.join(localFileLocation, fileName + '.png'), text, color, bgColor, errCorrectionLevel, margin, callback)
         },
         function (filePath, callback) {
           var text = config.showText ? dialcode.trim() : ''

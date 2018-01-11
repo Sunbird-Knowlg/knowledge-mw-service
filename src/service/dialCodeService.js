@@ -64,13 +64,14 @@ function generateDialCodeAPI (req, response) {
       })
     }, function (res, CBW) {
       var requestObj = data && data.request && data.request.dialcodes ? data.request.dialcodes : {}
-      if (requestObj.image && requestObj.image === true && res.result.dialcodes && res.result.dialcodes.length) {
-        var batchImageService = new BatchImageService({ width: req.query.width,
-          height: requestObj.height,
-          border: requestObj.border,
-          text: requestObj.text,
-          quality: requestObj.quality,
-          color: requestObj.color
+      if (requestObj.qrCodeSpec && !_.isEmpty(requestObj.qrCodeSpec) && res.result.dialcodes && res.result.dialcodes.length) {
+        var batchImageService = new BatchImageService({
+          width: requestObj.qrCodeSpec.width,
+          height: requestObj.qrCodeSpec.height,
+          border: requestObj.qrCodeSpec.border,
+          text: requestObj.qrCodeSpec.text,
+          errCorrectionLevel: requestObj.qrCodeSpec.errCorrectionLevel,
+          color: requestObj.qrCodeSpec.color
         })
         var channel = _.clone(req.headers['x-channel-id'])
         batchImageService.createRequest(res.result.dialcodes, channel, requestObj.publisher, function (err, processId) {
@@ -106,20 +107,21 @@ function generateDialCodeAPI (req, response) {
 function dialCodeListAPI (req, response) {
   var data = req.body
   var rspObj = req.rspObj
-  var imageFlag = !!(data && data.request && data.request.search && data.request.search.image)
-  var imageConfig = {}
-  if (imageFlag) {
-    var requestObj = data && data.request && data.request.search ? data.request.search : {}
-    imageConfig = { width: req.query.width,
-      height: _.clone(requestObj.height),
-      border: _.clone(requestObj.border),
-      text: _.clone(requestObj.text),
-      quality: _.clone(requestObj.quality),
-      color: _.clone(requestObj.color)
+  var qrCodeFlag = !!(data && data.request && data.request.search && data.request.search.qrCodeSpec && !_.isEmpty(data.request.search.qrCodeSpec))
+  var qrCodeConfig = {}
+  if (qrCodeFlag) {
+    var requestObj = data.request.search
+    qrCodeConfig = {
+      width: _.clone(requestObj.qrCodeSpec.width),
+      height: _.clone(requestObj.qrCodeSpec.height),
+      border: _.clone(requestObj.qrCodeSpec.border),
+      text: _.clone(requestObj.qrCodeSpec.text),
+      errCorrectionLevel: _.clone(requestObj.qrCodeSpec.errCorrectionLevel),
+      color: _.clone(requestObj.qrCodeSpec.color)
     }
   }
 
-  if (!data.request || !data.request.search) {
+  if (!data.request || !data.request.search || !data.request.search.publisher) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI', 'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.LIST.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.LIST.MISSING_MESSAGE
@@ -128,7 +130,7 @@ function dialCodeListAPI (req, response) {
   }
 
   if (data.request && data.request.search) {
-    data.request.search = _.omit(data.request.search, ['image', 'height', 'border', 'quality', 'color'])
+    data.request.search = _.omit(data.request.search, ['qrCodeSpec'])
   }
     // Transform request for Ek step
   var reqData = {
@@ -155,8 +157,8 @@ function dialCodeListAPI (req, response) {
         }
       })
     }, function (res, CBW) {
-      if (imageFlag) {
-        var batchImageService = new BatchImageService(imageConfig)
+      if (qrCodeFlag && res.result.dialcodes && res.result.dialcodes.length) {
+        var batchImageService = new BatchImageService(qrCodeConfig)
         var channel = _.clone(req.headers['x-channel-id'])
         var dialcodes = _.map(res.result.dialcodes, 'identifier')
         batchImageService.createRequest(dialcodes, channel, requestObj.publisher, function (err, processId) {
@@ -244,7 +246,7 @@ function updateDialCodeAPI (req, response) {
 function getDialCodeAPI (req, response) {
   var data = {}
   data.body = req.body
-  data.dialCodeId = req.params.dialCodeId
+  data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
   var rspObj = req.rspObj
 
   if (!data.dialCodeId) {
@@ -281,14 +283,15 @@ function getDialCodeAPI (req, response) {
       })
     },
     function (res, CBW) {
-      if (req.query && req.query.image === 'true') {
+      var qrCodeSpec = _.get(req, 'body.request.dialcode.qrCodeSpec')
+      if (qrCodeSpec && !_.isEmpty(qrCodeSpec)) {
         var imgService = new ImageService(
-          { width: req.query.width,
-            height: req.query.height,
-            border: req.query.border,
-            text: req.query.text,
-            quality: req.query.quality,
-            color: req.query.color
+          { width: qrCodeSpec.width,
+            height: qrCodeSpec.height,
+            border: qrCodeSpec.border,
+            text: qrCodeSpec.text,
+            errCorrectionLevel: qrCodeSpec.errCorrectionLevel,
+            color: qrCodeSpec.color
           })
         var dialcode = res.result.dialcode.identifier
         var channel = res.result.dialcode.channel
