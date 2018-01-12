@@ -8,12 +8,9 @@ var blobService = azure.createBlobService(process.env.sunbird_azure_account_name
 
 function UploadUtil (name) {
   this.containerName = name || 'dial'
-  var self = this
   blobService.createContainerIfNotExists(this.containerName, { publicAccessLevel: 'blob' }, function (err) {
     if (err) {
       LOG.error({filename, 'Unable to create container in azure : ': err})
-    } else {
-      LOG.info({filename, 'if not exist ,Creating container  is successful with name': self.containerName})
     }
   })
 }
@@ -31,8 +28,6 @@ UploadUtil.prototype.downloadFile = function downloadFile (destPath, sourcePath,
   blobService.getBlobToStream(this.containerName, sourcePath, fs.createWriteStream(destPath), function (error, result, response) {
     if (error) {
       LOG.error({filename, 'Unable to download file from azure : ': error})
-    } else {
-      LOG.info({filename, 'successful downloaded file from': sourcePath, 'to the location': destPath})
     }
     callback(error, destPath)
   })

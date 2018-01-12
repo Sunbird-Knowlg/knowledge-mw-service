@@ -12,7 +12,6 @@ function addUnproccessedItems () {
     if (error) {
       LOG.error({filename, 'error while getting data from db for scheduled process ': error})
     } else {
-      LOG.info({filename, status: 'successfully queried data for for schedule process', data: JSON.stringify(batches)})
       _.forEach(batches, function (batch) {
         global.imageBatchProcess.send({processId: batch.processid.toString()})
       })
@@ -23,7 +22,6 @@ function addUnproccessedItems () {
     if (error) {
       LOG.error({filename, 'error while getting data from db for scheduled process ': error})
     } else {
-      LOG.info({filename, status: 'successfully queried data for for schedule process', data: JSON.stringify(batches)})
       _.forEach(batches, function (batch) {
         global.imageBatchProcess.send({processId: batch.processid.toString()})
       })

@@ -38,7 +38,6 @@ BatchImageService.prototype.createRequest = function (dialcodes, channel, publis
       LOG.error({filename, 'error while inserting record :': error})
       callback(error, null)
     } else {
-      LOG.info({filename, 'successfully inserted record with :': processId})
       global.imageBatchProcess.send({processId: processId})
       callback(null, processId)
     }

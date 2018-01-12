@@ -27,18 +27,7 @@ qrCodeUtil.prototype.generate = function generateImage (filePath, text, color, b
   }, function (err) {
     if (err) {
       LOG.error({filename, 'qrcode generation error': err})
-    } else {
-      LOG.info(
-        {filename,
-          'qrcode generated successfully with file': filePath,
-          text,
-          color,
-          bgColor,
-          errorCorrectionLevel,
-          margin
-        })
     }
-
     callback(err, filePath)
   })
 }
@@ -61,14 +50,6 @@ qrCodeUtil.prototype.addTextAndBorder = function addTextAndBorder (filePath, tex
         .write(filePath, function (err) {
           if (err) {
             LOG.error({filename, 'Unable to add text or border : ': err})
-          } else {
-            LOG.info(
-              {filename,
-                'added text or border to file': filePath,
-                text,
-                border,
-                color
-              })
           }
           callback(err, filePath)
         })
@@ -81,13 +62,6 @@ qrCodeUtil.prototype.resize = function resize (filePath, width, height, callback
       .write(filePath, function (err) {
         if (err) {
           LOG.error({filename, 'Unable to resize image : ': err})
-        } else {
-          LOG.info(
-            {filename,
-              'Resize image is success of file ': filePath,
-              width,
-              height
-            })
         }
         callback(err, filePath)
       })

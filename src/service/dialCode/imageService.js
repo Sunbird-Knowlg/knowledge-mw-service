@@ -38,7 +38,6 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
   this.getImgFromDB(dialcode, channel, publisher, function (error, images) {
     var image = compareImageConfig(images, self.configToString())
     if (!error && image && image.url) {
-      LOG.info({'Image Status:': 'avialable', url: image.url})
       cb(null, {url: image.url, 'created': false})
     } else {
       async.waterfall([
@@ -79,8 +78,6 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
           uploadUtil.uploadFile(destFilePath, filePath, function (error, result) {
             if (error) {
               LOG.error({currentFile, 'Error uploading file': error, filePath, destFilePath})
-            } else {
-              LOG.info({currentFile, 'Uploading file': 'success', filePath, destFilePath})
             }
             callback(error, filePath, process.env.sunbird_image_storage_url + destFilePath)
           })
@@ -141,13 +138,6 @@ ImageService.prototype.getImgFromDB = function (dialcode, channel, publisher, ca
           channel,
           publisher
         })
-      } else {
-        LOG.info({'Querying dial code images before creating one : ': 'success',
-          data: JSON.stringify(images),
-          dialcode,
-          channel,
-          publisher
-        })
       }
       callback(error, images)
     })
@@ -173,13 +163,6 @@ ImageService.prototype.insertImg = function (dialcode, channel, publisher, callb
       })
       callback(error, null)
     } else {
-      LOG.info({'insering data to images table is : ': 'success',
-        data: fileName,
-        dialcode,
-        channel,
-        publisher,
-        config: self.configToString()
-      })
       callback(error, fileName)
     }
   })

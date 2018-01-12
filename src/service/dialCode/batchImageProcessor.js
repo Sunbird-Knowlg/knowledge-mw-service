@@ -51,8 +51,6 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
       dbModel.instance.dialcode_batch.findOne({processid: processId}, function (error, batch) {
         if (error) {
           LOG.error({filename, 'error while getting data from db': error, processId})
-        } else {
-          LOG.info({filename, processId: processId, status: 'successfully queried data', data: JSON.stringify(batch)})
         }
         callback(error, batch)
       })
@@ -64,8 +62,6 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
               {status: 1}, function (err) {
                 if (err) {
                   LOG.error({filename, 'error while updating status to 1:': err, processId})
-                } else {
-                  LOG.info({filename, processId: processId, status: 'successfully updated status to 1'})
                 }
                 callback(err, batch)
               })
@@ -75,8 +71,6 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
       self.createImages(batch, function (err, images) {
         if (err) {
           LOG.error({filename, 'error while creating images': err, processId})
-        } else {
-          LOG.info({filename, processId: processId, status: 'successfully created images'})
         }
         callback(err, images, batch)
       })
@@ -88,8 +82,6 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
       zipFolder(sourceFile, zipFile, function (err) {
         if (err) {
           LOG.error({filename, 'error while zipping folder:': err, processId, folder: sourceFile})
-        } else {
-          LOG.info({filename, processId: processId, status: 'successfully created zip', zipFile})
         }
         callback(err, batch, zipFile)
       })
@@ -101,8 +93,6 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
       uploadUtil.uploadFile(destPath, filePath, function (error, result) {
         if (error) {
           LOG.error({filename, 'error while uploading zip file:': error, processId, zipFile: filePath})
-        } else {
-          LOG.info({filename, processId: processId, status: 'successfully uploaded zip', zipFile: filePath})
         }
         callback(error, batch, filePath, process.env.sunbird_image_storage_url + destPath)
       })
@@ -114,8 +104,6 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
               {url: fileUrl, status: 2}, function (err) {
                 if (err) {
                   LOG.error({filename, 'error while updating status to 2:': err, processId})
-                } else {
-                  LOG.info({filename, processId: processId, status: 'successfully updated status to 2'})
                 }
                 callback(err, batch)
               })

@@ -219,26 +219,27 @@ exports.CONTENT = {
 
 exports.REQUEST = {
 
-    PARAMS: {
-        MISSING_CID_CODE: "ERR_REQUEST_FIELDS_CID_MISSING",
-        MISSING_CID_MESSAGE: "Required field consumer id is missing",
-        MISSING_CHANNELID_CODE: "ERR_REQUEST_FIELDS_CHANNEL_ID_MISSING",
-        MISSING_CHANNELID_MESSAGE: "Required field channel id is missing",
-    },
-    TOKEN : {
-        MISSING_CODE: "ERR_TOKEN_FIELD_MISSING",
-        MISSING_MESSAGE: "Required field token is missing",
-        INVALID_CODE: "ERR_TOKEN_INVALID",
-        INVALID_MESSAGE: "Access denied"
-    }
-};
+  PARAMS: {
+    MISSING_CID_CODE: 'ERR_REQUEST_FIELDS_CID_MISSING',
+    MISSING_CID_MESSAGE: 'Required field consumer id is missing',
+    MISSING_CHANNELID_CODE: 'ERR_REQUEST_FIELDS_CHANNEL_ID_MISSING',
+    MISSING_CHANNELID_MESSAGE: 'Required field channel id is missing'
+  },
+  TOKEN: {
+    MISSING_CODE: 'ERR_TOKEN_FIELD_MISSING',
+    MISSING_MESSAGE: 'Required field token is missing',
+    INVALID_CODE: 'ERR_TOKEN_INVALID',
+    INVALID_MESSAGE: 'Access denied'
+  }
+}
 
 exports.RESPONSE_CODE = {
   CLIENT_ERROR: 'CLIENT_ERROR',
   SERVER_ERROR: 'SERVER_ERROR',
   SUCCESS: 'OK',
   RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
-  UNAUTHORIZED_ACCESS: 'UNAUTHORIZED_ACCESS'
+  UNAUTHORIZED_ACCESS: 'UNAUTHORIZED_ACCESS',
+  PARTIAL_SUCCESS: 'PARTIAL_SUCCESS'
 }
 
 exports.API_VERSION = {
@@ -409,7 +410,10 @@ exports.DIALCODE = {
     MISSING_CODE: 'ERR_DIALCODE_GENERATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for generate dialcode are missing',
     FAILED_CODE: 'ERR_DIALCODE_GENERATE_FAILED',
-    FAILED_MESSAGE: 'Generate dialcode failed'
+    FAILED_MESSAGE: 'Generate dialcode failed',
+    MISSING_COUNT: 'ERR_DIALCODE_GENERATE_COUNT_ERROR',
+    MISSING_COUNT_MESSAGE: 'Required fields count is missing or invalid'
+
   },
 
   LIST: {
@@ -440,50 +444,50 @@ exports.DIALCODE = {
     FAILED_MESSAGE: 'Content link dialcode failed'
   },
 
-    PROCESS: {
-        MISSING_ID: 'ERR_DIALCODE_PROCESS_FIELDS_MISSING',
-        MISSING_MESSAGE: 'Required fields for process status are missing',
-        FAILED_CODE: 'ERR_DIALCODE_PROCESS_ID_FAILED',
-        FAILED_MESSAGE: 'Unable get the process info',
-        NOTFOUND_CODE: 'ERR_PROCESS_ID_NOT_FOUND',
-        NOTFOUND_MESSAGE: 'Requested process id not found',
-        INPROGRESS_MESSAGE: 'in-process',
-        COMPLETED: 'completed'
-    },
-    
-    SEARCH: {
-        MISSING_CODE: "ERR_DIALCODE_SEARCH_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for search dialcode are missing",
-        FAILED_CODE: "ERR_DIALCODE_SEARCH_FAILED",
-        FAILED_MESSAGE: "Search dialcode failed"
-    },
+  PROCESS: {
+    MISSING_ID: 'ERR_DIALCODE_PROCESS_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for process status are missing',
+    FAILED_CODE: 'ERR_DIALCODE_PROCESS_ID_FAILED',
+    FAILED_MESSAGE: 'Unable get the process info',
+    NOTFOUND_CODE: 'ERR_PROCESS_ID_NOT_FOUND',
+    NOTFOUND_MESSAGE: 'Requested process id not found',
+    INPROGRESS_MESSAGE: 'in-process',
+    COMPLETED: 'completed'
+  },
 
-    PUBLISH: {
-        MISSING_CODE: "ERR_DIALCODE_PUBLISH_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for publish dialcode are missing",
-        FAILED_CODE: "ERR_DIALCODE_PUBLISH_FAILED",
-        FAILED_MESSAGE: "Publish dialcode failed"
-    },
+  SEARCH: {
+    MISSING_CODE: 'ERR_DIALCODE_SEARCH_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for search dialcode are missing',
+    FAILED_CODE: 'ERR_DIALCODE_SEARCH_FAILED',
+    FAILED_MESSAGE: 'Search dialcode failed'
+  },
 
-    CREATE_PUBLISHER: {
-        MISSING_CODE: "ERR_CREATE_PUBLISHER_DIALCODE_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for create publisher are missing",
-        FAILED_CODE: "ERR_CREATE_PUBLISHER_DIALCODE_FAILED",
-        FAILED_MESSAGE: "Create publisher failed"
-    },
+  PUBLISH: {
+    MISSING_CODE: 'ERR_DIALCODE_PUBLISH_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for publish dialcode are missing',
+    FAILED_CODE: 'ERR_DIALCODE_PUBLISH_FAILED',
+    FAILED_MESSAGE: 'Publish dialcode failed'
+  },
 
-    UPDATE_PUBLISHER: {
-        MISSING_CODE: "ERR_UPDATE_PUBLISHER_DIALCODE_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for update publisher are missing",
-        FAILED_CODE: "ERR_UPDATE_PUBLISHER_DIALCODE_FAILED",
-        FAILED_MESSAGE: "Update publisher failed"
-    },
+  CREATE_PUBLISHER: {
+    MISSING_CODE: 'ERR_CREATE_PUBLISHER_DIALCODE_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for create publisher are missing',
+    FAILED_CODE: 'ERR_CREATE_PUBLISHER_DIALCODE_FAILED',
+    FAILED_MESSAGE: 'Create publisher failed'
+  },
 
-    GET_PUBLISHER: {
-        MISSING_CODE: "ERR_GET_PUBLISHER_DIALCODE_FIELDS_MISSING",
-        MISSING_MESSAGE: "Required fields for get publisher are missing",
-        FAILED_CODE: "ERR_GET_PUBLISHER_DIALCODE_FAILED",
-        FAILED_MESSAGE: "GET publisher failed"
-    },
+  UPDATE_PUBLISHER: {
+    MISSING_CODE: 'ERR_UPDATE_PUBLISHER_DIALCODE_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for update publisher are missing',
+    FAILED_CODE: 'ERR_UPDATE_PUBLISHER_DIALCODE_FAILED',
+    FAILED_MESSAGE: 'Update publisher failed'
+  },
 
-};
+  GET_PUBLISHER: {
+    MISSING_CODE: 'ERR_GET_PUBLISHER_DIALCODE_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for get publisher are missing',
+    FAILED_CODE: 'ERR_GET_PUBLISHER_DIALCODE_FAILED',
+    FAILED_MESSAGE: 'GET publisher failed'
+  }
+
+}

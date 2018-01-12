@@ -10,11 +10,13 @@ var _ = require('lodash')
 var contentProvider = require('sb_content_provider_util')
 var respUtil = require('response_util')
 var LOG = require('sb_logger_util')
+var configUtil = require('sb-config-util')
 
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
-var ImageService = require('./../service/dialCode/imageService')
-var BatchImageService = require('./../service/dialCode/batchImageService')
+var ImageService = require('./dialCode/imageService')
+var BatchImageService = require('./dialCode/batchImageService')
+var dialCodeServiceHelper = require('./dialCode/dialCodeServiceHelper')
 
 var filename = path.basename(__filename)
 var dialCodeMessage = messageUtils.DIALCODE
@@ -38,11 +40,19 @@ function generateDialCodeAPI (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
+  if (!_.get(data, 'request.dialcodes.count') || !_.isSafeInteger(data.request.dialcodes.count)) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI', 'Error due to error in count input', data.request))
+    rspObj.errCode = dialCodeMessage.GENERATE.MISSING_COUNT
+    rspObj.errMsg = dialCodeMessage.GENERATE.MISSING_COUNT_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+
     // Transform request for Content provider
   var reqData = {
     request: data.request
   }
-
+  var requestedCount = _.clone(_.get(data, 'request.dialcodes.count'))
   async.waterfall([
 
     function (CBW) {
@@ -50,8 +60,9 @@ function generateDialCodeAPI (req, response) {
         body: reqData,
         headers: req.headers
       }))
-      contentProvider.generateDialCode(reqData, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
+
+      dialCodeServiceHelper.generateDialcodes(reqData, req.headers, function (err, res) {
+        if (err || _.indexOf([responseCode.SUCCESS, responseCode.PARTIAL_SUCCESS], res.responseCode) === -1) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI', 'Getting error', res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GENERATE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GENERATE.FAILED_MESSAGE
@@ -93,6 +104,12 @@ function generateDialCodeAPI (req, response) {
     function (res) {
       rspObj.result = res.result
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'generateDialCodeAPI', 'Return response back to user', rspObj))
+
+      if (requestedCount > configUtil.getConfig('DIALCODE_GENERATE_MAX_COUNT')) {
+        rspObj.responseCode = responseCode.PARTIAL_SUCCESS
+        console.log('req count', rspObj)
+        return response.status(207).send(respUtil.successResponse(rspObj))
+      }
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -325,17 +342,17 @@ function getDialCodeAPI (req, response) {
  * @param {type} data
  * @returns {boolean} return response boolean value true or false
  */
-function checkContentLinkRequest(data) {
-    if (!data.request || !data.request.content || !data.request.content.identifier || !data.request.content.dialcode) {
-        return false;
-    }
-    var dialcodesLength = data.request.content.dialcode.length;
-    var identifiersLength = data.request.content.identifier.length;
-    if(dialcodesLength < 1 || identifiersLength < 1 || (dialcodesLength > 1 && identifiersLength > 1)) {
-        return false;
-    } else {
-        return true;
-    }
+function checkContentLinkRequest (data) {
+  if (!data.request || !data.request.content || !data.request.content.identifier || !data.request.content.dialcode) {
+    return false
+  }
+  var dialcodesLength = data.request.content.dialcode.length
+  var identifiersLength = data.request.content.identifier.length
+  if (dialcodesLength < 1 || identifiersLength < 1 || (dialcodesLength > 1 && identifiersLength > 1)) {
+    return false
+  } else {
+    return true
+  }
 }
 
 /**
@@ -422,273 +439,268 @@ function getProcessIdStatusAPI (req, response) {
  * This function helps to search dialcode
  * @param {type} req
  * @param {type} response
- * @returns {object} return response object with http status 
+ * @returns {object} return response object with http status
  */
-function searchDialCodeAPI(req, response) {
+function searchDialCodeAPI (req, response) {
+  var data = req.body,
+    rspObj = req.rspObj
 
-    var data = req.body,
-        rspObj = req.rspObj;
+  if (!data.request || !data.request.search) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchDialCodeAPI', 'Error due to required params are missing', data.request))
+    rspObj.errCode = dialCodeMessage.SEARCH.MISSING_CODE
+    rspObj.errMsg = dialCodeMessage.SEARCH.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
 
-    if (!data.request || !data.request.search) {
-        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchDialCodeAPI", "Error due to required params are missing", data.request));
-        rspObj.errCode = dialCodeMessage.SEARCH.MISSING_CODE;
-        rspObj.errMsg = dialCodeMessage.SEARCH.MISSING_MESSAGE;
-        rspObj.responseCode = responseCode.CLIENT_ERROR;
-        return response.status(400).send(respUtil.errorResponse(rspObj));
-    }
+    // Transform request for Content provider
+  var reqData = {
+    request: data.request
+  }
 
-    //Transform request for Content provider
-    var reqData = {
-        request: data.request
-    };
+  async.waterfall([
 
-    async.waterfall([
-
-        function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchDialCodeAPI", "Request for search", {
-                body : reqData, 
-                headers: req.headers
-            }));
-            contentProvider.searchDialCode(reqData, req.headers, function(err, res) {
-                if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "searchDialCodeAPI", "Getting error", res));
-                    rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.SEARCH.FAILED_CODE;
-                    rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.SEARCH.FAILED_MESSAGE;
-                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
-                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
-                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
-                } else {
-                    CBW(null, res);
-                }
-            });
-        },
-        function(res) {
-            rspObj.result = res.result;
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "searchDialCodeAPI", "Return response back to user", rspObj));
-            return response.status(200).send(respUtil.successResponse(rspObj));
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchDialCodeAPI', 'Request for search', {
+        body: reqData,
+        headers: req.headers
+      }))
+      contentProvider.searchDialCode(reqData, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchDialCodeAPI', 'Getting error', res))
+          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.SEARCH.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.SEARCH.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
         }
-    ]);
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchDialCodeAPI', 'Return response back to user', rspObj))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
 }
 
 /**
  * This function helps to publish dialcode
  * @param {type} req
  * @param {type} response
- * @returns {object} return response object with http status 
+ * @returns {object} return response object with http status
  */
-function publishDialCodeAPI(req, response) {
+function publishDialCodeAPI (req, response) {
+  var data = req.body,
+    rspObj = req.rspObj
+  data.dialCodeId = req.params.dialCodeId
 
-    var data = req.body,
-        rspObj = req.rspObj;
-    data.dialCodeId = req.params.dialCodeId;
+  if (!data.request || !data.dialCodeId) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'publishDialCodeAPI', 'Error due to required params are missing', data.request))
+    rspObj.errCode = dialCodeMessage.PUBLISH.MISSING_CODE
+    rspObj.errMsg = dialCodeMessage.PUBLISH.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
 
-    if (!data.request || !data.dialCodeId) {
-        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishDialCodeAPI", "Error due to required params are missing", data.request));
-        rspObj.errCode = dialCodeMessage.PUBLISH.MISSING_CODE;
-        rspObj.errMsg = dialCodeMessage.PUBLISH.MISSING_MESSAGE;
-        rspObj.responseCode = responseCode.CLIENT_ERROR;
-        return response.status(400).send(respUtil.errorResponse(rspObj));
-    }
+    // Transform request for Content provider
+  var reqData = {
+    request: data.request
+  }
 
-    //Transform request for Content provider
-    var reqData = {
-        request: data.request
-    };
+  async.waterfall([
 
-    async.waterfall([
-
-        function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishDialCodeAPI", "Request for publish dialcode", {
-                body : reqData, 
-                headers: req.headers
-            }));
-            contentProvider.publishDialCode(reqData, data.dialCodeId, req.headers, function(err, res) {
-                if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "publishDialCodeAPI", "Getting error", res));
-                    rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.PUBLISH.FAILED_CODE;
-                    rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.PUBLISH.FAILED_MESSAGE;
-                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
-                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
-                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
-                } else {
-                    CBW(null, res);
-                }
-            });
-        },
-        function(res) {
-            rspObj.result = res.result;
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "publishDialCodeAPI", "Return response back to user", rspObj));
-            return response.status(200).send(respUtil.successResponse(rspObj));
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishDialCodeAPI', 'Request for publish dialcode', {
+        body: reqData,
+        headers: req.headers
+      }))
+      contentProvider.publishDialCode(reqData, data.dialCodeId, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'publishDialCodeAPI', 'Getting error', res))
+          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.PUBLISH.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.PUBLISH.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
         }
-    ]);
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishDialCodeAPI', 'Return response back to user', rspObj))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
 }
 
 /**
  * This function helps to create publisher
  * @param {type} req
  * @param {type} response
- * @returns {object} return response object with http status 
+ * @returns {object} return response object with http status
  */
-function createPublisherAPI(req, response) {
+function createPublisherAPI (req, response) {
+  var data = req.body,
+    rspObj = req.rspObj
 
-    var data = req.body,
-        rspObj = req.rspObj;
+  if (!data.request || !data.request.publisher || !data.request.publisher.identifier || !data.request.publisher.name) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createPublisherAPI', 'Error due to required params are missing', data.request))
+    rspObj.errCode = dialCodeMessage.CREATE_PUBLISHER.MISSING_CODE
+    rspObj.errMsg = dialCodeMessage.CREATE_PUBLISHER.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
 
-    if (!data.request || !data.request.publisher || !data.request.publisher.identifier || !data.request.publisher.name) {
-        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createPublisherAPI", "Error due to required params are missing", data.request));
-        rspObj.errCode = dialCodeMessage.CREATE_PUBLISHER.MISSING_CODE;
-        rspObj.errMsg = dialCodeMessage.CREATE_PUBLISHER.MISSING_MESSAGE;
-        rspObj.responseCode = responseCode.CLIENT_ERROR;
-        return response.status(400).send(respUtil.errorResponse(rspObj));
-    }
+    // Transform request for Content provider
+  var reqData = {
+    request: data.request
+  }
 
-    //Transform request for Content provider
-    var reqData = {
-        request: data.request
-    };
+  async.waterfall([
 
-    async.waterfall([
-
-        function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createPublisherAPI", "Request for create publisher", {
-                body : reqData, 
-                headers: req.headers
-            }));
-            contentProvider.createPublisher(reqData, req.headers, function(err, res) {
-                if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "createPublisherAPI", "Getting error", res));
-                    rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.CREATE_PUBLISHER.FAILED_CODE;
-                    rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.CREATE_PUBLISHER.FAILED_MESSAGE;
-                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
-                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
-                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
-                } else {
-                    CBW(null, res);
-                }
-            });
-        },
-        function(res) {
-            rspObj.result = res.result;
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "createPublisherAPI", "Return response back to user", rspObj));
-            return response.status(200).send(respUtil.successResponse(rspObj));
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createPublisherAPI', 'Request for create publisher', {
+        body: reqData,
+        headers: req.headers
+      }))
+      contentProvider.createPublisher(reqData, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createPublisherAPI', 'Getting error', res))
+          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.CREATE_PUBLISHER.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.CREATE_PUBLISHER.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
         }
-    ]);
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createPublisherAPI', 'Return response back to user', rspObj))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
 }
 
 /**
  * This function helps to update publisher
  * @param {type} req
  * @param {type} response
- * @returns {object} return response object with http status 
+ * @returns {object} return response object with http status
  */
-function updatePublisherAPI(req, response) {
+function updatePublisherAPI (req, response) {
+  var data = req.body
+  data.publisherId = req.params.publisherId
+  var rspObj = req.rspObj
 
-    var data = req.body;
-    data.publisherId = req.params.publisherId;
-    var rspObj = req.rspObj;
+  if (!data.request || !data.request.publisher || !data.publisherId) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updatePublisherAPI', 'Error due to required params are missing', data.request))
+    rspObj.errCode = dialCodeMessage.UPDATE_PUBLISHER.MISSING_CODE
+    rspObj.errMsg = dialCodeMessage.UPDATE_PUBLISHER.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
 
-    if (!data.request || !data.request.publisher || !data.publisherId) {
-        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updatePublisherAPI", "Error due to required params are missing", data.request));
-        rspObj.errCode = dialCodeMessage.UPDATE_PUBLISHER.MISSING_CODE;
-        rspObj.errMsg = dialCodeMessage.UPDATE_PUBLISHER.MISSING_MESSAGE;
-        rspObj.responseCode = responseCode.CLIENT_ERROR;
-        return response.status(400).send(respUtil.errorResponse(rspObj));
-    }
+    // Transform request for Content Provider
+  var reqData = {
+    request: data.request
+  }
 
-    //Transform request for Content Provider
-    var reqData = {
-        request: data.request
-    };
+  async.waterfall([
 
-    async.waterfall([
-
-        function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updatePublisherAPI", "Request for update the publisher", {
-                body : reqData, 
-                headers: req.headers
-            }));
-            contentProvider.updatePublisher(reqData, data.publisherId, req.headers, function(err, res) {
-                if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "updatePublisherAPI", "Getting error", res));
-                    rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.UPDATE_PUBLISHER.FAILED_CODE;
-                    rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.UPDATE_PUBLISHER.FAILED_MESSAGE;
-                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
-                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
-                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
-                } else {
-                    CBW(null, res);
-                }
-            });
-        },
-        function(res) {
-            rspObj.result = res.result;
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "updatePublisherAPI", "Return response back to user", rspObj));
-            return response.status(200).send(respUtil.successResponse(rspObj));
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updatePublisherAPI', 'Request for update the publisher', {
+        body: reqData,
+        headers: req.headers
+      }))
+      contentProvider.updatePublisher(reqData, data.publisherId, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updatePublisherAPI', 'Getting error', res))
+          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.UPDATE_PUBLISHER.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.UPDATE_PUBLISHER.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
         }
-    ]);
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updatePublisherAPI', 'Return response back to user', rspObj))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
 }
 
 /**
  * This function helps to get publisher metadata
  * @param {type} req
  * @param {type} response
- * @returns {object} return response object with http status 
+ * @returns {object} return response object with http status
  */
-function getPublisherAPI(req, response) {
+function getPublisherAPI (req, response) {
+  var data = {}
+  data.publisherId = req.params.publisherId
+  var rspObj = req.rspObj
 
-    var data = {};
-    data.publisherId = req.params.publisherId;
-    var rspObj = req.rspObj;
+  if (!data.publisherId) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getPublisherAPI', 'Error due to required params are missing', {
+      dialCodeId: data.dialCodeId
+    }))
+    rspObj.errCode = dialCodeMessage.GET.MISSING_CODE
+    rspObj.errMsg = dialCodeMessage.GET.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
 
-    if (!data.publisherId) {
-        LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getPublisherAPI", "Error due to required params are missing", {
-            dialCodeId: data.dialCodeId
-        }));
-        rspObj.errCode = dialCodeMessage.GET.MISSING_CODE;
-        rspObj.errMsg = dialCodeMessage.GET.MISSING_MESSAGE;
-        rspObj.responseCode = responseCode.CLIENT_ERROR;
-        return response.status(400).send(respUtil.errorResponse(rspObj));
-    }
+  async.waterfall([
 
-    async.waterfall([
-
-        function(CBW) {
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getPublisherAPI", "Request for get publisher meta data", {
-                publisherId: data.publisherId,
-                qs: data.queryParams, 
-                headers: req.headers
-            }));
-            contentProvider.getPublisher(data.publisherId, req.headers, function(err, res) {
-                //After check response, we perform other operation
-                if (err || res.responseCode !== responseCode.SUCCESS) {
-                    LOG.error(utilsService.getLoggerData(rspObj, "ERROR", filename, "getPublisherAPI", "Getting error", res));
-                    rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GET.FAILED_CODE;
-                    rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GET.FAILED_MESSAGE;
-                    rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
-                    var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
-                    return response.status(httpStatus).send(respUtil.errorResponse(rspObj));
-                } else {
-                    CBW(null, res);
-                }
-            });
-        },
-        function(res) {
-            rspObj.result = res.result;
-            LOG.info(utilsService.getLoggerData(rspObj, "INFO", filename, "getPublisherAPI", "Sending response back to user"));
-            return response.status(200).send(respUtil.successResponse(rspObj));
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getPublisherAPI', 'Request for get publisher meta data', {
+        publisherId: data.publisherId,
+        qs: data.queryParams,
+        headers: req.headers
+      }))
+      contentProvider.getPublisher(data.publisherId, req.headers, function (err, res) {
+                // After check response, we perform other operation
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getPublisherAPI', 'Getting error', res))
+          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GET.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GET.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
         }
-    ]);
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getPublisherAPI', 'Sending response back to user'))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
 }
 
-module.exports.generateDialCodeAPI = generateDialCodeAPI;
-module.exports.dialCodeListAPI = dialCodeListAPI;
-module.exports.updateDialCodeAPI = updateDialCodeAPI;
-module.exports.getDialCodeAPI = getDialCodeAPI;
-module.exports.contentLinkDialCodeAPI = contentLinkDialCodeAPI;
-module.exports.getProcessIdStatusAPI = getProcessIdStatusAPI;
-module.exports.searchDialCodeAPI = searchDialCodeAPI;
-module.exports.publishDialCodeAPI = publishDialCodeAPI;
-module.exports.createPublisherAPI = createPublisherAPI;
-module.exports.createPublisherAPI = createPublisherAPI;
-module.exports.getPublisherAPI = getPublisherAPI;
-module.exports.updatePublisherAPI = updatePublisherAPI;
+module.exports.generateDialCodeAPI = generateDialCodeAPI
+module.exports.dialCodeListAPI = dialCodeListAPI
+module.exports.updateDialCodeAPI = updateDialCodeAPI
+module.exports.getDialCodeAPI = getDialCodeAPI
+module.exports.contentLinkDialCodeAPI = contentLinkDialCodeAPI
+module.exports.getProcessIdStatusAPI = getProcessIdStatusAPI
+module.exports.searchDialCodeAPI = searchDialCodeAPI
+module.exports.publishDialCodeAPI = publishDialCodeAPI
+module.exports.createPublisherAPI = createPublisherAPI
+module.exports.createPublisherAPI = createPublisherAPI
+module.exports.getPublisherAPI = getPublisherAPI
+module.exports.updatePublisherAPI = updatePublisherAPI
