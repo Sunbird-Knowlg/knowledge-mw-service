@@ -96,6 +96,7 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
     },
     function (batch, filePath, callback) {
         // upload file
+      self.filePath = filePath
       var destPath = path.join(batch.channel, batch.publisher, batch.processid.toString()) + '.zip'
       uploadUtil.uploadFile(destPath, filePath, function (error, result) {
         if (error) {
@@ -116,26 +117,18 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
                 } else {
                   LOG.info({filename, processId: processId, status: 'successfully updated status to 2'})
                 }
-                callback(err, batch, filePath, fileUrl)
+                callback(err, batch)
               })
-    },
-    function (batch, filePath, fileUrl, callback) {
-        // clean up local files
-      var error = null
-      try {
-        fs.unlinkSync(filePath)
-        rimraf.sync(path.join(process.env.dial_code_image_temp_folder, batch.channel, batch.publisher, batch.processid.toString()))
-      } catch (e) {
-        error = e
-        LOG.error({filename, 'error while deleting local files:': e, filePath})
-      }
-      if (!error) {
-        LOG.info({filename, processId: processId, status: 'successfully deleted local files', filePath})
-      }
-      callback(error, batch)
     }
-  ], function (err, result) {
-    cb(err, result)
+  ], function (err, batch) {
+    // delete local file create
+    try {
+      fs.unlinkSync(self.filePath)
+      rimraf.sync(path.join(process.env.dial_code_image_temp_folder, batch.channel, batch.publisher, batch.processid.toString()))
+    } catch (e) {
+      LOG.error({filename, 'error while deleting local files:': e, filePath: self.filePath})
+    }
+    cb(err, batch)
   })
 }
 

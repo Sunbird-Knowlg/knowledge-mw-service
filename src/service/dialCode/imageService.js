@@ -15,13 +15,13 @@ var currentFile = path.basename(__filename)
 var errorCorrectionLevels = ['L', 'M', 'Q', 'H']
 
 function ImageService (config) {
-  this.color = config && config.color ? colorConvert.cmykTohex(config.color) : '#000'
-  this.backgroundColor = config && config.backgroundColor ? config.backgroundColor : '#ffff'
-  this.width = config && config.width ? config.width : '30'
-  this.height = config && config.height ? config.height : '30'
-  this.margin = config && config.margin ? config.margin : '2'
-  this.border = config && (config.border === 'false') ? '0' : '20'
-  this.showText = config && (config.showText === 'false') ? '0' : '1'
+  this.color = _.get(config, 'color') ? colorConvert.cmykTohex(config.color) : '#000'
+  this.backgroundColor = _.get(config, 'backgroundColor') ? config.backgroundColor : '#ffff'
+  this.width = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'width')), 30, 32))
+  this.height = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'height')), 30, 32))
+  this.margin = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'margin')), 2, 100))
+  this.border = (config && parseInt(config.border, 10) >= 0) ? parseInt(config.border, 10) : '10'
+  this.text = (config && (config.text === false)) ? '0' : '1'
   this.errCorrectionLevel = (config && config.errCorrectionLevel && _.indexOf(errorCorrectionLevels, config.errCorrectionLevel) !== -1) ? config.errCorrectionLevel : 'H'
 }
 
@@ -49,7 +49,7 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
         function (fileName, callback) {
         // genratate Image
           self.fileName = fileName
-          var text = process.env.sunbird_dial_code_registry_url + dialcode
+          var qrText = process.env.sunbird_dial_code_registry_url + dialcode
           var color = config.color
           var bgColor = config.backgroundColor
           var errCorrectionLevel = config.errCorrectionLevel
@@ -62,10 +62,10 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
             LOG.error({currentFile, 'unable create directory': e, directoryPath: localFileLocation})
           }
 
-          qrCodeUtil.generate(path.join(localFileLocation, fileName + '.png'), text, color, bgColor, errCorrectionLevel, margin, callback)
+          qrCodeUtil.generate(path.join(localFileLocation, fileName + '.png'), qrText, color, bgColor, errCorrectionLevel, margin, callback)
         },
         function (filePath, callback) {
-          var text = config.showText ? dialcode.trim() : ''
+          var text = config.text ? dialcode.trim() : ''
           qrCodeUtil.addTextAndBorder(filePath, text, config.border, config.color, callback)
         },
         function (filePath, callback) {
@@ -89,22 +89,18 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
           dbModel.instance.dialcode_images.update(
               {filename: self.fileName},
               {url: fileUrl, status: 2}, function (err) {
-                callback(err, filePath, fileUrl)
+                callback(err, {url: fileUrl, path: filePath})
               })
-        },
-        function (filePath, fileUrl, callback) {
-           // delete local image
-          if (deleteLocalFileFlag) {
-            try {
-              fs.unlinkSync(filePath)
-            } catch (e) {
-              LOG.error({'unable delete local file ': e})
-            }
-          }
-          callback(null, fileUrl)
         }
-      ], function (err, fileUrl) {
-        cb(err, {url: fileUrl, 'created': true})
+      ], function (err, results) {
+        if (deleteLocalFileFlag) {
+          try {
+            fs.unlinkSync(results.path)
+          } catch (e) {
+            LOG.error({'unable delete local file ': e})
+          }
+        }
+        cb(err, {url: results.url, 'created': true})
       })
     }
   })
@@ -116,17 +112,6 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
   // return url
 }
 
-ImageService.prototype.setConfig = function (config) {
-  this.color = config && config.color ? colorConvert.cmykTohex(config.color) : '#000'
-  this.backgroundColor = config && config.backgroundColor ? config.backgroundColor : '#ffff'
-  this.width = config && config.width ? config.width : '30'
-  this.height = config && config.height ? config.height : '30'
-  this.margin = config && config.margin ? config.margin : '2'
-  this.border = config && (config.border === 'false') ? '0' : '20'
-  this.showText = config && (config.showText === 'false') ? '0' : '1'
-  this.errCorrectionLevel = config && config.quality && _.indexOf(errorCorrectionLevels, config.quality) ? config.quality : 'H'
-}
-
 ImageService.prototype.getConfig = function () {
   return {
     color: this.color,
@@ -135,7 +120,7 @@ ImageService.prototype.getConfig = function () {
     height: parseInt(this.height),
     margin: parseInt(this.margin),
     border: parseInt(this.border),
-    showText: parseInt(this.showText),
+    text: parseInt(this.text),
     errCorrectionLevel: this.errCorrectionLevel
   }
 }

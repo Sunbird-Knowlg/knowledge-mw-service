@@ -12,13 +12,13 @@ var responseCode = messageUtils.RESPONSE_CODE
 var errorCorrectionLevels = ['L', 'M', 'Q', 'H']
 
 function BatchImageService (config) {
-  this.color = config && config.color ? colorConvert.cmykTohex(config.color) : '#000'
-  this.backgroundColor = config && config.backgroundColor ? config.backgroundColor : '#ffff'
-  this.width = config && config.width ? config.width : '30'
-  this.height = config && config.height ? config.height : '30'
-  this.margin = config && config.margin ? config.margin : '2'
-  this.border = config && (config.border === 'false') ? '0' : '20'
-  this.showText = config && (config.showText === 'false') ? '0' : '1'
+  this.color = _.get(config, 'color') ? colorConvert.cmykTohex(config.color) : '#000'
+  this.backgroundColor = _.get(config, 'backgroundColor') ? config.backgroundColor : '#ffff'
+  this.width = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'width')), 30, 32))
+  this.height = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'height')), 30, 32))
+  this.margin = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'margin')), 2, 100))
+  this.border = (config && parseInt(config.border, 10) >= 0) ? parseInt(config.border, 10) : '10'
+  this.text = (config && (config.text === false)) ? '0' : '1'
   this.errCorrectionLevel = (config && config.errCorrectionLevel && _.indexOf(errorCorrectionLevels, config.errCorrectionLevel) !== -1) ? config.errCorrectionLevel : 'H'
 }
 
@@ -53,7 +53,7 @@ BatchImageService.prototype.getConfig = function () {
     height: parseInt(this.height),
     margin: parseInt(this.margin),
     border: parseInt(this.border),
-    showText: parseInt(this.showText),
+    text: parseInt(this.text),
     errCorrectionLevel: this.errCorrectionLevel
   }
 }
