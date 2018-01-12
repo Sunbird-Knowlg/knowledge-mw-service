@@ -21,7 +21,7 @@ function ImageService (config) {
   this.height = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'height')), 30, 32))
   this.margin = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'margin')), 2, 100))
   this.border = (config && parseInt(config.border, 10) >= 0) ? parseInt(config.border, 10) : '10'
-  this.text = (config && (config.text === false)) ? '0' : '1'
+  this.text = (config && (config.text === false || config.text === '0')) ? '0' : '1'
   this.errCorrectionLevel = (config && config.errCorrectionLevel && _.indexOf(errorCorrectionLevels, config.errCorrectionLevel) !== -1) ? config.errCorrectionLevel : 'H'
 }
 
@@ -65,8 +65,8 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
           qrCodeUtil.generate(path.join(localFileLocation, fileName + '.png'), qrText, color, bgColor, errCorrectionLevel, margin, callback)
         },
         function (filePath, callback) {
-          var text = config.text ? dialcode.trim() : ''
-          qrCodeUtil.addTextAndBorder(filePath, text, config.border, config.color, callback)
+          var dialcodeText = config.text ? dialcode.trim() : false
+          qrCodeUtil.addTextAndBorder(filePath, dialcodeText, config.border, config.color, callback)
         },
         function (filePath, callback) {
             // resize image
@@ -155,6 +155,7 @@ ImageService.prototype.getImgFromDB = function (dialcode, channel, publisher, ca
 
 ImageService.prototype.insertImg = function (dialcode, channel, publisher, callback) {
   var fileName = dialcode + '_' + Date.now()
+  var self = this
   var image = new dbModel.instance.dialcode_images({
     dialcode: dialcode,
     config: this.configToString(),
@@ -176,7 +177,8 @@ ImageService.prototype.insertImg = function (dialcode, channel, publisher, callb
         data: fileName,
         dialcode,
         channel,
-        publisher
+        publisher,
+        config: self.configToString()
       })
       callback(error, fileName)
     }

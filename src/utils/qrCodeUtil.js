@@ -64,7 +64,7 @@ qrCodeUtil.prototype.addTextAndBorder = function addTextAndBorder (filePath, tex
           } else {
             LOG.info(
               {filename,
-                'add text or border to file': filePath,
+                'added text or border to file': filePath,
                 text,
                 border,
                 color
