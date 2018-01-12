@@ -162,7 +162,7 @@ function dialCodeListAPI (req, response) {
         headers: req.headers
       }))
       contentProvider.dialCodeList(reqData, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
+        if (err || _.indexOf([responseCode.SUCCESS, responseCode.PARTIAL_SUCCESS], res.responseCode) === -1) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI', 'Getting error', res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.LIST.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.LIST.FAILED_MESSAGE
@@ -466,7 +466,7 @@ function searchDialCodeAPI (req, response) {
         headers: req.headers
       }))
       contentProvider.searchDialCode(reqData, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
+        if (err || _.indexOf([responseCode.SUCCESS, responseCode.PARTIAL_SUCCESS], res.responseCode) === -1) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchDialCodeAPI', 'Getting error', res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.SEARCH.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.SEARCH.FAILED_MESSAGE
