@@ -43,7 +43,7 @@
              LOG.error({'err': err, 'response': respData})
            } else {
              totalResCount = totalResCount + respData.result.count
-             res.result.dialcodes.push(respData.result.dialcodes)
+             res.result.dialcodes = _.merge(res.result.dialcodes, respData.result.dialcodes)
            }
          })
          remainingCount = remainingCount - apiMaxCount

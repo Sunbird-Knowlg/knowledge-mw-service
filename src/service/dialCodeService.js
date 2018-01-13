@@ -105,11 +105,10 @@ function generateDialCodeAPI (req, response) {
       rspObj.result = res.result
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'generateDialCodeAPI', 'Return response back to user', rspObj))
 
-      if (requestedCount > configUtil.getConfig('DIALCODE_GENERATE_MAX_COUNT')) {
-        rspObj.responseCode = responseCode.PARTIAL_SUCCESS
-        console.log('req count', rspObj)
-        return response.status(207).send(respUtil.successResponse(rspObj))
-      }
+      // if (requestedCount > configUtil.getConfig('DIALCODE_GENERATE_MAX_COUNT')) {
+      //   rspObj.responseCode = responseCode.PARTIAL_SUCCESS
+      //   return response.status(207).send(respUtil.successResponse(rspObj))
+      // }
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])

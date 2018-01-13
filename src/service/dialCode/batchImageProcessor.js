@@ -17,6 +17,7 @@ function BatchImageProcessor () {}
 
 BatchImageProcessor.prototype.register = function (processId) {
   var self = this
+
   if (!processStatus) {
     this.startProcess(dbModel.uuidFromString(processId), function (err, res) {
       if (err) {
@@ -43,6 +44,7 @@ BatchImageProcessor.prototype.register = function (processId) {
 }
 
 BatchImageProcessor.prototype.startProcess = function (processId, cb) {
+  LOG.info({filename, processId: processId, status: 'started processing'})
   processStatus = true
   var self = this
   async.waterfall([
