@@ -88,10 +88,8 @@ function generateDialCodeAPI (req, response) {
         batchImageService.createRequest(res.result.dialcodes, channel, requestObj.publisher, function (err, processId) {
           if (err) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI', 'Error while creating request to child process for images creation', err))
-            rspObj.errCode = dialCodeMessage.GENERATE.FAILED_CODE
-            rspObj.errMsg = dialCodeMessage.GENERATE.FAILED_MESSAGE
-            rspObj.responseCode = responseCode.SERVER_ERROR
-            return response.status(500).send(respUtil.errorResponse(rspObj))
+            res.responseCode = responseCode.PARTIAL_SUCCESS
+            return response.status(207).send(respUtil.successResponse(res))
           } else {
             res.result.processId = processId
             CBW(null, res)
@@ -105,10 +103,10 @@ function generateDialCodeAPI (req, response) {
       rspObj.result = res.result
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'generateDialCodeAPI', 'Return response back to user', rspObj))
 
-      // if (requestedCount > configUtil.getConfig('DIALCODE_GENERATE_MAX_COUNT')) {
-      //   rspObj.responseCode = responseCode.PARTIAL_SUCCESS
-      //   return response.status(207).send(respUtil.successResponse(rspObj))
-      // }
+      if (requestedCount > configUtil.getConfig('DIALCODE_GENERATE_MAX_COUNT')) {
+        rspObj.responseCode = responseCode.PARTIAL_SUCCESS
+        return response.status(207).send(respUtil.successResponse(rspObj))
+      }
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -180,10 +178,8 @@ function dialCodeListAPI (req, response) {
         batchImageService.createRequest(dialcodes, channel, requestObj.publisher, function (err, processId) {
           if (err) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI', 'Error while creating request to child process for images creation', err))
-            rspObj.errCode = dialCodeMessage.GENERATE.FAILED_CODE
-            rspObj.errMsg = dialCodeMessage.GENERATE.FAILED_MESSAGE
-            rspObj.responseCode = responseCode.SERVER_ERROR
-            return response.status(500).send(respUtil.errorResponse(rspObj))
+            res.responseCode = responseCode.PARTIAL_SUCCESS
+            return response.status(207).send(respUtil.successResponse(res))
           } else {
             res.result.processId = processId
             CBW(null, res)
@@ -315,10 +311,8 @@ function getDialCodeAPI (req, response) {
         imgService.getImage(dialcode, channel, publisher, undefined, undefined, true, function (err, image) {
           if (err) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDialCodeAPI', 'Generating image error', err))
-            rspObj.errCode = dialCodeMessage.GET.FAILED_CODE
-            rspObj.errMsg = dialCodeMessage.GET.FAILED_MESSAGE
-            rspObj.responseCode = responseCode.SERVER_ERROR
-            return response.status(500).send(respUtil.errorResponse(rspObj))
+            res.responseCode = responseCode.PARTIAL_SUCCESS
+            return response.status(207).send(respUtil.successResponse(res))
           } else {
             res.result.dialcode.image = image.url
             CBW(null, res)
