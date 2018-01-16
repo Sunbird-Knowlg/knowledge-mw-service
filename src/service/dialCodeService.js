@@ -48,7 +48,7 @@ function generateDialCodeAPI (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
-    // Transform request for Content provider
+  // Transform request for Content provider
   var reqData = {
     request: data.request
   }
@@ -146,7 +146,7 @@ function dialCodeListAPI (req, response) {
   if (data.request && data.request.search) {
     data.request.search = _.omit(data.request.search, ['qrCodeSpec'])
   }
-    // Transform request for Content provider
+  // Transform request for Content provider
   var reqData = {
     request: data.request
   }
@@ -216,7 +216,7 @@ function updateDialCodeAPI (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
-    // Transform request for Ek step
+  // Transform request for Ek step
   var reqData = {
     request: data.request
   }
@@ -280,7 +280,7 @@ function getDialCodeAPI (req, response) {
         headers: req.headers
       }))
       contentProvider.getDialCode(data.dialCodeId, req.headers, function (err, res) {
-                // After check response, we perform other operation
+        // After check response, we perform other operation
         console.log(err)
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDialCodeAPI', 'Getting error', res))
@@ -365,7 +365,7 @@ function contentLinkDialCodeAPI (req, response) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
-    // Transform request for content provider
+  // Transform request for content provider
   var reqData = {
     request: data.request
   }
@@ -423,9 +423,9 @@ function getProcessIdStatusAPI (req, response) {
   batchImageService.getStatus(rspObj, req.params.processId).then(process => {
     return response.status(process.code).send(process.data)
   })
-  .catch(err => {
-    return response.status(err.code).send(err.data)
-  })
+    .catch(err => {
+      return response.status(err.code).send(err.data)
+    })
 }
 
 /**
@@ -446,7 +446,7 @@ function searchDialCodeAPI (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
-    // Transform request for Content provider
+  // Transform request for Content provider
   var reqData = {
     request: data.request
   }
@@ -498,7 +498,7 @@ function publishDialCodeAPI (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
-    // Transform request for Content provider
+  // Transform request for Content provider
   var reqData = {
     request: data.request
   }
@@ -549,7 +549,7 @@ function createPublisherAPI (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
-    // Transform request for Content provider
+  // Transform request for Content provider
   var reqData = {
     request: data.request
   }
@@ -601,7 +601,7 @@ function updatePublisherAPI (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
-    // Transform request for Content Provider
+  // Transform request for Content Provider
   var reqData = {
     request: data.request
   }
@@ -664,7 +664,7 @@ function getPublisherAPI (req, response) {
         headers: req.headers
       }))
       contentProvider.getPublisher(data.publisherId, req.headers, function (err, res) {
-                // After check response, we perform other operation
+        // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getPublisherAPI', 'Getting error', res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GET.FAILED_CODE

@@ -29,7 +29,7 @@
          self.callApi(req, headers, task.count, function (err, resData) {
            cb(err, resData)
          })
-       }, 5)
+       }, 10)
 
        q.drain = function () {
          LOG.info({filename, status: 'processed all the requests count: ' + totalResCount})
