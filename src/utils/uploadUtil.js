@@ -25,12 +25,13 @@ UploadUtil.prototype.deleteFile = function deleteFile (filePath, callback) {
 
 UploadUtil.prototype.downloadFile = function downloadFile (destPath, sourcePath, callback) {
   fse.ensureFileSync(destPath)
-  blobService.getBlobToStream(this.containerName, sourcePath, fs.createWriteStream(destPath), function (error, result, response) {
-    if (error) {
-      LOG.error({filename, 'Unable to download file from azure : ': error})
-    }
-    callback(error, destPath)
-  })
+  blobService.getBlobToStream(this.containerName, sourcePath, fs.createWriteStream(destPath),
+    function (error, result, response) {
+      if (error) {
+        LOG.error({filename, 'Unable to download file from azure : ': error})
+      }
+      callback(error, destPath)
+    })
 }
 
 module.exports = UploadUtil

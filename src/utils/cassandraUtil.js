@@ -19,14 +19,14 @@ models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind
       migration: 'safe'
     }
   },
-    function (err) {
-      if (err) {
-        LOG.error({filename, 'Error connecting to the database: ': err})
-        throw err
-      } else {
-        LOG.info({filename, 'connecting to database': 'success'})
-      }
+  function (err) {
+    if (err) {
+      LOG.error({filename, 'Error connecting to the database: ': err})
+      throw err
+    } else {
+      LOG.info({filename, 'connecting to database': 'success'})
     }
+  }
 )
 
 module.exports = models
