@@ -7,7 +7,7 @@
 var async = require('async')
 var path = require('path')
 var respUtil = require('response_util')
-var ekStepUtil = require('sb-ekstep-util')
+var ekStepUtil = require('sb_content_provider_util')
 var LOG = require('sb_logger_util')
 
 var messageUtils = require('./messageUtil')
