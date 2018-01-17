@@ -14,8 +14,8 @@ var reqDataLimitOfContentUpload = '30mb'
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000
 
 global_content_provider_base_url = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://dev.ekstep.in/api'
-global_ekstep_proxy_base_url = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://dev.ekstep.in'
-global_content_provider_api_key = process.env.sunbird_content_provider_api_key || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI2NWU2MTUxNzdkODY0MGJkYWNmMWE4MWEwM2Y5MmNjYSJ9.yST4a-kA0K-r-86m0gx45IMTTZP0ujQnjFDEjv2wU0A'
+global_ekstep_proxy_base_url = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://qa.ekstep.in'
+global_content_provider_api_key = process.env.sunbird_content_provider_api_key
 
 global_learner_service_api_key = process.env.sunbird_learner_service_api_key
 global_learner_service_base_url = process.env.sunbird_learner_service_base_url ? process.env.sunbird_learner_service_base_url : 'https://dev.open-sunbird.org/api'
