@@ -13,9 +13,9 @@ var reqDataLimitOfContentUpload = '30mb';
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000;
 
-global_ekstep_api_base_url = process.env.ekstep_api_base_url ? process.env.ekstep_api_base_url : "https://qa.ekstep.in/api";
-global_ekstep_proxy_base_url = process.env.ekstep_proxy_base_url ? process.env.ekstep_proxy_base_url : "https://qa.ekstep.in";
-global_ekstep_api_key = process.env.ekstep_api_key;
+global_ekstep_api_base_url = process.env.ekstep_api_base_url ? process.env.ekstep_api_base_url : 'https://qa.ekstep.in/api'
+global_ekstep_proxy_base_url = process.env.ekstep_proxy_base_url ? process.env.ekstep_proxy_base_url : 'https://qa.ekstep.in'
+global_ekstep_api_key = process.env.ekstep_api_key 
 
 global_learner_service_api_key = process.env.sunbird_learner_service_api_key;
 global_learner_service_base_url = process.env.sunbird_learner_service_base_url ? process.env.sunbird_learner_service_base_url : "https://dev.open-sunbird.org/api";
@@ -71,6 +71,10 @@ require('./routes/courseRoutes')(app);
 require('./routes/contentRoutes')(app);
 require('./routes/conceptRoutes')(app);
 require('./routes/searchRoutes')(app);
+require('./routes/channelRoutes')(app)
+require('./routes/frameworkRoutes')(app)
+require('./routes/frameworkTermRoutes')(app)
+require('./routes/frameworkCategoryInstanceRoutes')(app)
 //last this middle in last
 require('./middlewares/proxy.middleware')(app);
 
