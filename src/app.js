@@ -69,14 +69,14 @@ app.use(function (req, res, next) {
     next();
 });
 
-require('./routes/courseRoutes')(app)
-require('./routes/contentRoutes')(app)
-require('./routes/conceptRoutes')(app)
-require('./routes/searchRoutes')(app)
-require('./routes/channelRoutes')(app)
-require('./routes/frameworkRoutes')(app)
-require('./routes/frameworkTermRoutes')(app)
-require('./routes/frameworkCategoryInstanceRoutes')(app)
+require('./routes/courseRoutes')(app);
+require('./routes/contentRoutes')(app);
+require('./routes/conceptRoutes')(app);
+require('./routes/searchRoutes')(app);
+require('./routes/channelRoutes')(app);
+require('./routes/frameworkRoutes')(app);
+require('./routes/frameworkTermRoutes')(app);
+require('./routes/frameworkCategoryInstanceRoutes')(app);
 
 // last this middle in last
 require('./middlewares/proxy.middleware')(app)
