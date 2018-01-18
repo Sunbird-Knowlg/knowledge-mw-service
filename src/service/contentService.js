@@ -72,6 +72,7 @@ function getHealthCheckResp (rsp, healthy, checksArrayObj) {
 }
 
 function checkHealth (req, response) {
+  console.log(".")
   return response.status(200).send('ok')
 //     var rspObj = req.rspObj;
 //     var checksArrayObj = [];
