@@ -80,6 +80,10 @@ require('./routes/searchRoutes')(app)
 require('./routes/dialCodeRoutes')(app)
 // last this middle in last
 require('./middlewares/proxy.middleware')(app)
+require('./routes/channelRoutes')(app)
+require('./routes/frameworkRoutes')(app)
+require('./routes/frameworkTermRoutes')(app)
+require('./routes/frameworkCategoryInstanceRoutes')(app)
 
 // Create server
 this.server = http.createServer(app).listen(port, function () {
