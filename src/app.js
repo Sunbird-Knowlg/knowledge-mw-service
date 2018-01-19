@@ -13,7 +13,7 @@ var reqDataLimitOfContentUpload = '30mb'
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000
 
-global_content_provider_base_url = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://dev.ekstep.in/api'
+global_content_provider_base_url = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://qa.ekstep.in/api'
 global_ekstep_proxy_base_url = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://qa.ekstep.in'
 global_content_provider_api_key = process.env.sunbird_content_provider_api_key
 
@@ -80,6 +80,10 @@ require('./routes/searchRoutes')(app)
 require('./routes/dialCodeRoutes')(app)
 // last this middle in last
 require('./middlewares/proxy.middleware')(app)
+require('./routes/channelRoutes')(app)
+require('./routes/frameworkRoutes')(app)
+require('./routes/frameworkTermRoutes')(app)
+require('./routes/frameworkCategoryInstanceRoutes')(app)
 
 // Create server
 this.server = http.createServer(app).listen(port, function () {
