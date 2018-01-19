@@ -1,5 +1,5 @@
 /**
- * file: search-route.js
+ * file: frameworkCategoryInstance-route.js
  * author: Rajath V B
  * desc: route file for Channel
  */

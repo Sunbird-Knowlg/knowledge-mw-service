@@ -1,5 +1,5 @@
 /**
- * @file  : domainService.js
+ * @file  : channelService.js
  * @author: Rajath V B
  * @desc  : controller file for handle domain and concepts.
  */
@@ -25,11 +25,7 @@ var responseCode = messageUtils.RESPONSE_CODE
 function getChannelValuesById (req, response) {
   var data = {}
   var rspObj = req.rspObj
-
   data.body = req.body
-  console.log('req.body', req.body)
-  console.log('req.params.channelId', req.params.channelId)
-  console.log('req.headers', req.headers)
   data.channelId = req.params.channelId
 
   if (!data.channelId) {

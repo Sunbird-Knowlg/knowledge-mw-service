@@ -1,5 +1,5 @@
 /**
- * file: search-route.js
+ * file: frameworkTerm-route.js
  * author: Rajath V B
  * desc: route file for Channel
  */

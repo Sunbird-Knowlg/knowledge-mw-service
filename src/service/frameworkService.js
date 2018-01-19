@@ -1,5 +1,5 @@
 /**
- * @file  : domainService.js
+ * @file  : frameworkService.js
  * @author: Rajath V B
  * @desc  : controller file for handle domain and concepts.
  */
@@ -25,11 +25,7 @@ var responseCode = messageUtils.RESPONSE_CODE
 function getFrameworkById (req, response) {
   var data = {}
   var rspObj = req.rspObj
-
   data.body = req.body
-  console.log('req.body', req.body)
-  console.log('req.params.frameworkId', req.params.frameworkId)
-  console.log('req.headers', req.headers)
   data.frameworkId = req.params.frameworkId
 
   if (!data.frameworkId) {

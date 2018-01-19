@@ -1,5 +1,5 @@
 /**
- * @file  : domainService.js
+ * @file  : frameworkCategoryInstanceService.js
  * @author: Rajath V B
  * @desc  : controller file for handle domain and concepts.
  */
@@ -25,19 +25,12 @@ var responseCode = messageUtils.RESPONSE_CODE
 function getFrameworkCategoryInstance (req, response) {
   var data = {}
   var rspObj = req.rspObj
-
   data.body = req.body
-  console.log('req.body', req.body)
-  console.log('req.params.frameworkId', req.params.frameworkId)
-  console.log('req.headers', req.headers)
-//   data.frameworkId = req.params.frameworkId
   data.category = req.params.categoryID
   data.queryParams = req.query
-  console.log('data.queryParams', data.queryParams)
 
   if (!data.queryParams) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkCategoryInstanceServiceAPI', 'Error due to required params are missing', {
-    //   frameworkId: data.frameworkId,
       category: data.category,
       qs: data.queryParams
     }))
