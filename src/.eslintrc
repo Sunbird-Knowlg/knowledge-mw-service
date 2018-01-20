@@ -1,6 +1,7 @@
 {
     "extends": "standard",
     "globals": {
+        "globalEkstepProxyBaseUrl": true
     },
     "rules": {
         "indent": ["error", 2],

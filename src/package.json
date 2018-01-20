@@ -68,6 +68,9 @@
     "ignore": [
       "./../Dockerfile"
     ],
+    "globals": [
+      "globalEkstepProxyBaseUrl"
+    ],
     "rules": {
       "indent": [
         "error",
