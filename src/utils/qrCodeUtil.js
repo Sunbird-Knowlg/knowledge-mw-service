@@ -17,14 +17,15 @@ qrCodeUtil.prototype.mmToPixel = function mmToPixel (data) {
 }
 
 qrCodeUtil.prototype.generate = function generateImage (filePath, text, color,
-  bgColor, errorCorrectionLevel, margin, callback) {
+  bgColor, errorCorrectionLevel, margin, size, callback) {
   QRCode.toFile(filePath, text, { // dynamic - name should be dial code
     color: {
       dark: color,
       light: bgColor
     },
     errorCorrectionLevel: errorCorrectionLevel,
-    margin: margin
+    margin: margin,
+    width: this.mmToPixel(size)
   }, function (err) {
     if (err) {
       LOG.error({filename, 'qrcode generation error': err})
@@ -33,16 +34,13 @@ qrCodeUtil.prototype.generate = function generateImage (filePath, text, color,
   })
 }
 
-qrCodeUtil.prototype.addTextAndBorder = function addTextAndBorder (filePath, text, border, color, callback) {
+qrCodeUtil.prototype.addTextAndBorder = function addTextAndBorder (filePath, text, border, color, size, callback) {
   var tempgm = gm()
-  tempgm.in('-geometry', '1000X1000')
-  console.log('path: ', path.join(__dirname, './../assets/fonts/arial/arialbold.ttf'))
   if (text) {
     tempgm
-      .in('-extent', '1000X1120')
+      .in('-extent', this.mmToPixel(size) + 'X' + (this.mmToPixel(size) + 10))
       .in('-fill', color)
       .in('-font', path.join(__dirname, './../assets/fonts/arial/arialbold.ttf'))
-      .in('-pointsize', '130')
       .drawText(0, 0, text, 'south')
   }
   tempgm.borderColor(color)

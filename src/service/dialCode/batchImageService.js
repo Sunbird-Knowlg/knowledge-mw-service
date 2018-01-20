@@ -16,8 +16,8 @@ function BatchImageService (config) {
   this.backgroundColor = _.get(config, 'backgroundColor') ? config.backgroundColor : '#ffff'
   this.width = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'width')), 30, 32))
   this.height = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'height')), 30, 32))
-  this.margin = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'margin')), 2, 100))
-  this.border = (config && parseInt(config.border, 10) >= 0) ? parseInt(config.border, 10) : '10'
+  this.margin = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'margin')), 3, 100))
+  this.border = (config && parseInt(config.border, 10) >= 0) ? parseInt(config.border, 1) : '1'
   this.text = (config && (config.text === false)) ? '0' : '1'
   this.errCorrectionLevel = (config && config.errCorrectionLevel && _.indexOf(errorCorrectionLevels, config.errCorrectionLevel) !== -1) ? config.errCorrectionLevel : 'H'
 }

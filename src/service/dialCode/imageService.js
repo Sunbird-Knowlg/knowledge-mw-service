@@ -19,8 +19,8 @@ function ImageService (config) {
   this.backgroundColor = _.get(config, 'backgroundColor') ? config.backgroundColor : '#ffff'
   this.width = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'width')), 30, 32))
   this.height = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'height')), 30, 32))
-  this.margin = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'margin')), 2, 100))
-  this.border = (config && parseInt(config.border, 10) >= 0) ? parseInt(config.border, 10) : '10'
+  this.margin = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'margin')), 3, 100))
+  this.border = (config && parseInt(config.border, 10) >= 0) ? parseInt(config.border, 1) : '1'
   this.text = (config && (config.text === false || config.text === '0')) ? '0' : '1'
   this.errCorrectionLevel = (config && config.errCorrectionLevel && _.indexOf(errorCorrectionLevels, config.errCorrectionLevel) !== -1) ? config.errCorrectionLevel : 'H'
 }
@@ -53,6 +53,7 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
           var bgColor = config.backgroundColor
           var errCorrectionLevel = config.errCorrectionLevel
           var margin = config.margin
+          var size = config.width
           try {
             if (!fs.existsSync(localFileLocation)) {
               fx.mkdirSync(localFileLocation)
@@ -61,15 +62,11 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
             LOG.error({currentFile, 'unable create directory': e, directoryPath: localFileLocation})
           }
 
-          qrCodeUtil.generate(path.join(localFileLocation, fileName + '.png'), qrText, color, bgColor, errCorrectionLevel, margin, callback)
+          qrCodeUtil.generate(path.join(localFileLocation, fileName + '.png'), qrText, color, bgColor, errCorrectionLevel, margin, size, callback)
         },
         function (filePath, callback) {
           var dialcodeText = config.text ? dialcode.trim() : false
-          qrCodeUtil.addTextAndBorder(filePath, dialcodeText, config.border, config.color, callback)
-        },
-        function (filePath, callback) {
-            // resize image
-          qrCodeUtil.resize(filePath, config.width, config.height, callback)
+          qrCodeUtil.addTextAndBorder(filePath, dialcodeText, config.border, config.color, config.width, callback)
         },
         function (filePath, callback) {
            // upload image
