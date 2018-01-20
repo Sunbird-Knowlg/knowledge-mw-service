@@ -4,7 +4,13 @@
   "description": "This service used to perform CRUD operations on content",
   "main": "app.js",
   "scripts": {
+    "lint": "eslint --ignore-path .eslintignore .",
+    "validate": "npm ls",
+    "precommit": "lint-staged",
     "preinstall": "npm install ./libs/sb-config-util && npm install ./libs/sb-http-util && npm install ./libs/sb_content_provider_util && npm install ./libs/sb_logger_util && npm install ./libs/sb_req_validator_util && npm install ./libs/response_util && npm install ./libs/sb_api_interceptor && npm install ./libs/sb_cache_manager"
+  },
+  "lint-staged": {
+    "*.js": "eslint"
   },
   "author": "Harish Kumar Gangula",
   "license": "ISC",
@@ -49,7 +55,37 @@
     "gulp": "^3.9.1",
     "gulp-istanbul": "^1.1.2",
     "gulp-jasmine-node": "^1.0.7",
+    "husky": "^0.14.3",
     "jasmine-node": "^1.14.5",
+    "lint-staged": "^6.0.1",
     "rimraf": "2.6.2"
+  },
+  "standard": {
+    "env": {
+      "node": true,
+      "jasmine": true
+    },
+    "ignore": [
+      "./../Dockerfile"
+    ],
+    "rules": {
+      "indent": [
+        "error",
+        2
+      ],
+      "max-len": [
+        "error",
+        120,
+        2,
+        {
+          "ignoreUrls": true,
+          "ignoreComments": true
+        }
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ]
+    }
   }
 }
