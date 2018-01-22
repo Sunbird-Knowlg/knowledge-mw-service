@@ -46,6 +46,7 @@
         "FRAMEWORK_LIST_URI": "/framework/v3/list",
         "FRAMEWORK_CREATE_URI": "/framework/v3/create",
         "FRAMEWORK_UPDATE_URI": "/framework/v3/update",
+        "FRAMEWORK_COPY_URI": "/framework/v3/copy",
       
         "FRAMEWORK_TERM_URI": "/framework/v3/term/read",
         "FRAMEWORK_TERM_SEARCH_URI": "/framework/v3/term/search",
