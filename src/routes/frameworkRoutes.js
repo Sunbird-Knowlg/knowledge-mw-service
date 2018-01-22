@@ -21,4 +21,7 @@ module.exports = function (app) {
 
   app.route(BASE_URL_V1_Framework + '/update/:frameworkId')
     .patch(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkUpdate)
+    
+  app.route(BASE_URL_V1_Framework + '/copy/:frameworkId')
+    .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkCopy)
 }
