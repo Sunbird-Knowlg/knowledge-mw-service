@@ -29,12 +29,17 @@ function getFrameworkTerm (req, response) {
   data.body = req.body
   data.category = req.params.categoryID
   data.queryParams = req.query
+  // Adding telemetry object data
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.category, 'frameworkTerm', '', {})
+  }
 
   if (!data.queryParams) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI', 'Error due to required params are missing', {
-      category: data.category,
-      qs: data.queryParams
-    }))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI',
+      'Error due to required params are missing', {
+        category: data.category,
+        qs: data.queryParams
+      }))
 
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
@@ -43,13 +48,15 @@ function getFrameworkTerm (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI', 'Request to ekstep for get course meta data', {
-        qs: data.queryParams,
-        category: data.category
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI',
+        'Request to ekstep for get course meta data', {
+          qs: data.queryParams,
+          category: data.category
+        }))
       ekStepUtil.getFrameworkTerm(data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI', 'Getting error from ekstep', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI',
+            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -61,7 +68,8 @@ function getFrameworkTerm (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI',
+        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -72,7 +80,8 @@ function frameworkTermSearch (req, response) {
   var data = req.body
   data.queryParams = req.query
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI', 'Error due to required params are missing', data))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI',
+      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -84,14 +93,16 @@ function frameworkTermSearch (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI', 'Request to ekstep for search object type', {
-        body: data,
-        headers: req.headers,
-        qs: data.queryParams
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI',
+        'Request to ekstep for search object type', {
+          body: data,
+          headers: req.headers,
+          qs: data.queryParams
+        }))
       ekStepUtil.frameworkTermSearch(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI', 'Getting error from ekstep', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI',
+            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -102,7 +113,8 @@ function frameworkTermSearch (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI',
+        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -114,7 +126,8 @@ function frameworkTermCreate (req, response) {
   var data = req.body
   data.queryParams = req.query
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI', 'Error due to required params are missing', data))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI',
+      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -126,14 +139,16 @@ function frameworkTermCreate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI', 'Request to ekstep for search object type', {
-        body: data,
-        headers: req.headers,
-        qs: data.queryParams
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI',
+        'Request to ekstep for search object type', {
+          body: data,
+          headers: req.headers,
+          qs: data.queryParams
+        }))
       ekStepUtil.frameworkTermCreate(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI', 'Getting error from ekstep', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI',
+            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -144,7 +159,8 @@ function frameworkTermCreate (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI',
+        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -156,9 +172,14 @@ function frameworkTermUpdate (req, response) {
   var data = req.body
   data.queryParams = req.query
   data.category = req.params.categoryID
+  // Adding telemetry object data
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.category, 'frameworkTerm', '', {})
+  }
 
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI', 'Error due to required params are missing', data))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI',
+      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -170,15 +191,17 @@ function frameworkTermUpdate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI', 'Request to ekstep for search object type', {
-        body: data,
-        headers: req.headers,
-        category: data.category,
-        qs: data.queryParams
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI',
+        'Request to ekstep for search object type', {
+          body: data,
+          headers: req.headers,
+          category: data.category,
+          qs: data.queryParams
+        }))
       ekStepUtil.frameworkTermUpdate(ekStepReqData, data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI', 'Getting error from ekstep', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkTermServiceAPI',
+            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -189,7 +212,8 @@ function frameworkTermUpdate (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkTermServiceAPI',
+        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }

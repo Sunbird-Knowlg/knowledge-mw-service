@@ -48,8 +48,17 @@ function createAndValidateRequestBody (req, res, next) {
     path: req.body.path,
     apiVersion: apiVersions.V1,
     msgid: req.body.params.msgid,
-    result: {}
+    result: {},
+    startTime: new Date(),
+    method: req.originalMethod
   }
+
+  rspObj.telemetryData = {
+    params: utilsService.getParamsDataForLogEvent(rspObj),
+    context: utilsService.getTelemetryContextData(req),
+    actor: utilsService.getTelemetryActorData(req)
+  }
+  req.headers.telemetryData = rspObj.telemetryData
 
   var removedHeaders = ['host', 'origin', 'accept', 'referer', 'content-length', 'user-agent', 'accept-encoding',
     'accept-language', 'accept-charset', 'cookie', 'dnt', 'postman-token', 'cache-control', 'connection']
@@ -94,6 +103,8 @@ function validateToken (req, res, next) {
     } else {
       delete req.headers['x-authenticated-userid']
       delete req.headers['x-authenticated-user-token']
+      req.rspObj.userId = tokenData.userId
+      rspObj.telemetryData.actor = utilsService.getTelemetryActorData(req)
       req.headers['x-authenticated-userid'] = tokenData.userId
       req.rspObj = rspObj
       next()
@@ -264,7 +275,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
 }
 
 /**
- * [validateToken - Used to check channed id in request headers.
+ * [validateChannel - Used to check channed id in request headers.
  * @param  {[type]}   req
  * @param  {[type]}   res
  * @param  {Function} next
