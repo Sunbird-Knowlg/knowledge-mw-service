@@ -11,7 +11,7 @@ module.exports = function (app) {
 
   app.use('/api/*', proxy(contentProviderBaseUrl, {
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-      proxyReqOpts.headers['Authorization'] = 'Bearer ' + contentProviderApiKey
+      proxyReqOpts.headers['Authorization'] = contentProviderApiKey
       return proxyReqOpts
     },
     proxyReqPathResolver: function (req) {
@@ -83,7 +83,7 @@ module.exports = function (app) {
 
   app.use('/action/*', proxy(contentProviderBaseUrl, {
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-      proxyReqOpts.headers['Authorization'] = 'Bearer ' + contentProviderApiKey
+      proxyReqOpts.headers['Authorization'] = contentProviderApiKey
       return proxyReqOpts
     },
     proxyReqPathResolver: function (req) {
@@ -95,7 +95,7 @@ module.exports = function (app) {
 
   app.use('/v1/telemetry', proxy(contentProviderBaseUrl, {
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-      proxyReqOpts.headers['Authorization'] = 'Bearer ' + contentProviderApiKey
+      proxyReqOpts.headers['Authorization'] = contentProviderApiKey
       return proxyReqOpts
     },
     proxyReqPathResolver: function (req) {
