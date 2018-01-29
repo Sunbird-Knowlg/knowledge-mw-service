@@ -12,6 +12,8 @@ var uploadUtil = new UploadUtil()
 var filename = path.basename(__filename)
 var queue = []
 var processStatus = false
+var Telemetry = require('sb_telemetry_util')
+var telemetry = new Telemetry()
 
 function BatchImageProcessor () {}
 
@@ -59,14 +61,23 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
     },
     function (batch, callback) {
       //  update status to 1
+      // Generate Audit event
+      const cdata = [{id: batch.dialcodes.toString(), type: 'dialCode'}, {id: batch.publisher, type: 'publisher'}]
+      const telemetryData = {
+        edata: telemetry.auditEventData(['status'], 'Update', 'NA'),
+        object: telemetry.getObjectData({id: processId, type: 'process'}),
+        context: telemetry.getContextData({channel: batch.channel, env: 'dialcode', cdata: cdata}),
+        actor: telemetry.getActorData('system', 'system')
+      }
+      telemetry.audit(telemetryData)
       dbModel.instance.dialcode_batch.update(
-              {processid: processId},
-              {status: 1}, function (err) {
-                if (err) {
-                  LOG.error({filename, 'error while updating status to 1:': err, processId})
-                }
-                callback(err, batch)
-              })
+        {processid: processId},
+        {status: 1}, function (err) {
+          if (err) {
+            LOG.error({filename, 'error while updating status to 1:': err, processId})
+          }
+          callback(err, batch)
+        })
     },
     function (batch, callback) {
       // create images
@@ -78,8 +89,9 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
       })
     },
     function (images, batch, callback) {
-        // zip folder
-      var sourceFile = path.join(process.env.dial_code_image_temp_folder, batch.channel, batch.publisher, batch.processid.toString())
+      // zip folder
+      var sourceFile = path.join(process.env.dial_code_image_temp_folder, batch.channel,
+        batch.publisher, batch.processid.toString())
       var zipFile = sourceFile + '.zip'
       zipFolder(sourceFile, zipFile, function (err) {
         if (err) {
@@ -89,7 +101,7 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
       })
     },
     function (batch, filePath, callback) {
-        // upload file
+      // upload file
       self.filePath = filePath
       var destPath = path.join(batch.channel, batch.publisher, batch.processid.toString()) + '.zip'
       uploadUtil.uploadFile(destPath, filePath, function (error, result) {
@@ -100,21 +112,31 @@ BatchImageProcessor.prototype.startProcess = function (processId, cb) {
       })
     },
     function (batch, filePath, fileUrl, callback) {
-        // update status to 2 and url
+      // update status to 2 and url
+      // Generate Audit event
+      const cdata = [{id: batch.dialcodes.toString(), type: 'dialCode'}, {id: batch.publisher, type: 'publisher'}]
+      const telemetryData = {
+        edata: telemetry.auditEventData(['status'], 'Update', 'NA'),
+        object: telemetry.getObjectData({id: processId, type: 'process'}),
+        context: telemetry.getContextData({channel: batch.channel, env: 'dialcode', cdata: cdata}),
+        actor: telemetry.getActorData('system', 'system')
+      }
+      telemetry.audit(telemetryData)
       dbModel.instance.dialcode_batch.update(
-              {processid: batch.processid},
-              {url: fileUrl, status: 2}, function (err) {
-                if (err) {
-                  LOG.error({filename, 'error while updating status to 2:': err, processId})
-                }
-                callback(err, batch)
-              })
+        {processid: batch.processid},
+        {url: fileUrl, status: 2}, function (err) {
+          if (err) {
+            LOG.error({filename, 'error while updating status to 2:': err, processId})
+          }
+          callback(err, batch)
+        })
     }
   ], function (err, batch) {
     // delete local file create
     try {
       fs.unlinkSync(self.filePath)
-      rimraf.sync(path.join(process.env.dial_code_image_temp_folder, batch.channel, batch.publisher, batch.processid.toString()))
+      rimraf.sync(path.join(process.env.dial_code_image_temp_folder, batch.channel,
+        batch.publisher, batch.processid.toString()))
     } catch (e) {
       LOG.error({filename, 'error while deleting local files:': e, filePath: self.filePath})
     }
@@ -128,18 +150,19 @@ BatchImageProcessor.prototype.createImages = function (batch, cb) {
   var imageData = {}
   var q = async.queue(function (task, callback) {
     imageService = new ImageService(batch.config)
-    imageService.getImage(task.dialcode, task.channel, task.publisher, task.localFilePath, undefined, false, function (err, file) {
-      imageData[task.dialcode] = path.basename(file.url)
-      if (file.created) {
-        callback(err, file.url)
-      } else {
-        var sourcePath = file.url.replace(process.env.sunbird_image_storage_url, '')
-        var destPath = path.join(task.localFilePath, path.basename(file.url))
-        uploadUtil.downloadFile(destPath, sourcePath, function (err) {
+    imageService.getImage(task.dialcode, task.channel, task.publisher, task.localFilePath,
+      undefined, false, function (err, file) {
+        imageData[task.dialcode] = path.basename(file.url)
+        if (file.created) {
           callback(err, file.url)
-        })
-      }
-    })
+        } else {
+          var sourcePath = file.url.replace(process.env.sunbird_image_storage_url, '')
+          var destPath = path.join(task.localFilePath, path.basename(file.url))
+          uploadUtil.downloadFile(destPath, sourcePath, function (err) {
+            callback(err, file.url)
+          })
+        }
+      })
   }, 5)
 
   q.drain = function () {
@@ -151,10 +174,11 @@ BatchImageProcessor.prototype.createImages = function (batch, cb) {
       { dialcode: batch.dialcodes[i],
         publisher: batch.publisher,
         channel: batch.channel,
-        localFilePath: path.join(process.env.dial_code_image_temp_folder, batch.channel, batch.publisher, batch.processid.toString())
+        localFilePath: path.join(process.env.dial_code_image_temp_folder, batch.channel, batch.publisher,
+          batch.processid.toString())
       }, function (err) {
-      error = err
-    })
+        error = err
+      })
   }
 }
 

@@ -89,7 +89,7 @@ function generateDialCodeAPI (req, response) {
           color: requestObj.qrCodeSpec.color
         })
         var channel = _.clone(req.headers['x-channel-id'])
-        batchImageService.createRequest(res.result.dialcodes, channel, requestObj.publisher,
+        batchImageService.createRequest(res.result.dialcodes, channel, requestObj.publisher, rspObj,
           function (err, processId) {
             if (err) {
               LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
@@ -185,7 +185,7 @@ function dialCodeListAPI (req, response) {
         var batchImageService = new BatchImageService(qrCodeConfig)
         var channel = _.clone(req.headers['x-channel-id'])
         var dialcodes = _.map(res.result.dialcodes, 'identifier')
-        batchImageService.createRequest(dialcodes, channel, requestObj.publisher, function (err, processId) {
+        batchImageService.createRequest(dialcodes, channel, requestObj.publisher, rspObj, function (err, processId) {
           if (err) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI',
               'Error while creating request to child process for images creation', err))
@@ -460,7 +460,8 @@ function getProcessIdStatusAPI (req, response) {
     return response.status(process.code).send(process.data)
   })
     .catch(err => {
-      return response.status(err.code).send(err.data)
+      var error = JSON.parse(err.message)
+      return response.status(error.code).send(error.data)
     })
 }
 

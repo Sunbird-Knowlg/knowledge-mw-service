@@ -1,4 +1,9 @@
 {
+  "pdata": {
+    "id": "content-service",
+    "ver": "1.0",
+    "pid": ""
+  },
   "API": {
     "content/search": {
       "title": "Content search api",

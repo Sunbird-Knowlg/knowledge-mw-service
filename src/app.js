@@ -11,6 +11,7 @@ var configUtil = require('sb-config-util')
 
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
 var contentProviderApiConfig = JSON.parse(fs.readFileSync(contentProviderConfigPath))
+const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/telemetryEventConfig.json')))
 
 var reqDataLimitOfContentUpload = '30mb'
 
@@ -112,11 +113,7 @@ global.imageBatchProcess.on('exit', function () {
 
 // Telemetry initialization
 const telemetryConfig = {
-  pdata: {
-    id: 'content-service',
-    ver: '1.0',
-    pid: ''
-  },
+  pdata: telemtryEventConfig.pdata,
   method: 'POST',
   batchsize: process.env.sunbird_telemetry_sync_batch_size || 20,
   endpoint: configUtil.getConfig('TELEMETRY'),
