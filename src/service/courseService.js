@@ -109,7 +109,7 @@ function searchCourseAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchCourseAPI',
-        'Request to content provider for search the course', ekStepReqData))
+        'Request to content provider to search the course', ekStepReqData))
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchCourseAPI',
@@ -171,7 +171,7 @@ function createCourseAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createCourseAPI',
-        'Request to content provider for create the course', ekStepReqData))
+        'Request to content provider to create the course', ekStepReqData))
       contentProvider.createContent(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createCourseAPI',
@@ -237,7 +237,7 @@ function updateCourseAPI (req, response) {
         mode: 'edit'
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCourseAPI',
-        'Request to content provider for get latest version key', {
+        'Request to content provider to get latest version key', {
           courseId: data.courseId,
           query: qs
         }))
@@ -259,7 +259,7 @@ function updateCourseAPI (req, response) {
     function (CBW) {
       var ekStepReqData = transformReqBody(data.request, 'course', 'content')
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCourseAPI',
-        'Request to content provider for update the course', ekStepReqData))
+        'Request to content provider to update the course', ekStepReqData))
       contentProvider.updateContent(ekStepReqData, data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateCourseAPI',
@@ -310,7 +310,7 @@ function reviewCourseAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'reviewCourseAPI',
-        'Request to content provider for review the course', {
+        'Request to content provider to review the course', {
           req: ekStepReqData,
           courseId: data.courseId
         }))
@@ -370,7 +370,7 @@ function publishCourseAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishCourseAPI',
-        'Request to content provider for published the course', {
+        'Request to content provider to publish the course', {
           courseId: data.courseId,
           reqData: ekStepReqData
         }))
@@ -432,7 +432,7 @@ function getCourseAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseAPI',
-        'Request to content provider for get course meta data', {
+        'Request to content provider to get course meta data', {
           courseId: data.courseId
         }))
       contentProvider.getContent(data.courseId, req.headers, function (err, res) {
@@ -484,7 +484,7 @@ function getMyCourseAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getMyCourseAPI',
-        'Request to content provider for get user course', ekStepReqData))
+        'Request to content provider to get user course', ekStepReqData))
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getMyCourseAPI',
@@ -547,7 +547,7 @@ function getCourseHierarchyAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseHierarchyAPI',
-        'Request to content provider for get user course', {
+        'Request to content provider to get course hierarchy', {
           courseId: data.courseId
         }))
       contentProvider.contentHierarchy(data.courseId, req.headers, function (err, res) {

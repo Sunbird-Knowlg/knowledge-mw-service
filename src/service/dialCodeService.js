@@ -59,7 +59,7 @@ function generateDialCodeAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'generateDialCodeAPI',
-        'Request for generate the dialcode', {
+        'Request to generate the dialcode', {
           body: reqData,
           headers: req.headers
         }))
@@ -164,7 +164,7 @@ function dialCodeListAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'dialCodeListAPI',
-        'Request for get list of dialcode', {
+        'Request to get list of dialcode', {
           body: reqData,
           headers: req.headers
         }))
@@ -242,7 +242,7 @@ function updateDialCodeAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateDialCodeAPI',
-        'Request for update the dialcode', {
+        'Request to update the dialcode', {
           body: reqData,
           headers: req.headers
         }))
@@ -299,7 +299,7 @@ function getDialCodeAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDialCodeAPI',
-        'Request for get dialcode meta data', {
+        'Request to get dialcode meta data', {
           dialCodeId: data.dialCodeId,
           qs: data.queryParams,
           headers: req.headers
@@ -402,7 +402,7 @@ function contentLinkDialCodeAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'contentLinkDialCodeAPI',
-        'Request for link the content', {
+        'Request to link the content', {
           body: reqData,
           headers: req.headers
         }))
@@ -492,7 +492,7 @@ function searchDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchDialCodeAPI', 'Request for search', {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchDialCodeAPI', 'Request to search', {
         body: reqData,
         headers: req.headers
       }))
@@ -551,7 +551,7 @@ function publishDialCodeAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishDialCodeAPI',
-        'Request for publish dialcode', {
+        'Request to publish the dialcode', {
           body: reqData,
           headers: req.headers
         }))
@@ -605,7 +605,7 @@ function createPublisherAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createPublisherAPI',
-        'Request for create publisher', {
+        'Request to create publisher', {
           body: reqData,
           headers: req.headers
         }))
@@ -664,7 +664,7 @@ function updatePublisherAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updatePublisherAPI',
-        'Request for update the publisher', {
+        'Request to update the publisher', {
           body: reqData,
           headers: req.headers
         }))
@@ -716,7 +716,7 @@ function getPublisherAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getPublisherAPI',
-        'Request for get publisher meta data', {
+        'Request to get publisher meta data', {
           publisherId: data.publisherId,
           qs: data.queryParams,
           headers: req.headers

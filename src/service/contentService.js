@@ -164,7 +164,7 @@ function search (defaultContentTypes, req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchContentAPI',
-        'Request to content provider for search the content', {
+        'Request to content provider to search the content', {
           body: ekStepReqData,
           headers: req.headers
         }))
@@ -224,7 +224,7 @@ function createContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createContentAPI',
-        'Request to content provider for create the content', {
+        'Request to content provider to create content', {
           body: ekStepReqData,
           headers: req.headers
         }))
@@ -286,7 +286,7 @@ function updateContentAPI (req, response) {
         fields: 'versionKey'
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateContentAPI',
-        'Request to content provider for get latest version key', {
+        'Request to content provider to get the latest version key', {
           contentId: data.contentId,
           query: qs,
           headers: req.headers
@@ -311,7 +311,7 @@ function updateContentAPI (req, response) {
         request: data.request
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateContentAPI',
-        'Request to content provider for update the content', {
+        'Request to content provider to update the content', {
           body: ekStepReqData,
           headers: req.headers
         }))
@@ -380,7 +380,7 @@ function uploadContentAPI (req, response) {
 
         function (CBW) {
           LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'uploadContentAPI',
-            'Request to content provider for upload the content file', {
+            'Request to content provider to upload the content', {
               contentId: data.contentId,
               headers: req.headers
             }))
@@ -415,7 +415,7 @@ function uploadContentAPI (req, response) {
 
       function (CBW) {
         LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'uploadContentAPI',
-          'Request to content provider for upload the content file', {
+          'Request to content provider to upload the content', {
             contentId: data.contentId,
             headers: req.headers
           }))
@@ -464,7 +464,7 @@ function reviewContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'reviewContentAPI',
-        'Request to content provider for review the content', {
+        'Request to content provider to review the content', {
           req: ekStepReqData,
           contentId: data.contentId,
           headers: req.headers
@@ -518,7 +518,7 @@ function publishContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishContentAPI',
-        'Request to content provider for published the content', {
+        'Request to content provider to publish the content', {
           contentId: data.contentId,
           reqData: ekStepReqData,
           headers: req.headers
@@ -576,7 +576,7 @@ function getContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getContentAPI',
-        'Request to content provider for get content meta data', {
+        'Request to content provider to get the content meta data', {
           contentId: data.contentId,
           qs: data.queryParams,
           headers: req.headers
@@ -622,7 +622,7 @@ function getMyContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getMyContentAPI',
-        'Request to content provider for get user content', {
+        'Request to content provider to get user content', {
           body: ekStepReqData,
           headers: req.headers
         }))
@@ -709,7 +709,7 @@ function retireContentAPI (req, response) {
     function (CBW) {
       async.each(data.request.contentIds, function (contentId, CBE) {
         LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'retireContentAPI',
-          'Request to content provider for retire content meta data', {
+          'Request to content provider to retire content', {
             contentId: contentId,
             headers: req.headers
           }))
@@ -780,7 +780,7 @@ function rejectContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'rejectContentAPI',
-        'Request to content provider for reject content meta data', {
+        'Request to content provider to reject content', {
           contentId: data.contentId,
           headers: req.headers
         }))
@@ -835,7 +835,7 @@ function flagContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'flagContentAPI',
-        'Request to content provider for flag the content meta data', {
+        'Request to content provider to flag the content', {
           contentId: data.contentId,
           body: ekStepReqData,
           headers: req.headers
@@ -891,7 +891,7 @@ function acceptFlagContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'acceptFlagContentAPI',
-        'Request to content provider for accept flag', {
+        'Request to content provider to accept flag', {
           contentId: data.contentId,
           body: ekStepReqData,
           headers: req.headers
@@ -947,7 +947,7 @@ function rejectFlagContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'rejectFlagContentAPI',
-        'Request to content provider for reject flag', {
+        'Request to content provider to reject flag', {
           contentId: data.contentId,
           body: ekStepReqData,
           headers: req.headers
@@ -1004,7 +1004,7 @@ function uploadContentUrlAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'uploadContentUrlAPI',
-        'Request to content provider for get upload content url', {
+        'Request to content provider to get upload content url', {
           contentId: data.contentId,
           body: ekStepReqData,
           headers: req.headers
@@ -1060,7 +1060,7 @@ function unlistedPublishContentAPI (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'unlistedPublishContentAPI',
-        'Request to content provider for unlisted published the content', {
+        'Request to content provider to unlisted published the content', {
           contentId: data.contentId,
           reqData: ekStepReqData,
           headers: req.headers

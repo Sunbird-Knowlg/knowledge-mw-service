@@ -60,18 +60,18 @@ function createFlagContentEmail (req, callback) {
     function (CBW) {
       var cData = data.request.contentData
       var eData = emailMessage.CREATE_FLAG
-      var flagReaons = cData.flagReasons ? cData.flagReasons.toString() : ''
+      var flagReasons = cData.flagReasons ? cData.flagReasons.toString() : ''
       var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
       var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
-        .replace(/{{Flag reason}}/g, flagReaons)
+        .replace(/{{Flag reason}}/g, flagReasons)
         .replace(/{{Content status}}/g, cData.status)
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createFlagContentEmail',
-        'Request to Leaner service for sending email', {
+        'Request to Leaner service to send email', {
           body: lsEmailData
         }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
@@ -94,7 +94,7 @@ function createFlagContentEmail (req, callback) {
 }
 
 /**
- * Below function is used for sending email when accept flag api called
+ * Below function is used to send email when accept flag api called
  * @param {object} req
  * @param {function} callback
  */
@@ -119,17 +119,17 @@ function acceptFlagContentEmail (req, callback) {
     },
     function (CBW) {
       var cData = data.request.contentData
-      var flagReaons = cData.flagReasons ? cData.flagReasons.toString() : ''
+      var flagReasons = cData.flagReasons ? cData.flagReasons.toString() : ''
       var eData = emailMessage.ACCEPT_FLAG
       var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType)
       var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
-        .replace(/{{Flag reason}}/g, flagReaons)
+        .replace(/{{Flag reason}}/g, flagReasons)
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'acceptFlagContentEmail',
-        'Request to Leaner service for sending email', {
+        'Request to Leaner service to send email', {
           body: lsEmailData
         }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
@@ -187,7 +187,7 @@ function rejectFlagContentEmail (req, callback) {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'rejectFlagContentEmail',
-        'Request to Leaner service for sending email', {
+        'Request to Leaner service to send email', {
           body: lsEmailData
         }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
@@ -245,14 +245,14 @@ function publishedContentEmail (req, callback) {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishedContentEmail',
-        'Request to Leaner service for sending email', {
+        'Request to Leaner service to send email', {
           body: lsEmailData
         }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'publishedContentEmail',
             'Sending email failed', res))
-          callback(new Error('Seanding email failed'), null)
+          callback(new Error('Sending email failed'), null)
         } else {
           CBW(null, res)
         }
@@ -303,7 +303,7 @@ function rejectContentEmail (req, callback) {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'rejectContentEmail',
-        'Request to Leaner service for sending email', {
+        'Request to Leaner service to send email', {
           body: lsEmailData
         }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
@@ -389,7 +389,7 @@ function unlistedPublishContentEmail (req, callback) {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'unlistedPublishContentEmail',
-        'Request to Leaner service for sending email', {
+        'Request to Leaner service to send email', {
           body: lsEmailData
         }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {

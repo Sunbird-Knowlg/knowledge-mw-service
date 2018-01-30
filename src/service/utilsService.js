@@ -7,7 +7,7 @@
 const API_CONFIG = require('../config/telemetryEventConfig.json').API
 
 /**
- * this function helps to create apiId for error and success responseresponse
+ * this function helps to create apiId for error and success response
  * @param {String} path
  * @returns {getAppIDForRESP.appId|String}
  */

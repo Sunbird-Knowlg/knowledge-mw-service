@@ -22,7 +22,7 @@ var keyCloakConfig = {
 }
 
 var cacheConfig = {
-  stroe: process.env.sunbird_cache_store ? process.env.sunbird_cache_store : 'memory',
+  store: process.env.sunbird_cache_store ? process.env.sunbird_cache_store : 'memory',
   ttl: process.env.sunbird_cache_ttl ? process.env.sunbird_cache_ttl : 1800
 }
 
@@ -214,7 +214,7 @@ function apiAccessForReviewerUser (req, response, next) {
 }
 
 /**
- * [hierarchyUpdateApiAccess - Check api access for heirarchy update
+ * [hierarchyUpdateApiAccess - Check api access for hierarchy update
  * @param  {[type]}   req
  * @param  {[type]}   response
  * @param  {Function} next
@@ -275,7 +275,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
 }
 
 /**
- * [validateChannel - Used to check channed id in request headers.
+ * [validateChannel - Used to check channel id in request headers.
  * @param  {[type]}   req
  * @param  {[type]}   res
  * @param  {Function} next
