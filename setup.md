@@ -22,6 +22,7 @@
 * sunbird_dial_code_registry_url eg: staging.open-sunbird.org/dial/
 * sunbird_cassandra_ips  e.g : 127.0.0.1,127.0.0.2
 * sunbird_cassandra_port e.g: 9042
+* sunbird_telemetry_sync_batch_size e.g: 20
 
 ##Setup Instructions
 * Clone the project.

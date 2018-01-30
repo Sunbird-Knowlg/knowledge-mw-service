@@ -27,11 +27,15 @@ function getChannelValuesById (req, response) {
   var rspObj = req.rspObj
   data.body = req.body
   data.channelId = req.params.channelId
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.channelId, 'channel', '', {})
+  }
 
   if (!data.channelId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Error due to required params are missing', {
-      channelId: data.channelId
-    }))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+      'Error due to required params are missing', {
+        channelId: data.channelId
+      }))
 
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
@@ -40,12 +44,14 @@ function getChannelValuesById (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Request to ekstep for get course meta data', {
-        channelId: data.channelId
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Request to ekstep for get course meta data', {
+          channelId: data.channelId
+        }))
       ekStepUtil.getChannelValuesById(data.channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Getting error from ekstep', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -57,7 +63,8 @@ function getChannelValuesById (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -67,7 +74,8 @@ function ChannelList (req, response) {
   var rspObj = req.rspObj
   var data = req.body
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Error due to required params are missing', data))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -79,13 +87,15 @@ function ChannelList (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Request to ekstep for search object type', {
-        body: data,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Request to ekstep for search object type', {
+          body: data,
+          headers: req.headers
+        }))
       ekStepUtil.ChannelList(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Getting error from ekstep', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -96,7 +106,8 @@ function ChannelList (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -107,7 +118,8 @@ function ChannelSearch (req, response) {
   var rspObj = req.rspObj
   var data = req.body
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Error due to required params are missing', data))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -119,13 +131,15 @@ function ChannelSearch (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Request to ekstep for search object type', {
-        body: data,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Request to ekstep for search object type', {
+          body: data,
+          headers: req.headers
+        }))
       ekStepUtil.ChannelSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Getting error from ekstep', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -136,7 +150,8 @@ function ChannelSearch (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -147,7 +162,8 @@ function ChannelCreate (req, response) {
   var rspObj = req.rspObj
   var data = req.body
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Error due to required params are missing', data))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -159,13 +175,15 @@ function ChannelCreate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Request to ekstep for search object type', {
-        body: data,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Request to ekstep for search object type', {
+          body: data,
+          headers: req.headers
+        }))
       ekStepUtil.ChannelCreate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Getting error from ekstep', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -176,7 +194,8 @@ function ChannelCreate (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -187,8 +206,13 @@ function ChannelUpdate (req, response) {
   var rspObj = req.rspObj
   var data = req.body
   data.channelId = req.params.channelId
+  // Adding telemetry object data
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.channelId, 'channel', '', {})
+  }
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Error due to required params are missing', data))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -200,14 +224,16 @@ function ChannelUpdate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Request to ekstep for search object type', {
-        body: data,
-        headers: req.headers,
-        channelId: data.channelId
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Request to ekstep for search object type', {
+          body: data,
+          headers: req.headers,
+          channelId: data.channelId
+        }))
       ekStepUtil.ChannelUpdate(ekStepReqData, data.channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI', 'Getting error from ekstep', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'channelServiceAPI',
+            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -218,7 +244,8 @@ function ChannelUpdate (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'channelServiceAPI',
+        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }

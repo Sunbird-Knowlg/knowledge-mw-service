@@ -385,7 +385,7 @@ exports.EMAIL = {
     TEMPLATE: 'rejectContent'
   },
   UNLISTED_PUBLISH_CONTENT: {
-    FAILED_CODE: 'ERR_SEND_PUNLISTED_PUBLISH_CONTENT_EMAIL',
+    FAILED_CODE: 'ERR_SEND_UNLISTED_PUBLISH_CONTENT_EMAIL',
     FAILED_MESSAGE: 'Sending email failed for unlist publish content',
     SUBJECT: 'Congratulations, your content {{Content title}} is live!',
     BODY: 'Congratulations! The content is now ready for limited sharing. ' +

@@ -4,11 +4,14 @@ var methodOverride = require('method-override')
 var http = require('http')
 var path = require('path')
 var cp = require('child_process')
-
-var configUtil = require('sb-config-util')
+var TelemetryUtil = require('sb_telemetry_util')
+var telemetry = new TelemetryUtil()
 var fs = require('fs')
+var configUtil = require('sb-config-util')
+
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
 var contentProviderApiConfig = JSON.parse(fs.readFileSync(contentProviderConfigPath))
+const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/telemetryEventConfig.json')))
 
 var reqDataLimitOfContentUpload = '30mb'
 
@@ -81,12 +84,13 @@ require('./routes/contentRoutes')(app)
 require('./routes/conceptRoutes')(app)
 require('./routes/searchRoutes')(app)
 require('./routes/dialCodeRoutes')(app)
-// last this middle in last
-require('./middlewares/proxy.middleware')(app)
 require('./routes/channelRoutes')(app)
 require('./routes/frameworkRoutes')(app)
 require('./routes/frameworkTermRoutes')(app)
 require('./routes/frameworkCategoryInstanceRoutes')(app)
+
+// this middleware route add after all the routes
+require('./middlewares/proxy.middleware')(app)
 
 // Create server
 this.server = http.createServer(app).listen(port, function () {
@@ -106,3 +110,32 @@ global.imageBatchProcess = cp.fork(path.join('service', 'dialCode', 'batchImageP
 global.imageBatchProcess.on('exit', function () {
   global.imageBatchProcess = cp.fork(path.join('service', 'dialCode', 'batchImageProcessor.js'))
 })
+
+// Telemetry initialization
+const telemetryConfig = {
+  pdata: telemtryEventConfig.pdata,
+  method: 'POST',
+  batchsize: process.env.sunbird_telemetry_sync_batch_size || 20,
+  endpoint: configUtil.getConfig('TELEMETRY'),
+  host: configUtil.getConfig('BASE_URL'),
+  authtoken: configUtil.getConfig('Authorization_TOKEN')
+}
+
+telemetry.init(telemetryConfig)
+
+function exitHandler (options, err) {
+  console.log('Exit', options, err)
+  telemetry.syncOnExit(function (err, res) {
+    if (err) {
+      process.exit()
+    } else {
+      process.exit()
+    }
+  })
+}
+
+// catches ctrl+c event
+process.on('SIGINT', exitHandler)
+
+// catches uncaught exceptions
+process.on('uncaughtException', exitHandler)

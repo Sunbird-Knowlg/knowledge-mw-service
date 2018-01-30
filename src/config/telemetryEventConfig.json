@@ -1,0 +1,268 @@
+{
+  "pdata": {
+    "id": "content-service",
+    "ver": "1.0",
+    "pid": ""
+  },
+  "API": {
+    "content/search": {
+      "title": "Content search api",
+      "category": "contentsearch",
+      "env": "content"
+    },
+    "content/create": {
+      "title": "Content create api",
+      "category": "contentcreate",
+      "env": "content"
+    },
+    "content/update": {
+      "title": "Content update api",
+      "category": "contentupdate",
+      "env": "content"
+    },
+    "content/upload": {
+      "title": "Content upload api",
+      "category": "contentupload",
+      "env": "content"
+    },
+    "content/review": {
+      "title": "Content review api",
+      "category": "contentreview",
+      "env": "content"
+    },
+    "content/publish": {
+      "title": "Content publish api",
+      "category": "contentpublish",
+      "env": "content"
+    },
+    "content/retire": {
+      "title": "Content retire api",
+      "category": "contentretire",
+      "env": "content"
+    },
+    "content/reject": {
+      "title": "Content reject api",
+      "category": "contentreject",
+      "env": "content"
+    },
+    "content/read": {
+      "title": "Content read api",
+      "category": "contentread",
+      "env": "content"
+    },
+    "content/read/mycontent": {
+      "title": "Content read api",
+      "category": "contentread",
+      "env": "content"
+    },
+    "content/flag": {
+      "title": "Content flag api",
+      "category": "contentflag",
+      "env": "content"
+    },
+    "content/flag/accept": {
+      "title": "Content flag accept api",
+      "category": "contentflagaccept",
+      "env": "content"
+    },
+    "content/flag/reject": {
+      "title": "Content flag reject api",
+      "category": "contentflagreject",
+      "env": "content"
+    },
+    "content/upload/url": {
+      "title": "Content upload url api",
+      "category": "contentuploadurl",
+      "env": "content"
+    },
+    "course/search": {
+      "title": "Course search api",
+      "category": "coursesearch",
+      "env": "content"
+    },
+    "course/create": {
+      "title": "Course create api",
+      "category": "coursecreate",
+      "env": "content"
+    },
+    "course/update": {
+      "title": "Course update api",
+      "category": "courseupdate",
+      "env": "content"
+    },
+    "course/review": {
+      "title": "Course review api",
+      "category": "coursereview",
+      "env": "content"
+    },
+    "course/publish": {
+      "title": "Course publish api",
+      "category": "coursepublish",
+      "env": "content"
+    },
+    "course/read": {
+      "title": "Course read api",
+      "category": "courseread",
+      "env": "content"
+    },
+    "course/read/mycourse": {
+      "title": "Course read api",
+      "category": "courseread",
+      "env": "content"
+    },
+    "course/hierarchy": {
+      "title": "Course hierarchy api",
+      "category": "coursehierarchy"
+    },
+    "search": {
+      "title": "Search api",
+      "category": "search",
+      "env": "content"
+    },
+    "dialcode/generate": {
+      "title": "Dialcode generate api",
+      "category": "dialcodegenerate",
+      "env": "dialcode"
+    },
+    "dialcode/list": {
+      "title": "Dialcode list api",
+      "category": "dialcodelist",
+      "env": "dialcode"
+    },
+    "dialcode/read": {
+      "title": "Dialcode read api",
+      "category": "dialcoderead",
+      "env": "dialcode"
+    },
+    "dialcode/update": {
+      "title": "Dialcode update api",
+      "category": "dialcodeupdate",
+      "env": "dialcode"
+    },
+    "dialcode/content/link": {
+      "title": "Dialcode content link api",
+      "category": "dialcodecontentlink",
+      "env": "dialcode"
+    },
+    "dialcode/search": {
+      "title": "Dialcode search api",
+      "category": "dialcodesearch",
+      "env": "dialcode"
+    },
+    "dialcode/publish": {
+      "title": "Dialcode publish api",
+      "category": "dialcodepublish",
+      "env": "dialcode"
+    },
+    "dialcode/publisher/create": {
+      "title": "Publisher create api",
+      "category": "publishercreate",
+      "env": "dialcode"
+    },
+    "dialcode/publisher/read": {
+      "title": "Publisher read api",
+      "category": "publishergenerate",
+      "env": "dialcode"
+    },
+    "dialcode/publisher/update": {
+      "title": "Publisher update api",
+      "category": "publisherupdate",
+      "env": "dialcode"
+    },
+    "dialcode/process/status": {
+      "title": "Qr code process status api",
+      "category": "processstatus",
+      "env": "dialcode"
+    },
+    "channel/read": {
+      "title": "Channel read api",
+      "category": "channelread",
+      "env": "channel"
+    },
+    "channel/list": {
+      "title": "Channel list api",
+      "category": "channellist",
+      "env": "channel"
+    },
+    "channel/search": {
+      "title": "Channel search api",
+      "category": "channelsearch",
+      "env": "channel"
+    },
+    "channel/create": {
+      "title": "Channel create api",
+      "category": "channelcreate",
+      "env": "channel"
+    },
+    "channel/update": {
+      "title": "Channel update api",
+      "category": "channelupdate",
+      "env": "channel"
+    },
+    "framework/category/read": {
+      "title": "Framework category read api",
+      "category": "frameworkcategoryread",
+      "env": "framework"
+    },
+    "framework/category/search": {
+      "title": "Framework category search api",
+      "category": "frameworkcategorysearch",
+      "env": "framework"
+    },
+    "framework/category/create": {
+      "title": "Framework category create api",
+      "category": "frameworkcategorycreate",
+      "env": "framework"
+    },
+    "framework/category/update": {
+      "title": "Framework category update api",
+      "category": "frameworkcategoryupdate",
+      "env": "framework"
+    },
+    "framework/read": {
+      "title": "Framework read api",
+      "category": "frameworkread",
+      "env": "framework"
+    },
+    "framework/list": {
+      "title": "Framework list api",
+      "category": "frameworklist",
+      "env": "framework"
+    },
+    "framework/create": {
+      "title": "Framework create api",
+      "category": "frameworkcreate",
+      "env": "framework"
+    },
+    "framework/update": {
+      "title": "Framework update api",
+      "category": "frameworkupdate",
+      "env": "framework"
+    },
+    "framework/copy": {
+      "title": "Framework copy api",
+      "category": "frameworkcopy",
+      "env": "framework"
+    },
+    "framework/term/read": {
+      "title": "Framework term read api",
+      "category": "frameworktermread",
+      "env": "framework"
+    },
+    "framework/term/search": {
+      "title": "Framework term search api",
+      "category": "frameworktermsearch",
+      "env": "framework"
+    },
+    "framework/term/create": {
+      "title": "Framework term create api",
+      "category": "frameworktermcreate",
+      "env": "framework"
+    },
+    "framework/term/update": {
+      "title": "Framework term update api",
+      "category": "frameworktermupdate",
+      "env": "framework"
+    }
+  }
+}

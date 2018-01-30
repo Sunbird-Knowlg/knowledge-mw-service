@@ -56,6 +56,8 @@
         "FRAMEWORK_CATEGORY_INSTANCE_URI": "/framework/v3/category/read",
         "FRAMEWORK_CATEGORY_INSTANCE_SEARCH_URI": "/framework/v3/category/search",
         "FRAMEWORK_CATEGORY_INSTANCE_CREATE_URI": "/framework/v3/category/create",
-        "FRAMEWORK_CATEGORY_INSTANCE_UPDATE_URI": "/framework/v3/category/update"
+        "FRAMEWORK_CATEGORY_INSTANCE_UPDATE_URI": "/framework/v3/category/update",
+
+        "TELEMETRY": "/data/v3/telemetry"
     }
 }    

@@ -33,7 +33,8 @@ function generateDialCodeAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.dialcodes) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI', 'Error due to required params are missing', data.request))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+      'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.GENERATE.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.GENERATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -41,7 +42,8 @@ function generateDialCodeAPI (req, response) {
   }
 
   if (!_.get(data, 'request.dialcodes.count') || !_.isSafeInteger(data.request.dialcodes.count)) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI', 'Error due to error in count input', data.request))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+      'Error due to error in count input', data.request))
     rspObj.errCode = dialCodeMessage.GENERATE.MISSING_COUNT
     rspObj.errMsg = dialCodeMessage.GENERATE.MISSING_COUNT_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -56,10 +58,11 @@ function generateDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'generateDialCodeAPI', 'Request for generate the dialcode', {
-        body: reqData,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'generateDialCodeAPI',
+        'Request to generate the dialcode', {
+          body: reqData,
+          headers: req.headers
+        }))
 
       dialCodeServiceHelper.generateDialcodes(reqData, req.headers, function (err, res) {
         if (err || _.indexOf([responseCode.SUCCESS, responseCode.PARTIAL_SUCCESS], res.responseCode) === -1) {
@@ -75,7 +78,8 @@ function generateDialCodeAPI (req, response) {
       })
     }, function (res, CBW) {
       var requestObj = data && data.request && data.request.dialcodes ? data.request.dialcodes : {}
-      if (requestObj.qrCodeSpec && !_.isEmpty(requestObj.qrCodeSpec) && res.result.dialcodes && res.result.dialcodes.length) {
+      if (requestObj.qrCodeSpec && !_.isEmpty(requestObj.qrCodeSpec) && res.result.dialcodes &&
+       res.result.dialcodes.length) {
         var batchImageService = new BatchImageService({
           width: requestObj.qrCodeSpec.width,
           height: requestObj.qrCodeSpec.height,
@@ -85,23 +89,26 @@ function generateDialCodeAPI (req, response) {
           color: requestObj.qrCodeSpec.color
         })
         var channel = _.clone(req.headers['x-channel-id'])
-        batchImageService.createRequest(res.result.dialcodes, channel, requestObj.publisher, function (err, processId) {
-          if (err) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI', 'Error while creating request to child process for images creation', err))
-            res.responseCode = responseCode.PARTIAL_SUCCESS
-            return response.status(207).send(respUtil.successResponse(res))
-          } else {
-            res.result.processId = processId
-            CBW(null, res)
-          }
-        })
+        batchImageService.createRequest(res.result.dialcodes, channel, requestObj.publisher, rspObj,
+          function (err, processId) {
+            if (err) {
+              LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+                'Error while creating request to child process for images creation', err))
+              res.responseCode = responseCode.PARTIAL_SUCCESS
+              return response.status(207).send(respUtil.successResponse(res))
+            } else {
+              res.result.processId = processId
+              CBW(null, res)
+            }
+          })
       } else {
         CBW(null, res)
       }
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'generateDialCodeAPI', 'Return response back to user', rspObj))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'generateDialCodeAPI',
+        'Return response back to user', rspObj))
 
       if (requestedCount > configUtil.getConfig('DIALCODE_GENERATE_MAX_COUNT')) {
         rspObj.responseCode = responseCode.PARTIAL_SUCCESS
@@ -121,7 +128,8 @@ function generateDialCodeAPI (req, response) {
 function dialCodeListAPI (req, response) {
   var data = req.body
   var rspObj = req.rspObj
-  var qrCodeFlag = !!(data && data.request && data.request.search && data.request.search.qrCodeSpec && !_.isEmpty(data.request.search.qrCodeSpec))
+  var qrCodeFlag = !!(data && data.request && data.request.search && data.request.search.qrCodeSpec &&
+     !_.isEmpty(data.request.search.qrCodeSpec))
   var qrCodeConfig = {}
   if (qrCodeFlag) {
     var requestObj = data.request.search
@@ -136,7 +144,8 @@ function dialCodeListAPI (req, response) {
   }
 
   if (!data.request || !data.request.search || !data.request.search.publisher) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI', 'Error due to required params are missing', data.request))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI',
+      'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.LIST.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.LIST.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -154,10 +163,11 @@ function dialCodeListAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'dialCodeListAPI', 'Request for get list of dialcode', {
-        body: reqData,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'dialCodeListAPI',
+        'Request to get list of dialcode', {
+          body: reqData,
+          headers: req.headers
+        }))
       contentProvider.dialCodeList(reqData, req.headers, function (err, res) {
         if (err || _.indexOf([responseCode.SUCCESS, responseCode.PARTIAL_SUCCESS], res.responseCode) === -1) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI', 'Getting error', res))
@@ -175,9 +185,10 @@ function dialCodeListAPI (req, response) {
         var batchImageService = new BatchImageService(qrCodeConfig)
         var channel = _.clone(req.headers['x-channel-id'])
         var dialcodes = _.map(res.result.dialcodes, 'identifier')
-        batchImageService.createRequest(dialcodes, channel, requestObj.publisher, function (err, processId) {
+        batchImageService.createRequest(dialcodes, channel, requestObj.publisher, rspObj, function (err, processId) {
           if (err) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI', 'Error while creating request to child process for images creation', err))
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI',
+              'Error while creating request to child process for images creation', err))
             res.responseCode = responseCode.PARTIAL_SUCCESS
             return response.status(207).send(respUtil.successResponse(res))
           } else {
@@ -191,7 +202,8 @@ function dialCodeListAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'dialCodeListAPI', 'Return response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'dialCodeListAPI',
+        'Return response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -207,9 +219,14 @@ function updateDialCodeAPI (req, response) {
   var data = req.body
   data.dialCodeId = req.params.dialCodeId
   var rspObj = req.rspObj
+  // Adding objectData in telemetryData object
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.dialCodeId, 'dialcode', '', {})
+  }
 
   if (!data.request || !data.request.dialcode || !data.dialCodeId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateDialCodeAPI', 'Error due to required params are missing', data.request))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateDialCodeAPI',
+      'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.UPDATE.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -224,10 +241,11 @@ function updateDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateDialCodeAPI', 'Request for update the dialcode', {
-        body: reqData,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateDialCodeAPI',
+        'Request to update the dialcode', {
+          body: reqData,
+          headers: req.headers
+        }))
       contentProvider.updateDialCode(reqData, data.dialCodeId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateDialCodeAPI', 'Getting error', res))
@@ -243,7 +261,8 @@ function updateDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateDialCodeAPI', 'Return response back to user', rspObj))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateDialCodeAPI',
+        'Return response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -260,11 +279,16 @@ function getDialCodeAPI (req, response) {
   data.body = req.body
   data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
   var rspObj = req.rspObj
+  // Adding objectData in telemetryData object
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.dialCodeId, 'dialcode', '', {})
+  }
 
   if (!data.dialCodeId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDialCodeAPI', 'Error due to required params are missing', {
-      dialCodeId: data.dialCodeId
-    }))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDialCodeAPI',
+      'Error due to required params are missing', {
+        dialCodeId: data.dialCodeId
+      }))
     rspObj.errCode = dialCodeMessage.GET.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.GET.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -274,11 +298,12 @@ function getDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDialCodeAPI', 'Request for get dialcode meta data', {
-        dialCodeId: data.dialCodeId,
-        qs: data.queryParams,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDialCodeAPI',
+        'Request to get dialcode meta data', {
+          dialCodeId: data.dialCodeId,
+          qs: data.queryParams,
+          headers: req.headers
+        }))
       contentProvider.getDialCode(data.dialCodeId, req.headers, function (err, res) {
         // After check response, we perform other operation
         console.log(err)
@@ -310,7 +335,8 @@ function getDialCodeAPI (req, response) {
         var publisher = res.result.dialcode.publisher
         imgService.getImage(dialcode, channel, publisher, undefined, undefined, true, function (err, image) {
           if (err) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDialCodeAPI', 'Generating image error', err))
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDialCodeAPI',
+              'Generating image error', err))
             res.responseCode = responseCode.PARTIAL_SUCCESS
             return response.status(207).send(respUtil.successResponse(res))
           } else {
@@ -324,7 +350,8 @@ function getDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDialCodeAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDialCodeAPI',
+        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -359,7 +386,8 @@ function contentLinkDialCodeAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!checkContentLinkRequest(data)) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'contentLinkDialCodeAPI', 'Error due to required params are missing', data.request))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'contentLinkDialCodeAPI',
+      'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.CONTENT_LINK.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.CONTENT_LINK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -373,13 +401,15 @@ function contentLinkDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'contentLinkDialCodeAPI', 'Request for link the content', {
-        body: reqData,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'contentLinkDialCodeAPI',
+        'Request to link the content', {
+          body: reqData,
+          headers: req.headers
+        }))
       contentProvider.contentLinkDialCode(reqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'contentLinkDialCodeAPI', 'Getting error', res))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'contentLinkDialCodeAPI',
+            'Getting error', res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.CONTENT_LINK.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.CONTENT_LINK.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -392,7 +422,8 @@ function contentLinkDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'contentLinkDialCodeAPI', 'Return response back to user', rspObj))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'contentLinkDialCodeAPI',
+        'Return response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -409,11 +440,16 @@ function getProcessIdStatusAPI (req, response) {
   data.body = req.body
   data.processId = req.params.processId
   var rspObj = req.rspObj
+  // Adding objectData in telemetryData object
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.processId, 'dialcode', '', {})
+  }
 
   if (!data.processId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDialCodeAPI', 'Error due to required params are missing', {
-      processId: data.processId
-    }))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDialCodeAPI',
+      'Error due to required params are missing', {
+        processId: data.processId
+      }))
     rspObj.errCode = dialCodeMessage.PROCESS.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.PROCESS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -424,7 +460,8 @@ function getProcessIdStatusAPI (req, response) {
     return response.status(process.code).send(process.data)
   })
     .catch(err => {
-      return response.status(err.code).send(err.data)
+      var error = JSON.parse(err.message)
+      return response.status(error.code).send(error.data)
     })
 }
 
@@ -435,11 +472,12 @@ function getProcessIdStatusAPI (req, response) {
  * @returns {object} return response object with http status
  */
 function searchDialCodeAPI (req, response) {
-  var data = req.body,
-    rspObj = req.rspObj
+  var data = req.body
+  var rspObj = req.rspObj
 
   if (!data.request || !data.request.search) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchDialCodeAPI', 'Error due to required params are missing', data.request))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchDialCodeAPI',
+      'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.SEARCH.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.SEARCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -454,7 +492,7 @@ function searchDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchDialCodeAPI', 'Request for search', {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchDialCodeAPI', 'Request to search', {
         body: reqData,
         headers: req.headers
       }))
@@ -473,7 +511,8 @@ function searchDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchDialCodeAPI', 'Return response back to user', rspObj))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchDialCodeAPI',
+        'Return response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -486,12 +525,17 @@ function searchDialCodeAPI (req, response) {
  * @returns {object} return response object with http status
  */
 function publishDialCodeAPI (req, response) {
-  var data = req.body,
-    rspObj = req.rspObj
+  var data = req.body
+  var rspObj = req.rspObj
   data.dialCodeId = req.params.dialCodeId
+  // Adding objectData in telemetryData object
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.dialCodeId, 'dialcode', '', {})
+  }
 
   if (!data.request || !data.dialCodeId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'publishDialCodeAPI', 'Error due to required params are missing', data.request))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'publishDialCodeAPI',
+      'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.PUBLISH.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.PUBLISH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -506,10 +550,11 @@ function publishDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishDialCodeAPI', 'Request for publish dialcode', {
-        body: reqData,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishDialCodeAPI',
+        'Request to publish the dialcode', {
+          body: reqData,
+          headers: req.headers
+        }))
       contentProvider.publishDialCode(reqData, data.dialCodeId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'publishDialCodeAPI', 'Getting error', res))
@@ -525,7 +570,8 @@ function publishDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishDialCodeAPI', 'Return response back to user', rspObj))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishDialCodeAPI',
+        'Return response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -538,11 +584,12 @@ function publishDialCodeAPI (req, response) {
  * @returns {object} return response object with http status
  */
 function createPublisherAPI (req, response) {
-  var data = req.body,
-    rspObj = req.rspObj
+  var data = req.body
+  var rspObj = req.rspObj
 
   if (!data.request || !data.request.publisher || !data.request.publisher.identifier || !data.request.publisher.name) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createPublisherAPI', 'Error due to required params are missing', data.request))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createPublisherAPI',
+      'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.CREATE_PUBLISHER.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.CREATE_PUBLISHER.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -557,10 +604,11 @@ function createPublisherAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createPublisherAPI', 'Request for create publisher', {
-        body: reqData,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createPublisherAPI',
+        'Request to create publisher', {
+          body: reqData,
+          headers: req.headers
+        }))
       contentProvider.createPublisher(reqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createPublisherAPI', 'Getting error', res))
@@ -576,7 +624,12 @@ function createPublisherAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createPublisherAPI', 'Return response back to user', rspObj))
+      // Adding objectData in telemetryData object
+      if (rspObj.telemetryData) {
+        rspObj.telemetryData.object = utilsService.getObjectData(data.dialCodeId, 'dialcode', '', {})
+      }
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createPublisherAPI',
+        'Return response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -594,7 +647,8 @@ function updatePublisherAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.publisher || !data.publisherId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updatePublisherAPI', 'Error due to required params are missing', data.request))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updatePublisherAPI',
+      'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.UPDATE_PUBLISHER.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.UPDATE_PUBLISHER.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -609,10 +663,11 @@ function updatePublisherAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updatePublisherAPI', 'Request for update the publisher', {
-        body: reqData,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updatePublisherAPI',
+        'Request to update the publisher', {
+          body: reqData,
+          headers: req.headers
+        }))
       contentProvider.updatePublisher(reqData, data.publisherId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updatePublisherAPI', 'Getting error', res))
@@ -628,7 +683,8 @@ function updatePublisherAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updatePublisherAPI', 'Return response back to user', rspObj))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updatePublisherAPI',
+        'Return response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -646,9 +702,10 @@ function getPublisherAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.publisherId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getPublisherAPI', 'Error due to required params are missing', {
-      dialCodeId: data.dialCodeId
-    }))
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getPublisherAPI',
+      'Error due to required params are missing', {
+        dialCodeId: data.dialCodeId
+      }))
     rspObj.errCode = dialCodeMessage.GET.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.GET.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -658,11 +715,12 @@ function getPublisherAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getPublisherAPI', 'Request for get publisher meta data', {
-        publisherId: data.publisherId,
-        qs: data.queryParams,
-        headers: req.headers
-      }))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getPublisherAPI',
+        'Request to get publisher meta data', {
+          publisherId: data.publisherId,
+          qs: data.queryParams,
+          headers: req.headers
+        }))
       contentProvider.getPublisher(data.publisherId, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
@@ -679,7 +737,8 @@ function getPublisherAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getPublisherAPI', 'Sending response back to user'))
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getPublisherAPI',
+        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
