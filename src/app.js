@@ -13,7 +13,7 @@ const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderA
 var contentProviderApiConfig = JSON.parse(fs.readFileSync(contentProviderConfigPath))
 const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/telemetryEventConfig.json')))
 
-var reqDataLimitOfContentUpload = '30mb'
+var reqDataLimitOfContentUpload = '50mb'
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000
 
@@ -31,6 +31,7 @@ configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + contentProviderApiKey)
 configUtil.setConfig('LEARNER_SERVICE_BASE_URL', learnerServiceBaseUrl)
 configUtil.setConfig('LEARNER_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + learnerServiceApiKey)
 configUtil.setConfig('DIALCODE_GENERATE_MAX_COUNT', 20000)
+configUtil.setConfig('CONTENT_UPLOAD_REQ_LIMIT', reqDataLimitOfContentUpload)
 process.env.sunbird_cassandra_ips = process.env.sunbird_cassandra_ips || '127.0.0.1'
 process.env.sunbird_cassandra_port = process.env.sunbird_cassandra_port || 9042
 process.env.dial_code_image_temp_folder = 'temp'

@@ -8,6 +8,7 @@ module.exports = function (app) {
   var contentProviderBaseUrl = configUtil.getConfig('BASE_URL')
   var ekstepProxyUrl = globalEkstepProxyBaseUrl
   var contentProviderApiKey = configUtil.getConfig('Authorization_TOKEN')
+  var reqDataLimitOfContentUpload = configUtil.getConfig('CONTENT_UPLOAD_REQ_LIMIT')
 
   app.use('/api/*', proxy(contentProviderBaseUrl, {
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -82,6 +83,7 @@ module.exports = function (app) {
       requestMiddleware.apiAccessForCreatorUser, contentService.unlistedPublishContentAPI)
 
   app.use('/action/*', proxy(contentProviderBaseUrl, {
+    limit: reqDataLimitOfContentUpload,
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
       proxyReqOpts.headers['Authorization'] = contentProviderApiKey
       return proxyReqOpts
