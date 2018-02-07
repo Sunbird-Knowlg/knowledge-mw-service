@@ -1,3 +1,3 @@
 #!/bin/sh
-# return version
-echo '{"name":"content_service","version":"0.0.4","org":"sunbird","hubuser":"purplesunbird"}'
+check=$(cat package.json| jq -c '{name: .name , version: .version, org: .author, hubuser: "purplesunbird"}')
+echo $check
