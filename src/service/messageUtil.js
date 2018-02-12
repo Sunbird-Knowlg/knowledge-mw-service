@@ -59,6 +59,13 @@ exports.COURSE = {
     FAILED_MESSAGE: 'Get course hierarchy failed'
   },
 
+  HIERARCHY_UPDATE: {
+    MISSING_CODE: 'ERR_COURSE_HIERARCHY_UPDATE_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for update course hierarchy are missing',
+    FAILED_CODE: 'ERR_COURSE_HIERARCHY_UPDATE_FAILED',
+    FAILED_MESSAGE: 'Update course hierarchy failed'
+  },
+
   MIME_TYPE: 'application/vnd.ekstep.content-collection',
   CONTENT_TYPE: 'Course',
   PREFIX_CODE: 'org.sunbird.'

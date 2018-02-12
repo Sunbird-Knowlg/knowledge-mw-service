@@ -11,6 +11,7 @@ var contentProvider = require('sb_content_provider_util')
 var respUtil = require('response_util')
 var validatorUtil = require('sb_req_validator_util')
 var LOG = require('sb_logger_util')
+var _ = require('underscore')
 
 var courseModel = require('../models/courseModel').COURSE
 var messageUtils = require('./messageUtil')
@@ -574,6 +575,62 @@ function getCourseHierarchyAPI (req, response) {
   ])
 }
 
+/**
+ * this function helps to update course hierarchy
+ * @param {Object} req
+ * @param {Object} response
+ * @returns {Object} object with error or success response with http status code
+ */
+function updateCourseHierarchyAPI (req, response) {
+  var data = req.body
+  var rspObj = req.rspObj
+
+  if (!data.request || !data.request.data || !data.request.data.hierarchy) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateCourseHierarchyAPI',
+      'Error due to required params are missing', data.request))
+    rspObj.errCode = courseMessage.HIERARCHY_UPDATE.MISSING_CODE
+    rspObj.errMsg = courseMessage.HIERARCHY_UPDATE.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+  var hierarchy = data.request.data.hierarchy
+  data.courseId = _.findKey(hierarchy, function (item) {
+    if (item.root === true) return item
+  })
+
+  // Adding objectData in telemetryData object
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.courseId, 'course', '', {})
+  }
+
+  async.waterfall([
+    function (CBW) {
+      var ekStepReqData = {request: data.request}
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCourseHierarchyAPI',
+        'Request to content provider to update the course hierarchy', ekStepReqData))
+      contentProvider.contentHierarchyUpdate(ekStepReqData, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateCourseHierarchyAPI',
+            'Getting error from content provider', res))
+          rspObj.errCode = courseMessage.HIERARCHY_UPDATE.FAILED_CODE
+          rspObj.errMsg = courseMessage.HIERARCHY_UPDATE.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCourseHierarchyAPI',
+        'Sending response back to user', rspObj))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
+}
+
 module.exports.searchCourseAPI = searchCourseAPI
 module.exports.createCourseAPI = createCourseAPI
 module.exports.updateCourseAPI = updateCourseAPI
@@ -582,3 +639,4 @@ module.exports.publishCourseAPI = publishCourseAPI
 module.exports.getCourseAPI = getCourseAPI
 module.exports.getMyCourseAPI = getMyCourseAPI
 module.exports.getCourseHierarchyAPI = getCourseHierarchyAPI
+module.exports.updateCourseHierarchyAPI = updateCourseHierarchyAPI
