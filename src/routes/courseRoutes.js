@@ -35,6 +35,10 @@ module.exports = function (app) {
   app.route(BASE_URL + '/hierarchy/:courseId')
     .get(requestMiddleware.createAndValidateRequestBody, courseService.getCourseHierarchyAPI)
 
+  app.route(BASE_URL + '/hierarchy/update')
+    .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+      requestMiddleware.hierarchyUpdateApiAccess, courseService.updateCourseHierarchyAPI)
+
   app.route(BASE_URL + '/retire')
     .get(contentService.checkHealth)
 }
