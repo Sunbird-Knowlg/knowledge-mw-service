@@ -9,6 +9,8 @@ module.exports = function (app) {
   var ekstepProxyUrl = globalEkstepProxyBaseUrl
   var contentProviderApiKey = configUtil.getConfig('Authorization_TOKEN')
   var reqDataLimitOfContentUpload = configUtil.getConfig('CONTENT_UPLOAD_REQ_LIMIT')
+  var learnerServiceBaseUrl = configUtil.getConfig('LEARNER_SERVICE_BASE_URL')
+  var learnerServiceAPIKey = configUtil.getConfig('LEARNER_SERVICE_AUTHORIZATION_TOKEN')
 
   app.use('/api/*', proxy(contentProviderBaseUrl, {
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -81,6 +83,18 @@ module.exports = function (app) {
   app.route('/action' + configUtil.getConfig('UNLISTED_PUBLISH_CONTENT_URI') + '/:contentId')
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, contentService.unlistedPublishContentAPI)
+
+  app.use('/action' + configUtil.getConfig('LEARNER_SERVICE_PAGE_ASSEMBLE'), proxy(learnerServiceBaseUrl, {
+    proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+      proxyReqOpts.headers['Authorization'] = learnerServiceAPIKey
+      return proxyReqOpts
+    },
+    proxyReqPathResolver: function (req) {
+      var originalUrl = req.originalUrl
+      originalUrl = originalUrl.replace('action/', '/')
+      return require('url').parse(learnerServiceBaseUrl + originalUrl).path
+    }
+  }))
 
   app.use('/action/*', proxy(contentProviderBaseUrl, {
     limit: reqDataLimitOfContentUpload,
