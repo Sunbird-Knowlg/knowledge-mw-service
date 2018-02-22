@@ -341,7 +341,7 @@ exports.EMAIL = {
     FAILED_CODE: 'ERR_SEND_CREATE_FLAG_EMAIL',
     FAILED_MESSAGE: 'Sending email failed for create flag',
     SUBJECT: 'Flag raised for your content: Content Type: {{Content type}}, Title: {{Content title}} ',
-    BODY: 'Your content is flagged by another user. Details:<br><br>' +
+    BODY: 'Your content is flagged by another user. <br><br>' +
             '<b>Content Type: </b>{{Content type}}<br>' +
             '<b>Title: </b>{{Content title}}<br>' +
             '<b>Flag(s) Raised: </b>{{Flag reason}}<br>' +
@@ -352,7 +352,7 @@ exports.EMAIL = {
     FAILED_CODE: 'ERR_SEND_ACCEPT_FLAG_EMAIL',
     FAILED_MESSAGE: 'Sending email failed for accept flag',
     SUBJECT: 'Reviewer has accepted the flag for your content: {{Content type}} ',
-    BODY: 'Your content has been flagged by the reviewer. Details:<br><br>' +
+    BODY: 'Your content has been flagged by the reviewer. <br><br>' +
             '<b>Content Type: </b>{{Content type}}<br>' +
             '<b>Title: </b>{{Content title}}<br>' +
             '<b>Flag(s) Raised: </b>{{Flag reason}}<br>',
@@ -363,7 +363,7 @@ exports.EMAIL = {
     FAILED_MESSAGE: 'Sending email failed for reject flag',
     SUBJECT: 'Congratulations, your content is live! Content Type: {{Content type}}, Title: {{Content title}}',
     BODY: 'Congratulations! The content that you had submitted has been accepted for publication.' +
-            ' It is now available for usage. Details:<br><br>' +
+            ' It is now available for usage. <br><br>' +
             '<b>Content Type: </b>{{Content type}}<br>' +
             '<b>Title: </b>{{Content title}}<br>' +
             '<b>Status: </b>{{Content status}}<br>',
@@ -374,7 +374,7 @@ exports.EMAIL = {
     FAILED_MESSAGE: 'Sending email failed for published content',
     SUBJECT: 'Congratulations, your content is live! Content Type: {{Content type}}, Title: {{Content title}}',
     BODY: 'Congratulations! The content that you had submitted has been accepted for publication. ' +
-            'It will be available for usage shortly. Details:<br><br>' +
+            'It will be available for usage shortly. <br><br>' +
             '<b>Content Type: </b>{{Content type}}<br>  ' +
             '<b>Title: </b>{{Content title}}<br>',
     TEMPLATE: 'publishContent'
@@ -385,7 +385,7 @@ exports.EMAIL = {
     SUBJECT: 'Our sincere apologies! Content Type: {{Content type}}, Title: {{Content title}}',
     BODY: 'We acknowledge your contribution and effort in creating content for us.' +
             ' However, we are unable to accept the content that you submitted.<br>' +
-            'We look forward to a more meaningful relationship with you, the next time around. Details:<br><br>' +
+            'We look forward to a more meaningful relationship with you, the next time around. <br><br>' +
             '<b>Content Type: </b>{{Content type}}<br>' +
             '<b>Title: </b>{{Content title}}<br>' +
             '<b>Status: </b>{{Content status}}<br>',
@@ -396,7 +396,7 @@ exports.EMAIL = {
     FAILED_MESSAGE: 'Sending email failed for unlist publish content',
     SUBJECT: 'Congratulations, your content {{Content title}} is live!',
     BODY: 'Congratulations! The content is now ready for limited sharing. ' +
-            'You can share it using <a href=\'{{Share url}}\'>{{Share url}}</a>. Details:<br><br>' +
+            'You can share it using <a href=\'{{Share url}}\'>{{Share url}}</a>. <br><br>' +
             '<b>Content Type: </b>{{Content type}}<br>  ' +
             '<b>Title: </b>{{Content title}}<br>',
     TEMPLATE: 'unlistedPublishContent'
