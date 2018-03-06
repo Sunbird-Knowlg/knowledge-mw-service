@@ -12,7 +12,7 @@
   "lint-staged": {
     "*.js": "eslint"
   },
-  "author": "Harish Kumar Gangula",
+  "author": "sunbird",
   "license": "ISC",
   "dependencies": {
     "async": "^2.4.0",
