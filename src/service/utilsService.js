@@ -15,7 +15,12 @@ function getAppIDForRESP (path) {
   var arr = path.split(':')[0].split('/').filter(function (n) {
     return n !== ''
   })
-  var appId = 'api.' + arr[arr.length - 2] + '.' + arr[arr.length - 1]
+  var appId
+  if (arr.length === 1) {
+    appId = 'api.' + arr[arr.length - 1]
+  } else {
+    appId = 'api.' + arr[arr.length - 2] + '.' + arr[arr.length - 1]
+  }
   return appId
 }
 

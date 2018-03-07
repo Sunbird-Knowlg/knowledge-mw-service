@@ -406,13 +406,18 @@ exports.EMAIL = {
 exports.HEALTH_CHECK = {
   EK_STEP: {
     NAME: 'ekstep.api',
-    FAILED_CODE: 'EK_STEP_HEALTH_FAILED',
-    FAILED_MESSAGE: 'Ekstep service is not healthy'
+    FAILED_CODE: 'CONTENT_PROVIDER_HEALTH_FAILED',
+    FAILED_MESSAGE: 'Content provider service is not healthy'
   },
   LEARNER_SERVICE: {
     NAME: 'learnerservice.api',
     FAILED_CODE: 'LEARNER_SERVICE_HEALTH_FAILED',
     FAILED_MESSAGE: 'Learner service is not healthy'
+  },
+  CASSANDRA_DB: {
+    NAME: 'cassandra.db',
+    FAILED_CODE: 'CASSANDRA_HEALTH_FAILED',
+    FAILED_MESSAGE: 'Cassandra db is not connected'
   }
 }
 
