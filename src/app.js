@@ -95,6 +95,7 @@ require('./routes/channelRoutes')(app)
 require('./routes/frameworkRoutes')(app)
 require('./routes/frameworkTermRoutes')(app)
 require('./routes/frameworkCategoryInstanceRoutes')(app)
+require('./routes/dataExhaustRoutes')(app)
 
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)

@@ -505,5 +505,19 @@ exports.DIALCODE = {
     FAILED_CODE: 'ERR_GET_PUBLISHER_DIALCODE_FAILED',
     FAILED_MESSAGE: 'GET publisher failed'
   }
+}
 
+exports.DATASET = {
+  SUBMIT: {
+    FAILED_CODE: 'SUBMIT_DATASET_REQUEST_FAILED',
+    FAILED_MESSAGE: 'Submit dataset request failed'
+  },
+  LIST: {
+    FAILED_CODE: 'GET_DATASET_REQUEST_LIST_FAILED',
+    FAILED_MESSAGE: 'Get dataset request list failed'
+  },
+  READ: {
+    FAILED_CODE: 'GET_DATASET_REQUEST_FAILED',
+    FAILED_MESSAGE: 'Get dataset request detail failed'
+  }
 }
