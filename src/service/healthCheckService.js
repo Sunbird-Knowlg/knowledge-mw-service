@@ -7,9 +7,13 @@
 var async = require('async')
 var contentProvider = require('sb_content_provider_util')
 var respUtil = require('response_util')
+var path = require('path')
+var LOG = require('sb_logger_util')
 
 var messageUtils = require('./messageUtil')
+var utilsService = require('./utilsService')
 var cassandraUtils = require('../utils/cassandraUtil')
+var filename = path.basename(__filename)
 
 var hcMessages = messageUtils.HEALTH_CHECK
 
@@ -96,9 +100,13 @@ function checkHealth (req, response) {
   ], function () {
     var rsp = respUtil.successResponse(rspObj)
     if (isEkStepHealthy && isLSHealthy && isDbConnected) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'checkHealth',
+        'Content service is healthy'))
       return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj))
     } else {
-      return response.status(500).send(getHealthCheckResp(rsp, false, checksArrayObj))
+      LOG.error(utilsService.getLoggerData(rspObj, 'INFO', filename, 'checkHealth',
+        'Content service is not healthy', { rsp: checksArrayObj }))
+      return response.status(200).send(getHealthCheckResp(rsp, false, checksArrayObj))
     }
   })
 }
