@@ -60,8 +60,9 @@
 
         "TELEMETRY": "/data/v3/telemetry",
 
-        "SUBMIT_DATA_EXHAUST_URI": "/data/v3/dataset/request/submit",
-        "LIST_DATA_EXHAUST_URI": "/data/v3/dataset/request/list",
-        "READ_DATA_EXHAUST_URI": "/data/v3/dataset/request/read"
+        "SUBMIT_DATA_EXHAUST_URI": "/data/v2/dataset/request/submit",
+        "LIST_DATA_EXHAUST_URI": "/data/v2/dataset/request/list",
+        "READ_DATA_EXHAUST_URI": "/data/v2/dataset/request/read",
+        "CHANNEL_DATA_EXHAUST_URI": "/data/v2/dataset/request"
     }
 }    

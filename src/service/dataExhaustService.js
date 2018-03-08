@@ -68,7 +68,7 @@ function getListOfDataSetRequest (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getListOfDataSetRequest',
-        'Request to content provider to get list of data get', {
+        'Request to content provider to get list of dataset', {
           query: query,
           clientKey: clientKey,
           headers: req.headers
@@ -107,7 +107,7 @@ function getDataSetDetailRequest (req, response) {
 
     function (CBW) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDataSetDetailRequest',
-        'Request to content provider to get detail of data get', {
+        'Request to content provider to get detail of dataset', {
           clientKey: clientKey,
           requestId: requestId,
           headers: req.headers
@@ -132,6 +132,48 @@ function getDataSetDetailRequest (req, response) {
   ])
 }
 
+/**
+ * This constructor function helps to get channel data set.
+ * @param {object} req
+ * @param {object} response
+ */
+function getChannelDataSetRequest (req, response) {
+  var query = req.query
+  var rspObj = req.rspObj
+  var dataSetId = req.params.dataSetId
+  var channelId = req.params.channelId
+
+  async.waterfall([
+
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getChannelDataSetRequest',
+        'Request to content provider to get channel dataset', {
+          query: query,
+          dataSetId: dataSetId,
+          channelId: channelId,
+          headers: req.headers
+        }))
+      contentProvider.getChannelDataSetRequest(query, dataSetId, channelId, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getChannelDataSetRequest',
+            'Getting error from content provider', res))
+          rspObj = utilsService.getErrorResponse(rspObj, res, dataSetMessages.CHANNEL)
+          return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getChannelDataSetRequest',
+        'Sending response back to user'))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
+}
+
 module.exports.submitDataSetRequest = submitDataSetRequest
 module.exports.getListOfDataSetRequest = getListOfDataSetRequest
 module.exports.getDataSetDetailRequest = getDataSetDetailRequest
+module.exports.getChannelDataSetRequest = getChannelDataSetRequest

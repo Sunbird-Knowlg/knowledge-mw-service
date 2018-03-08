@@ -19,4 +19,7 @@ module.exports = function (app) {
 
   app.route(BASE_URL + '/read/:clientKey/:requestId')
     .get(requestMiddleware.createAndValidateRequestBody, dataExaustService.getDataSetDetailRequest)
+
+  app.route(BASE_URL + '/:dataSetId/:channelId')
+    .get(requestMiddleware.createAndValidateRequestBody, dataExaustService.getChannelDataSetRequest)
 }

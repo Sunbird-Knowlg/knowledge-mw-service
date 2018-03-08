@@ -519,5 +519,9 @@ exports.DATASET = {
   READ: {
     FAILED_CODE: 'GET_DATASET_REQUEST_FAILED',
     FAILED_MESSAGE: 'Get dataset request detail failed'
+  },
+  CHANNEL: {
+    FAILED_CODE: 'GET_CHANNEL_DATASET_REQUEST_FAILED',
+    FAILED_MESSAGE: 'Get channel dataset request failed'
   }
 }
