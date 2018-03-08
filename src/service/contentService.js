@@ -19,13 +19,11 @@ var contentModel = require('../models/contentModel').CONTENT
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 var emailService = require('./emailService')
-var cassandraUtils = require('../utils/cassandraUtil')
 
 var filename = path.basename(__filename)
 var contentMessage = messageUtils.CONTENT
 var compositeMessage = messageUtils.COMPOSITE
 var responseCode = messageUtils.RESPONSE_CODE
-var hcMessages = messageUtils.HEALTH_CHECK
 var reqMsg = messageUtils.REQUEST
 
 /**
@@ -50,90 +48,6 @@ function getCode () {
  */
 function getContentTypeForContent () {
   return contentMessage.CONTENT_TYPE
-}
-
-// Function help to check health api
-function getChecksObj (name, healthy, err, errMsg) {
-  return {
-    name: name,
-    healthy: healthy,
-    err: err,
-    errmsg: errMsg
-  }
-};
-
-// Function help to check health api
-function getHealthCheckResp (rsp, healthy, checksArrayObj) {
-  delete rsp.responseCode
-  rsp.result = {}
-  rsp.result.name = messageUtils.SERVICE.NAME
-  rsp.result.version = messageUtils.API_VERSION.V1
-  rsp.result.healthy = healthy
-  rsp.result.check = checksArrayObj
-  return rsp
-}
-
-function checkHealth (req, response) {
-  var rspObj = req.rspObj
-  var checksArrayObj = []
-  var isEkStepHealthy
-  var isLSHealthy
-  var isDbConnected
-  async.parallel([
-    function (CB) {
-      var cassandraStatus = cassandraUtils.getCassandraStatus()
-      if (cassandraStatus) {
-        isDbConnected = true
-        checksArrayObj.push(getChecksObj(hcMessages.CASSANDRA_DB.NAME, isDbConnected, '', ''))
-      } else {
-        isDbConnected = false
-        checksArrayObj.push(getChecksObj(hcMessages.CASSANDRA_DB.NAME, isDbConnected,
-          hcMessages.CASSANDRA_DB.FAILED_CODE, hcMessages.CASSANDRA_DB.FAILED_MESSAGE))
-      }
-      CB()
-    },
-    function (CB) {
-      contentProvider.ekStepHealthCheck(function (err, res) {
-        if (err) {
-          isEkStepHealthy = false
-          checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy,
-            hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE))
-        } else if (res && res.result && res.result.healthy) {
-          isEkStepHealthy = true
-          checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, '', ''))
-        } else {
-          isEkStepHealthy = false
-          checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy,
-            hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE))
-        }
-        CB()
-      })
-    },
-    function (CB) {
-      contentProvider.learnerServiceHealthCheck(function (err, res) {
-        if (err) {
-          isLSHealthy = false
-          checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME,
-            isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE))
-        } else if (res && res.result && res.result.response && res.result.response.healthy) {
-          isLSHealthy = true
-          checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, '', ''))
-        } else {
-          isLSHealthy = false
-          checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME,
-            isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE))
-        }
-        CB()
-      })
-    }
-  ], function () {
-    var rsp = respUtil.successResponse(rspObj)
-    if (isEkStepHealthy && isLSHealthy && isDbConnected) {
-      return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj))
-    } else {
-      return response.status(500).send(getHealthCheckResp(rsp, false, checksArrayObj))
-    }
-  })
 }
 
 function searchAPI (req, response) {
@@ -1118,7 +1032,6 @@ module.exports.reviewContentAPI = reviewContentAPI
 module.exports.publishContentAPI = publishContentAPI
 module.exports.getContentAPI = getContentAPI
 module.exports.getMyContentAPI = getMyContentAPI
-module.exports.checkHealth = checkHealth
 module.exports.retireContentAPI = retireContentAPI
 module.exports.rejectContentAPI = rejectContentAPI
 module.exports.flagContentAPI = flagContentAPI

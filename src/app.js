@@ -85,6 +85,7 @@ app.use(function (req, res, next) {
   next()
 })
 
+require('./routes/healthCheckRoutes')(app)
 require('./routes/courseRoutes')(app)
 require('./routes/contentRoutes')(app)
 require('./routes/conceptRoutes')(app)

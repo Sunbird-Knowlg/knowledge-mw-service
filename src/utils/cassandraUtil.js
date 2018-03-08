@@ -3,7 +3,7 @@ var LOG = require('sb_logger_util')
 var path = require('path')
 var filename = path.basename(__filename)
 var contactPoints = process.env.sunbird_cassandra_ips.split(',')
-var isCassandraConnected = false
+var cassandra = require('cassandra-driver')
 
 models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind(
   {
@@ -11,7 +11,7 @@ models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind
       contactPoints: contactPoints,
       protocolOptions: { port: process.env.sunbird_cassandra_port },
       keyspace: 'dialcodes',
-      queryOptions: {consistency: models.consistencies.one}
+      queryOptions: { consistency: models.consistencies.one }
     },
     ormOptions: {
       defaultReplicationStrategy: {
@@ -23,19 +23,27 @@ models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind
   },
   function (err) {
     if (err) {
-      isCassandraConnected = false
-      LOG.error({filename, 'Error connecting to the database: ': err})
+      LOG.error({ filename, 'Error connecting to the database: ': err })
       throw err
     } else {
-      isCassandraConnected = true
-      LOG.info({filename, 'connecting to database': 'success'})
+      LOG.info({ filename, 'connecting to database': 'success' })
     }
   }
 )
 
-function getCassandraStatus () {
-  return isCassandraConnected
+function checkCassandraDBHealth (callback) {
+  const client = new cassandra.Client({ contactPoints: contactPoints })
+  client.connect()
+    .then(function () {
+      client.shutdown()
+      callback(null, true)
+    })
+    .catch(function (err) {
+      console.log('cassandra err:', err)
+      client.shutdown()
+      callback(err, false)
+    })
 }
 
 module.exports = models
-module.exports.getCassandraStatus = getCassandraStatus
+module.exports.checkCassandraDBHealth = checkCassandraDBHealth

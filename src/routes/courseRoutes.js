@@ -5,7 +5,6 @@
  */
 
 var courseService = require('../service/courseService')
-var contentService = require('../service/contentService')
 var requestMiddleware = require('../middlewares/request.middleware')
 
 var BASE_URL = '/v1/course'
@@ -38,7 +37,4 @@ module.exports = function (app) {
   app.route(BASE_URL + '/hierarchy/update')
     .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.hierarchyUpdateApiAccess, courseService.updateCourseHierarchyAPI)
-
-  app.route(BASE_URL + '/retire')
-    .get(contentService.checkHealth)
 }

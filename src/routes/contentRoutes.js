@@ -10,9 +10,6 @@ var requestMiddleware = require('../middlewares/request.middleware')
 var BASE_URL = '/v1/content'
 
 module.exports = function (app) {
-  app.route('/health').get(requestMiddleware.createAndValidateRequestBody,
-    contentService.checkHealth)
-
   app.route(BASE_URL + '/search')
     .post(requestMiddleware.createAndValidateRequestBody, contentService.searchContentAPI)
 
@@ -63,7 +60,4 @@ module.exports = function (app) {
   app.route(BASE_URL + '/upload/url/:contentId')
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, contentService.uploadContentUrlAPI)
-
-  app.route(BASE_URL + '/retire')
-    .get(contentService.checkHealth)
 }
