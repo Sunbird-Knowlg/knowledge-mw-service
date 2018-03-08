@@ -25,10 +25,15 @@ const contentProviderApiKey = process.env.sunbird_content_provider_api_key
 const learnerServiceApiKey = process.env.sunbird_learner_service_api_key
 const learnerServiceBaseUrl = process.env.sunbird_learner_service_base_url ? process.env.sunbird_learner_service_base_url : 'https://dev.open-sunbird.org/api'
 
+const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_base_url
+  ? process.env.sunbird_learner_service_local_base_url
+  : 'http://learner-service:9000'
+
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('BASE_URL', contentProviderBaseUrl)
 configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + contentProviderApiKey)
 configUtil.setConfig('LEARNER_SERVICE_BASE_URL', learnerServiceBaseUrl)
+configUtil.setConfig('LEARNER_SERVICE_LOCAL_BASE_URL', learnerServiceLocalBaseUrl)
 configUtil.setConfig('LEARNER_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + learnerServiceApiKey)
 configUtil.setConfig('DIALCODE_GENERATE_MAX_COUNT', 20000)
 configUtil.setConfig('CONTENT_UPLOAD_REQ_LIMIT', reqDataLimitOfContentUpload)
@@ -80,6 +85,7 @@ app.use(function (req, res, next) {
   next()
 })
 
+require('./routes/healthCheckRoutes')(app)
 require('./routes/courseRoutes')(app)
 require('./routes/contentRoutes')(app)
 require('./routes/conceptRoutes')(app)

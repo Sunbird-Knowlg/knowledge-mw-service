@@ -18,6 +18,7 @@
     "async": "^2.4.0",
     "azure-storage": "2.7.0",
     "body-parser": "^1.14.2",
+    "cassandra-driver": "^3.4.1",
     "express": "^4.13.3",
     "express-cassandra": "2.1.0",
     "express-http-proxy": "^1.0.3",

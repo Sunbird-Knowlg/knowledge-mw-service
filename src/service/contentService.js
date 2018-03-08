@@ -24,7 +24,6 @@ var filename = path.basename(__filename)
 var contentMessage = messageUtils.CONTENT
 var compositeMessage = messageUtils.COMPOSITE
 var responseCode = messageUtils.RESPONSE_CODE
-// var hcMessages = messageUtils.HEALTH_CHECK
 var reqMsg = messageUtils.REQUEST
 
 /**
@@ -49,74 +48,6 @@ function getCode () {
  */
 function getContentTypeForContent () {
   return contentMessage.CONTENT_TYPE
-}
-
-// Function help to check health api
-// function getChecksObj (name, healthy, err, errMsg) {
-//   return {
-//     name: name,
-//     healthy: healthy,
-//     err: err,
-//     errmsg: errMsg
-//   }
-// };
-
-// Function help to check health api
-// function getHealthCheckResp (rsp, healthy, checksArrayObj) {
-//   delete rsp.responseCode
-//   rsp.result = {}
-//   rsp.result.name = messageUtils.SERVICE.NAME
-//   rsp.result.version = messageUtils.API_VERSION.V1
-//   rsp.result.healthy = healthy
-//   rsp.result.check = checksArrayObj
-//   return rsp
-// }
-
-function checkHealth (req, response) {
-  return response.status(200).send('ok')
-//     var rspObj = req.rspObj;
-//     var checksArrayObj = [];
-//     var isEkStepHealthy, isLSHealthy, isDbConnected;
-//     var csApiStart = Date.now();
-//     async.parallel([
-//         function(CB) {
-//             var apiCallStart = Date.now();
-//             contentProvider.ekStepHealthCheck(function(err, res) {
-//                 if(res && res.result && res.result.healthy) {
-//                     isEkStepHealthy = true;
-//                     checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, "", ""));
-//                 } else {
-//                     isEkStepHealthy = false;
-//                     checksArrayObj.push(getChecksObj(hcMessages.EK_STEP.NAME, isEkStepHealthy,
-//                     hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE));
-//                 }
-//                 CB();
-//             })
-//         },
-//         function(CB) {
-//             var apiCallStart = Date.now();
-//             contentProvider.learnerServiceHealthCheck(function(err, res) {
-//                 if(res && res.result && res.result.healthy) {
-//                     isLSHealthy = true;
-//                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, "", ""));
-//                 } else {
-//                     isLSHealthy = false;
-//                     checksArrayObj.push(getChecksObj(hcMessages.LEARNER_SERVICE.NAME,
-//                      isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE,
-//                      hcMessages.LEARNER_SERVICE.FAILED_MESSAGE));
-//                 }
-//                 CB();
-//             })
-//         }
-//     ], function() {
-//         if(isEkStepHealthy && isLSHealthy && isDbConnected) {
-//             var rsp = respUtil.successResponse(rspObj);
-//             return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj));
-//         } else {
-//             var rsp = respUtil.successResponse(rspObj);
-//             return response.status(500).send(getHealthCheckResp(rsp, false, checksArrayObj));
-//         }
-//     });
 }
 
 function searchAPI (req, response) {
@@ -410,7 +341,7 @@ function uploadContentAPI (req, response) {
       ])
     })
   } else {
-    var queryString = {fileUrl: data.queryParams.fileUrl}
+    var queryString = { fileUrl: data.queryParams.fileUrl }
     async.waterfall([
 
       function (CBW) {
@@ -726,7 +657,7 @@ function retireContentAPI (req, response) {
             errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE
             respCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-            failedContent.push({contentId: contentId, errCode: errCode, errMsg: errMsg})
+            failedContent.push({ contentId: contentId, errCode: errCode, errMsg: errMsg })
           }
           CBE(null, null)
         })
@@ -1101,7 +1032,6 @@ module.exports.reviewContentAPI = reviewContentAPI
 module.exports.publishContentAPI = publishContentAPI
 module.exports.getContentAPI = getContentAPI
 module.exports.getMyContentAPI = getMyContentAPI
-module.exports.checkHealth = checkHealth
 module.exports.retireContentAPI = retireContentAPI
 module.exports.rejectContentAPI = rejectContentAPI
 module.exports.flagContentAPI = flagContentAPI

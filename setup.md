@@ -23,6 +23,7 @@
 * sunbird_cassandra_ips  e.g : 127.0.0.1,127.0.0.2
 * sunbird_cassandra_port e.g: 9042
 * sunbird_telemetry_sync_batch_size e.g: 20
+* sunbird_learner_service_local_base_url e.g: 'http://learner-service:9000'
 
 ##Setup Instructions
 * Clone the project.
