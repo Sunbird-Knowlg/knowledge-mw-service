@@ -120,10 +120,11 @@ global.imageBatchProcess.on('exit', function () {
 })
 
 // Telemetry initialization
+const telemetryBatchSize = parseInt(process.env.sunbird_telemetry_sync_batch_size, 10) || 20
 const telemetryConfig = {
   pdata: telemtryEventConfig.pdata,
   method: 'POST',
-  batchsize: process.env.sunbird_telemetry_sync_batch_size || 20,
+  batchsize: telemetryBatchSize,
   endpoint: configUtil.getConfig('TELEMETRY'),
   host: configUtil.getConfig('BASE_URL'),
   authtoken: configUtil.getConfig('Authorization_TOKEN')
