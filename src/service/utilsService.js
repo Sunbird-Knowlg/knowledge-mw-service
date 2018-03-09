@@ -4,7 +4,9 @@
  * @author      :: Anuj Gupta
  */
 
-const API_CONFIG = require('../config/telemetryEventConfig.json').API
+var API_CONFIG = require('../config/telemetryEventConfig.json').API
+var messageUtils = require('../service/messageUtil')
+var responseCode = messageUtils.RESPONSE_CODE
 
 /**
  * this function helps to create apiId for error and success response
@@ -169,6 +171,27 @@ function getObjectData (id, type, ver, rollup) {
   }
 }
 
+/**
+ * This function helps to get http status code for response
+ * @param {object} res
+ */
+function getHttpStatus (res) {
+  return res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+}
+
+/**
+ * This function helps to get error response code
+ * @param {object} rspObj
+ * @param {object} serverRsp
+ * @param {object} msgObject
+ */
+function getErrorResponse (rspObj, serverRsp, msgObject) {
+  rspObj.errCode = serverRsp && serverRsp.params ? serverRsp.params.err : msgObject.FAILED_CODE
+  rspObj.errMsg = serverRsp && serverRsp.params ? serverRsp.params.errmsg : msgObject.FAILED_MESSAGE
+  rspObj.responseCode = serverRsp && serverRsp.responseCode ? serverRsp.responseCode : responseCode.SERVER_ERROR
+  return rspObj
+}
+
 module.exports.getLoggerData = getLoggerData
 module.exports.getPerfLoggerData = getPerfLoggerData
 module.exports.getAppIDForRESP = getAppIDForRESP
@@ -177,3 +200,5 @@ module.exports.getTelemetryContextData = getTelemetryContextData
 module.exports.getTelemetryActorData = getTelemetryActorData
 module.exports.getObjectData = getObjectData
 module.exports.updateContextData = updateContextData
+module.exports.getHttpStatus = getHttpStatus
+module.exports.getErrorResponse = getErrorResponse
