@@ -1029,7 +1029,7 @@ function assignBadge (req, response) {
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
 
-  if (!data.request || !data.request.content || !data.request.content.badgeAssertion) {
+  if (!data.request || !data.request.content || !data.request.content.badge) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'assignBadgeAPI',
       'Error due to required params are missing', data.request))
     rspObj.errCode = contentMessage.ASSIGN_BADGE.MISSING_CODE
@@ -1060,9 +1060,9 @@ function assignBadge (req, response) {
     })
   }, function (content, CBW) {
     // TODO: logic to find the final badge list.
-    var badgesStr = content.result.content.badgeAssertion
+    var badgesStr = content.result.content.badgeAssertions
     var badges = (badgesStr) ? JSON.parse(badgesStr) : []
-    var newBadge = data.request.content.badgeAssertion
+    var newBadge = data.request.content.badge
     var isbadgeExists = badges.length !== 0
 
     lodash.forEach(badges, function (badge) {
@@ -1072,13 +1072,13 @@ function assignBadge (req, response) {
         isbadgeExists = true
       }
     })
-    console.log('isbadgeExists:', content)
     if (isbadgeExists === true) {
       rspObj.result = rspObj.result || {}
       rspObj.result.content = rspObj.result.content || {}
       rspObj.result.content.message = 'badge already exist'
-      return response.status(302).send(respUtil.successResponse(rspObj))
+      return response.status(409).send(respUtil.successResponse(rspObj))
     } else {
+      badges.push(data.request.content.badge)
       data.request.badgeAssertions = badges
       contentProvider.systemUpdateContent(data, data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
