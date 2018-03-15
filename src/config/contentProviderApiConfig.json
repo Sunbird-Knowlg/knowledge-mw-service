@@ -63,6 +63,7 @@
         "SUBMIT_DATA_EXHAUST_URI": "/data/v2/dataset/request/submit",
         "LIST_DATA_EXHAUST_URI": "/data/v2/dataset/request/list",
         "READ_DATA_EXHAUST_URI": "/data/v2/dataset/request/read",
-        "CHANNEL_DATA_EXHAUST_URI": "/data/v2/dataset/request"
+        "CHANNEL_DATA_EXHAUST_URI": "/data/v2/dataset/request",
+        "SYSTEM_UPDATE_CONTENT_URI": "/system/v3/content/update"
     }
 }    

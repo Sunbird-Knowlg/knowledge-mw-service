@@ -60,4 +60,7 @@ module.exports = function (app) {
   app.route(BASE_URL + '/upload/url/:contentId')
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, contentService.uploadContentUrlAPI)
+
+  app.route(BASE_URL + '/badge/assign/:contentId')
+    .post(requestMiddleware.createAndValidateRequestBody, contentService.assignBadgeAPI)
 }

@@ -14,6 +14,7 @@ var respUtil = require('response_util')
 var LOG = require('sb_logger_util')
 var validatorUtil = require('sb_req_validator_util')
 var _ = require('underscore')
+var lodash = require('lodash')
 
 var contentModel = require('../models/contentModel').CONTENT
 var messageUtils = require('./messageUtil')
@@ -1023,6 +1024,82 @@ function unlistedPublishContentAPI (req, response) {
   ])
 }
 
+function assignBadge (req, response) {
+  var data = req.body
+  data.contentId = req.params.contentId
+  var rspObj = req.rspObj
+
+  if (!data.request || !data.request.content || !data.request.content.badgeAssertion) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'assignBadgeAPI',
+      'Error due to required params are missing', data.request))
+    rspObj.errCode = contentMessage.ASSIGN_BADGE.MISSING_CODE
+    rspObj.errMsg = contentMessage.ASSIGN_BADGE.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+
+  async.waterfall([function (CBW) {
+    LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'assignBadgeAPI',
+      'Request to content provider to get the content meta data', {
+        contentId: data.contentId,
+        qs: data.queryParams,
+        headers: req.headers
+      }))
+    contentProvider.getContent(data.contentId, req.headers, function (err, res) {
+      if (err || res.responseCode !== responseCode.SUCCESS) {
+        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'assignBadgeAPI',
+          'Getting error from content provider', res))
+        rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
+        rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
+        rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+        var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+        return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+      } else {
+        CBW(null, res)
+      }
+    })
+  }, function (content, CBW) {
+    // TODO: logic to find the final badge list.
+    var badgesStr = content.result.content.badgeAssertion
+    var badges = (badgesStr) ? JSON.parse(badgesStr) : []
+    var newBadge = data.request.content.badgeAssertion
+    var isbadgeExists = badges.length !== 0
+
+    lodash.forEach(badges, function (badge) {
+      if (badge.assertionId === newBadge.assertionId &&
+        badge.badgeId === newBadge.badgeId &&
+        badge.issuerId === newBadge.issuerId) {
+        isbadgeExists = true
+      }
+    })
+    console.log('isbadgeExists:', content)
+    if (isbadgeExists === true) {
+      rspObj.result = rspObj.result || {}
+      rspObj.result.content = rspObj.result.content || {}
+      rspObj.result.content.message = 'badge already exist'
+      return response.status(302).send(respUtil.successResponse(rspObj))
+    } else {
+      data.request.badgeAssertions = badges
+      contentProvider.systemUpdateContent(data, data.contentId, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateContentAPI',
+            'Getting error from content provider', res))
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    }
+  }, function (res) {
+    LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'assignBadgeAPI', 'Sending response back to user'))
+    rspObj.result = res.result
+    return response.status(200).send(respUtil.successResponse(rspObj))
+  }])
+}
 module.exports.searchAPI = searchAPI
 module.exports.searchContentAPI = searchContentAPI
 module.exports.createContentAPI = createContentAPI
@@ -1039,3 +1116,4 @@ module.exports.acceptFlagContentAPI = acceptFlagContentAPI
 module.exports.rejectFlagContentAPI = rejectFlagContentAPI
 module.exports.uploadContentUrlAPI = uploadContentUrlAPI
 module.exports.unlistedPublishContentAPI = unlistedPublishContentAPI
+module.exports.assignBadgeAPI = assignBadge

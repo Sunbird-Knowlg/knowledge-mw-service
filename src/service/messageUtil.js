@@ -221,7 +221,13 @@ exports.CONTENT = {
     'audio/x-wav',
     'audio/wav'
   ],
-  PREFIX_CODE: 'org.sunbird.'
+  PREFIX_CODE: 'org.sunbird.',
+  ASSIGN_BADGE: {
+    MISSING_CODE: 'ERR_CONTENT_ASSIGN_BADGE_MISSING',
+    MISSING_MESSAGE: 'Required fields for assigning badge are missing',
+    FAILED_CODE: 'ERR_CONTENT_ASSIGN_BADGE_FAILED',
+    FAILED_MESSAGE: 'Assigning badge to content failed'
+  }
 }
 
 exports.REQUEST = {
