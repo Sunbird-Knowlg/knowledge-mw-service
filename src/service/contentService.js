@@ -1060,9 +1060,10 @@ function assignBadge (req, response) {
     })
   }, function (content, CBW) {
     // TODO: logic to find the final badge list.
-    var badgesStr = content.result.content.badgeAssertions
-    var badges = (badgesStr) ? JSON.parse(badgesStr) : []
-    var newBadge = data.request.content.badge
+    var badgeAssertions = content.result.content.badgeAssertions
+    var badges = badgeAssertions || []
+    var newBadge = lodash.cloneDeep(data.request.content.badge)
+    delete data.request.content.badge
     var isbadgeExists = badges.length !== 0
 
     lodash.forEach(badges, function (badge) {
@@ -1078,9 +1079,15 @@ function assignBadge (req, response) {
       rspObj.result.content.message = 'badge already exist'
       return response.status(409).send(respUtil.successResponse(rspObj))
     } else {
-      badges.push(data.request.content.badge)
-      data.request.badgeAssertions = badges
-      contentProvider.systemUpdateContent(data, data.contentId, req.headers, function (err, res) {
+      badges.push(newBadge)
+      var requestBody = {
+        'request': {
+          'content': {
+            'badgeAssertions': badges
+          }
+        }
+      }
+      contentProvider.systemUpdateContent(requestBody, data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateContentAPI',
             'Getting error from content provider', res))
