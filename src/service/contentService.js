@@ -1029,7 +1029,7 @@ function assignBadge (req, response) {
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
 
-  if (!data.request || !data.request.content || !data.request.content.badge) {
+  if (!data.request || !data.request.content || !data.request.content.badgeAssertion) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'assignBadgeAPI',
       'Error due to required params are missing', data.request))
     rspObj.errCode = contentMessage.ASSIGN_BADGE.MISSING_CODE
@@ -1059,21 +1059,19 @@ function assignBadge (req, response) {
       }
     })
   }, function (content, CBW) {
-    // TODO: logic to find the final badge list.
     var badgeAssertions = content.result.content.badgeAssertions
     var badges = badgeAssertions || []
-    var newBadge = lodash.cloneDeep(data.request.content.badge)
-    delete data.request.content.badge
-    var isbadgeExists = badges.length !== 0
+    var newBadge = data.request.content.badgeAssertion
+    var isBadgeExists = false
 
     lodash.forEach(badges, function (badge) {
       if (badge.assertionId === newBadge.assertionId &&
         badge.badgeId === newBadge.badgeId &&
         badge.issuerId === newBadge.issuerId) {
-        isbadgeExists = true
+        isBadgeExists = true
       }
     })
-    if (isbadgeExists === true) {
+    if (isBadgeExists === true) {
       rspObj.result = rspObj.result || {}
       rspObj.result.content = rspObj.result.content || {}
       rspObj.result.content.message = 'badge already exist'
@@ -1107,6 +1105,89 @@ function assignBadge (req, response) {
     return response.status(200).send(respUtil.successResponse(rspObj))
   }])
 }
+
+function revokeBadge (req, response) {
+  var data = req.body
+  data.contentId = req.params.contentId
+  var rspObj = req.rspObj
+
+  if (!data.request || !data.request.content || !data.request.content.badgeAssertion) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'revokeBadgeAPI',
+      'Error due to required params are missing', data.request))
+    rspObj.errCode = contentMessage.REVOKE_BADGE.MISSING_CODE
+    rspObj.errMsg = contentMessage.REVOKE_BADGE.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+  async.waterfall([function (CBW) {
+    LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'revokeBadgeAPI',
+      'Request to content provider to get the content meta data', {
+        contentId: data.contentId,
+        qs: data.queryParams,
+        headers: req.headers
+      }))
+    contentProvider.getContent(data.contentId, req.headers, function (err, res) {
+      if (err || res.responseCode !== responseCode.SUCCESS) {
+        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'revokeBadgeAPI',
+          'Getting error from content provider', res))
+        rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
+        rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
+        rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+        var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+        return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+      } else {
+        CBW(null, res)
+      }
+    })
+  }, function (content, CBW) {
+    var badgeAssertions = content.result.content.badgeAssertions
+    var badges = badgeAssertions || []
+    var revokeBadge = lodash.cloneDeep(data.request.content.badgeAssertion)
+    delete data.request.content.badgeAssertion
+    var isbadgeExists = false
+
+    lodash.remove(badges, function (badge) {
+      if (badge.assertionId === revokeBadge.assertionId &&
+        badge.badgeId === revokeBadge.badgeId &&
+        badge.issuerId === revokeBadge.issuerId) {
+        isbadgeExists = true
+        return true
+      }
+    })
+    if (isbadgeExists === false) {
+      rspObj.result = rspObj.result || {}
+      rspObj.result.content = rspObj.result.content || {}
+      rspObj.result.content.message = 'badge not exist'
+      return response.status(404).send(respUtil.successResponse(rspObj))
+    } else {
+      var requestBody = {
+        'request': {
+          'content': {
+            'badgeAssertions': badges
+          }
+        }
+      }
+      contentProvider.systemUpdateContent(requestBody, data.contentId, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateContentAPI',
+            'Getting error from content provider', res))
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    }
+  }, function (res) {
+    LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'revokeBadgeAPI', 'Sending response back to user'))
+    rspObj.result = res.result
+    return response.status(200).send(respUtil.successResponse(rspObj))
+  }])
+}
+
 module.exports.searchAPI = searchAPI
 module.exports.searchContentAPI = searchContentAPI
 module.exports.createContentAPI = createContentAPI
@@ -1124,3 +1205,4 @@ module.exports.rejectFlagContentAPI = rejectFlagContentAPI
 module.exports.uploadContentUrlAPI = uploadContentUrlAPI
 module.exports.unlistedPublishContentAPI = unlistedPublishContentAPI
 module.exports.assignBadgeAPI = assignBadge
+module.exports.revokeBadgeAPI = revokeBadge
