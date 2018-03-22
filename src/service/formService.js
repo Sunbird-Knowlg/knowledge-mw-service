@@ -47,7 +47,7 @@ function getForm (req, response) {
        '.' + data.request.action.toLowerCase()
       var requestData = {
         'request': {
-          'orgId': data.request.rootOrgId || '*',
+          'rootOrgId': data.request.rootOrgId || '*',
           'keys': [key]
         }
       }
