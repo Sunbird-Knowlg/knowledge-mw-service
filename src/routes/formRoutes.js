@@ -8,7 +8,7 @@
 var formService = require('../service/formService')
 var requestMiddleware = require('../middlewares/request.middleware')
 
-var BASE_URL = '/v1/data/form'
+var BASE_URL = '/v1/content/form'
 
 module.exports = function (app) {
   app.route(BASE_URL + '/read')
