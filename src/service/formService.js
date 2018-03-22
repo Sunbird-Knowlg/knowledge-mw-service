@@ -58,6 +58,14 @@ function getForm (req, response) {
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.READ)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
+          try {
+            var data = JSON.parse(res.result.tenantPreference[0].data)
+            res.result.tenantPreference[0].data = data[data.request.framework] || data['default']
+          } catch (error) {
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getForm',
+              'error while parsing response data', res))
+          }
+
           CBW(null, res)
         }
       })
