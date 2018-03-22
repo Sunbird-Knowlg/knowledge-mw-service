@@ -9,6 +9,7 @@ var path = require('path')
 var respUtil = require('response_util')
 var contentProvider = require('sb_content_provider_util')
 var LOG = require('sb_logger_util')
+var _ = require('lodash')
 
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
@@ -58,15 +59,21 @@ function getForm (req, response) {
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.READ)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
+          var responseData = res
           try {
             var data = JSON.parse(res.result.tenantPreference[0].data)
-            res.result.tenantPreference[0].data = data[data.request.framework] || data['default']
+            responseData = {
+              'result': {
+                'form': _.omit(res.result.tenantPreference[0], 'data')
+              }
+            }
+            responseData.result.form.data = data[data.request.framework] || data['default']
           } catch (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getForm',
               'error while parsing response data', res))
           }
 
-          CBW(null, res)
+          CBW(null, responseData)
         }
       })
     },
