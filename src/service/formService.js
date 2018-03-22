@@ -61,13 +61,13 @@ function getForm (req, response) {
         } else {
           var responseData = res
           try {
-            var data = JSON.parse(res.result.tenantPreference[0].data)
+            var formData = JSON.parse(res.result.tenantPreference[0].data)
             responseData = {
               'result': {
                 'form': _.omit(res.result.tenantPreference[0], 'data')
               }
             }
-            responseData.result.form.data = data[data.request.framework] || data['default']
+            responseData.result.form.data = formData[data.request.framework] || formData['default']
           } catch (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getForm',
               'error while parsing response data', res))
