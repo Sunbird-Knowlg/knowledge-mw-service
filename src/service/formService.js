@@ -211,11 +211,6 @@ function createForm (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createForm',
-        'Request to learner service to create form data', {
-          body: data,
-          headers: req.headers
-        }))
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
        '.' + data.request.action.toLowerCase()
       var requestData = {
@@ -231,6 +226,12 @@ function createForm (req, response) {
       }
       var frameworkKey = data.request.framework || 'default'
       requestData.request.tenantPreference[0].data[frameworkKey] = data.request.data
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createForm',
+        'Request to learner service to create form data', {
+          body: requestData,
+          headers: req.headers
+        }))
+
       contentProvider.learnerServiceCreateForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createForm',
