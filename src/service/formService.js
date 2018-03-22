@@ -9,7 +9,6 @@ var path = require('path')
 var respUtil = require('response_util')
 var contentProvider = require('sb_content_provider_util')
 var LOG = require('sb_logger_util')
-
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 
@@ -149,13 +148,18 @@ function updateForm (req, response) {
       }
       var formData = {}
       try {
-        formData = JSON.parse(data.tenantPreference[0].data)
+        formData = data.tenantPreference[0].data ? JSON.parse(data.tenantPreference[0].data) : {}
+        var frameworkKey = data.request.framework || 'default'
+        formData[frameworkKey] = JSON.parse(data.request.data)
       } catch (error) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
           'unable to parse data after read', data))
+        rspObj.errCode = formMessages.READ.MISSING_CODE
+        rspObj.errMsg = formMessages.READ.MISSING_MESSAGE
+        rspObj.responseCode = responseCode.CLIENT_ERROR
+        return response.status(400).send(respUtil.errorResponse(rspObj))
       }
-      var frameworkKey = data.request.framework || 'default'
-      formData[frameworkKey] = data.request.data
+
       requestData.request.tenantPreference[0].data = JSON.stringify(formData)
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateForm',
         'Request to learner service to update form data', {
@@ -166,7 +170,7 @@ function updateForm (req, response) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
             'Got error from learner service', res))
-          rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.READ)
+          rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.UPDATE)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
           CBW(null, res)
