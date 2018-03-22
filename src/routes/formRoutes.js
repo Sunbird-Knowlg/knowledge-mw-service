@@ -13,6 +13,5 @@ var BASE_URL = '/v1/content/form'
 module.exports = function (app) {
   app.route(BASE_URL + '/read')
     .post(requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
       formService.getFormRequest)
 }
