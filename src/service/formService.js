@@ -51,7 +51,6 @@ function getForm (req, response) {
           'keys': [key]
         }
       }
-      console.log(contentProvider)
       contentProvider.learnerServiceGetForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getForm',
