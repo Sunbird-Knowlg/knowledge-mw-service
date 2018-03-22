@@ -14,4 +14,10 @@ module.exports = function (app) {
   app.route(BASE_URL + '/read')
     .post(requestMiddleware.createAndValidateRequestBody,
       formService.getFormRequest)
+  app.route(BASE_URL + '/update')
+    .post(requestMiddleware.createAndValidateRequestBody,
+      formService.updateFormRequest)
+  app.route(BASE_URL + '/create')
+    .post(requestMiddleware.createAndValidateRequestBody,
+      formService.createFormRequest)
 }
