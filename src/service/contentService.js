@@ -1075,6 +1075,7 @@ function assignBadge (req, response) {
       rspObj.result = rspObj.result || {}
       rspObj.result.content = rspObj.result.content || {}
       rspObj.result.content.message = 'badge already exist'
+      rspObj.responseCode = 'CONFLICT'
       return response.status(409).send(respUtil.successResponse(rspObj))
     } else {
       badges.push(newBadge)
