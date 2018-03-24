@@ -541,7 +541,7 @@ exports.DATASET = {
 exports.FORM = {
   READ: {
     MISSING_CODE: 'ERR_GET_FORM_DATA',
-    MISSING_MESSAGE: 'Required fields for get form are missing',
+    MISSING_MESSAGE: 'Required fields to get form are missing',
     FAILED_CODE: 'ERR_GET_FORM_DATA_FAILED',
     FAILED_MESSAGE: 'Unable to get the form data'
   },

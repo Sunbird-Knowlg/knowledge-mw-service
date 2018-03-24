@@ -148,14 +148,15 @@ function updateForm (req, response) {
       }
       var formData = {}
       try {
-        formData = responseData.tenantPreference[0].data ? JSON.parse(responseData.tenantPreference[0].data) : {}
+        formData = responseData.result.tenantPreference[0].data
+          ? JSON.parse(responseData.result.tenantPreference[0].data) : {}
         var frameworkKey = data.request.framework || 'default'
         formData[frameworkKey] = JSON.parse(data.request.data)
       } catch (error) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
           'unable to parse data after read', data))
-        rspObj.errCode = formMessages.READ.MISSING_CODE
-        rspObj.errMsg = formMessages.READ.MISSING_MESSAGE
+        rspObj.errCode = formMessages.UPDATE.FAILED_CODE
+        rspObj.errMsg = formMessages.UPDATE.FAILED_MESSAGE
         rspObj.responseCode = responseCode.CLIENT_ERROR
         return response.status(400).send(respUtil.errorResponse(rspObj))
       }
