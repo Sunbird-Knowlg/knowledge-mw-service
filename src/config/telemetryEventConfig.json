@@ -1,8 +1,8 @@
 {
   "pdata": {
-    "id": "content-service",
+    "id": "sunbird.content-service",
     "ver": "1.0",
-    "pid": ""
+    "pid": "sunbird-content-service"
   },
   "API": {
     "content/search": {
