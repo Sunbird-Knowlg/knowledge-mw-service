@@ -100,8 +100,8 @@ function updateForm (req, response) {
      !data.request.data) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
       'Error due to required params are missing', data.request))
-    rspObj.errCode = formMessages.READ.MISSING_CODE
-    rspObj.errMsg = formMessages.READ.MISSING_MESSAGE
+    rspObj.errCode = formMessages.UPDATE.MISSING_CODE
+    rspObj.errMsg = formMessages.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
