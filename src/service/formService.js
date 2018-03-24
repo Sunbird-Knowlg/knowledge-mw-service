@@ -108,7 +108,7 @@ function updateForm (req, response) {
 
   async.waterfall([
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getFupdateFormorm',
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateForm',
         'Request to learner service to read form data', {
           body: data,
           headers: req.headers
@@ -132,7 +132,7 @@ function updateForm (req, response) {
         }
       })
     },
-    function (data, CBW) {
+    function (responseData, CBW) {
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
        '.' + data.request.action.toLowerCase()
       var requestData = {
@@ -148,7 +148,7 @@ function updateForm (req, response) {
       }
       var formData = {}
       try {
-        formData = data.tenantPreference[0].data ? JSON.parse(data.tenantPreference[0].data) : {}
+        formData = responseData.tenantPreference[0].data ? JSON.parse(responseData.tenantPreference[0].data) : {}
         var frameworkKey = data.request.framework || 'default'
         formData[frameworkKey] = JSON.parse(data.request.data)
       } catch (error) {
