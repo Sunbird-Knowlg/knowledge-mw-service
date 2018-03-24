@@ -19,7 +19,7 @@ const port = process.env.sunbird_content_service_port ? process.env.sunbird_cont
 
 globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://qa.ekstep.in'
 
-const contentProviderBaseUrl = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://qa.ekstep.in/api'
+const contentProviderBaseUrl = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://dev.ekstep.in/api'
 const contentProviderApiKey = process.env.sunbird_content_provider_api_key
 
 const learnerServiceApiKey = process.env.sunbird_learner_service_api_key
@@ -28,6 +28,8 @@ const learnerServiceBaseUrl = process.env.sunbird_learner_service_base_url ? pro
 const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_base_url
   ? process.env.sunbird_learner_service_local_base_url
   : 'http://learner-service:9000'
+
+const producerId = process.env.sunbird_content_service_producer_id
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('BASE_URL', contentProviderBaseUrl)
@@ -104,6 +106,10 @@ require('./middlewares/proxy.middleware')(app)
 // Create server
 this.server = http.createServer(app).listen(port, function () {
   console.log('server running at PORT [%d]', port)
+  if (!producerId) {
+    console.error('please set environment variable  process.env.sunbird_content_service_producer_id to start service')
+    process.exit(1)
+  }
 })
 
 // Close server, when we start for test cases
@@ -122,12 +128,13 @@ global.imageBatchProcess.on('exit', function () {
 
 // Telemetry initialization
 const telemetryBatchSize = parseInt(process.env.sunbird_telemetry_sync_batch_size, 10) || 20
+telemtryEventConfig.pdata.id = producerId
 const telemetryConfig = {
   pdata: telemtryEventConfig.pdata,
   method: 'POST',
   batchsize: telemetryBatchSize,
   endpoint: configUtil.getConfig('TELEMETRY'),
-  host: configUtil.getConfig('BASE_URL'),
+  host: learnerServiceLocalBaseUrl,
   authtoken: configUtil.getConfig('Authorization_TOKEN')
 }
 
