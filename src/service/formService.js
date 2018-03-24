@@ -227,7 +227,7 @@ function createForm (req, response) {
       }
       var frameworkKey = data.request.framework || 'default'
       requestData.request.tenantPreference[0].data[frameworkKey] = data.request.data
-      requestData.request.tenantPreference[0] = JSON.stringify(requestData.request.tenantPreference[0])
+      requestData.request.tenantPreference[0].data = JSON.stringify(requestData.request.tenantPreference[0].data)
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createForm',
         'Request to learner service to create form data', {
           body: requestData,
