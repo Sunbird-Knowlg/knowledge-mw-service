@@ -128,7 +128,7 @@ function updateForm (req, response) {
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.READ)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
-          CBW(null, res)
+          CBW(null, res.result.tenantPreference)
         }
       })
     },
@@ -148,8 +148,8 @@ function updateForm (req, response) {
       }
       var formData = {}
       try {
-        formData = responseData.result.tenantPreference[0].data
-          ? JSON.parse(responseData.result.tenantPreference[0].data) : {}
+        formData = responseData[0].data
+          ? JSON.parse(responseData[0].data) : {}
         var frameworkKey = data.request.framework || 'default'
         formData[frameworkKey] = JSON.parse(data.request.data)
       } catch (error) {
