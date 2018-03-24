@@ -154,7 +154,7 @@ function updateForm (req, response) {
         formData[frameworkKey] = JSON.parse(data.request.data)
       } catch (error) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
-          'unable to parse data after read', data))
+          'unable to parse data after read', responseData))
         rspObj.errCode = formMessages.UPDATE.FAILED_CODE
         rspObj.errMsg = formMessages.UPDATE.FAILED_MESSAGE
         rspObj.responseCode = responseCode.CLIENT_ERROR
