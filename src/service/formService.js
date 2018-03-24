@@ -148,10 +148,10 @@ function updateForm (req, response) {
       }
       var formData = {}
       try {
-        formData = responseData[0].data
-          ? JSON.parse(responseData[0].data) : {}
+        formData = responseData[0]['data']
+          ? JSON.parse(responseData[0]['data']) : {}
         var frameworkKey = data.request.framework || 'default'
-        formData[frameworkKey] = JSON.parse(data.request.data)
+        formData[frameworkKey] = data.request.data
       } catch (error) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
           'unable to parse data after read', responseData))
@@ -227,6 +227,7 @@ function createForm (req, response) {
       }
       var frameworkKey = data.request.framework || 'default'
       requestData.request.tenantPreference[0].data[frameworkKey] = data.request.data
+      requestData.request.tenantPreference[0] = JSON.stringify(requestData.request.tenantPreference[0])
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createForm',
         'Request to learner service to create form data', {
           body: requestData,
