@@ -134,7 +134,7 @@ const telemetryConfig = {
   method: 'POST',
   batchsize: telemetryBatchSize,
   endpoint: configUtil.getConfig('TELEMETRY'),
-  host: learnerServiceLocalBaseUrl,
+  host: configUtil.getConfig('BASE_URL'),
   authtoken: configUtil.getConfig('Authorization_TOKEN')
 }
 
