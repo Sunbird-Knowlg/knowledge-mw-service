@@ -1,6 +1,6 @@
 {
   "name": "content-service",
-  "version": "0.0.5",
+  "version": "1.5.0",
   "description": "This service used to perform CRUD operations on content",
   "main": "app.js",
   "scripts": {
