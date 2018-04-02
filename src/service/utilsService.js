@@ -161,6 +161,7 @@ function getTelemetryActorData (req) {
     actor.id = req.headers['x-consumer-id']
     actor.type = req.headers['x-consumer-username']
   }
+  console.log('actor_in_content_service', actor)
   return actor
 }
 
