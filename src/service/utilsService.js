@@ -6,6 +6,7 @@
 
 var API_CONFIG = require('../config/telemetryEventConfig.json').API
 var messageUtils = require('../service/messageUtil')
+const jwt = require('jsonwebtoken')
 var responseCode = messageUtils.RESPONSE_CODE
 
 /**
@@ -151,6 +152,10 @@ function getTelemetryActorData (req) {
   var actor = {}
   if (req.rspObj && req.rspObj.userId) {
     actor.id = req.rspObj.userId
+    actor.type = 'user'
+  } else if (req && req['headers'] && req['headers'] && req['headers']['x-authenticated-user-token']) {
+    var payload = jwt.decode(req['headers']['x-authenticated-user-token'])
+    actor.id = payload['sub']
     actor.type = 'user'
   } else {
     actor.id = req.headers['x-consumer-id']
