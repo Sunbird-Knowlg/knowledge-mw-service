@@ -157,9 +157,12 @@ function getTelemetryActorData (req) {
     var payload = jwt.decode(req['headers']['x-authenticated-user-token'])
     actor.id = payload['sub']
     actor.type = 'user'
-  } else {
+  }
+  if (!actor['id']) {
     actor.id = req.headers['x-consumer-id']
-    actor.type = req.headers['x-consumer-username']
+  }
+  if (!actor['type']) {
+    actor.id = req.headers['x-consumer-username']
   }
   console.log('actor_in_content_service', actor)
   return actor
