@@ -157,15 +157,17 @@ function getTelemetryActorData (req) {
     var payload = jwt.decode(req['headers']['x-authenticated-user-token'])
     actor.id = payload['sub']
     actor.type = 'user'
-  }
-  if (!actor['id']) {
+  } else {
     actor.id = req.headers['x-consumer-id']
-  }
-  if (!actor['type']) {
     actor.type = req.headers['x-consumer-username']
   }
+  if (!actor['id']) {
+    actor.id = process.pid
+  }
+  if (!actor['type']) {
+    actor.type = 'service'
+  }
   console.log('actor_in_content_service', actor)
-  console.log('actor_in_content_service_headers', req.headers)
   return actor
 }
 
