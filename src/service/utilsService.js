@@ -167,7 +167,6 @@ function getTelemetryActorData (req) {
   if (!actor['type']) {
     actor.type = 'service'
   }
-  console.log('actor_in_content_service', actor)
   return actor
 }
 
