@@ -8,6 +8,7 @@ var API_CONFIG = require('../config/telemetryEventConfig.json').API
 var messageUtils = require('../service/messageUtil')
 const jwt = require('jsonwebtoken')
 var responseCode = messageUtils.RESPONSE_CODE
+var _ = require('lodash')
 
 /**
  * this function helps to create apiId for error and success response
@@ -151,22 +152,23 @@ function updateContextData (oldData, newData) {
 function getTelemetryActorData (req) {
   var actor = {}
   if (req.rspObj && req.rspObj.userId) {
-    actor.id = req.rspObj.userId
+    actor.id = _.toString(req.rspObj.userId)
     actor.type = 'user'
   } else if (req && req['headers'] && req['headers'] && req['headers']['x-authenticated-user-token']) {
     var payload = jwt.decode(req['headers']['x-authenticated-user-token'])
-    actor.id = payload['sub']
+    actor.id = _.toString(payload['sub'])
     actor.type = 'user'
   } else {
-    actor.id = req.headers['x-consumer-id']
+    actor.id = _.toString(req.headers['x-consumer-id'])
     actor.type = req.headers['x-consumer-username']
   }
-  if (!actor['id']) {
-    actor.id = process.pid
+  if (!actor['id'] || actor['id'] === '') {
+    actor.id = _.toString(process.pid)
   }
   if (!actor['type']) {
     actor.type = 'service'
   }
+
   return actor
 }
 
