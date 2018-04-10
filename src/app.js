@@ -29,7 +29,7 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
   ? process.env.sunbird_learner_service_local_base_url
   : 'http://learner-service:9000'
 
-const producerId = process.env.sunbird_content_service_producer_id
+const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('BASE_URL', contentProviderBaseUrl)
@@ -106,8 +106,9 @@ require('./middlewares/proxy.middleware')(app)
 // Create server
 this.server = http.createServer(app).listen(port, function () {
   console.log('server running at PORT [%d]', port)
-  if (!producerId) {
-    console.error('please set environment variable  process.env.sunbird_content_service_producer_id to start service')
+  if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
+    console.error('please set environment variable sunbird_environment, sunbird_instance  ' +
+    'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
     process.exit(1)
   }
 })
