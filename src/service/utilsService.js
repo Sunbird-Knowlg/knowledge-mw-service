@@ -164,8 +164,6 @@ function getTelemetryActorData (req) {
   }
   if (!actor['id'] || actor['id'] === '') {
     actor.id = _.toString(process.pid)
-  }
-  if (!actor['type']) {
     actor.type = 'service'
   }
 
