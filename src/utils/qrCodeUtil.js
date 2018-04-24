@@ -40,7 +40,7 @@ qrCodeUtil.prototype.addTextAndBorder = function addTextAndBorder (filePath, tex
     tempgm
       .in('-extent', this.mmToPixel(size) + 'X' + (this.mmToPixel(size) + 10))
       .in('-fill', color)
-      .in('-font', path.join(__dirname, './../assets/fonts/calibri/CalibriBold.ttf'))
+      .in('-font', path.join(__dirname, './../assets/fonts/arial/arialbold.ttf'))
       .drawText(0, 0, text, 'south')
   }
   tempgm.borderColor(color)

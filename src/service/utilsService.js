@@ -197,9 +197,11 @@ function getHttpStatus (res) {
  * @param {object} msgObject
  */
 function getErrorResponse (rspObj, serverRsp, msgObject) {
-  rspObj.errCode = serverRsp && serverRsp.params ? serverRsp.params.err : msgObject.FAILED_CODE
-  rspObj.errMsg = serverRsp && serverRsp.params ? serverRsp.params.errmsg : msgObject.FAILED_MESSAGE
-  rspObj.responseCode = serverRsp && serverRsp.responseCode ? serverRsp.responseCode : responseCode.SERVER_ERROR
+  rspObj.errCode = _.get(serverRsp, 'params.err') ? serverRsp.params.err
+    : (msgObject && msgObject['FAILED_CODE'] ? msgObject['FAILED_CODE'] : null)
+  rspObj.errMsg = _.get(serverRsp, 'params.errmsg') ? serverRsp.params.errmsg
+    : (msgObject && msgObject['FAILED_MESSAGE'] ? msgObject['FAILED_MESSAGE'] : null)
+  rspObj.responseCode = serverRsp && serverRsp.responseCode ? serverRsp.responseCode : responseCode['SERVER_ERROR']
   return rspObj
 }
 
