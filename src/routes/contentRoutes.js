@@ -66,4 +66,8 @@ module.exports = function (app) {
 
   app.route(BASE_URL + '/badge/revoke/:contentId')
     .post(requestMiddleware.createAndValidateRequestBody, contentService.revokeBadgeAPI)
+
+  app.route(BASE_URL + '/copy/:contentId')
+    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+      contentService.copyContentAPI)
 }

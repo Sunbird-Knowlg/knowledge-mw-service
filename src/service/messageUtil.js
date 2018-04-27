@@ -233,6 +233,13 @@ exports.CONTENT = {
     MISSING_MESSAGE: 'Required fields for revoking badge are missing',
     FAILED_CODE: 'ERR_CONTENT_REVOKE_BADGE_FAILED',
     FAILED_MESSAGE: 'Assigning badge to content failed'
+  },
+
+  COPY: {
+    MISSING_CODE: 'ERR_CONTENT_ID_MISSING',
+    MISSING_MESSAGE: 'Content Id is missing for copying content',
+    FAILED_CODE: 'ERR_CONTENT_COPY_FAILED',
+    FAILED_MESSAGE: 'content copy failed'
   }
 }
 

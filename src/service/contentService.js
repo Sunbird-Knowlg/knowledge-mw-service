@@ -1168,9 +1168,7 @@ function revokeBadge (req, response) {
     var isbadgeExists = false
 
     lodash.remove(badges, function (badge) {
-      if (badge.assertionId === revokeBadge.assertionId &&
-        badge.badgeId === revokeBadge.badgeId &&
-        badge.issuerId === revokeBadge.issuerId) {
+      if (badge.assertionId === revokeBadge.assertionId) {
         isbadgeExists = true
         return true
       }
@@ -1210,6 +1208,68 @@ function revokeBadge (req, response) {
   }])
 }
 
+/**
+ * This function helps to copy content
+ * @param {type} req
+ * @param {type} response
+ * @returns {unresolved}
+ */
+function copyContentAPI (req, response) {
+  var data = req.body
+  data.contentId = req.params.contentId
+
+  var rspObj = req.rspObj
+  // Adding objectData in telemetry
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.contentId, 'content', '', {})
+  }
+
+  if (!data['contentId']) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateContentAPI',
+      'Error due to required params are missing', data.request))
+    rspObj.errCode = contentMessage.COPY.MISSING_CODE
+    rspObj.errMsg = contentMessage.COPY.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+
+  var ekStepReqData = {
+    request: data.request
+  }
+
+  async.waterfall([
+
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'copyContentAPI',
+        'Request to content provider to copy content', {
+          body: ekStepReqData,
+          headers: req.headers
+        }))
+      contentProvider.copyContent(ekStepReqData, data['contentId'], req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'copyContentAPI',
+            'copy content error from content provider', res))
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.COPY.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.COPY.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj = utilsService.getErrorResponse(rspObj, res)
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'copyContentAPI',
+        'Sending response back to user', rspObj))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+
+  ])
+}
+
 module.exports.searchAPI = searchAPI
 module.exports.searchContentAPI = searchContentAPI
 module.exports.createContentAPI = createContentAPI
@@ -1228,3 +1288,4 @@ module.exports.uploadContentUrlAPI = uploadContentUrlAPI
 module.exports.unlistedPublishContentAPI = unlistedPublishContentAPI
 module.exports.assignBadgeAPI = assignBadge
 module.exports.revokeBadgeAPI = revokeBadge
+module.exports.copyContentAPI = copyContentAPI
