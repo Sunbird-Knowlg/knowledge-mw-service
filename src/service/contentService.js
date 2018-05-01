@@ -716,7 +716,7 @@ function rejectContentAPI (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   var ekStepReqData = {
-    request: data.request
+    request: data.body.request
   }
 
   async.waterfall([
