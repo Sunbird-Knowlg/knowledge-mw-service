@@ -19,7 +19,7 @@ const port = process.env.sunbird_content_service_port ? process.env.sunbird_cont
 
 globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://qa.ekstep.in'
 
-const contentProviderBaseUrl = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://dev.ekstep.in/api'
+const contentProviderBaseUrl = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://qa.ekstep.in/api'
 const contentProviderApiKey = process.env.sunbird_content_provider_api_key
 
 const learnerServiceApiKey = process.env.sunbird_learner_service_api_key

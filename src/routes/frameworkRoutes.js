@@ -7,21 +7,23 @@
 var frameworkService = require('../service/frameworkService')
 var requestMiddleware = require('../middlewares/request.middleware')
 
-var BASE_URL_V1_Framework = '/v1/framework'
+var baseUrl = '/v1/framework'
 
 module.exports = function (app) {
-  app.route(BASE_URL_V1_Framework + '/read/:frameworkId')
+  app.route(baseUrl + '/read/:frameworkId')
     .get(requestMiddleware.createAndValidateRequestBody, frameworkService.getFrameworkById)
 
-  app.route(BASE_URL_V1_Framework + '/list')
+  app.route(baseUrl + '/list')
     .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworklList)
 
-  app.route(BASE_URL_V1_Framework + '/create')
+  app.route(baseUrl + '/create')
     .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkCreate)
 
-  app.route(BASE_URL_V1_Framework + '/update/:frameworkId')
+  app.route(baseUrl + '/update/:frameworkId')
     .patch(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkUpdate)
-    
-  app.route(BASE_URL_V1_Framework + '/copy/:frameworkId')
+
+  app.route(baseUrl + '/copy/:frameworkId')
     .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkCopy)
+  app.route(baseUrl + '/publish/:frameworkId')
+    .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkPublish)
 }
