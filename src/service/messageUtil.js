@@ -565,3 +565,11 @@ exports.FORM = {
     FAILED_MESSAGE: 'Unable to update the form data'
   }
 }
+exports.EXTERNAL_URL_META = {
+  FETCH: {
+    MISSING_CODE: 'ERR_FETCH_URLMETA_MISSING',
+    MISSING_MESSAGE: 'Required fields for fetching url meta data are missing',
+    FAILED_CODE: 'ERR_FETCH_URLMETA_FAILED',
+    FAILED_MESSAGE: 'Unable to load the url metadata'
+  }
+}
