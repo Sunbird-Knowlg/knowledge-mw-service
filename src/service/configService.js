@@ -11,6 +11,7 @@ function getChannelSearchString (req, callback) {
   var searchString = generateChannelSearchString()
   callback(null, searchString)
 }
+
 function generateChannelSearchString () {
   var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
   var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
