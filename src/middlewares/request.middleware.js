@@ -295,14 +295,14 @@ function checkChannelID (req, res, next) {
   next()
 }
 
-function checkAndAddChannelFilters (req, res, next) {
+function addChannelFilters (req, res, next) {
   // Assuming that the request will not send the filter of channels
-  configService.getSearchString(req, function (err, channels) {
+  configService.getChannelSearchString(req, function (err, channels) {
     if (err) {
-      LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'checkAndAddChannelFilters',
+      LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'addChannelFilters',
         'failed to get channels'))
     }
-    if (channels) {
+    if (channels && (!_.isEmpty(channels))) {
       req.body.request.filters.channel = channels
     }
     console.log('request', req.body)
@@ -317,4 +317,4 @@ module.exports.apiAccessForReviewerUser = apiAccessForReviewerUser
 module.exports.apiAccessForCreatorUser = apiAccessForCreatorUser
 module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess
 module.exports.checkChannelID = checkChannelID
-module.exports.checkAndAddChannelFilters = checkAndAddChannelFilters
+module.exports.addChannelFilters = addChannelFilters
