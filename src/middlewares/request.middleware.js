@@ -296,14 +296,15 @@ function checkChannelID (req, res, next) {
 }
 
 function checkAndAddChannelFilters (req, res, next) {
-  var reqChannelFilters = req.body.request.filters.channel || []
-  configService.getAllowedChannels(req, function (err, channels) {
+  // Assuming that the request will not send the filter of channels
+  configService.getSearchString(req, function (err, channels) {
     if (err) {
       LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'checkAndAddChannelFilters',
         'failed to get channels'))
     }
-    var channelFilters = _.union(reqChannelFilters, channels)
-    req.body.request.filters.channel = channelFilters
+    if (channels) {
+      req.body.request.filters.channel = channels
+    }
     console.log('request', req.body)
     next()
   })
