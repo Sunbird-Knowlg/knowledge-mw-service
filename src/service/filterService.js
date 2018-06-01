@@ -1,11 +1,11 @@
 /**
- *  configService - provides service methods for configurations like channel filters
+ *  filterService - provides service methods for filters like channel filters
  *
  * author: Loganathan Shanmugam
  * email: loganathan.shanmugam@tarento.com
  */
-var whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels_new
-var blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels_new
+var whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
+var blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
 
 function getChannelSearchString (req, callback) {
   var searchString = generateChannelSearchString()
