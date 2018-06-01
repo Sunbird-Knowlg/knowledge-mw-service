@@ -8,7 +8,7 @@ var path = require('path')
 var contentProvider = require('sb_content_provider_util')
 var ApiInterceptor = require('sb_api_interceptor')
 var _ = require('underscore')
-var configService = require('../service/configService')
+var filterService = require('../service/filterService')
 var reqMsg = messageUtil.REQUEST
 var responseCode = messageUtil.RESPONSE_CODE
 var apiVersions = messageUtil.API_VERSION
@@ -297,7 +297,7 @@ function checkChannelID (req, res, next) {
 
 function addChannelFilters (req, res, next) {
   // Assuming that the request will not send the filter of channels
-  configService.getChannelSearchString(req, function (err, channels) {
+  filterService.getChannelSearchString(req, function (err, channels) {
     if (err) {
       LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'addChannelFilters',
         'failed to get channels'))
@@ -305,7 +305,7 @@ function addChannelFilters (req, res, next) {
     if (channels && (!_.isEmpty(channels))) {
       req.body.request.filters.channel = channels
     }
-    console.log('request', req.body)
+    // console.log('request', req.headers)
     next()
   })
 }
