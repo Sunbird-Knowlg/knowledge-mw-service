@@ -116,7 +116,7 @@ this.server = http.createServer(app).listen(port, function () {
     'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
     process.exit(1)
   }
-  generateChannelSearchString()
+  getFilterConfig()
 })
 
 // Close server, when we start for test cases
@@ -158,17 +158,21 @@ function exitHandler (options, err) {
   })
 }
 
-function generateChannelSearchString () {
+function getFilterConfig () {
   var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
   var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-  var searchString = {}
+  var configString = {}
+  var isWhiteList = null
   if (allowedChannels && allowedChannels.length > 0) {
-    searchString = allowedChannels
+    configString = allowedChannels
+    isWhiteList = true
   } else if (blackListedChannels && blackListedChannels.length > 0) {
     // console.log({'ne': blaclListedChannels.join()})
-    searchString = { 'ne': blackListedChannels }
+    configString = blackListedChannels // { 'ne': blackListedChannels }
+    isWhiteList = false
   }
-  configUtil.setConfig('CHANNEL_FILTER_STRING', searchString)
+  configUtil.setConfig('CHANNEL_FILTER_CONFIG_ARRAY', configString)
+  configUtil.setConfig('CHANNEL_IS_WHITELIST', isWhiteList)
 }
 
 // catches ctrl+c event
