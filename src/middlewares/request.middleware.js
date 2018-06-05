@@ -8,7 +8,7 @@ var path = require('path')
 var contentProvider = require('sb_content_provider_util')
 var ApiInterceptor = require('sb_api_interceptor')
 var _ = require('underscore')
-
+var filterService = require('../service/filterService')
 var reqMsg = messageUtil.REQUEST
 var responseCode = messageUtil.RESPONSE_CODE
 var apiVersions = messageUtil.API_VERSION
@@ -295,6 +295,21 @@ function checkChannelID (req, res, next) {
   next()
 }
 
+function addChannelFilters (req, res, next) {
+  // Assuming that the request will not send the filter of channels
+  filterService.getChannelSearchString(req, function (err, channels) {
+    if (err) {
+      LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'addChannelFilters',
+        'failed to get channels'))
+    }
+    if (channels && (!_.isEmpty(channels))) {
+      req.body.request.filters.channel = channels
+    }
+    // console.log('request', req.headers)
+    next()
+  })
+}
+
 // Exports required function
 module.exports.validateToken = validateToken
 module.exports.createAndValidateRequestBody = createAndValidateRequestBody
@@ -302,3 +317,4 @@ module.exports.apiAccessForReviewerUser = apiAccessForReviewerUser
 module.exports.apiAccessForCreatorUser = apiAccessForCreatorUser
 module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess
 module.exports.checkChannelID = checkChannelID
+module.exports.addChannelFilters = addChannelFilters

@@ -11,5 +11,6 @@ var BASE_URL_V1 = '/v1'
 
 module.exports = function (app) {
   app.route(BASE_URL_V1 + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, contentService.searchAPI)
+    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.addChannelFilters,
+      contentService.searchAPI)
 }
