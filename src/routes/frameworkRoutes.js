@@ -14,7 +14,8 @@ module.exports = function (app) {
     .get(requestMiddleware.createAndValidateRequestBody, frameworkService.getFrameworkById)
 
   app.route(baseUrl + '/list')
-    .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworklList)
+    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.addChannelFilters,
+      frameworkService.frameworklList)
 
   app.route(baseUrl + '/create')
     .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkCreate)

@@ -29,7 +29,12 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
   ? process.env.sunbird_learner_service_local_base_url
   : 'http://learner-service:9000'
 
+const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
+const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
+
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
+
+// var channelFilteringString = ''
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('BASE_URL', contentProviderBaseUrl)
@@ -111,6 +116,7 @@ this.server = http.createServer(app).listen(port, function () {
     'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
     process.exit(1)
   }
+  generateChannelSearchString()
 })
 
 // Close server, when we start for test cases
@@ -150,6 +156,19 @@ function exitHandler (options, err) {
       process.exit()
     }
   })
+}
+
+function generateChannelSearchString () {
+  var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
+  var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
+  var searchString = {}
+  if (allowedChannels && allowedChannels.length > 0) {
+    searchString = allowedChannels
+  } else if (blackListedChannels && blackListedChannels.length > 0) {
+    // console.log({'ne': blaclListedChannels.join()})
+    searchString = { 'ne': blackListedChannels }
+  }
+  configUtil.setConfig('CHANNEL_FILTER_STRING', searchString)
 }
 
 // catches ctrl+c event
