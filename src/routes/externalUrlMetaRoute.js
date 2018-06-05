@@ -6,7 +6,7 @@
 
 var extUrlMetaService = require('../service/externalUrlMetaService')
 
-var BASE_URL = '/url/v1'
+var BASE_URL = '/v1/url'
 
 module.exports = function (app) {
   app.route(BASE_URL + '/fetchmeta')
