@@ -297,19 +297,19 @@ function checkChannelID (req, res, next) {
 
 function addChannelFilters (req, res, next) {
   // Assuming that the request will not send the filter of channels
-  filterService.getChannelSearchString(req, function (err, channels, isChannelFilterEnabled) {
-    if (err) {
-      LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'addChannelFilters',
-        'failed to get channels'))
-    }
-    if (channels && (!_.isEmpty(channels))) {
-      req.body.request.filters.channel = channels
-    } else if (isChannelFilterEnabled) {
-      req.body.request.not_exists = 'channel'
-    }
-    // console.log('request', req.headers)
+  if (req && req.body && req.body.request && req.body.request.filters && req.body.request.filters.channel) {
     next()
-  })
+  } else {
+    filterService.getChannelSearchString(function (err, channels) {
+      if (err) {
+        LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'addChannelFilters',
+          'failed to get channels'))
+      } else if (channels && (!_.isEmpty(channels))) {
+        req.body.request.filters.channel = channels
+      }
+      next()
+    })
+  }
 }
 
 // Exports required function

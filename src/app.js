@@ -162,17 +162,13 @@ function getFilterConfig () {
   var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
   var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
   var configString = {}
-  var isWhiteList = null
   if (allowedChannels && allowedChannels.length > 0) {
     configString = allowedChannels
-    isWhiteList = true
   } else if (blackListedChannels && blackListedChannels.length > 0) {
     // console.log({'ne': blaclListedChannels.join()})
-    configString = blackListedChannels // { 'ne': blackListedChannels }
-    isWhiteList = false
+    configString = { 'ne': blackListedChannels }
   }
-  configUtil.setConfig('CHANNEL_FILTER_CONFIG_ARRAY', configString)
-  configUtil.setConfig('CHANNEL_IS_WHITELIST', isWhiteList)
+  configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
 }
 
 // catches ctrl+c event
