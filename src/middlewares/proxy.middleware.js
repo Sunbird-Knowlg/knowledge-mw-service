@@ -90,7 +90,7 @@ module.exports = function (app) {
     },
     proxyReqPathResolver: function (req) {
       var originalUrl = req.originalUrl
-      originalUrl = originalUrl.replace('action/', '/')
+      originalUrl = originalUrl.replace('action/', '')
       return require('url').parse(contentProviderBaseUrl + originalUrl).path
     }
   }))
