@@ -298,7 +298,7 @@ function checkChannelID (req, res, next) {
 function addChannelFilters (req, res, next) {
   // Assuming that the request will not send the filter of channels
   if (req && req.body && req.body.request && req.body.request.filters && req.body.request.filters.channel) {
-    next()
+    next(req)
   } else {
     filterService.getChannelSearchString(function (err, channels) {
       if (err) {
@@ -307,7 +307,7 @@ function addChannelFilters (req, res, next) {
       } else if (channels && (!_.isEmpty(channels))) {
         req.body.request.filters.channel = channels
       }
-      next()
+      next(channels)
     })
   }
 }
