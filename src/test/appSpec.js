@@ -1,4 +1,5 @@
 var server = require('../app.js')
+var configUtil = require('../libs/sb-config-util')
 
 var request = require('request')
 var host = 'http://localhost:5000'
@@ -8,8 +9,11 @@ describe('Check health api', function (done) {
     request.options({
       url: host + '/health',
       json: true
-    }, function (error, response, body) {
+    }, function (_error, response, body) {
       expect(body).toBe('OK')
+      var whiteListQuery = (process.env.sunbird_content_service_whitelisted_channels).split(',')
+      var blackListQuery = {'ne': ((process.env.sunbird_content_service_blacklisted_channels).split(','))}
+      expect(configUtil.getConfig('CHANNEL_FILTER_QUERY_STRING')).toEqual(whiteListQuery || blackListQuery)
       done()
     })
   })
