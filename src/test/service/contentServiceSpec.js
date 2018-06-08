@@ -742,7 +742,7 @@ describe('Content', function () {
       request.post({
         headers: {'Content-Type': 'application/json'},
         uri: baseUrl + '/flag/' + contentId,
-        body: {request: {flaggedReasons: ['Copyright Violation'], flaggedBy: 'Test case', flags: ['Test case'] }},
+        body: {request: { flaggedReasons: ['Copyright Violation'], flaggedBy: 'Test case', flags: ['Test case'] }},
         json: true
       }, function (_error, response, body) {
         expect(response.statusCode).toBe(400)
@@ -757,7 +757,10 @@ describe('Content', function () {
       request.post({
         headers: {'Content-Type': 'application/json'},
         uri: baseUrl + '/flag/' + contentId + 'ff',
-        body: {request: {flaggedReasons: ['Copyright Violation'], flaggedBy: 'Test case', flags: ['Test case'], versionKey: '31312314' }},
+        body: {request: { flaggedReasons: ['Copyright Violation'],
+          flaggedBy: 'Test case',
+          flags: ['Test case'],
+          versionKey: '31312314' }},
         json: true
       }, function (_error, response, body) {
         expect(response.statusCode).toBe(404)
@@ -773,7 +776,10 @@ describe('Content', function () {
         request.post({
           headers: {'Content-Type': 'application/json'},
           uri: baseUrl + '/flag/' + content.identifier,
-          body: {request: {flagReasons: ['Copyright Violation'], flaggedBy: 'Test case', flags: ['Test case'], versionKey: content.versionKey }},
+          body: {request: { flagReasons: ['Copyright Violation'],
+            flaggedBy: 'Test case',
+            flags: ['Test case'],
+            versionKey: content.versionKey }},
           json: true
         }, function (_error, response, body) {
           expect(response.statusCode).toBe(200)
