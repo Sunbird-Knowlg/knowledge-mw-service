@@ -34,8 +34,6 @@ const blackListedChannelList = process.env.sunbird_content_service_blacklisted_c
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
-// var channelFilteringString = ''
-
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('BASE_URL', contentProviderBaseUrl)
 configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + contentProviderApiKey)
@@ -67,9 +65,6 @@ const bodyParserJsonMiddleware = function () {
 }
 
 app.use(bodyParserJsonMiddleware())
-// app.use(bodyParser.urlencoded({
-//     extended: true
-// }));
 
 app.use(methodOverride())
 
@@ -158,6 +153,12 @@ function exitHandler (options, err) {
   })
 }
 
+// function to update the config
+function updateConfig (configString) {
+  configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
+}
+
+// function to generate the search string
 function getFilterConfig () {
   var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
   var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
@@ -165,10 +166,9 @@ function getFilterConfig () {
   if (allowedChannels && allowedChannels.length > 0) {
     configString = allowedChannels
   } else if (blackListedChannels && blackListedChannels.length > 0) {
-    // console.log({'ne': blaclListedChannels.join()})
     configString = { 'ne': blackListedChannels }
   }
-  configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
+  updateConfig(configString)
 }
 
 // catches ctrl+c event
