@@ -12,7 +12,7 @@ var httpMocks = require('node-mocks-http')
 var baseUrl = 'http://localhost:5000/v1/'
 var async = require('async')
 
-describe('Check', function () {
+describe('Check for all route to be calling the AddChannelFilter', function () {
   async.forEach(routes, function (route, callback) {
     describe('Composite search services', function () {
       var req, res
@@ -34,7 +34,7 @@ describe('Check', function () {
 
         done() // call done so that the next test can run
       })
-      it('check for filter in config with ', function () {
+      it('check for filter in config with ' + route, function () {
         requestMiddleware.addChannelFilters(req, res, function next () {
           expect(req.body.request.filters.channel).toBeDefined()
         })
