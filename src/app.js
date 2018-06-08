@@ -114,7 +114,7 @@ this.server = http.createServer(app).listen(port, function () {
     'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
     process.exit(1)
   }
-  getFilterConfig()
+  updateConfig(getFilterConfig())
 })
 
 // Close server, when we start for test cases
@@ -173,7 +173,7 @@ function getFilterConfig () {
   } else if (blackListedChannels && blackListedChannels.length > 0) {
     configString = { 'ne': blackListedChannels }
   }
-  updateConfig(configString)
+  return configString
 }
 
 // catches ctrl+c event
