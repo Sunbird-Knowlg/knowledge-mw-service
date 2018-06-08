@@ -8,6 +8,7 @@ var TelemetryUtil = require('sb_telemetry_util')
 var telemetry = new TelemetryUtil()
 var fs = require('fs')
 var configUtil = require('sb-config-util')
+var _ = require('underscore')
 
 // TODO below configuration should to be refactored in a seperate file
 
@@ -165,7 +166,9 @@ function getFilterConfig () {
   var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
   var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
   var configString = {}
-  if (allowedChannels && allowedChannels.length > 0) {
+  if ((allowedChannels && allowedChannels.length > 0) && (blackListedChannels && blackListedChannels.length > 0)) {
+    configString = _.difference(allowedChannels, blackListedChannels)
+  } else if (allowedChannels && allowedChannels.length > 0) {
     configString = allowedChannels
   } else if (blackListedChannels && blackListedChannels.length > 0) {
     configString = { 'ne': blackListedChannels }
