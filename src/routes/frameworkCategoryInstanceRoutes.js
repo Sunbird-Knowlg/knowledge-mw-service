@@ -7,18 +7,21 @@
 var frameworkCategoryInstanceService = require('../service/frameworkCategoryInstanceService')
 var requestMiddleware = require('../middlewares/request.middleware')
 
-var BASE_URL_V1_Framework_Category = '/v1/framework/category'
+var baseUrl = '/v1/framework/category'
 
 module.exports = function (app) {
-  app.route(BASE_URL_V1_Framework_Category + '/read/:categoryID')
+  app.route(baseUrl + '/read/:categoryID')
     .get(requestMiddleware.createAndValidateRequestBody, frameworkCategoryInstanceService.getFrameworkCategoryInstance)
 
-  app.route(BASE_URL_V1_Framework_Category + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, frameworkCategoryInstanceService.frameworkCategoryInstanceSearch)
+  app.route(baseUrl + '/search')
+    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.addChannelFilters,
+      frameworkCategoryInstanceService.frameworkCategoryInstanceSearch)
 
-  app.route(BASE_URL_V1_Framework_Category + '/create')
-    .post(requestMiddleware.createAndValidateRequestBody, frameworkCategoryInstanceService.frameworkCategoryInstanceCreate)
+  app.route(baseUrl + '/create')
+    .post(requestMiddleware.createAndValidateRequestBody,
+      frameworkCategoryInstanceService.frameworkCategoryInstanceCreate)
 
-  app.route(BASE_URL_V1_Framework_Category + '/update/:categoryID')
-    .patch(requestMiddleware.createAndValidateRequestBody, frameworkCategoryInstanceService.frameworkCategoryInstanceUpdate)
+  app.route(baseUrl + '/update/:categoryID')
+    .patch(requestMiddleware.createAndValidateRequestBody,
+      frameworkCategoryInstanceService.frameworkCategoryInstanceUpdate)
 }
