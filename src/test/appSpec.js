@@ -21,26 +21,30 @@ describe('Check health api', function (done) {
   })
 
   it('test for whiteList configured', function () {
-    if (whiteListQuery && whiteListQuery.lenght > 0) {
+    if ((whiteListQuery && whiteListQuery.length > 0) &&
+    !(blackListedChannelListNew && blackListedChannelListNew.length > 0)) {
       expect(configUtil.getConfig('CHANNEL_FILTER_QUERY_STRING')).toEqual(whiteListQuery)
     }
   })
 
   it('test for blackList configured', function () {
-    if (!(whiteListQuery && whiteListQuery.lenght > 0) && (blackListQuery && blackListQuery.lenght > 0)) {
+    if (!(whiteListQuery && whiteListQuery.length > 0) &&
+    (blackListedChannelListNew && blackListedChannelListNew.length > 0)) {
       expect(configUtil.getConfig('CHANNEL_FILTER_QUERY_STRING')).toEqual(blackListQuery)
     }
   })
 
   it('test for whitelist and blackList not configured', function () {
-    if (!(whiteListQuery && whiteListQuery.lenght > 0) && !(blackListQuery && blackListQuery.lenght > 0)) {
+    if (!(whiteListQuery && whiteListQuery.length > 0) &&
+    !(blackListedChannelListNew && blackListedChannelListNew.length > 0)) {
       expect(configUtil.getConfig('CHANNEL_FILTER_QUERY_STRING')).toEqual({})
     }
   })
 
   it('test for whitelist and blackList is configured', function () {
-    if ((whiteListQuery && whiteListQuery.lenght > 0) && (blackListQuery && blackListQuery.lenght > 0)) {
-      var searchQuery = _.difference(whiteListQuery, blackListQuery)
+    if ((whiteListQuery && whiteListQuery.length > 0) &&
+    (blackListedChannelListNew && blackListedChannelListNew.length > 0)) {
+      var searchQuery = _.difference(whiteListQuery, blackListedChannelListNew)
       expect(configUtil.getConfig('CHANNEL_FILTER_QUERY_STRING')).toEqual(searchQuery)
     }
   })
