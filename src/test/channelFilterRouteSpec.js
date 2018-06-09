@@ -1,4 +1,4 @@
-var routes = [
+var channelFilterRoutes = [
   'content/search',
   'course/search',
   'framework/category/search',
@@ -13,6 +13,8 @@ var baseUrl = 'http://localhost:5000/v1/'
 var async = require('async')
 var _ = require('underscore')
 
+// TODO to fix, if this test case running correctly depends on environment.
+
 const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
 const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
 var whiteListQuery = whiteListedChannelList ? whiteListedChannelList.split(',') : []
@@ -20,7 +22,7 @@ var blackListedChannelListNew = blackListedChannelList ? blackListedChannelList.
 var blackListQuery = {'ne': (blackListedChannelListNew)}
 
 describe('Check for all route to be calling the AddChannelFilter', function () {
-  async.forEach(routes, function (route, callback) {
+  async.forEach(channelFilterRoutes, function (route, callback) {
     describe('Composite search services', function () {
       var req, res
       var body = {
