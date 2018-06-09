@@ -5,6 +5,7 @@
  **/
 var requestMiddleware = require('../../middlewares/request.middleware')
 var filterService = require('../../service/filterService')
+var configUtil = require('../../libs/sb-config-util')
 
 var req = {
   'body': {
@@ -36,18 +37,17 @@ describe('filter of channels', function () {
     expect(filterService.getChannelSearchString).toHaveBeenCalled()
   })
   it('check for getChannelSearchString method creates proper whitelisted search string', function () {
-    var whiteListQuery = (process.env.sunbird_content_service_whitelisted_channels).split(',')
+    var whiteList = ['in.ekstep', '505c7c48ac6dc1edc9b08f21db5a571d', 'b00bc992ef25f1a9a8d63291e20efc8d']
+    configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', whiteList)
     requestMiddleware.addChannelFilters(req1, {}, function () {
-      expect(req1.body.request.filters.channel).toEqual(whiteListQuery)
+      expect(req1.body.request.filters.channel).toEqual(whiteList)
     })
   })
   it('check for getChannelSearchString method creates proper blacklisted search string', function () {
-    var blackListQuery = {'ne': ((process.env.sunbird_content_service_blacklisted_channels).split(','))}
-    var whiteListQuery = (process.env.sunbird_content_service_whitelisted_channels).split(',')
+    var blacklist = {'ne': ['in.ekstep', '505c7c48ac6dc1edc9b08f21db5a571d', 'b00bc992ef25f1a9a8d63291e20efc8d']}
+    configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', blacklist)
     requestMiddleware.addChannelFilters(req1, {}, function () {
-      if (!whiteListQuery && blackListQuery) {
-        expect(req1.body.request.filters.channel).toEqual(blackListQuery)
-      }
+      expect(req1.body.request.filters.channel).toEqual(blacklist)
     })
   })
 })
