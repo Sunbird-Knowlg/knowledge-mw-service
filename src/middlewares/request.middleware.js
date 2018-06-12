@@ -306,9 +306,9 @@ function addChannelFilters (req, res, next) {
           'failed to get channels'))
       } else if (channels && (!_.isEmpty(channels))) {
         req.body.request.filters.channel = channels
+        LOG.info(utilsService.getLoggerData({}, 'INFO',
+          filename, 'addChannelFilters', 'added channel filter', req.body.request.filters.channel))
       }
-      LOG.info(utilsService.getLoggerData({}, 'INFO',
-        filename, 'addChannelFilters', 'added channel filter', req.body.request.filters.channel))
       next()
     })
   }
