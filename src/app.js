@@ -148,17 +148,6 @@ const telemetryConfig = {
 
 telemetry.init(telemetryConfig)
 
-function exitHandler (options, err) {
-  console.log('Exit', options, err)
-  telemetry.syncOnExit(function (err, res) {
-    if (err) {
-      process.exit()
-    } else {
-      process.exit()
-    }
-  })
-}
-
 // function to update the config
 function updateConfig (configString) {
   configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
@@ -182,9 +171,3 @@ function getFilterConfig () {
     filename, 'getFilterConfig', 'config string', configString))
   return configString
 }
-
-// catches ctrl+c event
-process.on('SIGINT', exitHandler)
-
-// catches uncaught exceptions
-process.on('uncaughtException', exitHandler)
