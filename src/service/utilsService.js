@@ -126,7 +126,7 @@ function getApiUrl (url) {
 function getTelemetryContextData (req) {
   const url = getApiUrl(req.body.path)
   var context = {
-    channel: req.get('x-channel-id') || '',
+    channel: req.get('X-Channel-Id') || '',
     env: API_CONFIG[url] && API_CONFIG[url].env,
     did: req.get('X-Device-ID') || ''
   }
