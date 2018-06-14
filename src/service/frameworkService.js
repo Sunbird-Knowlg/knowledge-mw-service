@@ -6,6 +6,7 @@
 
 var async = require('async')
 var path = require('path')
+var _ = require('lodash')
 var respUtil = require('response_util')
 var ekStepUtil = require('sb_content_provider_util')
 var LOG = require('sb_logger_util')
@@ -27,6 +28,13 @@ function getFrameworkById (req, response) {
   var rspObj = req.rspObj
   data.body = req.body
   data.frameworkId = req.params.frameworkId
+  var queryString = ''
+  if (!_.isEmpty(req.query)) {
+    queryString = '?'
+    _.forEach(req.query, function (values, key) {
+      queryString = queryString + key + '=' + values
+    })
+  }
   // Adding telemetry object data
   if (rspObj.telemetryData) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.frameworkId, 'framework', '', {})
@@ -49,7 +57,7 @@ function getFrameworkById (req, response) {
         'Request to ekstep for get course meta data', {
           frameworkId: data.frameworkId
         }))
-      ekStepUtil.getFrameworkById(data.frameworkId, req.headers, function (err, res) {
+      ekStepUtil.getFrameworkById(data.frameworkId, queryString, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
             'Getting error from ekstep', res))
