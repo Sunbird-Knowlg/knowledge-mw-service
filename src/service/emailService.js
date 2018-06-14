@@ -341,13 +341,23 @@ var getBase64Url = function (type, identifier) {
  * @param  {[String]} baseUri [base url]
  * @return {[String]}         [share url]
  */
+// var getUnlistedShareUrl = function (cData, baseUri) {
+//   if (cData.contentType === 'Course') {
+//     return baseUri + '/unlisted' + '/' + getBase64Url('course', cData.identifier)
+//   } else if (cData.mimeType === 'application/vnd.ekstep.content-collection') {
+//     return baseUri + '/unlisted' + '/' + getBase64Url('collection', cData.identifier)
+//   } else {
+//     return baseUri + '/unlisted' + '/' + getBase64Url('content', cData.identifier)
+//   }
+// }
+
 var getUnlistedShareUrl = function (cData, baseUri) {
   if (cData.contentType === 'Course') {
-    return baseUri + '/unlisted' + '/' + getBase64Url('course', cData.identifier)
+    return baseUri + '/learn/course' + '/' + cData.identifier + '/Unlisted'
   } else if (cData.mimeType === 'application/vnd.ekstep.content-collection') {
-    return baseUri + '/unlisted' + '/' + getBase64Url('collection', cData.identifier)
+    return baseUri + '/resources/play/collection' + '/' + cData.identifier + '/Unlisted'
   } else {
-    return baseUri + '/unlisted' + '/' + getBase64Url('content', cData.identifier)
+    return baseUri + '/resources/play/content' + '/' + cData.identifier + '/Unlisted'
   }
 }
 
