@@ -12,7 +12,7 @@ var _ = require('underscore')
 var filename = path.basename(__filename)
 var utilsService = require('./service/utilsService')
 var LOG = require('sb_logger_util')
-
+const contentProvider = require('sb_content_provider_util')
 // TODO below configuration should to be refactored in a seperate file
 
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
@@ -22,6 +22,7 @@ const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'con
 var reqDataLimitOfContentUpload = '50mb'
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000
+const DEFAULT_TENANT = process.env.sunbird_default_tenant
 
 globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://qa.ekstep.in'
 
@@ -110,14 +111,23 @@ require('./routes/externalUrlMetaRoute')(app)
 require('./middlewares/proxy.middleware')(app)
 
 // Create server
-this.server = http.createServer(app).listen(port, function () {
-  console.log('server running at PORT [%d]', port)
-  if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
-    console.error('please set environment variable sunbird_environment, sunbird_instance  ' +
-    'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
+contentProvider.getChannel(process.env.sunbird_default_tenant, (err, res) => {
+  if (res.result.response.count > 0 && res.result.response.content[0].hashTagId) {
+    configUtil.setConfig('DEFAULT_CHANNEL', res.result.response.content[0].hashTagId)
+    console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
+    this.server = http.createServer(app).listen(port, function () {
+      console.log('server running at PORT [%d]', port)
+      if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
+        console.error('please set environment variable sunbird_environment, sunbird_instance, sunbird_default_tenant' +
+        'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
+        process.exit(1)
+      }
+      updateConfig(getFilterConfig())
+    })
+  } else {
+    console.log('error in fetching default channel', err, res)
     process.exit(1)
   }
-  updateConfig(getFilterConfig())
 })
 
 // Close server, when we start for test cases
