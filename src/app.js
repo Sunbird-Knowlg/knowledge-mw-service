@@ -9,6 +9,9 @@ var telemetry = new TelemetryUtil()
 var fs = require('fs')
 var configUtil = require('sb-config-util')
 var _ = require('underscore')
+var filename = path.basename(__filename)
+var utilsService = require('./service/utilsService')
+var LOG = require('sb_logger_util')
 
 // TODO below configuration should to be refactored in a seperate file
 
@@ -148,17 +151,6 @@ const telemetryConfig = {
 
 telemetry.init(telemetryConfig)
 
-function exitHandler (options, err) {
-  console.log('Exit', options, err)
-  telemetry.syncOnExit(function (err, res) {
-    if (err) {
-      process.exit()
-    } else {
-      process.exit()
-    }
-  })
-}
-
 // function to update the config
 function updateConfig (name, configString) {
   configUtil.setConfig(name, configString)
@@ -166,6 +158,8 @@ function updateConfig (name, configString) {
 
 // function to generate the search string
 function getFilterConfig () {
+  LOG.info(utilsService.getLoggerData({}, 'INFO',
+    filename, 'getFilterConfig', 'environment info', process.env))
   var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
   var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
   var configString = {}
@@ -176,17 +170,11 @@ function getFilterConfig () {
   } else if (blackListedChannels && blackListedChannels.length > 0) {
     configString = { 'ne': blackListedChannels }
   }
+  LOG.info(utilsService.getLoggerData({}, 'INFO',
+    filename, 'getFilterConfig', 'config string', configString))
   return configString
 }
 
 function getMetaFilterConfig () {
-// get metaFilters from the config
-  var allowedMetafilters = whiteListedMetafilterList
-  var blacklistedMetafilters = blacklistedMetafilterList
+  // get metaFilters from the config
 }
-
-// catches ctrl+c event
-process.on('SIGINT', exitHandler)
-
-// catches uncaught exceptions
-process.on('uncaughtException', exitHandler)
