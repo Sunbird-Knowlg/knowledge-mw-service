@@ -28,6 +28,8 @@ globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process
 const contentProviderBaseUrl = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://qa.ekstep.in/api'
 const contentProviderApiKey = process.env.sunbird_content_provider_api_key
 
+const telemetryBaseUrl = process.env.sunbird_telemetry_service_local_url ? process.env.sunbird_telemetry_service_local_url : 'http://telemetry-service:9001/'
+
 const learnerServiceApiKey = process.env.sunbird_learner_service_api_key
 const learnerServiceBaseUrl = process.env.sunbird_learner_service_base_url ? process.env.sunbird_learner_service_base_url : 'https://dev.open-sunbird.org/api'
 
@@ -42,6 +44,7 @@ const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_i
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('BASE_URL', contentProviderBaseUrl)
+configUtil.setConfig('TELEMETRY_BASE_URL', telemetryBaseUrl)
 configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + contentProviderApiKey)
 configUtil.setConfig('LEARNER_SERVICE_BASE_URL', learnerServiceBaseUrl)
 configUtil.setConfig('LEARNER_SERVICE_LOCAL_BASE_URL', learnerServiceLocalBaseUrl)
@@ -142,7 +145,7 @@ const telemetryConfig = {
   method: 'POST',
   batchsize: telemetryBatchSize,
   endpoint: configUtil.getConfig('TELEMETRY'),
-  host: configUtil.getConfig('BASE_URL'),
+  host: configUtil.getConfig('TELEMETRY_BASE_URL'),
   authtoken: configUtil.getConfig('Authorization_TOKEN')
 }
 
