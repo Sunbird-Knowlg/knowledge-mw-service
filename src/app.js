@@ -22,7 +22,7 @@ const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'con
 var reqDataLimitOfContentUpload = '50mb'
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000
-const DEFAULT_TENANT = process.env.sunbird_default_tenant
+const DEFAULT_TENANT = process.env.sunbird_default_channel
 
 globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://qa.ekstep.in'
 
