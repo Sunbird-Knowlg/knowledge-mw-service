@@ -6,6 +6,7 @@
 
 var frameworkTermService = require('../service/frameworkTermService')
 var requestMiddleware = require('../middlewares/request.middleware')
+var filterMiddleware = require('../middlewares/filter.middleware')
 
 var baseUrl = '/v1/framework/term'
 
@@ -15,7 +16,7 @@ module.exports = function (app) {
 
   app.route(baseUrl + '/search')
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.addChannelFilters,
-      frameworkTermService.frameworkTermSearch)
+      filterMiddleware.addMetaFilters, frameworkTermService.frameworkTermSearch)
 
   app.route(baseUrl + '/create')
     .post(requestMiddleware.createAndValidateRequestBody, frameworkTermService.frameworkTermCreate)

@@ -37,6 +37,8 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
 
 const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
 const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
+const whiteListedMetafilterList = process.env.sunbird_content_service_whitelisted_metafilter
+const blacklistedMetafilterList = process.env.sunbird_content_service_blacklisted_metafilter
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
@@ -117,7 +119,8 @@ this.server = http.createServer(app).listen(port, function () {
     'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
     process.exit(1)
   }
-  updateConfig(getFilterConfig())
+  updateConfig('CHANNEL_FILTER_QUERY_STRING', getFilterConfig())
+  updateConfig('META_FILTER_QUERY_STRING', getMetaFilterConfig())
 })
 
 // Close server, when we start for test cases
@@ -149,8 +152,8 @@ const telemetryConfig = {
 telemetry.init(telemetryConfig)
 
 // function to update the config
-function updateConfig (configString) {
-  configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
+function updateConfig (name, configString) {
+  configUtil.setConfig(name, configString)
 }
 
 // function to generate the search string
@@ -170,4 +173,8 @@ function getFilterConfig () {
   LOG.info(utilsService.getLoggerData({}, 'INFO',
     filename, 'getFilterConfig', 'config string', configString))
   return configString
+}
+
+function getMetaFilterConfig () {
+  // get metaFilters from the config
 }
