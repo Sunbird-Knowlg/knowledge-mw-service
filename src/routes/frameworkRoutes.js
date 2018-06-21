@@ -6,6 +6,7 @@
 
 var frameworkService = require('../service/frameworkService')
 var requestMiddleware = require('../middlewares/request.middleware')
+var filterMiddleware = require('../middlewares/filter.middleware')
 
 var baseUrl = '/v1/framework'
 
@@ -15,7 +16,7 @@ module.exports = function (app) {
 
   app.route(baseUrl + '/list')
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.addChannelFilters,
-      frameworkService.frameworklList)
+      filterMiddleware.addMetaFilters, frameworkService.frameworklList)
 
   app.route(baseUrl + '/create')
     .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkCreate)

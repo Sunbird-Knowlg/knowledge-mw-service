@@ -6,13 +6,14 @@
 
 var courseService = require('../service/courseService')
 var requestMiddleware = require('../middlewares/request.middleware')
+var filterMiddleware = require('../middlewares/filter.middleware')
 
 var BASE_URL = '/v1/course'
 
 module.exports = function (app) {
   app.route(BASE_URL + '/search')
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.addChannelFilters,
-      courseService.searchCourseAPI)
+      filterMiddleware.addMetaFilters, courseService.searchCourseAPI)
 
   app.route(BASE_URL + '/create')
     .post(requestMiddleware.createAndValidateRequestBody, courseService.createCourseAPI)
