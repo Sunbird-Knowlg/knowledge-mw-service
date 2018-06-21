@@ -34,7 +34,6 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
 
 const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
 const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
-
 const whiteListedMetafilterList = process.env.sunbird_content_service_whitelisted_metafilter
 const blacklistedMetafilterList = process.env.sunbird_content_service_blacklisted_metafilter
 
@@ -165,7 +164,6 @@ function updateConfig (name, configString) {
   configUtil.setConfig(name, configString)
 }
 
-
 // function to generate the search string
 function getFilterConfig () {
   var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
@@ -181,8 +179,10 @@ function getFilterConfig () {
   return configString
 }
 
-function getMetaFilterConfig() {
-//  get metaFilters from the config
+function getMetaFilterConfig () {
+// get metaFilters from the config
+  var allowedMetafilters = whiteListedMetafilterList
+  var blacklistedMetafilters = blacklistedMetafilterList
 }
 
 // catches ctrl+c event
