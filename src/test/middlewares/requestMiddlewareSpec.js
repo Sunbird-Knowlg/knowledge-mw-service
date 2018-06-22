@@ -50,4 +50,8 @@ describe('filter of channels', function () {
       expect(req1.body.request.filters.channel).toEqual(blacklist)
     })
   })
+  it('check for the request and then do next', function () {})
+  it('check for no request and get config', function () {})
+  it('check for getMetafilterSearchString method creates proper whitelisted search string', function () {})
+  it('check for getMetafilterSearchString method creates proper blacklisted search string', function () {})
 })

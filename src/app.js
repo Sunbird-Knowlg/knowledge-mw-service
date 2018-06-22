@@ -37,8 +37,12 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
 
 const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
 const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
-const whiteListedMetafilterList = process.env.sunbird_content_service_whitelisted_metafilter
-const blacklistedMetafilterList = process.env.sunbird_content_service_blacklisted_metafilter
+// const whitelistedframeworkList = process.env.sunbird_content_service_whitelisted_framework
+// const blacklistedframeworkList = process.env.sunbird_content_service_blacklisted_framework
+// const whitelistedLanguageList = process.env.sunbird_content_service_whitelisted_language
+// const blacklistedLanguageList = process.env.sunbird_content_service_blacklisted_language
+// const whitelistedCreatorList = process.env.sunbird_content_service_whitelisted_creator
+// const blacklistedCreatorList = process.env.sunbird_content_service_blacklisted_creator
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
