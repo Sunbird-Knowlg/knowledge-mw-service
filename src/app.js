@@ -126,7 +126,7 @@ contentProvider.getChannel(process.env.sunbird_default_tenant, (err, res) => {
       updateConfig(getFilterConfig())
     })
   } else {
-    console.log('error in fetching default channel', err, res)
+    console.log('error in fetching default channel', process.env.sunbird_default_channel, err, res)
     process.exit(1)
   }
 })
