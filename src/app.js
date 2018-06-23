@@ -22,7 +22,7 @@ const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'con
 var reqDataLimitOfContentUpload = '50mb'
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000
-const DEFAULT_TENANT = process.env.sunbird_default_channel
+const defaultChannel = process.env.sunbird_default_channel
 const telemetryBaseUrl = process.env.sunbird_telemetry_service_local_url ? process.env.sunbird_telemetry_service_local_url : 'http://telemetry-service:9001/'
 globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://qa.ekstep.in'
 
@@ -112,24 +112,30 @@ require('./routes/externalUrlMetaRoute')(app)
 require('./middlewares/proxy.middleware')(app)
 
 // Create server
-contentProvider.getChannel(process.env.sunbird_default_tenant, (err, res) => {
-  if (res.result.response.count > 0 && res.result.response.content[0].hashTagId) {
-    configUtil.setConfig('DEFAULT_CHANNEL', res.result.response.content[0].hashTagId)
-    console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
-    this.server = http.createServer(app).listen(port, function () {
-      console.log('server running at PORT [%d]', port)
-      if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
-        console.error('please set environment variable sunbird_environment, sunbird_instance, sunbird_default_tenant' +
-        'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
-        process.exit(1)
-      }
-      updateConfig(getFilterConfig())
-    })
-  } else {
-    console.log('error in fetching default channel', process.env.sunbird_default_channel, err, res)
-    process.exit(1)
-  }
-})
+if (defaultChannel) {
+  contentProvider.getChannel(defaultChannel, (err, res) => {
+    if (res && res.result.response.count > 0 && res.result.response.content[0].hashTagId) {
+      configUtil.setConfig('DEFAULT_CHANNEL', res.result.response.content[0].hashTagId)
+      console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
+      this.server = http.createServer(app).listen(port, function () {
+        console.log('server running at PORT [%d]', port)
+        if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
+          console.error('please set environment variable sunbird_environment, sunbird_instance' +
+          'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
+          process.exit(1)
+        }
+        updateConfig(getFilterConfig())
+      })
+    } else {
+      console.log('error in fetching default channel', defaultChannel, err, res)
+      process.exit(1)
+    }
+  })
+} else {
+  console.error('please set environment variable sunbird_default_channel ' +
+  'start service Eg: sunbird_default_channel = sunbird')
+  process.exit(1)
+}
 
 // Close server, when we start for test cases
 exports.close = function () {
