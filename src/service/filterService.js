@@ -11,4 +11,10 @@ function getChannelSearchString (callback) {
   callback(null, searchString)
 }
 
+function getMetaSearchString (callback) {
+  var searchString = configUtil.getConfig('CHANNEL_FILTER_QUERY_STRING')
+  callback(null, searchString)
+}
+
 module.exports.getChannelSearchString = getChannelSearchString
+module.exports.getMetaSearchString = getMetaSearchString

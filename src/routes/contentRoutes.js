@@ -6,12 +6,13 @@
 
 var contentService = require('../service/contentService')
 var requestMiddleware = require('../middlewares/request.middleware')
+var filterMiddleware = require('../middlewares/filter.middleware')
 
 var BASE_URL = '/v1/content'
 
 module.exports = function (app) {
   app.route(BASE_URL + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.addChannelFilters,
+    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       contentService.searchContentAPI)
 
   app.route(BASE_URL + '/create')
