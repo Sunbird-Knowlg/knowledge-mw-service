@@ -38,6 +38,12 @@ const dialServiceBaseUrl = process.env.sunbird_dial_service_api_base_url || 'htt
 
 const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
 const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
+const whitelistedframeworkList = process.env.sunbird_content_service_whitelisted_framework
+const blacklistedframeworkList = process.env.sunbird_content_service_blacklisted_framework
+const whitelistedLanguageList = process.env.sunbird_content_service_whitelisted_language
+const blacklistedLanguageList = process.env.sunbird_content_service_blacklisted_language
+const whitelistedCreatorList = process.env.sunbird_content_service_whitelisted_creator
+const blacklistedCreatorList = process.env.sunbird_content_service_blacklisted_creator
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
@@ -151,6 +157,7 @@ const telemetryConfig = {
 telemetry.init(telemetryConfig)
 
 // function to generate the search string
+
 function getMetaFilterConfig () {
   return setFilterJSONFromEnv()
 }

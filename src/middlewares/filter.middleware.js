@@ -6,8 +6,12 @@ function addMetaFilters (req, res, next) {
 
   // else call the getMetaSearchString() function to generate the search string for the meta filters
   filterService.getMetaSearchString(function () {
-
+    // Generate JSON and return
+    return setFilterJSON()
   })
 }
 
+function setFilterJSON () {
+
+}
 module.exports.addMetaFilters = addMetaFilters
