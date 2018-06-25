@@ -49,7 +49,4 @@ function fetchFilterQuery (req, filterProperty) {
   })
 }
 
-function setFilterJSON () {
-// Set the new filter Object for filter request body
-}
 module.exports.addMetaFilters = addMetaFilters
