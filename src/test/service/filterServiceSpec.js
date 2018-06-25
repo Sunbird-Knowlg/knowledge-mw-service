@@ -20,3 +20,9 @@ describe('filter service', function () {
     expect(configUtil.getConfig('CHANNEL_FILTER_QUERY_STRING')).toEqual(blacklist)
   })
 })
+
+describe('filter service', function () {
+  it('check for getMetaSearchString method', function () {})
+  it('check for whitelisted metafilter set in config', function () {})
+  it('check for blacklisted metafilter set in config', function () {})
+})

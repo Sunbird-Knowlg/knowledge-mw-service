@@ -112,30 +112,15 @@ require('./routes/externalUrlMetaRoute')(app)
 require('./middlewares/proxy.middleware')(app)
 
 // Create server
-if (defaultChannel) {
-  contentProvider.getChannel(defaultChannel, (err, res) => {
-    if (res && res.result.response.count > 0 && res.result.response.content[0].hashTagId) {
-      configUtil.setConfig('DEFAULT_CHANNEL', res.result.response.content[0].hashTagId)
-      console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
-      this.server = http.createServer(app).listen(port, function () {
-        console.log('server running at PORT [%d]', port)
-        if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
-          console.error('please set environment variable sunbird_environment, sunbird_instance' +
-          'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
-          process.exit(1)
-        }
-        updateConfig(getFilterConfig())
-      })
-    } else {
-      console.log('error in fetching default channel', defaultChannel, err, res)
-      process.exit(1)
-    }
-  })
-} else {
-  console.error('please set environment variable sunbird_default_channel ' +
-  'start service Eg: sunbird_default_channel = sunbird')
-  process.exit(1)
-}
+this.server = http.createServer(app).listen(port, function () {
+  console.log('server running at PORT [%d]', port)
+  if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
+    console.error('please set environment variable sunbird_environment, sunbird_instance  ' +
+    'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
+    process.exit(1)
+  }
+  configUtil.setConfig('META_FILTER_QUERY_STRING', getMetaFilterConfig())
+})
 
 // Close server, when we start for test cases
 exports.close = function () {
@@ -165,26 +150,15 @@ const telemetryConfig = {
 
 telemetry.init(telemetryConfig)
 
-// function to update the config
-function updateConfig (configString) {
-  configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
+// function to generate the search string
+function getMetaFilterConfig () {
+  return setFilterJSONFromEnv()
+}
+function setFilterJSONFromEnv () {
+  // Generate JSON and return
+  return setFilterJSON()
 }
 
-// function to generate the search string
-function getFilterConfig () {
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'environment info', process.env))
-  var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
-  var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-  var configString = {}
-  if ((allowedChannels && allowedChannels.length > 0) && (blackListedChannels && blackListedChannels.length > 0)) {
-    configString = _.difference(allowedChannels, blackListedChannels)
-  } else if (allowedChannels && allowedChannels.length > 0) {
-    configString = allowedChannels
-  } else if (blackListedChannels && blackListedChannels.length > 0) {
-    configString = { 'ne': blackListedChannels }
-  }
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'config string', configString))
-  return configString
+function setFilterJSON () {
+
 }

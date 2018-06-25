@@ -48,6 +48,12 @@ describe('Check health api', function (done) {
       expect(configUtil.getConfig('CHANNEL_FILTER_QUERY_STRING')).toEqual(searchQuery)
     }
   })
+
+  it('test for whiteListed metafilter configured', function () {})
+  it('test for blackList metafilter configured', function () {})
+  it('test for whitelist metafilter and blackList not configured', function () {})
+  it('test for whitelist metafilter and blackList is configured', function () {})
+  it('check if filter JSON is generated', function () { })
 })
 
 // below method used to close server once all the specs are executed

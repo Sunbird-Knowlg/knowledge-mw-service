@@ -113,6 +113,12 @@ describe('Composite search services', function () {
     })
     done()
   })
+
+  it('check for metafilter in config with whitelist', function (done) {
+  })
+
+  it('check for metafilter in config with blacklist', function (done) {
+  })
 })
 
 describe('Composite search services with request filter channel search', function () {
