@@ -154,16 +154,21 @@ const telemetryConfig = {
 
 telemetry.init(telemetryConfig)
 
-// function to generate the search string
-
+// function to generate the search filter and return JSON Object
 function getMetaFilterConfig () {
-  return setFilterJSONFromEnv()
+// Check if the Filter Config service data is defined, if yes, create Object with it
+  if (filterConfigService !== undefined) {
+    return getFilterJSONfromConfigService()
+  } else {
+    // Call getFilterJSONFromEnv to generate a JSON Object
+    return getFilterJSONFromEnv()
+  }
 }
-function setFilterJSONFromEnv () {
+
+function getFilterJSONFromEnv () {
   // Generate JSON and return
-  return setFilterJSON()
 }
 
-function setFilterJSON () {
-
+function getFilterJSONfromConfigService () {
+  // Generate JSON from Config Service and return
 }
