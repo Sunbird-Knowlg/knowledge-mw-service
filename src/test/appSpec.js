@@ -53,7 +53,9 @@ describe('Check health api', function (done) {
   it('test for blackList metafilter configured', function () {})
   it('test for whitelist metafilter and blackList not configured', function () {})
   it('test for whitelist metafilter and blackList is configured', function () {})
-  it('check if filter JSON is generated', function () { })
+  it('Check if filterConfig service data is available', function () {})
+  it('If FilterConfig is null/undefined, generate filter Object from environment variables', function () { })
+  it('Check if filter JSON is generated', function () { })
 })
 
 // below method used to close server once all the specs are executed

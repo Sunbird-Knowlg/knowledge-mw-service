@@ -6,9 +6,9 @@
  */
 var configUtil = require('sb-config-util')
 
-function getMetaSearchString (callback) {
-  var searchString = configUtil.getConfig('META_FILTER_QUERY_STRING')
-  callback(null, searchString)
+function getMetaSearchData (callback) {
+  var searchData = configUtil.getConfig('META_FILTER_REQUEST_JSON')
+  callback(null, searchData)
 }
 
-module.exports.getMetaSearchString = getMetaSearchString
+module.exports.getMetaSearchData = getMetaSearchData
