@@ -65,7 +65,3 @@ describe('Check for all route to be calling the AddChannelFilter', function () {
     })
   })
 })
-describe('Check for all route to be calling the AddMetaFilter', function () {
-  it('check for filter in config with route', function () {})
-  it('check for filter in config with value + route', function () {})
-})
