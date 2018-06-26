@@ -295,8 +295,10 @@ function checkChannelID (req, res, next) {
   next()
 }
 
+// If the request body has filter by channel property, continue with the same filter, do not alter the values
+// else call the getChannelSearchString() function to create search query for the channel filters
 // function addChannelFilters (req, res, next) {
-//   // Assuming that if request has filter by channel we use that or else the config
+// // Assuming that if request has filter by channel we use that or else the config
 //   if (req && req.body && req.body.request && req.body.request.filters && req.body.request.filters.channel) {
 //     next()
 //   } else {
