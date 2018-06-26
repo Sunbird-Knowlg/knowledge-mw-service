@@ -34,8 +34,8 @@ describe('content meta filter service from config', function () {
   })
 })
 
-describe('content meta filter service', function () {
-  it('check for getMetaSearchString method', function () {})
+describe('content meta filter service from config', function () {
+  it('check for getMetaSearchData method', function () {})
   it('check for whitelisted metafilter set in config', function () {})
   it('check for blacklisted metafilter set in config', function () {})
 })
