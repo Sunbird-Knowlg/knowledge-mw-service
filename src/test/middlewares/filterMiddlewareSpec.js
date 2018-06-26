@@ -1,3 +1,4 @@
+<<<<<<< 198581f70fcc553bdf8a8b3c40f5d0ebd95198e9
 /**
  * @name : requestMiddleware.js
  * @description : Responsible for test request.middleware.js
@@ -349,4 +350,14 @@ describe(' Combination of 2 meta filters  defined ', function () {
       expect(req7.body.request.filters.framework).toEqual(whiteList.framework)
     })
   })
+=======
+describe('Initialization of meta filters', function () {
+  it('check for the request and then do next', function () {})
+  it('check for no request and get config', function () {})
+  it('check for the filter object property exists in the request body', function () {})
+  it('if filter object property is equal to response body property then do not append property to the filter', function () {})
+  it('if the filter object property is not equal to response body property then append property to the filter', function () {})
+  it('check for getMetaSearchData method creates proper whitelisted search data', function () {})
+  it('check for getMetaSearchData method creates proper blacklisted search data', function () {})
+>>>>>>> Issue #SB-3715 fix: review fixes
 })
