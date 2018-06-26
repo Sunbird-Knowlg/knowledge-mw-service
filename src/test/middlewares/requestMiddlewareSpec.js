@@ -51,10 +51,3 @@ describe('filter of channels', function () {
     })
   })
 })
-
-describe('Initialization of meta filters', function () {
-  it('check for the request and then do next', function () {})
-  it('check for no request and get config', function () {})
-  it('check for getMetaSearchString method creates proper whitelisted search string', function () {})
-  it('check for getMetaSearchString method creates proper blacklisted search string', function () {})
-})
