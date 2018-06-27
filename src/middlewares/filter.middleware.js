@@ -20,20 +20,20 @@ function addMetaFilters (req, res, next) {
         LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'addChannelFilters',
           'failed to get channels'))
       } else if (searchJSON && (!_.isEmpty(searchJSON))) {
-        if (req.body.request.filters.channel && searchJSON.channel !== null) {
+        if (req.body.request.filters.channel && searchJSON.channel !== undefined) {
           req.body.request.filters.channel = searchJSON.channel
         }
-        if (req.body.request.filters.framework === undefined && searchJSON.framework !== null) {
+        if (req.body.request.filters.framework === undefined && searchJSON.framework !== undefined) {
           req.body.request.filters.framework = searchJSON.framework
         }
 
-        if (req.body.request.filters.contentType === undefined && searchJSON.contentType !== null) {
+        if (req.body.request.filters.contentType === undefined && searchJSON.contentType !== undefined) {
           req.body.request.filters.contentType = searchJSON.contentType
         }
-        if (req.body.request.filters.mimeType === undefined && searchJSON.mimeType !== null) {
+        if (req.body.request.filters.mimeType === undefined && searchJSON.mimeType !== undefined) {
           req.body.request.filters.mimeType = searchJSON.mimeType
         }
-        if (req.body.request.filters.resourceType === undefined && searchJSON.channel !== null) {
+        if (req.body.request.filters.resourceType === undefined && searchJSON.channel !== undefined) {
           req.body.request.filters.resourceType = searchJSON.resourceType
         }
         LOG.info(utilsService.getLoggerData({}, 'INFO',

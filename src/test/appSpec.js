@@ -49,15 +49,39 @@ describe('Check health api', function (done) {
     }
   })
 
-  it('test for whiteListed metafilter configured', function () {})
-  it('test for blackList metafilter configured', function () {})
-  it('test for whitelist metafilter and blackList not configured', function () {})
-  it('test for whitelist metafilter and blackList is configured', function () {})
-  it('Check if filterConfig service data is available', function () {})
-  it('If FilterConfig is null/undefined, generate filter Object from environment variables', function () { })
-  it('Check if filter JSON is generated', function () { })
-})
+  describe('Check environment config variables for meta filters', function (done) {
+    it('check if whiteListed channel is configured', function () {})
+    it('check if blackList channel is configured', function () {})
+    it('check if whiteListed framework is configured', function () {})
+    it('check if blackList framework is configured', function () {})
+    it('check if whiteListed contentType is configured', function () {})
+    it('check if blackList contentType is configured', function () {})
+    it('check if whiteListed mimeType is configured', function () {})
+    it('check if blackList mimeType is configured', function () {})
+    it('check if whiteListed resourceType is configured', function () {})
+    it('check if blackList resourceType is configured', function () {})
 
+    it('check if whiteListed and blacklisted channel is configured', function () {})
+    it('check if whiteListed and blacklisted framework is configured', function () {})
+    it('check if whiteListed and blacklisted contentType is configured', function () {})
+    it('check if whiteListed and blacklisted resourceType is configured', function () {})
+    it('check if whiteListed and blacklisted mimeType is configured', function () {})
+
+    it('Check if filterConfig service data is available', function () {})
+    it('If FilterConfig is null/undefined, generate filter Object from environment variables', function () { })
+
+    it('Check if filter JSON is generated and assigned to META_FILTER_QUERY_STRING', function () { })
+    it('Check if filter JSON is not generated, not assigned to META_FILTER_QUERY_STRING', function () { })
+
+    it('if framework and channel is configured', function () { })
+    it('if framework and mimeType is configured', function () { })
+    it('if framework and resourceType is configured', function () { })
+    it('if channel and resourceType is configured', function () { })
+    it('if contentType and mimeType is configured', function () { })
+    it('if contentType and resourceType is configured', function () { })
+    it('if channel and resourceType is configured', function () { })
+  })
+})
 // below method used to close server once all the specs are executed
 var _finishCallback = jasmine.Runner.prototype.finishCallback
 jasmine.Runner.prototype.finishCallback = function () {
