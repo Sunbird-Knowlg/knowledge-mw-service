@@ -180,15 +180,15 @@ function getMetaFilterConfig () {
   var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
 
   var configString = {}
-  function generateConfigString (allowedChannels, blackListedChannels) {
-    if ((allowedChannels && allowedChannels.length > 0) && (blackListedChannels && blackListedChannels.length > 0)) {
-      configString = _.difference(allowedChannels, blackListedChannels)
+  function generateConfigString (allowedMetadata, blackListedMetadata) {
+    if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
+      configString = _.difference(allowedMetadata, blackListedMetadata)
       return configString
-    } else if (allowedChannels && allowedChannels.length > 0) {
-      configString = allowedChannels
+    } else if (allowedMetadata && allowedMetadata.length > 0) {
+      configString = allowedMetadata
       return configString
-    } else if (blackListedChannels && blackListedChannels.length > 0) {
-      configString = { 'ne': blackListedChannels }
+    } else if (blackListedMetadata && blackListedMetadata.length > 0) {
+      configString = { 'ne': blackListedMetadata }
       return configString
     }
   }
