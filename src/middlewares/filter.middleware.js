@@ -3,7 +3,6 @@ var filterService = require('../service/filterService')
 var LOG = require('sb_logger_util')
 var utilsService = require('../service/utilsService')
 var path = require('path')
-var _ = require('underscore')
 var filename = path.basename(__filename)
 
 function addMetaFilters (req, res, next) {
