@@ -37,14 +37,14 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
 
 const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
 const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
-const whitelistedFrameworkList = process.env.sunbird_content_service_whitelisted_framework
-const blacklistedFrameworkList = process.env.sunbird_content_service_blacklisted_framework
-const whitelistedMimeTypeList = process.env.sunbird_content_service_whitelisted_mimeType
-const blacklistedMimeTypeList = process.env.sunbird_content_service_blacklisted_mimeType
-const whitelistedContentTypeList = process.env.sunbird_content_service_whitelisted_contentType
-const blacklistedContentTypeList = process.env.sunbird_content_service_blacklisted_contentType
-const whitelistedResourceTypeList = process.env.sunbird_content_service_whitelisted_resourceType
-const blacklistedResourceTypeList = process.env.sunbird_content_service_blacklisted_resourceType
+const whitelistedFrameworkList = process.env.sunbird_content_filter_framework_whitelist
+const blacklistedFrameworkList = process.env.sunbird_content_filter_framework_blacklist
+const whitelistedMimeTypeList = process.env.sunbird_content_filter_mimetype_whitelist
+const blacklistedMimeTypeList = process.env.sunbird_content_filter_mimetype_blacklist
+const whitelistedContentTypeList = process.env.sunbird_content_filter_contenttype_whitelist
+const blacklistedContentTypeList = process.env.sunbird_content_filter_contenttype_blacklist
+const whitelistedResourceTypeList = process.env.sunbird_content_filter_resourcetype_whitelist
+const blacklistedResourceTypeList = process.env.sunbird_content_filter_resourcetype_blacklist
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
