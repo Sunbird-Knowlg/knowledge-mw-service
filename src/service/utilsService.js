@@ -9,6 +9,7 @@ var messageUtils = require('../service/messageUtil')
 const jwt = require('jsonwebtoken')
 var responseCode = messageUtils.RESPONSE_CODE
 var _ = require('lodash')
+var configUtil = require('sb-config-util')
 
 /**
  * this function helps to create apiId for error and success response
@@ -126,7 +127,7 @@ function getApiUrl (url) {
 function getTelemetryContextData (req) {
   const url = getApiUrl(req.body.path)
   var context = {
-    channel: req.get('X-Channel-Id') || '',
+    channel: req.get('X-Channel-Id') || configUtil.getConfig('DEFAULT_CHANNEL'),
     env: API_CONFIG[url] && API_CONFIG[url].env,
     did: req.get('X-Device-ID') || ''
   }
