@@ -38,12 +38,14 @@ const dialServiceBaseUrl = process.env.sunbird_dial_service_api_base_url || 'htt
 
 const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
 const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
-const whitelistedframeworkList = process.env.sunbird_content_service_whitelisted_framework
-const blacklistedframeworkList = process.env.sunbird_content_service_blacklisted_framework
-const whitelistedLanguageList = process.env.sunbird_content_service_whitelisted_language
-const blacklistedLanguageList = process.env.sunbird_content_service_blacklisted_language
-const whitelistedCreatorList = process.env.sunbird_content_service_whitelisted_creator
-const blacklistedCreatorList = process.env.sunbird_content_service_blacklisted_creator
+const whitelistedFrameworkList = process.env.sunbird_content_service_whitelisted_framework
+const blacklistedFrameworkList = process.env.sunbird_content_service_blacklisted_framework
+const whitelistedMimeTypeList = process.env.sunbird_content_service_whitelisted_mimeType
+const blacklistedMimeTypeList = process.env.sunbird_content_service_blacklisted_mimeType
+const whitelistedContentTypeList = process.env.sunbird_content_service_whitelisted_contentType
+const blacklistedContentTypeList = process.env.sunbird_content_service_blacklisted_contentType
+const whitelistedResourceTypeList = process.env.sunbird_content_service_whitelisted_resourceType
+const blacklistedResourceTypeList = process.env.sunbird_content_service_blacklisted_resourceType
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
@@ -158,19 +160,51 @@ telemetry.init(telemetryConfig)
 
 // function to generate the search filter and return JSON Object
 function getMetaFilterConfig () {
-// Check if the Filter Config service data is defined, if yes, create Object with it
-  if (filterConfigService !== undefined) {
-    return getFilterJSONfromConfigService()
-  } else {
-    // Call getFilterJSONFromEnv to generate a JSON Object
-    return getFilterJSONFromEnv()
+  LOG.info(utilsService.getLoggerData({}, 'INFO',
+    filename, 'getFilterConfig', 'environment info', process.env))
+  var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
+  var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
+  var allowedFramework = whitelistedFrameworkList ? whitelistedFrameworkList.split(',') : []
+  var blackListedFramework = blacklistedFrameworkList ? blacklistedFrameworkList.split(',') : []
+  var allowedMimetype = whitelistedMimeTypeList ? whitelistedMimeTypeList.split(',') : []
+  var blackListedMimetype = blacklistedMimeTypeList ? blacklistedMimeTypeList.split(',') : []
+  var allowedContenttype = whitelistedContentTypeList ? whitelistedContentTypeList.split(',') : []
+  var blackListedContenttype = blacklistedContentTypeList ? blacklistedContentTypeList.split(',') : []
+  var allowedResourcetype = whitelistedResourceTypeList ? whitelistedResourceTypeList.split(',') : []
+  var blackListedResourcetype = blacklistedResourceTypeList ? blacklistedResourceTypeList.split(',') : []
+
+  var channelConf = generateConfigString(allowedChannels, blackListedChannels)
+  var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)
+  var mimeTypeConf = generateConfigString(allowedMimetype, blackListedMimetype)
+  var contentTypeConf = generateConfigString(allowedContenttype, blackListedContenttype)
+  var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
+
+  var configString = {}
+  function generateConfigString (allowedChannels, blackListedChannels) {
+    if ((allowedChannels && allowedChannels.length > 0) && (blackListedChannels && blackListedChannels.length > 0)) {
+      configString = _.difference(allowedChannels, blackListedChannels)
+      return configString
+    } else if (allowedChannels && allowedChannels.length > 0) {
+      configString = allowedChannels
+      return configString
+    } else if (blackListedChannels && blackListedChannels.length > 0) {
+      configString = { 'ne': blackListedChannels }
+      return configString
+    }
   }
+  LOG.info(utilsService.getLoggerData({}, 'INFO',
+    filename, 'getFilterConfig', 'config string', configString))
+  // return configString
+  return setFilterJSONFromEnv(channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf)
 }
-
-function getFilterJSONFromEnv () {
+function setFilterJSONFromEnv (channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf) {
   // Generate JSON and return
-}
-
-function getFilterJSONfromConfigService () {
-  // Generate JSON from Config Service and return
+  var generateJSON = {
+    channel: channelConf,
+    framework: frameworkConf,
+    contentType: contentTypeConf,
+    mimeType: mimeTypeConf,
+    resourceType: resourceTypeConf
+  }
+  return generateJSON
 }
