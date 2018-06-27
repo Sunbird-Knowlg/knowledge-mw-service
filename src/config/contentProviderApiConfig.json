@@ -59,7 +59,7 @@
         "FRAMEWORK_CATEGORY_INSTANCE_CREATE_URI": "/framework/v3/category/create",
         "FRAMEWORK_CATEGORY_INSTANCE_UPDATE_URI": "/framework/v3/category/update",
 
-        "TELEMETRY": "/data/v3/telemetry",
+        "TELEMETRY": "v1/telemetry",
 
 
         "SUBMIT_DATA_EXHAUST_URI": "/data/v2/dataset/request/submit",
