@@ -11,7 +11,8 @@ function addMetaFilters (req, res, next) {
   if (req && req.body && req.body.request && req.body.request.filters && req.body.request.filters.channel) {
     next()
   } else {
-    filterService.getMetaSearchString(function (err, searchJSON) {
+    filterService.getMetadataFilterQuery(function (err, searchJSON) {
+      console.log('err', err)
       console.log('channels', searchJSON)
       if (err) {
         LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'addChannelFilters',
