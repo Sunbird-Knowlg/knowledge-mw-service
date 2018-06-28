@@ -194,8 +194,15 @@ function getMetaFilterConfig () {
   }
   LOG.info(utilsService.getLoggerData({}, 'INFO',
     filename, 'getFilterConfig', 'config string', configString))
-  // return configString
-  return setFilterJSONFromEnv(channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf)
+  // Check if the Filter Config service data is defined, if yes, create Object with it
+  const filterConfigService = ''
+  if (filterConfigService !== '') {
+    // return getFilterJSONfromConfigService()
+    throw new Error('Config service is not set')
+  } else {
+  // Call getFilterJSONFromEnv to generate a JSON Object
+    return getFilterJSONFromEnv(channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf)
+  }
 }
 function setFilterJSONFromEnv (channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf) {
   // Generate JSON and return
