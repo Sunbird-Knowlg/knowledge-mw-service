@@ -80,6 +80,15 @@ describe('Check health api', function (done) {
     it('if contentType and mimeType is configured', function () { })
     it('if contentType and resourceType is configured', function () { })
     it('if channel and resourceType is configured', function () { })
+
+    // Negative scenarios of 3 combination not present
+    it('if contentType, mimeType, resourceType is not configured', function () { })
+    it('if contentType, channel, resourceType is not configured', function () { })
+    it('if contentType, mimeType, channel is not configured', function () { })
+    it('if contentType, mimeType, framework is not configured', function () { })
+    it('if channel, framework, resourceType is not configured', function () { })
+    it('if channel, mimeType, framework is not configured', function () { })
+    it('if contentType, mimeType, framework is not configured', function () { })
   })
 })
 // below method used to close server once all the specs are executed
