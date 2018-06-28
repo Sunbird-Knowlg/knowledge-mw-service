@@ -132,8 +132,7 @@ if (defaultChannel) {
           'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
           process.exit(1)
         }
-        // updateConfig(getFilterConfig())
-        configUtil.setConfig('META_FILTER_QUERY_STRING', getMetaFilterConfig())
+        configUtil.setConfig('META_FILTER_REQUEST_JSON', getMetaFilterConfig())
       })
     } else {
       console.log('error in fetching default channel', defaultChannel, err, res)
