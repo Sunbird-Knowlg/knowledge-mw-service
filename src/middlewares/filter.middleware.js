@@ -13,7 +13,7 @@ function addMetaFilters (req, res, next) {
     req.body.request.filters.mimeType && req.body.request.filters.resourceType) {
     next()
   } else {
-    filterService.getMetaSearchData(function (err, searchJSON) {
+    filterService.getMetadataFilterQuery(function (err, searchJSON) {
       console.log('err', err)
       console.log('channels', searchJSON)
       if (err) {

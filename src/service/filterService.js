@@ -6,11 +6,9 @@
  */
 var configUtil = require('sb-config-util')
 
-function getMetaSearchData (callback) {
-  var searchString = configUtil.getConfig('META_FILTER_QUERY_STRING')
-  console.log('searchString rev', searchString)
-  callback(null, searchString)
+function getMetadataFilterQuery (callback) {
+  var filterQuery = configUtil.getConfig('META_FILTER_REQUEST_JSON')
+  callback(null, filterQuery)
 }
 
-// module.exports.getChannelSearchString = getChannelSearchString
-module.exports.getMetaSearchData = getMetaSearchData
+module.exports.getMetadataFilterQuery = getMetadataFilterQuery

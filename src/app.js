@@ -214,6 +214,7 @@ function getMetaFilterConfig () {
   const filterConfigService = ''
   if (filterConfigService !== '') {
     // return getFilterJSONfromConfigService()
+    throw new Error('Config service is not set')
   } else {
   // Call getFilterJSONFromEnv to generate a JSON Object
     return getFilterJSONFromEnv(channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf)
