@@ -211,14 +211,15 @@ function getMetaFilterConfig () {
     filename, 'getFilterConfig', 'config string', configString))
   // Check if the Filter Config service data is defined, if yes, create Object with it
   const filterConfigService = ''
-  if (filterConfigService !== '') {
-    // return getFilterJSONfromConfigService()
-    throw new Error('Config service is not set')
-  } else {
-  // Call getFilterJSONFromEnv to generate a JSON Object
+  if (filterConfigService === '') {
+    // Call getFilterJSONFromEnv to generate a JSON Object
     return getFilterJSONFromEnv(channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf)
+  } else {
+    // return getFilterJSONfromConfigService()
+    return getFilterJSONfromConfigService()
   }
 }
+
 function getFilterJSONFromEnv (channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf) {
   // Generate JSON and return
   var generateJSON = {
@@ -229,4 +230,8 @@ function getFilterJSONFromEnv (channelConf, frameworkConf, contentTypeConf, mime
     resourceType: resourceTypeConf
   }
   return generateJSON
+}
+function getFilterJSONfromConfigService () {
+  // Generate JSON from Config Service and return
+  throw new Error('Config service is unavailable')
 }
