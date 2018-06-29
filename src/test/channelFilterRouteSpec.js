@@ -44,24 +44,24 @@ describe('Check for all route to be calling the AddChannelFilter', function () {
 
         done() // call done so that the next test can run
       })
-      it('check for filter in config with ' + route, function () {
-        requestMiddleware.addChannelFilters(req, res, function next () {
-          expect(req.body.request.filters.channel).toBeDefined()
-        })
-      })
-      it('check for filter in config with value ' + route, function () {
-        requestMiddleware.addChannelFilters(req, res, function next () {
-          if ((whiteListQuery && whiteListQuery.length > 0) &&
-          (blackListedChannelListNew && blackListedChannelListNew.length > 0)) {
-            var searchQuery = _.difference(whiteListQuery, blackListedChannelListNew)
-            expect(req.body.request.filters.channel).toEqual(searchQuery)
-          } else if (whiteListQuery && whiteListQuery.length > 0) {
-            expect(req.body.request.filters.channel).toEqual(whiteListQuery)
-          } else if (blackListedChannelListNew && blackListedChannelListNew.length > 0) {
-            expect(req.body.request.filters.channel).toEqual(blackListQuery)
-          }
-        })
-      })
+      // it('check for filter in config with ' + route, function () {
+      //   requestMiddleware.addChannelFilters(req, res, function next () {
+      //     expect(req.body.request.filters.channel).toBeDefined()
+      //   })
+      // })
+      // it('check for filter in config with value ' + route, function () {
+      //   requestMiddleware.addChannelFilters(req, res, function next () {
+      //     if ((whiteListQuery && whiteListQuery.length > 0) &&
+      //     (blackListedChannelListNew && blackListedChannelListNew.length > 0)) {
+      //       var searchQuery = _.difference(whiteListQuery, blackListedChannelListNew)
+      //       expect(req.body.request.filters.channel).toEqual(searchQuery)
+      //     } else if (whiteListQuery && whiteListQuery.length > 0) {
+      //       expect(req.body.request.filters.channel).toEqual(whiteListQuery)
+      //     } else if (blackListedChannelListNew && blackListedChannelListNew.length > 0) {
+      //       expect(req.body.request.filters.channel).toEqual(blackListQuery)
+      //     }
+      //   })
+      // })
     })
   })
 })
