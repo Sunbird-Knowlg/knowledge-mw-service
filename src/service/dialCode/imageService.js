@@ -2,7 +2,7 @@ var async = require('async')
 var _ = require('lodash')
 var path = require('path')
 var fs = require('fs')
-var fx = require('mkdir-recursive')
+var fse = require('fs-extra')
 var LOG = require('sb_logger_util')
 var ColorUtil = require('./../../utils/colorUtil')
 var QRCodeUtil = require('./../../utils/qrCodeUtil')
@@ -22,10 +22,12 @@ function ImageService (config) {
   this.margin = _.toString(_.clamp(_.toSafeInteger(_.get(config, 'margin')), 3, 100))
   this.border = (config && parseInt(config.border, 10) >= 0) ? parseInt(config.border, 10) : '1'
   this.text = (config && (config.text === false || config.text === '0')) ? '0' : '1'
-  this.errCorrectionLevel = (config && config.errCorrectionLevel && _.indexOf(errorCorrectionLevels, config.errCorrectionLevel) !== -1) ? config.errCorrectionLevel : 'H'
+  this.errCorrectionLevel = (config && config.errCorrectionLevel &&
+    _.indexOf(errorCorrectionLevels, config.errCorrectionLevel) !== -1) ? config.errCorrectionLevel : 'H'
 }
 
-ImageService.prototype.getImage = function generateImage (dialcode, channel, publisher, localFilePath, uploadFilePath, deleteLocalFileFlag, cb) {
+ImageService.prototype.getImage = function generateImage (dialcode, channel, publisher, localFilePath,
+  uploadFilePath, deleteLocalFileFlag, cb) {
   var self = this
   var config = self.getConfig()
 
@@ -56,20 +58,21 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
           var size = config.width
           try {
             if (!fs.existsSync(localFileLocation)) {
-              fx.mkdirSync(localFileLocation)
+              fse.ensureDirSync(localFileLocation)
             }
           } catch (e) {
             LOG.error({currentFile, 'unable create directory': e, directoryPath: localFileLocation})
           }
 
-          qrCodeUtil.generate(path.join(localFileLocation, fileName + '.png'), qrText, color, bgColor, errCorrectionLevel, margin, size, callback)
+          qrCodeUtil.generate(path.join(localFileLocation, fileName + '.png'), qrText,
+            color, bgColor, errCorrectionLevel, margin, size, callback)
         },
         function (filePath, callback) {
           var dialcodeText = config.text ? dialcode.trim() : false
           qrCodeUtil.addTextAndBorder(filePath, dialcodeText, config.border, config.color, config.width, callback)
         },
         function (filePath, callback) {
-           // upload image
+          // upload image
 
           var destFilePath = uploadFileLocaton ? path.join(uploadFileLocaton, self.fileName + '.png') : filePath
           uploadUtil.uploadFile(destFilePath, filePath, function (error, result) {
@@ -81,10 +84,10 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
         },
         function (filePath, fileUrl, callback) {
           dbModel.instance.dialcode_images.update(
-              {filename: self.fileName},
-              {url: fileUrl, status: 2}, function (err) {
-                callback(err, {url: fileUrl, path: filePath})
-              })
+            {filename: self.fileName},
+            {url: fileUrl, status: 2}, function (err) {
+              callback(err, {url: fileUrl, path: filePath})
+            })
         }
       ], function (err, results) {
         if (deleteLocalFileFlag) {
@@ -142,7 +145,6 @@ ImageService.prototype.getImgFromDB = function (dialcode, channel, publisher, ca
 
 ImageService.prototype.insertImg = function (dialcode, channel, publisher, callback) {
   var fileName = dialcode + '_' + Date.now()
-  var self = this
   var image = new dbModel.instance.dialcode_images({
     dialcode: dialcode,
     config: this.configToString(),
