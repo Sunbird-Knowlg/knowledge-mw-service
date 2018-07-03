@@ -264,7 +264,6 @@ describe(' Combination of 2 meta filters  defined ', function () {
       expect(req4.body.request.filters.mimeType).toEqual(whiteList.mimeType)
     })
   })
-
   it('if contentType and mimeType is configured', function () {
     const req5 = {
       'body': {
