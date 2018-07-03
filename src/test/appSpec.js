@@ -20,76 +20,132 @@ const whitelistedResourceTypeList = process.env.sunbird_content_filter_resourcet
 const blacklistedResourceTypeList = process.env.sunbird_content_filter_resourcetype_blacklist
 
 var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
-console.log('allowedChannels', allowedChannels)
 var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-console.log('blackListedChannels', blackListedChannels)
 var blackListQuery = {'ne': (blackListedChannels)}
 
 var allowedFramework = whitelistedFrameworkList ? whitelistedFrameworkList.split(',') : []
-console.log('allowedFramework', allowedFramework)
 var blackListedFramework = blacklistedFrameworkList ? blacklistedFrameworkList.split(',') : []
-console.log('blackListedFramework', blackListedFramework)
+var blackListFrameworkQuery = {'ne': (blackListedFramework)}
 var allowedMimetype = whitelistedMimeTypeList ? whitelistedMimeTypeList.split(',') : []
 var blackListedMimetype = blacklistedMimeTypeList ? blacklistedMimeTypeList.split(',') : []
+var blackListMimetypeQuery = {'ne': [(blacklistedMimeTypeList)]}
 var allowedContenttype = whitelistedContentTypeList ? whitelistedContentTypeList.split(',') : []
 var blackListedContenttype = blacklistedContentTypeList ? blacklistedContentTypeList.split(',') : []
+var blackListContenttypeQuery = {'ne': [(blacklistedContentTypeList)]}
 var allowedResourcetype = whitelistedResourceTypeList ? whitelistedResourceTypeList.split(',') : []
 var blackListedResourcetype = blacklistedResourceTypeList ? blacklistedResourceTypeList.split(',') : []
+var blackListResourcetypeQuery = {'ne': [(blacklistedResourceTypeList)]}
 
 const allwhiteListedFilterQuery = {
   channel: ['b00bc992ef25f1a9a8d63291e20efc8d'],
   framework: [ 'NCF' ],
-  contentType: [ 'Collection' ],
+  contentType: [ 'Resource' ],
   mimeType: [ 'application/vnd.ekstep.content-collection' ],
-  resourceType: [ 'Collection' ]
+  resourceType: [ 'Learn' ]
 }
 
 const allblackListedFilterQuery = {
-  channel: { ne: ['012345678901210240402'] },
-  framework: { ne: [ 'NCFCOPY' ] },
-  contentType: { ne: [ 'Resource' ] },
-  mimeType: { ne: [ 'application/vnd.ekstep.ecml-archive' ] },
-  resourceType: { ne: [ 'Course' ] }
+  channel: { ne: ['0124758418460180480', '0124758449502453761'] },
+  framework: { ne: [ '01231711180382208027', '012315809814749184151' ] },
+  contentType: { ne: [ 'Story' ] },
+  mimeType: { ne: [ 'application/vnd.ekstep.h5p-archive' ] },
+  resourceType: { ne: [ 'Read' ] }
 }
-// describe('Check health api', function (done) {
-//   it('Check with different methods, it should return status code 200', function (done) {
-//     request.options({
-//       url: host + '/health',
-//       json: true
-//     }, function (_error, response, body) {
-//       expect(body).toBe('OK')
-//       done()
-//     })
-//   })
-// })
+const emptyFilterQuery = {}
+
+var configString = {}
+var generateConfigString = function (allowedMetadata, blackListedMetadata) {
+  if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
+    configString = _.difference(allowedMetadata, blackListedMetadata)
+    return configString
+  } else if (allowedMetadata && allowedMetadata.length > 0) {
+    configString = allowedMetadata
+    return configString
+  } else if (blackListedMetadata && blackListedMetadata.length > 0) {
+    configString = { 'ne': blackListedMetadata }
+    return configString
+  }
+}
+var channelConf = generateConfigString(allowedChannels, blackListedChannels)
+var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)
+var mimeTypeConf = generateConfigString(allowedMimetype, blackListedMimetype)
+var contentTypeConf = generateConfigString(allowedContenttype, blackListedContenttype)
+var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
+describe('Check health api', function (done) {
+  it('Check with different methods, it should return status code 200', function (done) {
+    request.options({
+      url: host + '/health',
+      json: true
+    }, function (_error, response, body) {
+      expect(body).toBe('OK')
+      done()
+    })
+  })
+})
 
 describe('Check environment config variables for meta filters', function (done) {
   it('check if whiteListed channel is configured', function () {
-    if ((allowedChannels && allowedChannels.length > 0) &&
-    !(blackListedChannels && blackListedChannels.length > 0)) {
+    configUtil.setConfig('META_FILTER_REQUEST_JSON', allwhiteListedFilterQuery)
+    if ((allowedChannels && allowedChannels.length > 0)) {
       expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').channel).toEqual(allowedChannels)
     }
   })
-  it('check if blackList channel is configured', function () {
-    if (!(allowedChannels && allowedChannels.length > 0) &&
-    (blackListedChannels && blackListedChannels.length > 0)) {
-      console.log('meta json1', configUtil.getConfig('META_FILTER_REQUEST_JSON'))
-      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').channel).toEqual(blackListQuery)
+  it('check if whiteListed framework is configured', function () {
+    if ((allowedFramework && allowedFramework.length > 0)) {
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').framework).toEqual(allowedFramework)
     }
   })
-  it('check if whiteListed framework is configured', function () {})
-  it('check if blackList framework is configured', function () {})
-  it('check if whiteListed contentType is configured', function () {})
-  it('check if blackList contentType is configured', function () {})
-  it('check if whiteListed mimeType is configured', function () {})
-  it('check if blackList mimeType is configured', function () {})
-  it('check if whiteListed resourceType is configured', function () {})
-  it('check if blackList resourceType is configured', function () {})
+  it('check if whiteListed contentType is configured', function () {
+    if ((allowedContenttype && allowedContenttype.length > 0)) {
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').contentType).toEqual(allowedContenttype)
+    }
+  })
+  it('check if whiteListed mimeType is configured', function () {
+    if ((allowedMimetype && allowedMimetype.length > 0)) {
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').mimeType).toEqual(allowedMimetype)
+    }
+  })
+  it('check if whiteListed resourceType is configured', function () {
+    if ((allowedResourcetype && allowedResourcetype.length > 0)) {
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').resourceType).toEqual(allowedResourcetype)
+    }
+  })
+
+  it('check if blackList channel is configured', function () {
+    configUtil.setConfig('META_FILTER_REQUEST_JSON', allblackListedFilterQuery)
+    if ((blackListedChannels && blackListedChannels.length > 0)) {
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').channel, blackListQuery)).toBeTruthy()
+    }
+  })
+  it('check if blackList framework is configured', function () {
+    configUtil.setConfig('META_FILTER_REQUEST_JSON', allblackListedFilterQuery)
+    if ((blackListedFramework && blackListedFramework.length > 0)) {
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').framework).toEqual(blackListFrameworkQuery)
+    }
+  })
+
+  it('check if blackList contentType is configured', function () {
+    if ((blackListedContenttype && blackListedContenttype.length > 0)) {
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').contentType).toEqual(blackListContenttypeQuery)
+    }
+  })
+
+  it('check if blackList mimeType is configured', function () {
+    if ((blackListedMimetype && blackListedMimetype.length > 0)) {
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').mimeType).toEqual(blackListMimetypeQuery)
+    }
+  })
+
+  it('check if blackList resourceType is configured', function () {
+    if ((blackListedResourcetype && blackListedResourcetype.length > 0)) {
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').resourceType).toEqual(blackListResourcetypeQuery)
+    }
+  })
 
   it('test for whitelist channel and blackList channel not configured', function () {
-    if (!(allowedChannels && allowedChannels.length > 0) &&
-    !(blackListedChannels && blackListedChannels.length > 0)) {
-      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON')).toEqual(null)
+    configUtil.setConfig('META_FILTER_REQUEST_JSON', emptyFilterQuery)
+    if ((allowedChannels.length > 0) && (blackListedChannels.length > 0)) {
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON')).toEqual({})
     }
   })
 
@@ -99,8 +155,10 @@ describe('Check environment config variables for meta filters', function (done) 
       expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').channel).toEqual(allwhiteListedFilterQuery.channel)
       expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').framework).toEqual(allwhiteListedFilterQuery.framework)
       expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').mimeType).toEqual(allwhiteListedFilterQuery.mimeType)
-      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').contentType).toEqual(allwhiteListedFilterQuery.contentType)
-      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').resourceType).toEqual(allwhiteListedFilterQuery.resourceType)
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').contentType)
+        .toEqual(allwhiteListedFilterQuery.contentType)
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').resourceType)
+        .toEqual(allwhiteListedFilterQuery.resourceType)
     }
   })
 
@@ -110,61 +168,149 @@ describe('Check environment config variables for meta filters', function (done) 
       expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').channel).toEqual(allblackListedFilterQuery.channel)
       expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').framework).toEqual(allblackListedFilterQuery.framework)
       expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').mimeType).toEqual(allblackListedFilterQuery.mimeType)
-      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').contentType).toEqual(allblackListedFilterQuery.contentType)
-      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').resourceType).toEqual(allblackListedFilterQuery.resourceType)
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').contentType)
+        .toEqual(allblackListedFilterQuery.contentType)
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').resourceType)
+        .toEqual(allblackListedFilterQuery.resourceType)
     }
   })
 
-  it('check if whiteListed and blacklisted meta filters is configured', function () {
+  it('check if whiteListed and blacklisted channel filters is configured', function () {
     configUtil.setConfig('META_FILTER_REQUEST_JSON', allwhiteListedFilterQuery)
     if ((allowedChannels && allowedChannels.length > 0) &&
         (blackListedChannels && blackListedChannels.length > 0)) {
-      var configString = {}
-      var generateConfigString = function (allowedMetadata, blackListedMetadata) {
-        if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
-          configString = _.difference(allowedMetadata, blackListedMetadata)
-          return configString
-        } else if (allowedMetadata && allowedMetadata.length > 0) {
-          configString = allowedMetadata
-          return configString
-        } else if (blackListedMetadata && blackListedMetadata.length > 0) {
-          configString = { 'ne': blackListedMetadata }
-          return configString
-        }
-      }
-      var channelConf = generateConfigString(allowedChannels, blackListedChannels)
-      console.log('channelConf', channelConf)
-      console.log('mf conf', configUtil.getConfig('META_FILTER_REQUEST_JSON').channel)
-      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON').channel).toEqual(channelConf)
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').channel, channelConf)).toBeTruthy()
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').mimeType, mimeTypeConf)).toBeTruthy()
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').resourceType, resourceTypeConf)).toBeTruthy()
     }
   })
-  it('check if whiteListed and blacklisted framework is configured', function () {})
-  it('check if whiteListed and blacklisted contentType is configured', function () {})
-  it('check if whiteListed and blacklisted resourceType is configured', function () {})
-  it('check if whiteListed and blacklisted mimeType is configured', function () {})
+  it('check if whiteListed and blacklisted framework is configured', function () {
+    if ((allowedFramework && allowedFramework.length > 0) && (blackListedFramework &&
+      blackListedFramework.length > 0)) {
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').framework, frameworkConf)).toBeTruthy()
+    }
+  })
+  it('check if whiteListed and blacklisted contentType is configured', function () {
+    if ((allowedContenttype && allowedContenttype.length > 0) &&
+    (blackListedContenttype && blackListedContenttype.length > 0)) {
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').contentType, contentTypeConf)).toBeTruthy()
+    }
+  })
+  it('check if whiteListed and blacklisted resourceType is configured', function () {
+    if ((allowedResourcetype && allowedResourcetype.length > 0) &&
+    (blackListedResourcetype && blackListedResourcetype.length > 0)) {
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').resourceType, resourceTypeConf)).toBeTruthy()
+    }
+  })
+  it('check if whiteListed and blacklisted mimeType is configured', function () {
+    if ((allowedMimetype && allowedMimetype.length > 0) &&
+    (blackListedMimetype && blackListedMimetype.length > 0)) {
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').mimeType, mimeTypeConf)).toBeTruthy()
+    }
+  })
 
-  it('Check if filterConfig service data is available', function () {})
-  it('If FilterConfig is null/undefined, generate filter Object from environment variables', function () { })
+  it('If FilterConfig is null/undefined, generate filter Object from environment variables', function () {
+    const filterService = ''
+    if (filterService === '') {
+      var generateJSON = {
+        channel: channelConf,
+        framework: frameworkConf,
+        contentType: contentTypeConf,
+        mimeType: mimeTypeConf,
+        resourceType: resourceTypeConf
+      }
+      expect((generateJSON).channel).toEqual(allwhiteListedFilterQuery.channel)
+      expect((generateJSON).framework).toEqual(allwhiteListedFilterQuery.framework)
+      expect((generateJSON).contentType).toEqual(allwhiteListedFilterQuery.contentType)
+      expect((generateJSON).resourceType).toEqual(allwhiteListedFilterQuery.resourceType)
+      expect((generateJSON).mimeType).toEqual(allwhiteListedFilterQuery.mimeType)
+      configUtil.setConfig('META_FILTER_REQUEST_JSON', generateJSON)
+      expect(configUtil.getConfig('META_FILTER_REQUEST_JSON')).toEqual(generateJSON)
+    }
+  })
 
-  it('Check if filter JSON is generated and assigned to META_FILTER_QUERY_STRING', function () { })
-  it('Check if filter JSON is not generated, not assigned to META_FILTER_QUERY_STRING', function () { })
+  it('Check if filter JSON is not generated, not assigned to META_FILTER_REQUEST_JSON', function () {
+    configUtil.setConfig('META_FILTER_REQUEST_JSON', {})
+    expect(configUtil.getConfig('META_FILTER_REQUEST_JSON')).toEqual({})
+  })
+})
 
-  it('if framework and channel is configured', function () { })
-  it('if framework and mimeType is configured', function () { })
-  it('if framework and resourceType is configured', function () { })
-  it('if channel and resourceType is configured', function () { })
-  it('if contentType and mimeType is configured', function () { })
-  it('if contentType and resourceType is configured', function () { })
-  it('if channel and resourceType is configured', function () { })
+// Negative scenarios of 3 combination not present
+describe('Combination of 3 filters are not configured', function (done) {
+  var configString = {}
+  var generateConfigString = function (allowedMetadata, blackListedMetadata) {
+    if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
+      configString = _.difference(allowedMetadata, blackListedMetadata)
+      return configString
+    } else if (allowedMetadata && allowedMetadata.length > 0) {
+      configString = allowedMetadata
+      return configString
+    } else if (blackListedMetadata && blackListedMetadata.length > 0) {
+      configString = { 'ne': blackListedMetadata }
+      return configString
+    }
+  }
 
-  // Negative scenarios of 3 combination not present
-  it('if contentType, mimeType, resourceType is not configured', function () { })
-  it('if contentType, channel, resourceType is not configured', function () { })
-  it('if contentType, mimeType, channel is not configured', function () { })
-  it('if contentType, mimeType, framework is not configured', function () { })
-  it('if channel, framework, resourceType is not configured', function () { })
-  it('if channel, mimeType, framework is not configured', function () { })
-  it('if contentType, mimeType, framework is not configured', function () { })
+  it('if contentType, mimeType, resourceType is not configured', function () {
+    const chFwfilterQuery = {
+      channel: ['b00bc992ef25f1a9a8d63291e20efc8d'],
+      framework: [ 'NCF' ]
+    }
+    allowedMimetype = []
+    blackListedMimetype = []
+    allowedContenttype = []
+    blackListedContenttype = []
+    allowedResourcetype = []
+    blackListedResourcetype = []
+
+    var channelConf = generateConfigString(allowedChannels, blackListedChannels)
+    var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)
+    var mimeTypeConf = generateConfigString(allowedMimetype, blackListedMimetype)
+    var contentTypeConf = generateConfigString(allowedContenttype, blackListedContenttype)
+    var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
+
+    if (chFwfilterQuery) {
+      configUtil.setConfig('META_FILTER_REQUEST_JSON', chFwfilterQuery)
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').channel, channelConf)).toBeTruthy()
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').framework, frameworkConf)).toBeTruthy()
+      expect(mimeTypeConf).toBeUndefined()
+      expect(contentTypeConf).toBeUndefined()
+      expect(resourceTypeConf).toBeUndefined()
+    }
+  })
+
+  it('if contentType, channel, resourceType is not configured', function () {
+    const mimeFwfilterQuery = {
+      mimeType: ['application/vnd.ekstep.content-collection'],
+      framework: [ 'NCF' ]
+    }
+    allowedContenttype = []
+    blackListedContenttype = []
+
+    allowedChannels = []
+    blackListedChannels = []
+
+    allowedResourcetype = []
+    blackListedResourcetype = []
+
+    var allowedMimetype = whitelistedMimeTypeList ? whitelistedMimeTypeList.split(',') : []
+    var blackListedMimetype = blacklistedMimeTypeList ? blacklistedMimeTypeList.split(',') : []
+
+    var channelConf = generateConfigString(allowedChannels, blackListedChannels)
+    var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)
+    var mimeTypeConf = generateConfigString(allowedMimetype, blackListedMimetype)
+    var contentTypeConf = generateConfigString(allowedContenttype, blackListedContenttype)
+    var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
+
+    if (mimeFwfilterQuery) {
+      configUtil.setConfig('META_FILTER_REQUEST_JSON', mimeFwfilterQuery)
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').mimeType, mimeTypeConf)).toBeTruthy()
+      expect(_.isEqual(configUtil.getConfig('META_FILTER_REQUEST_JSON').framework, frameworkConf)).toBeTruthy()
+      expect(channelConf).toBeUndefined()
+      expect(contentTypeConf).toBeUndefined()
+      expect(resourceTypeConf).toBeUndefined()
+    }
+  })
 })
 // below method used to close server once all the specs are executed
 // var _finishCallback = jasmine.Runner.prototype.finishCallback

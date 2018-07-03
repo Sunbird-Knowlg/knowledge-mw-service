@@ -28,15 +28,14 @@ function addMetaFilters (req, res, next) {
     }
     LOG.info(utilsService.getLoggerData({}, 'INFO',
       filename, 'addMetaFilters', 'added content meta filter', req.body.request.filters))
-    console.log('req filters', req.body.request.filters)
+    next()
+  } else {
     next()
   }
-  // else {
 }
 function fetchFilterQuery (req, filter) {
   filterService.getMetadataFilterQuery(function (err, searchJSON) {
     console.log('err', err)
-    console.log('channels', searchJSON)
     if (err) {
       LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'addChannelFilters',
         'failed to get channels'))
@@ -46,9 +45,7 @@ function fetchFilterQuery (req, filter) {
           var val = searchJSON[key]
 
           if (key === filter && val !== undefined) {
-            console.log('key', key)
             var finalval = req.body.request.filters[key] = val
-            console.log('finalval', finalval)
             return finalval
           }
         }
