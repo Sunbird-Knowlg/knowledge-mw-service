@@ -33,9 +33,3 @@ describe('content meta filter service from config', function () {
     expect(configUtil.getConfig('META_FILTER_REQUEST_JSON')).toEqual(blacklist)
   })
 })
-
-describe('content meta filter service from config', function () {
-  it('check for getMetadataFilterQuery method', function () {})
-  it('check for whitelisted metafilter set in config', function () {})
-  it('check for blacklisted metafilter set in config', function () {})
-})
