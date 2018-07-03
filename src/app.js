@@ -29,9 +29,6 @@ globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process
 const contentProviderBaseUrl = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://qa.ekstep.in/api'
 const contentProviderApiKey = process.env.sunbird_content_provider_api_key
 
-const learnerServiceApiKey = process.env.sunbird_learner_service_api_key
-const learnerServiceBaseUrl = process.env.sunbird_learner_service_base_url ? process.env.sunbird_learner_service_base_url : 'https://dev.open-sunbird.org/api'
-
 const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_base_url
   ? process.env.sunbird_learner_service_local_base_url
   : 'http://learner-service:9000'
@@ -45,9 +42,7 @@ configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('BASE_URL', contentProviderBaseUrl)
 configUtil.setConfig('TELEMETRY_BASE_URL', telemetryBaseUrl)
 configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + contentProviderApiKey)
-configUtil.setConfig('LEARNER_SERVICE_BASE_URL', learnerServiceBaseUrl)
 configUtil.setConfig('LEARNER_SERVICE_LOCAL_BASE_URL', learnerServiceLocalBaseUrl)
-configUtil.setConfig('LEARNER_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + learnerServiceApiKey)
 configUtil.setConfig('DIALCODE_GENERATE_MAX_COUNT', 20000)
 configUtil.setConfig('CONTENT_UPLOAD_REQ_LIMIT', reqDataLimitOfContentUpload)
 process.env.sunbird_cassandra_ips = process.env.sunbird_cassandra_ips || '127.0.0.1'
