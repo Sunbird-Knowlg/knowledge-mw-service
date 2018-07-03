@@ -113,13 +113,6 @@ describe('Composite search services', function () {
     })
     done()
   })
-
-  // check if the filterMiddleware.addMetaFilter is called content Search route
-  it('check for metafilter JSON is called with whitelist filter values', function (done) {
-  })
-
-  it('check for metafilter JSON in called with blacklist filter values', function (done) {
-  })
 })
 
 describe('Composite search services with request filter channel search', function () {
