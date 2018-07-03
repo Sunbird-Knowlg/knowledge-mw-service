@@ -1,4 +1,7 @@
+<<<<<<< 8e9b02dc174560966972dd70f6795aadfae856ee
 
+=======
+>>>>>>> Issue #SB-3715 fix: unit test cases
 /**
  * @name : requestMiddleware.js
  * @description : Responsible for test request.middleware.js
@@ -235,10 +238,15 @@ describe(' Combination of 2 meta filters  defined ', function () {
       expect(req3.body.request.filters.resourceType).toEqual(whiteList.resourceType)
     })
   })
+<<<<<<< 8e9b02dc174560966972dd70f6795aadfae856ee
 
   // this.result.extra_suite_data = {suiteInfo: 'extra info'}
   it('if channel and resourceType is configured', function () {
     var req4 = {
+=======
+  it('if channel and resourceType is configured', function () {
+    const req4 = {
+>>>>>>> Issue #SB-3715 fix: unit test cases
       'body': {
         'request': {
           'filters': {
@@ -265,14 +273,21 @@ describe(' Combination of 2 meta filters  defined ', function () {
       expect(req4.body.request.filters.mimeType).toEqual(whiteList.mimeType)
     })
   })
+<<<<<<< 8e9b02dc174560966972dd70f6795aadfae856ee
 
+=======
+>>>>>>> Issue #SB-3715 fix: unit test cases
   it('if contentType and mimeType is configured', function () {
     const req5 = {
       'body': {
         'request': {
           'filters': {
             contentType: [ 'in.ekstep' ],
+<<<<<<< 8e9b02dc174560966972dd70f6795aadfae856ee
             mimeType: [ 'application/vnd.ekstep.h5p-archive' ]
+=======
+            mimeType: [ 'Story' ]
+>>>>>>> Issue #SB-3715 fix: unit test cases
           }
         }
       }
