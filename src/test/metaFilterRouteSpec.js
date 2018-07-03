@@ -209,6 +209,37 @@ describe('Check for routes not to call the AddMetaFilter', function () {
   })
 })
 describe('Check for routes not to call the AddMetaFilter', function () {
-  it('if framework filter calls the route, addMetaFilter should not be called ', function () {})
-  it('if framework filter calls the route, filter should not be generated', function () {})
+  // it('if framework filter calls the route, addMetaFilter should not be called ', function () {
+  async.forEach(nonFilterRoutes, function (route, callback) {
+    describe('Composite search services for non filters', function (done) {
+      var req
+      var body = {
+        'request': {
+          'query': 'Test',
+          'filters': {}
+        }
+      }
+      beforeEach(function (done) {
+        req = httpMocks.createRequest({
+          method: 'POST',
+          uri: baseUrl + route,
+          body: body
+        })
+
+        done()
+      })
+      it('if framework filter calls the route, addMetaFilter should not be called  ' + route, function () {
+        const allwhiteListedFilterQuery = {
+          channel: ['b00bc992ef25f1a9a8d63291e20efc8d'],
+          framework: [ 'NCF' ],
+          contentType: [ 'Resource' ],
+          mimeType: [ 'application/vnd.ekstep.content-collection' ],
+          resourceType: [ 'Learn' ]
+        }
+        configUtil.setConfig('META_FILTER_REQUEST_JSON', allwhiteListedFilterQuery)
+        expect(!_.includes(metaFilterRoutes, route)).toBeTruthy()
+        expect(req.body.request.filters).toEqual({})
+      })
+    })
+  })
 })

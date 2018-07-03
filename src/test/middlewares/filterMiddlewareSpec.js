@@ -234,7 +234,6 @@ describe(' Combination of 2 meta filters  defined ', function () {
       expect(req3.body.request.filters.resourceType).toEqual(whiteList.resourceType)
     })
   })
-
   it('if channel and resourceType is configured', function () {
     const req4 = {
       'body': {
