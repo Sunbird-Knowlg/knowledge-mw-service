@@ -30,37 +30,37 @@ function getAppIDForRESP (path) {
 }
 
 function getLoggerData (rspObj, level, file, method, message, data, stacktrace) {
-  var newDataObj = {}
-  if (data && data.headers && data.headers.telemetryData) {
-    newDataObj = JSON.parse(JSON.stringify(data))
-    delete newDataObj.headers['telemetryData']
-  } else {
-    newDataObj = data
-  }
-  var dataObj = {
-    'eid': 'BE_LOG',
-    'ets': Date.now(),
-    'ver': '1.0',
-    'mid': rspObj.msgid,
-    'context': {
-      'pdata': {
-        'id': rspObj.apiId,
-        'ver': rspObj.apiVersion
-      }
-    },
-    'edata': {
-      'eks': {
-        'level': level,
-        'class': file,
-        'method': method,
-        'message': message,
-        'data': newDataObj,
-        'stacktrace': stacktrace
-      }
-    }
-  }
+  // var newDataObj = {}
+  // if (data && data.headers && data.headers.telemetryData) {
+  //   newDataObj = JSON.parse(JSON.stringify(data))
+  //   delete newDataObj.headers['telemetryData']
+  // } else {
+  //   newDataObj = data
+  // }
+  // var dataObj = {
+  //   'eid': 'BE_LOG',
+  //   'ets': Date.now(),
+  //   'ver': '1.0',
+  //   'mid': rspObj.msgid,
+  //   'context': {
+  //     'pdata': {
+  //       'id': rspObj.apiId,
+  //       'ver': rspObj.apiVersion
+  //     }
+  //   },
+  //   'edata': {
+  //     'eks': {
+  //       'level': level,
+  //       'class': file,
+  //       'method': method,
+  //       'message': message,
+  //       'data': newDataObj,
+  //       'stacktrace': stacktrace
+  //     }
+  //   }
+  // }
 
-  return dataObj
+  return null
 }
 
 function getPerfLoggerData (rspObj, level, file, method, message, data, stacktrace) {
