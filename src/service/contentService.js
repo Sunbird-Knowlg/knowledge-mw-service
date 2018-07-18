@@ -56,7 +56,7 @@ function searchAPI (req, response) {
 }
 
 function searchContentAPI (req, response) {
-  return search(getContentTypeForContent(), req, response)
+  return search(getContentTypeForContent(), req, response, ['content'])
 }
 
 // This function used for performance log
@@ -67,7 +67,7 @@ function searchContentAPI (req, response) {
 //   }
 // }
 
-function search (defaultContentTypes, req, response) {
+function search (defaultContentTypes, req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -83,6 +83,9 @@ function search (defaultContentTypes, req, response) {
 
   if (!data.request.filters) {
     data.request.filters.contentType = defaultContentTypes
+  }
+  if (objectType) {
+    data.request.filters.objectType = objectType
   }
   //    if(!data.request.filters.mimeType) {
   //        data.request.filters.mimeType = getMimeTypeForContent();
