@@ -7,7 +7,7 @@ var filename = path.basename(__filename)
 
 function addMetaFilters (req, res, next) {
   // If the request body has filter by metaFilter data, continue with the same filter, do not alter the values
-  // else call the getMetaSearchJSON() function to generate the search string for the meta filters
+  // else call the fetchFilterQuery() function to generate the search string for the meta filters
   if (req && req.body && req.body.request && req.body.request.filters) {
     if (req.body.request.filters.channel === undefined) {
       fetchFilterQuery(req, 'channel')
