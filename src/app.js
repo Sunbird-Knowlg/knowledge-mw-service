@@ -31,6 +31,7 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
   ? process.env.sunbird_learner_service_local_base_url
   : 'http://learner-service:9000'
 
+
 const searchServiceBaseUrl = process.env.sunbird_search_service_api_base_url || 'https://qa.ekstep.in/api/search'
 const dialServiceBaseUrl = process.env.sunbird_dial_service_api_base_url || 'https://qa.ekstep.in/api'
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
