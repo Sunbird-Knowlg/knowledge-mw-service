@@ -8,11 +8,9 @@ var TelemetryUtil = require('sb_telemetry_util')
 var telemetry = new TelemetryUtil()
 var fs = require('fs')
 var configUtil = require('sb-config-util')
-var _ = require('underscore')
-var filename = path.basename(__filename)
-var utilsService = require('./service/utilsService')
-var LOG = require('sb_logger_util')
+
 const contentProvider = require('sb_content_provider_util')
+var contentMeta = require('./contentMetaFilter')
 // TODO below configuration should to be refactored in a seperate file
 
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
@@ -35,18 +33,6 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
 
 const searchServiceBaseUrl = process.env.sunbird_search_service_api_base_url || 'https://qa.ekstep.in/api/search'
 const dialServiceBaseUrl = process.env.sunbird_dial_service_api_base_url || 'https://qa.ekstep.in/api'
-
-const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
-const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
-const whitelistedFrameworkList = process.env.sunbird_content_filter_framework_whitelist
-const blacklistedFrameworkList = process.env.sunbird_content_filter_framework_blacklist
-const whitelistedMimeTypeList = process.env.sunbird_content_filter_mimetype_whitelist
-const blacklistedMimeTypeList = process.env.sunbird_content_filter_mimetype_blacklist
-const whitelistedContentTypeList = process.env.sunbird_content_filter_contenttype_whitelist
-const blacklistedContentTypeList = process.env.sunbird_content_filter_contenttype_blacklist
-const whitelistedResourceTypeList = process.env.sunbird_content_filter_resourcetype_whitelist
-const blacklistedResourceTypeList = process.env.sunbird_content_filter_resourcetype_blacklist
-
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
@@ -132,7 +118,7 @@ if (defaultChannel) {
           'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
           process.exit(1)
         }
-        configUtil.setConfig('META_FILTER_REQUEST_JSON', getMetaFilterConfig())
+        configUtil.setConfig('META_FILTER_REQUEST_JSON', contentMeta.getMetaFilterConfig())
       })
     } else {
       console.log('error in fetching default channel', defaultChannel, err, res)
@@ -172,66 +158,3 @@ const telemetryConfig = {
 }
 
 telemetry.init(telemetryConfig)
-
-// function to generate the search filter and return JSON Object
-function getMetaFilterConfig () {
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'environment info', process.env))
-  var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
-  var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-  var allowedFramework = whitelistedFrameworkList ? whitelistedFrameworkList.split(',') : []
-  var blackListedFramework = blacklistedFrameworkList ? blacklistedFrameworkList.split(',') : []
-  var allowedMimetype = whitelistedMimeTypeList ? whitelistedMimeTypeList.split(',') : []
-  var blackListedMimetype = blacklistedMimeTypeList ? blacklistedMimeTypeList.split(',') : []
-  var allowedContenttype = whitelistedContentTypeList ? whitelistedContentTypeList.split(',') : []
-  var blackListedContenttype = blacklistedContentTypeList ? blacklistedContentTypeList.split(',') : []
-  var allowedResourcetype = whitelistedResourceTypeList ? whitelistedResourceTypeList.split(',') : []
-  var blackListedResourcetype = blacklistedResourceTypeList ? blacklistedResourceTypeList.split(',') : []
-
-  var channelConf = generateConfigString(allowedChannels, blackListedChannels)
-  var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)
-  var mimeTypeConf = generateConfigString(allowedMimetype, blackListedMimetype)
-  var contentTypeConf = generateConfigString(allowedContenttype, blackListedContenttype)
-  var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
-
-  var configString = {}
-  function generateConfigString (allowedMetadata, blackListedMetadata) {
-    if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
-      configString = _.difference(allowedMetadata, blackListedMetadata)
-      return configString
-    } else if (allowedMetadata && allowedMetadata.length > 0) {
-      configString = allowedMetadata
-      return configString
-    } else if (blackListedMetadata && blackListedMetadata.length > 0) {
-      configString = { 'ne': blackListedMetadata }
-      return configString
-    }
-  }
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'config string', configString))
-  // Check if the Filter Config service data is defined, if yes, create Object with it
-  const filterConfigService = ''
-  if (filterConfigService === '') {
-    // Call getFilterJSONFromEnv to generate a JSON Object
-    return getFilterJSONFromEnv(channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf)
-  } else {
-    // return getFilterJSONfromConfigService()
-    return getFilterJSONfromConfigService()
-  }
-}
-
-function getFilterJSONFromEnv (channelConf, frameworkConf, contentTypeConf, mimeTypeConf, resourceTypeConf) {
-  // Generate JSON and return
-  var generateJSON = {
-    channel: channelConf,
-    framework: frameworkConf,
-    contentType: contentTypeConf,
-    mimeType: mimeTypeConf,
-    resourceType: resourceTypeConf
-  }
-  return generateJSON
-}
-function getFilterJSONfromConfigService () {
-  // Generate JSON from Config Service and return
-  throw new Error('Config service is unavailable')
-}
