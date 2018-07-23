@@ -2,7 +2,7 @@
     "API": {
         "CREATE_CONTENT_URI": "/content/v3/create",
         "SEARCH_CONTENT_URI": "/content/v3/search",
-        "COMPOSITE_SEARCH_URI": "/composite/v3/search",
+        "COMPOSITE_SEARCH_URI": "/v3/search",
         "UPDATE_CONTENT_URI": "/content/v3/update",
         "GET_CONTENT_URI": "/content/v3/read",
         "REVIEW_CONTENT_URI": "/content/v3/review",

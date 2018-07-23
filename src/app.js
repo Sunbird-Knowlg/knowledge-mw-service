@@ -33,6 +33,9 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
   ? process.env.sunbird_learner_service_local_base_url
   : 'http://learner-service:9000'
 
+const searchServiceBaseUrl = process.env.sunbird_search_service_api_base_url || 'https://qa.ekstep.in/api/search'
+const dialServiceBaseUrl = process.env.sunbird_dial_service_api_base_url || 'https://qa.ekstep.in/api'
+
 const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
 const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
 
@@ -45,6 +48,8 @@ configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + contentProviderApiKey)
 configUtil.setConfig('LEARNER_SERVICE_LOCAL_BASE_URL', learnerServiceLocalBaseUrl)
 configUtil.setConfig('DIALCODE_GENERATE_MAX_COUNT', 20000)
 configUtil.setConfig('CONTENT_UPLOAD_REQ_LIMIT', reqDataLimitOfContentUpload)
+configUtil.setConfig('SEARCH_SERVICE_BASE_URL', searchServiceBaseUrl)
+configUtil.setConfig('DIAL_SERVICE_BASE_URL', dialServiceBaseUrl)
 process.env.sunbird_cassandra_ips = process.env.sunbird_cassandra_ips || '127.0.0.1'
 process.env.sunbird_cassandra_port = process.env.sunbird_cassandra_port || 9042
 process.env.dial_code_image_temp_folder = 'temp'
