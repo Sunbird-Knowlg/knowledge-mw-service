@@ -21,36 +21,22 @@ var httpMocks = require('node-mocks-http')
 
 var baseUrl = 'http://localhost:5000/v1/'
 var async = require('async')
+var contentMetaConfig = require('./contentMetaConfig')
 
-const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
-const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
+var allowedChannels = contentMetaConfig.allowedChannels
+var blackListedChannels = contentMetaConfig.blackListedChannels
 
-const whitelistedFrameworkList = process.env.sunbird_content_service_whitelisted_framework
-const blacklistedFrameworkList = process.env.sunbird_content_service_blacklisted_framework
+var allowedFramework = contentMetaConfig.allowedFramework
+var blackListedFramework = contentMetaConfig.blacklistedFrameworkList
 
-const whitelistedMimeTypeList = process.env.sunbird_content_service_whitelisted_mimetype
-const blacklistedMimeTypeList = process.env.sunbird_content_service_blacklisted_mimetype
+var allowedMimetype = contentMetaConfig.allowedMimetype
+var blackListedMimetype = contentMetaConfig.blackListedMimetype
 
-const whitelistedContentTypeList = process.env.sunbird_content_service_whitelisted_contenttype
-const blacklistedContentTypeList = process.env.sunbird_content_service_blacklisted_contenttype
+var allowedContenttype = contentMetaConfig.allowedContenttype
+var blackListedContenttype = contentMetaConfig.blackListedContenttype
 
-const whitelistedResourceTypeList = process.env.sunbird_content_service_whitelisted_resourcetype
-const blacklistedResourceTypeList = process.env.sunbird_content_service_blacklisted_resourcetype
-
-var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
-var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-
-var allowedFramework = whitelistedFrameworkList ? whitelistedFrameworkList.split(',') : []
-var blackListedFramework = blacklistedFrameworkList ? blacklistedFrameworkList.split(',') : []
-
-var allowedMimetype = whitelistedMimeTypeList ? whitelistedMimeTypeList.split(',') : []
-var blackListedMimetype = blacklistedMimeTypeList ? blacklistedMimeTypeList.split(',') : []
-
-var allowedContenttype = whitelistedContentTypeList ? whitelistedContentTypeList.split(',') : []
-var blackListedContenttype = blacklistedContentTypeList ? blacklistedContentTypeList.split(',') : []
-
-var allowedResourcetype = whitelistedResourceTypeList ? whitelistedResourceTypeList.split(',') : []
-var blackListedResourcetype = blacklistedResourceTypeList ? blacklistedResourceTypeList.split(',') : []
+var allowedResourcetype = contentMetaConfig.allowedResourcetype
+var blackListedResourcetype = contentMetaConfig.blackListedResourcetype
 
 var channelConf = generateConfigString(allowedChannels, blackListedChannels)
 var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)

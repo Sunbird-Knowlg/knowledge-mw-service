@@ -49,16 +49,17 @@ function getMetaFilterConfig () {
   const filterConfigService = ''
   if (filterConfigService === '') {
     // generate JSON and return the configArray
-    var metaFiltersArray = {'channel': [allowedChannels, blackListedChannels],
+    var metaFiltersArray = {
+      'channel': [allowedChannels, blackListedChannels],
       'framework': [allowedFramework, blackListedFramework],
       'mimeType': [allowedMimetype, blackListedMimetype],
       'contentType': [allowedContenttype, blackListedContenttype],
-      'resourceType': [allowedResourcetype, blackListedResourcetype]}
+      'resourceType': [allowedResourcetype, blackListedResourcetype]
+    }
     var configArray = {}
     _.forOwn(metaFiltersArray, function (value, key) {
       configArray['' + key] = generateConfigString(value[0], value[1])
     })
-    console.log('configArray', configArray)
     return configArray
   } else {
     // return getFilterJSONfromConfigService()
@@ -67,7 +68,7 @@ function getMetaFilterConfig () {
 }
 
 function getFilterJSONfromConfigService () {
-  // Generate JSON from Config Service and return
+  // Generate JSON from Config Service and return the filter Object else throw errors
   throw new Error('Config service is unavailable')
 }
 
