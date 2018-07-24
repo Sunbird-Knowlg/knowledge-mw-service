@@ -12,8 +12,8 @@ const metaFilterRoutes = [
 ]
 
 const nonFilterRoutes = [
-  'xyz',
-  'abc'
+  'user/inbox',
+  'tenant/info/sunbird'
 ]
 
 var filterMiddleware = require('../middlewares/filter.middleware')
@@ -25,23 +25,24 @@ var async = require('async')
 const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
 const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
 
-const whitelistedFrameworkList = process.env.sunbird_content_filter_framework_whitelist
-const blacklistedFrameworkList = process.env.sunbird_content_filter_framework_blacklist
+const whitelistedFrameworkList = process.env.sunbird_content_service_whitelisted_framework
+const blacklistedFrameworkList = process.env.sunbird_content_service_blacklisted_framework
 
-const whitelistedMimeTypeList = process.env.sunbird_content_filter_mimetype_whitelist
-const blacklistedMimeTypeList = process.env.sunbird_content_filter_mimetype_blacklist
+const whitelistedMimeTypeList = process.env.sunbird_content_service_whitelisted_mimetype
+const blacklistedMimeTypeList = process.env.sunbird_content_service_blacklisted_mimetype
 
-const whitelistedContentTypeList = process.env.sunbird_content_filter_contenttype_whitelist
-const blacklistedContentTypeList = process.env.sunbird_content_filter_contenttype_blacklist
+const whitelistedContentTypeList = process.env.sunbird_content_service_whitelisted_contenttype
+const blacklistedContentTypeList = process.env.sunbird_content_service_blacklisted_contenttype
 
-const whitelistedResourceTypeList = process.env.sunbird_content_filter_resourcetype_whitelist
-const blacklistedResourceTypeList = process.env.sunbird_content_filter_resourcetype_blacklist
+const whitelistedResourceTypeList = process.env.sunbird_content_service_whitelisted_resourcetype
+const blacklistedResourceTypeList = process.env.sunbird_content_service_blacklisted_resourcetype
 
 var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
 var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
 
 var allowedFramework = whitelistedFrameworkList ? whitelistedFrameworkList.split(',') : []
 var blackListedFramework = blacklistedFrameworkList ? blacklistedFrameworkList.split(',') : []
+
 var allowedMimetype = whitelistedMimeTypeList ? whitelistedMimeTypeList.split(',') : []
 var blackListedMimetype = blacklistedMimeTypeList ? blacklistedMimeTypeList.split(',') : []
 
@@ -106,7 +107,7 @@ describe('Check for all required route to call the AddMetaFilter', function () {
           expect(req.body.request.filters).toBeDefined()
         })
       })
-      it('check for filter in config with value' + route, function () {
+      it('check for filter in config with value ' + route, function () {
         const allwhiteListedFilterQuery = {
           channel: ['b00bc992ef25f1a9a8d63291e20efc8d'],
           framework: [ 'NCF' ],

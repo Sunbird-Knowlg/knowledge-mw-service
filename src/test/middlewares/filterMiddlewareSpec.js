@@ -74,7 +74,6 @@ describe('Initialization of meta filters', function () {
     configUtil.setConfig('META_FILTER_REQUEST_JSON', blacklist)
     filterMiddleware.addMetaFilters(req1, {}, function () {
       expect(req1.body.request.filters.channel).toEqual(blacklist.channel)
-      console.log('rest', req1)
     })
   })
   it('check for getChannelSearchString method creates proper whitelisted search string', function () {
@@ -344,10 +343,10 @@ describe(' Combination of 2 meta filters  defined ', function () {
 
     filterMiddleware.addMetaFilters(req7, {}, function () {
       expect(req7.body.request.filters.channel).toBeDefined()
-      expect(req7.body.request.filters.resourceType).toBeDefined()
+      expect(req7.body.request.filters.mimeType).toBeDefined()
+      expect(req7.body.request.filters.resourceType).toEqual(whiteList.resourceType)
       expect(req7.body.request.filters.contentType).toEqual(whiteList.contentType)
       expect(req7.body.request.filters.framework).toEqual(whiteList.framework)
-      expect(req7.body.request.filters.mimeType).toEqual(whiteList.mimeType)
     })
   })
 })
