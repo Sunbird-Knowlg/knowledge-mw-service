@@ -1,4 +1,3 @@
-var _ = require('underscore')
 var filterService = require('../service/filterService')
 var LOG = require('sb_logger_util')
 var utilsService = require('../service/utilsService')
@@ -35,18 +34,17 @@ function addMetaFilters (req, res, next) {
 }
 function fetchFilterQuery (req, filter) {
   filterService.getMetadataFilterQuery(function (err, searchJSON) {
-    console.log('err', err)
+    // console.log('err', err)
     if (err) {
-      LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'addChannelFilters',
-        'failed to get channels'))
-    } else if (searchJSON && (!_.isEmpty(searchJSON))) {
+      LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'fetchFilterQuery',
+        'failed to get fetch filter query'))
+    } else if (searchJSON) {
       for (var key in searchJSON) {
         if (searchJSON.hasOwnProperty(key)) {
-          var val = searchJSON[key]
-
-          if (key === filter && val !== undefined) {
-            var finalval = req.body.request.filters[key] = val
-            return finalval
+          var searchJSONVal = searchJSON[key]
+          if (key === filter && searchJSONVal !== undefined) {
+            var finalFilterValue = req.body.request.filters[key] = searchJSONVal
+            return finalFilterValue
           }
         }
       }
