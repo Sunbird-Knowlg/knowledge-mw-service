@@ -21,6 +21,7 @@ var httpMocks = require('node-mocks-http')
 
 var baseUrl = 'http://localhost:5000/v1/'
 var async = require('async')
+<<<<<<< 310a0a009b5fea5989369ef73681efd4b276f3dc
 var contentMetaConfig = require('./contentMetaConfig')
 
 function generateConfigString (metaFiltersArray) {
@@ -37,6 +38,51 @@ function generateConfigString (metaFiltersArray) {
     }
   })
   return configArray
+=======
+
+const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
+const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
+
+const whitelistedFrameworkList = process.env.sunbird_content_service_whitelisted_framework
+const blacklistedFrameworkList = process.env.sunbird_content_service_blacklisted_framework
+
+const whitelistedMimeTypeList = process.env.sunbird_content_service_whitelisted_mimetype
+const blacklistedMimeTypeList = process.env.sunbird_content_service_blacklisted_mimetype
+
+const whitelistedContentTypeList = process.env.sunbird_content_service_whitelisted_contenttype
+const blacklistedContentTypeList = process.env.sunbird_content_service_blacklisted_contenttype
+
+const whitelistedResourceTypeList = process.env.sunbird_content_service_whitelisted_resourcetype
+const blacklistedResourceTypeList = process.env.sunbird_content_service_blacklisted_resourcetype
+
+var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
+var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
+
+var allowedFramework = whitelistedFrameworkList ? whitelistedFrameworkList.split(',') : []
+var blackListedFramework = blacklistedFrameworkList ? blacklistedFrameworkList.split(',') : []
+
+var allowedMimetype = whitelistedMimeTypeList ? whitelistedMimeTypeList.split(',') : []
+var blackListedMimetype = blacklistedMimeTypeList ? blacklistedMimeTypeList.split(',') : []
+
+var allowedContenttype = whitelistedContentTypeList ? whitelistedContentTypeList.split(',') : []
+var blackListedContenttype = blacklistedContentTypeList ? blacklistedContentTypeList.split(',') : []
+
+var allowedResourcetype = whitelistedResourceTypeList ? whitelistedResourceTypeList.split(',') : []
+var blackListedResourcetype = blacklistedResourceTypeList ? blacklistedResourceTypeList.split(',') : []
+
+var channelConf = generateConfigString(allowedChannels, blackListedChannels)
+var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)
+var mimeTypeConf = generateConfigString(allowedMimetype, blackListedMimetype)
+var contentTypeConf = generateConfigString(allowedContenttype, blackListedContenttype)
+var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
+
+var generateJSON = {
+  channel: channelConf,
+  framework: frameworkConf,
+  contentType: contentTypeConf,
+  mimeType: mimeTypeConf,
+  resourceType: resourceTypeConf
+>>>>>>> Issue #SB-3715 fix: var name changed in specs
 }
 var metaFiltersArray = {
   'channel': [contentMetaConfig.allowedChannels, contentMetaConfig.blackListedChannels],
