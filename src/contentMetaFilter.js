@@ -12,32 +12,22 @@ function getMetaFilterConfig () {
     ? process.env.sunbird_content_service_whitelisted_channels.split(',') : []
   var blackListedChannels = process.env.sunbird_content_service_blacklisted_channels
     ? process.env.sunbird_content_service_blacklisted_channels.split(',') : []
-  var allowedFramework = process.env.sunbird_content_filter_framework_whitelist
-    ? process.env.sunbird_content_filter_framework_whitelist.split(',') : []
-  var blackListedFramework = process.env.sunbird_content_filter_framework_blacklist
-    ? process.env.sunbird_content_filter_framework_blacklist.split(',') : []
-  var allowedMimetype = process.env.sunbird_content_filter_mimetype_whitelist
-    ? process.env.sunbird_content_filter_mimetype_whitelist.split(',') : []
-  var blackListedMimetype = process.env.sunbird_content_filter_mimetype_blacklist
-    ? process.env.sunbird_content_filter_mimetype_blacklist.split(',') : []
-  var allowedContenttype = process.env.sunbird_content_filter_contenttype_whitelist
-    ? process.env.sunbird_content_filter_contenttype_whitelist.split(',') : []
-  var blackListedContenttype = process.env.sunbird_content_filter_contenttype_blacklist
-    ? process.env.sunbird_content_filter_contenttype_blacklist.split(',') : []
-  var allowedResourcetype = process.env.sunbird_content_filter_resourcetype_whitelist
-    ? process.env.sunbird_content_filter_resourcetype_whitelist.split(',') : []
-  var blackListedResourcetype = process.env.sunbird_content_filter_resourcetype_blacklist
-    ? process.env.sunbird_content_filter_resourcetype_blacklist.split(',') : []
-
-  var metaFiltersArray = [[allowedChannels, blackListedChannels],
-    [allowedFramework, blackListedFramework],
-    [allowedMimetype, blackListedMimetype],
-    [allowedContenttype, blackListedContenttype],
-    [allowedResourcetype, blackListedResourcetype]]
-  var configArray = []
-  _.forEach(metaFiltersArray, function (value) {
-    configArray.push(generateConfigString(value[0], value[1]))
-  })
+  var allowedFramework = process.env.sunbird_content_service_whitelisted_framework
+    ? process.env.sunbird_content_service_whitelisted_framework.split(',') : []
+  var blackListedFramework = process.env.sunbird_content_service_blacklisted_framework
+    ? process.env.sunbird_content_service_blacklisted_framework.split(',') : []
+  var allowedMimetype = process.env.sunbird_content_service_whitelisted_mimetype
+    ? process.env.sunbird_content_service_whitelisted_mimetype.split(',') : []
+  var blackListedMimetype = process.env.sunbird_content_service_blacklisted_mimetype
+    ? process.env.sunbird_content_service_blacklisted_mimetype.split(',') : []
+  var allowedContenttype = process.env.sunbird_content_service_whitelisted_contenttype
+    ? process.env.sunbird_content_service_whitelisted_contenttype.split(',') : []
+  var blackListedContenttype = process.env.sunbird_content_service_blacklisted_contenttype
+    ? process.env.sunbird_content_service_blacklisted_contenttype.split(',') : []
+  var allowedResourcetype = process.env.sunbird_content_service_whitelisted_resourcetype
+    ? process.env.sunbird_content_service_whitelisted_resourcetype.split(',') : []
+  var blackListedResourcetype = process.env.sunbird_content_service_blacklisted_resourcetype
+    ? process.env.sunbird_content_service_blacklisted_resourcetype.split(',') : []
 
   var configString = {}
   // Function to generate the Config String
@@ -58,20 +48,22 @@ function getMetaFilterConfig () {
   // Check if the Filter Config service data is defined, if yes, create Object with it
   const filterConfigService = ''
   if (filterConfigService === '') {
-    // Call getFilterJSONFromEnv to generate a JSON Object
-    return getFilterJSONFromEnv(configArray)
+    // generate JSON and return the configArray
+    var metaFiltersArray = {'channel': [allowedChannels, blackListedChannels],
+      'framework': [allowedFramework, blackListedFramework],
+      'mimeType': [allowedMimetype, blackListedMimetype],
+      'contentType': [allowedContenttype, blackListedContenttype],
+      'resourceType': [allowedResourcetype, blackListedResourcetype]}
+    var configArray = {}
+    _.forOwn(metaFiltersArray, function (value, key) {
+      configArray['' + key] = generateConfigString(value[0], value[1])
+    })
+    console.log('configArray', configArray)
+    return configArray
   } else {
     // return getFilterJSONfromConfigService()
     return getFilterJSONfromConfigService()
   }
-}
-
-// Generate JSON and return
-function getFilterJSONFromEnv (metaConfigData) {
-  var metaFilterKey = ['channel', 'framework', 'mimeType', 'contentType', 'resourceType']
-  var generateJSON = _.zipObject(metaFilterKey, metaConfigData)
-  //   console.log('genreated json', generateJSON)
-  return generateJSON
 }
 
 function getFilterJSONfromConfigService () {

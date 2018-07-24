@@ -10,7 +10,7 @@ var fs = require('fs')
 var configUtil = require('sb-config-util')
 
 const contentProvider = require('sb_content_provider_util')
-var contentMeta = require('./contentMetaFilter')
+var contentMetaProvider = require('./contentMetaFilter')
 // TODO below configuration should to be refactored in a seperate file
 
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
@@ -118,7 +118,7 @@ if (defaultChannel) {
           'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
           process.exit(1)
         }
-        configUtil.setConfig('META_FILTER_REQUEST_JSON', contentMeta.getMetaFilterConfig())
+        configUtil.setConfig('META_FILTER_REQUEST_JSON', contentMetaProvider.getMetaFilterConfig())
       })
     } else {
       console.log('error in fetching default channel', defaultChannel, err, res)
