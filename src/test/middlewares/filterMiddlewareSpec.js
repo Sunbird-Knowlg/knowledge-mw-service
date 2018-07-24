@@ -74,7 +74,6 @@ describe('Initialization of meta filters', function () {
     configUtil.setConfig('META_FILTER_REQUEST_JSON', blacklist)
     filterMiddleware.addMetaFilters(req1, {}, function () {
       expect(req1.body.request.filters.channel).toEqual(blacklist.channel)
-      console.log('rest', req1)
     })
   })
   it('check for getChannelSearchString method creates proper whitelisted search string', function () {
