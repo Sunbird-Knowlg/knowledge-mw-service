@@ -23,21 +23,6 @@ var baseUrl = 'http://localhost:5000/v1/'
 var async = require('async')
 var contentMetaConfig = require('./contentMetaConfig')
 
-var allowedChannels = contentMetaConfig.allowedChannels
-var blackListedChannels = contentMetaConfig.blackListedChannels
-
-var allowedFramework = contentMetaConfig.allowedFramework
-var blackListedFramework = contentMetaConfig.blacklistedFrameworkList
-
-var allowedMimetype = contentMetaConfig.allowedMimetype
-var blackListedMimetype = contentMetaConfig.blackListedMimetype
-
-var allowedContenttype = contentMetaConfig.allowedContenttype
-var blackListedContenttype = contentMetaConfig.blackListedContenttype
-
-var allowedResourcetype = contentMetaConfig.allowedResourcetype
-var blackListedResourcetype = contentMetaConfig.blackListedResourcetype
-
 function generateConfigString (metaFiltersArray) {
   var configArray = {}
   _.forOwn(metaFiltersArray, function (value, key) {
@@ -54,11 +39,11 @@ function generateConfigString (metaFiltersArray) {
   return configArray
 }
 var metaFiltersArray = {
-  'channel': [allowedChannels, blackListedChannels],
-  'framework': [allowedFramework, blackListedFramework],
-  'mimeType': [allowedMimetype, blackListedMimetype],
-  'contentType': [allowedContenttype, blackListedContenttype],
-  'resourceType': [allowedResourcetype, blackListedResourcetype]
+  'channel': [contentMetaConfig.allowedChannels, contentMetaConfig.blackListedChannels],
+  'framework': [contentMetaConfig.allowedFramework, contentMetaConfig.blacklistedFramework],
+  'mimeType': [contentMetaConfig.allowedMimetype, contentMetaConfig.blackListedMimetype],
+  'contentType': [contentMetaConfig.allowedContenttype, contentMetaConfig.blackListedContenttype],
+  'resourceType': [contentMetaConfig.allowedResourcetype, contentMetaConfig.blackListedResourcetype]
 }
 
 var generateConfigArray = generateConfigString(metaFiltersArray)
@@ -101,57 +86,58 @@ describe('Check for all required route to call the AddMetaFilter', function () {
 
         filterMiddleware.addMetaFilters(req, res, function next () {
           var filterQuery = generateConfigArray
-
           // channels
-          if (allowedChannels && allowedChannels.length > 0 && blackListedChannels && blackListedChannels.length > 0) {
+          if (contentMetaConfig.allowedChannels && (contentMetaConfig.allowedChannels).length > 0 && contentMetaConfig.blackListedChannels &&
+           (contentMetaConfig.blackListedChannels).length > 0) {
             expect(req.body.request.filters.channel).toEqual(filterQuery.channel)
-          } else if (allowedChannels && allowedChannels.length > 0) {
-            expect(req.body.request.filters.channel).toEqual(allowedChannels)
-          } else if (blackListedChannels && blackListedChannels.length > 0) {
-            expect(req.body.request.filters.channel).toEqual(blackListedChannels)
+          } else if (contentMetaConfig.allowedChannels && (contentMetaConfig.allowedChannels).length > 0) {
+            expect(req.body.request.filters.channel).toEqual(contentMetaConfig.allowedChannels)
+          } else if (contentMetaConfig.blackListedChannels && (contentMetaConfig.blackListedChannels).length > 0) {
+            expect(req.body.request.filters.channel).toEqual(contentMetaConfig.blackListedChannels)
           }
 
           // framework
-          if (allowedFramework && allowedFramework.length > 0 && blackListedFramework &&
-            blackListedFramework.length > 0) {
+          if (contentMetaConfig.allowedFramework && (contentMetaConfig.allowedFramework).length > 0 && contentMetaConfig.blackListedFramework &&
+           (contentMetaConfig.blackListedFramework).length > 0) {
             expect(req.body.request.filters.framework).toEqual(filterQuery.framework)
-          } else if (allowedFramework && allowedFramework.length > 0) {
-            expect(req.body.request.filters.framework).toEqual(allowedFramework)
-          } else if (blackListedFramework && blackListedFramework.length > 0) {
-            expect(req.body.request.filters.framework).toEqual(blackListedFramework)
+          } else if (contentMetaConfig.allowedFramework && (contentMetaConfig.allowedFramework).length > 0) {
+            expect(req.body.request.filters.framework).toEqual(contentMetaConfig.allowedFramework)
+          } else if (contentMetaConfig.blackListedFramework && (contentMetaConfig.blackListedFramework).length > 0) {
+            expect(req.body.request.filters.framework).toEqual(contentMetaConfig.blackListedFramework)
           }
 
           // contentType
-          if (allowedContenttype && blackListedContenttype) {
+          if (contentMetaConfig.allowedContenttype && contentMetaConfig.blackListedContenttype) {
             expect(req.body.request.filters.contentType).toEqual(filterQuery.contentType)
-          } else if (allowedContenttype && allowedContenttype.length > 0) {
-            expect(req.body.request.filters.contentType).toEqual(allowedContenttype)
-          } else if (blackListedContenttype && blackListedContenttype.length > 0) {
-            expect(req.body.request.filters.contentType).toEqual(blackListedContenttype)
+          } else if (contentMetaConfig.allowedContenttype && (contentMetaConfig.allowedContenttype).length > 0) {
+            expect(req.body.request.filters.contentType).toEqual(contentMetaConfig.allowedContenttype)
+          } else if (contentMetaConfig.blackListedContenttype && (contentMetaConfig.blackListedContenttype).length > 0) {
+            expect(req.body.request.filters.contentType).toEqual(contentMetaConfig.blackListedContenttype)
           }
 
           // mimeType
-          if (allowedMimetype && blackListedMimetype) {
+          if (contentMetaConfig.allowedMimetype && contentMetaConfig.blackListedMimetype) {
             expect(req.body.request.filters.mimeType).toEqual(filterQuery.mimeType)
-          } else if (allowedMimetype && allowedMimetype.length > 0) {
-            expect(req.body.request.filters.mimeType).toEqual(allowedMimetype)
-          } else if (blackListedMimetype && blackListedMimetype.length > 0) {
-            expect(req.body.request.filters.mimeType).toEqual(blackListedMimetype)
+          } else if ((contentMetaConfig.allowedMimetype && (contentMetaConfig.allowedMimetype).length > 0)) {
+            expect(req.body.request.filters.mimeType).toEqual(contentMetaConfig.allowedMimetype)
+          } else if (contentMetaConfig.blackListedMimetype && (contentMetaConfig.blackListedMimetype).length > 0) {
+            expect(req.body.request.filters.mimeType).toEqual(contentMetaConfig.blackListedMimetype)
           }
 
           // resourceType
-          if (allowedResourcetype && blackListedResourcetype) {
+          if (contentMetaConfig.allowedResourcetype && contentMetaConfig.blackListedResourcetype) {
             expect(req.body.request.filters.resourceType).toEqual(filterQuery.resourceType)
-          } else if (allowedResourcetype && allowedResourcetype.length > 0) {
-            expect(req.body.request.filters.resourceType).toEqual(allowedResourcetype)
-          } else if (blackListedResourcetype && blackListedResourcetype.length > 0) {
-            expect(req.body.request.filters.resourceType).toEqual(blackListedResourcetype)
+          } else if (contentMetaConfig.allowedResourcetype && (contentMetaConfig.allowedResourcetype).length > 0) {
+            expect(req.body.request.filters.resourceType).toEqual(contentMetaConfig.allowedResourcetype)
+          } else if (contentMetaConfig.blackListedResourcetype && (contentMetaConfig.blackListedResourcetype).length > 0) {
+            expect(req.body.request.filters.resourceType).toEqual(contentMetaConfig.blackListedResourcetype)
           }
         })
       })
     })
   })
 })
+
 describe('Check for routes not to call the AddMetaFilter', function () {
   // it('if framework filter calls the route, addMetaFilter should not be called ', function () {
   async.forEach(nonFilterRoutes, function (route, callback) {
