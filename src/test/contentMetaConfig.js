@@ -1,27 +1,26 @@
-const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
-const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
-const whitelistedFrameworkList = process.env.sunbird_content_service_whitelisted_framework
-const blacklistedFrameworkList = process.env.sunbird_content_service_blacklisted_framework
-const whitelistedMimeTypeList = process.env.sunbird_content_service_whitelisted_mimetype
-const blacklistedMimeTypeList = process.env.sunbird_content_service_blacklisted_mimetype
-const whitelistedContentTypeList = process.env.sunbird_content_service_whitelisted_contenttype
-const blacklistedContentTypeList = process.env.sunbird_content_service_blacklisted_contenttype
-const whitelistedResourceTypeList = process.env.sunbird_content_service_whitelisted_resourcetype
-const blacklistedResourceTypeList = process.env.sunbird_content_service_blacklisted_resourcetype
-
 module.exports = Object.freeze({
-  allowedChannels: whiteListedChannelList ? whiteListedChannelList.split(',') : [],
-  blackListedChannels: blackListedChannelList ? blackListedChannelList.split(',') : [],
+  allowedChannels: process.env.sunbird_content_service_whitelisted_channels
+    ? process.env.sunbird_content_service_whitelisted_channels.split(',') : [],
+  blackListedChannels: process.env.sunbird_content_service_blacklisted_channels
+    ? process.env.sunbird_content_service_blacklisted_channels.split(',') : [],
 
-  allowedFramework: whitelistedFrameworkList ? whitelistedFrameworkList.split(',') : [],
-  blackListedFramework: blacklistedFrameworkList ? blacklistedFrameworkList.split(',') : [],
+  allowedFramework: process.env.sunbird_content_service_whitelisted_framework
+    ? process.env.sunbird_content_service_whitelisted_framework.split(',') : [],
+  blackListedFramework: process.env.sunbird_content_service_blacklisted_framework
+    ? process.env.sunbird_content_service_blacklisted_framework.split(',') : [],
 
-  allowedMimetype: whitelistedMimeTypeList ? whitelistedMimeTypeList.split(',') : [],
-  blackListedMimetype: blacklistedMimeTypeList ? blacklistedMimeTypeList.split(',') : [],
+  allowedMimetype: process.env.sunbird_content_service_whitelisted_mimetype
+    ? process.env.sunbird_content_service_whitelisted_mimetype.split(',') : [],
+  blackListedMimetype: process.env.sunbird_content_service_blacklisted_mimetype
+    ? process.env.sunbird_content_service_blacklisted_mimetype.split(',') : [],
 
-  allowedContenttype: whitelistedContentTypeList ? whitelistedContentTypeList.split(',') : [],
-  blackListedContenttype: blacklistedContentTypeList ? blacklistedContentTypeList.split(',') : [],
+  allowedContenttype: process.env.sunbird_content_service_whitelisted_contenttype
+    ? process.env.sunbird_content_service_whitelisted_contenttype.split(',') : [],
+  blackListedContenttype: process.env.sunbird_content_service_blacklisted_contenttype
+    ? process.env.sunbird_content_service_blacklisted_contenttype.split(',') : [],
 
-  allowedResourcetype: whitelistedResourceTypeList ? whitelistedResourceTypeList.split(',') : [],
-  blackListedResourcetype: blacklistedResourceTypeList ? blacklistedResourceTypeList.split(',') : []
+  allowedResourcetype: process.env.sunbird_content_service_whitelisted_resourcetype
+    ? process.env.sunbird_content_service_whitelisted_resourcetype.split(',') : [],
+  blackListedResourcetype: process.env.sunbird_content_service_blacklisted_resourcetype
+    ? process.env.sunbird_content_service_blacklisted_resourcetype.split(',') : []
 })
