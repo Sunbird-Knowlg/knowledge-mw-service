@@ -39,8 +39,7 @@ function getMetaFilterConfig () {
       configString = allowedMetadata
       return configString
     } else if (blackListedMetadata && blackListedMetadata.length > 0) {
-      configString = { 'ne': blackListedMetadata }
-      return configString
+      return { 'ne': blackListedMetadata }
     }
   }
   LOG.info(utilsService.getLoggerData({}, 'INFO',
@@ -58,7 +57,7 @@ function getMetaFilterConfig () {
     }
     var configArray = {}
     _.forOwn(metaFiltersArray, function (value, key) {
-      configArray['' + key] = generateConfigString(value[0], value[1])
+      configArray[key] = generateConfigString(value[0], value[1])
     })
     return configArray
   } else {
