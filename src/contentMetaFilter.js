@@ -47,21 +47,6 @@ function getMetaFilterConfig () {
   var blackListedResourcetype = process.env.sunbird_content_service_blacklisted_resourcetype
     ? process.env.sunbird_content_service_blacklisted_resourcetype.split(',') : []
 
-  var configString = {}
-  // Function to generate the Config String
-  function generateConfigString (allowedMetadata, blackListedMetadata) {
-    if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
-      configString = _.difference(allowedMetadata, blackListedMetadata)
-      return configString
-    } else if (allowedMetadata && allowedMetadata.length > 0) {
-      configString = allowedMetadata
-      return configString
-    } else if (blackListedMetadata && blackListedMetadata.length > 0) {
-      return { 'ne': blackListedMetadata }
-    }
-  }
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'config string', configString))
   // Check if the Filter Config service data is defined, if yes, create Object with it
   const filterConfigService = ''
   if (filterConfigService === '') {
@@ -73,11 +58,7 @@ function getMetaFilterConfig () {
       'contentType': [allowedContenttype, blackListedContenttype],
       'resourceType': [allowedResourcetype, blackListedResourcetype]
     }
-    var configArray = {}
-    _.forOwn(metaFiltersArray, function (value, key) {
-      configArray[key] = generateConfigString(value[0], value[1])
-    })
-    return configArray
+    return generateConfigString(metaFiltersArray)
   } else {
     // return getFilterJSONfromConfigService()
     return getFilterJSONfromConfigService()
