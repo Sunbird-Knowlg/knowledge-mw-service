@@ -32,20 +32,17 @@ function addMetaFilters (req, res, next) {
     next()
   }
 }
-function fetchFilterQuery (req, filter) {
+function fetchFilterQuery (req, filterProperty) {
   filterService.getMetadataFilterQuery(function (err, searchJSON) {
-    // console.log('err', err)
     if (err) {
       LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'fetchFilterQuery',
         'failed to get fetch filter query'))
-    } else if (searchJSON) {
+    } else {
       for (var key in searchJSON) {
-        if (searchJSON.hasOwnProperty(key)) {
-          var searchJSONVal = searchJSON[key]
-          if (key === filter && searchJSONVal !== undefined) {
-            var finalFilterValue = req.body.request.filters[key] = searchJSONVal
-            return finalFilterValue
-          }
+        var searchValue = searchJSON[key]
+        if (key === filterProperty && searchValue !== undefined) {
+          var finalFilterValue = req.body.request.filters[key] = searchValue
+          return finalFilterValue
         }
       }
     }
