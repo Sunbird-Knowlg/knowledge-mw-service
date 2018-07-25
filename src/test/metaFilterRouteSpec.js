@@ -1,6 +1,6 @@
 // const express = require('express')
 var configUtil = require('../libs/sb-config-util')
-var _ = require('underscore')
+var _ = require('lodash')
 
 const metaFilterRoutes = [
   'content/search',
@@ -38,34 +38,30 @@ var blackListedContenttype = contentMetaConfig.blackListedContenttype
 var allowedResourcetype = contentMetaConfig.allowedResourcetype
 var blackListedResourcetype = contentMetaConfig.blackListedResourcetype
 
-var channelConf = generateConfigString(allowedChannels, blackListedChannels)
-var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)
-var mimeTypeConf = generateConfigString(allowedMimetype, blackListedMimetype)
-var contentTypeConf = generateConfigString(allowedContenttype, blackListedContenttype)
-var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
-
-var generateJSON = {
-  channel: channelConf,
-  framework: frameworkConf,
-  contentType: contentTypeConf,
-  mimeType: mimeTypeConf,
-  resourceType: resourceTypeConf
+function generateConfigString (metaFiltersArray) {
+  var configArray = {}
+  _.forOwn(metaFiltersArray, function (value, key) {
+    const allowedMetadata = value[0]
+    const blackListedMetadata = value[1]
+    if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
+      configArray[key] = _.difference(allowedMetadata, blackListedMetadata)
+    } else if (allowedMetadata && allowedMetadata.length > 0) {
+      configArray[key] = allowedMetadata
+    } else if (blackListedMetadata && blackListedMetadata.length > 0) {
+      configArray[key] = { 'ne': blackListedMetadata }
+    }
+  })
+  return configArray
+}
+var metaFiltersArray = {
+  'channel': [allowedChannels, blackListedChannels],
+  'framework': [allowedFramework, blackListedFramework],
+  'mimeType': [allowedMimetype, blackListedMimetype],
+  'contentType': [allowedContenttype, blackListedContenttype],
+  'resourceType': [allowedResourcetype, blackListedResourcetype]
 }
 
-var configString = {}
-function generateConfigString (allowedMetadata, blackListedMetadata) {
-  if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
-    configString = _.difference(allowedMetadata, blackListedMetadata)
-    return configString
-  } else if (allowedMetadata && allowedMetadata.length > 0) {
-    configString = allowedMetadata
-    return configString
-  } else if (blackListedMetadata && blackListedMetadata.length > 0) {
-    configString = { 'ne': blackListedMetadata }
-    return configString
-  }
-}
-
+var generateConfigArray = generateConfigString(metaFiltersArray)
 describe('Check for all required route to call the AddMetaFilter', function () {
   async.forEach(metaFilterRoutes, function (route, callback) {
     describe('Composite search services', function () {
@@ -104,7 +100,7 @@ describe('Check for all required route to call the AddMetaFilter', function () {
         configUtil.setConfig('META_FILTER_REQUEST_JSON', allwhiteListedFilterQuery)
 
         filterMiddleware.addMetaFilters(req, res, function next () {
-          var filterQuery = generateJSON
+          var filterQuery = generateConfigArray
 
           // channels
           if (allowedChannels && allowedChannels.length > 0 && blackListedChannels && blackListedChannels.length > 0) {

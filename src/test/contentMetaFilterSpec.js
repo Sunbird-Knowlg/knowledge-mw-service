@@ -40,24 +40,35 @@ const allblackListedFilterQuery = {
 }
 const emptyFilterQuery = {}
 
-var configString = {}
-var generateConfigString = function (allowedMetadata, blackListedMetadata) {
-  if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
-    configString = _.difference(allowedMetadata, blackListedMetadata)
-    return configString
-  } else if (allowedMetadata && allowedMetadata.length > 0) {
-    configString = allowedMetadata
-    return configString
-  } else if (blackListedMetadata && blackListedMetadata.length > 0) {
-    configString = { 'ne': blackListedMetadata }
-    return configString
-  }
+function generateConfigString (metaFiltersArray) {
+  var configArray = {}
+  _.forOwn(metaFiltersArray, function (value, key) {
+    const allowedMetadata = value[0]
+    const blackListedMetadata = value[1]
+    if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
+      configArray[key] = _.difference(allowedMetadata, blackListedMetadata)
+    } else if (allowedMetadata && allowedMetadata.length > 0) {
+      configArray[key] = allowedMetadata
+    } else if (blackListedMetadata && blackListedMetadata.length > 0) {
+      configArray[key] = { 'ne': blackListedMetadata }
+    }
+  })
+  return configArray
 }
-var channelConf = generateConfigString(allowedChannels, blackListedChannels)
-var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)
-var mimeTypeConf = generateConfigString(allowedMimetype, blackListedMimetype)
-var contentTypeConf = generateConfigString(allowedContenttype, blackListedContenttype)
-var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
+var metaFiltersArray = {
+  'channel': [allowedChannels, blackListedChannels],
+  'framework': [allowedFramework, blackListedFramework],
+  'mimeType': [allowedMimetype, blackListedMimetype],
+  'contentType': [allowedContenttype, blackListedContenttype],
+  'resourceType': [allowedResourcetype, blackListedResourcetype]
+}
+
+var generateConfigArray = generateConfigString(metaFiltersArray)
+var channelConf = generateConfigArray.channel
+var frameworkConf = generateConfigArray.framework
+var mimeTypeConf = generateConfigArray.mimeType
+var contentTypeConf = generateConfigArray.contentType
+var resourceTypeConf = generateConfigArray.resourceType
 
 describe('Check environment config variables for meta filters for whitelisted filter query', function (done) {
   configUtil.setConfig('META_FILTER_REQUEST_JSON', allwhiteListedFilterQuery)
@@ -210,20 +221,6 @@ describe('Check environment config variables for meta filters for blacklisted fi
 
 // Negative scenarios of 3 combination not present
 describe('Combination of 3 filters are not configured', function (done) {
-  var configString = {}
-  var generateConfigString = function (allowedMetadata, blackListedMetadata) {
-    if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
-      configString = _.difference(allowedMetadata, blackListedMetadata)
-      return configString
-    } else if (allowedMetadata && allowedMetadata.length > 0) {
-      configString = allowedMetadata
-      return configString
-    } else if (blackListedMetadata && blackListedMetadata.length > 0) {
-      configString = { 'ne': blackListedMetadata }
-      return configString
-    }
-  }
-
   it('if contentType, mimeType, resourceType is not configured', function () {
     const chFwfilterQuery = {
       channel: ['b00bc992ef25f1a9a8d63291e20efc8d'],
@@ -236,20 +233,23 @@ describe('Combination of 3 filters are not configured', function (done) {
     allowedResourcetype = []
     blackListedResourcetype = []
 
-    var channelConf = generateConfigString(allowedChannels, blackListedChannels)
-    var frameworkConf = generateConfigString(allowedFramework, blackListedFramework)
-    var mimeTypeConf = generateConfigString(allowedMimetype, blackListedMimetype)
-    var contentTypeConf = generateConfigString(allowedContenttype, blackListedContenttype)
-    var resourceTypeConf = generateConfigString(allowedResourcetype, blackListedResourcetype)
+    var metaFiltersArray = {
+      'channel': [allowedChannels, blackListedChannels],
+      'framework': [allowedFramework, blackListedFramework],
+      'mimeType': [allowedMimetype, blackListedMimetype],
+      'contentType': [allowedContenttype, blackListedContenttype],
+      'resourceType': [allowedResourcetype, blackListedResourcetype]
+    }
 
+    var generateConfigArray = generateConfigString(metaFiltersArray)
     if (chFwfilterQuery) {
       configUtil.setConfig('META_FILTER_REQUEST_JSON', chFwfilterQuery)
       var generateJSON = configUtil.getConfig('META_FILTER_REQUEST_JSON')
-      expect(_.isEqual(generateJSON.channel, channelConf)).toBeTruthy()
-      expect(_.isEqual(generateJSON.framework, frameworkConf)).toBeTruthy()
-      expect(mimeTypeConf).toBeUndefined()
-      expect(contentTypeConf).toBeUndefined()
-      expect(resourceTypeConf).toBeUndefined()
+      expect(_.isEqual(generateJSON.channel, generateConfigArray.channel)).toBeTruthy()
+      expect(_.isEqual(generateJSON.framework, generateConfigArray.framework)).toBeTruthy()
+      expect(generateConfigArray.mimeType).toBeUndefined()
+      expect(generateConfigArray.contentType).toBeUndefined()
+      expect(generateConfigArray.resourceType).toBeUndefined()
     }
   })
 })
