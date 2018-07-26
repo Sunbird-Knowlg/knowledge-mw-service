@@ -4,8 +4,9 @@ var jasmineNode = require('gulp-jasmine-node')
 var istanbul = require('gulp-istanbul')
 
 var paths = {
-  scripts: ['middlewares/*.js', 'models/*.js', 'routes/*.js', 'service/*.js', 'app.js', '!service/conceptService.js'],
-  tests: ['test/*.js', 'test/**/*.js'],
+  scripts: ['middlewares/*.js', 'helpers/*.js', 'models/*.js', 'routes/*.js',
+    'service/*.js', 'app.js', '!service/conceptService.js'],
+  tests: ['test/helpers/*.js'],
   coverage: 'coverage'
 }
 
