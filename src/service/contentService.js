@@ -810,7 +810,7 @@ function flagContentAPI (req, response) {
   //     return response.status(200).send(respUtil.successResponse(rspObj))
   //   }
   // ])
-  return response.status(200)
+  return response.status(200).send(respUtil.successResponse({}))
 }
 
 function acceptFlagContentAPI (req, response) {
