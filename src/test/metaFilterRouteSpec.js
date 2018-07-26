@@ -173,3 +173,7 @@ describe('Check for routes not to call the AddMetaFilter', function () {
     })
   })
 })
+describe('Check for routes not to call the AddMetaFilter', function () {
+  it('if framework filter calls the route, addMetaFilter should not be called ', function () {})
+  it('if framework filter calls the route, filter should not be generated', function () {})
+})
