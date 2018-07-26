@@ -48,8 +48,8 @@ function getMetaFilterConfig () {
     ? process.env.sunbird_content_service_blacklisted_resourcetype.split(',') : []
 
   // Check if the Filter Config service data is defined, if yes, create Object with it
-  const filterConfigService = ''
-  if (filterConfigService === '') {
+  const filterConfigService = null
+  if (filterConfigService === null) {
     // generate JSON and return the configArray
     var metaFiltersArray = {
       'channel': [allowedChannels, blackListedChannels],
