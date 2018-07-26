@@ -47,7 +47,7 @@ function getMetaFilterConfig () {
   var blackListedResourcetype = process.env.sunbird_content_service_blacklisted_resourcetype
     ? process.env.sunbird_content_service_blacklisted_resourcetype.split(',') : []
 
-  // Check if the Filter Config service data is defined, if yes, create Object with it
+  // Check if the Filter Configservice data is defined, if yes, create Object with it
   const filterConfigService = null
   if (filterConfigService === null) {
     // generate JSON and return the configArray
