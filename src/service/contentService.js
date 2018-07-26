@@ -756,60 +756,61 @@ function rejectContentAPI (req, response) {
 }
 
 function flagContentAPI (req, response) {
-  var data = req.body
-  data.contentId = req.params.contentId
-  var rspObj = req.rspObj
-  // Adding objectData in telemetry
-  if (rspObj.telemetryData) {
-    rspObj.telemetryData.object = utilsService.getObjectData(data.contentId, 'content', '', {})
-  }
+  // var data = req.body
+  // data.contentId = req.params.contentId
+  // var rspObj = req.rspObj
+  // // Adding objectData in telemetry
+  // if (rspObj.telemetryData) {
+  //   rspObj.telemetryData.object = utilsService.getObjectData(data.contentId, 'content', '', {})
+  // }
 
-  if (!data.contentId || !data.request || !data.request.flaggedBy || !data.request.versionKey) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'flagContentAPI',
-      'Error due to required params are missing', {
-        contentId: data.contentId
-      }))
-    rspObj.errCode = contentMessage.FLAG.MISSING_CODE
-    rspObj.errMsg = contentMessage.FLAG.MISSING_MESSAGE
-    rspObj.responseCode = responseCode.CLIENT_ERROR
-    return response.status(400).send(respUtil.errorResponse(rspObj))
-  }
-  var ekStepReqData = {
-    request: data.request
-  }
+  // if (!data.contentId || !data.request || !data.request.flaggedBy || !data.request.versionKey) {
+  //   LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'flagContentAPI',
+  //     'Error due to required params are missing', {
+  //       contentId: data.contentId
+  //     }))
+  //   rspObj.errCode = contentMessage.FLAG.MISSING_CODE
+  //   rspObj.errMsg = contentMessage.FLAG.MISSING_MESSAGE
+  //   rspObj.responseCode = responseCode.CLIENT_ERROR
+  //   return response.status(400).send(respUtil.errorResponse(rspObj))
+  // }
+  // var ekStepReqData = {
+  //   request: data.request
+  // }
 
-  async.waterfall([
+  // async.waterfall([
 
-    function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'flagContentAPI',
-        'Request to content provider to flag the content', {
-          contentId: data.contentId,
-          body: ekStepReqData,
-          headers: req.headers
-        }))
-      contentProvider.flagContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'flagContentAPI',
-            'Getting error from content provider', res))
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.FLAG.FAILED_CODE
-          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.FLAG.FAILED_MESSAGE
-          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-          rspObj = utilsService.getErrorResponse(rspObj, res)
-          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
-        } else {
-          CBW(null, res)
-        }
-      })
-    },
-    function (res) {
-      rspObj.result = res.result
-      emailService.createFlagContentEmail(req, function () { })
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'flagContentAPI',
-        'Sending response back to user'))
-      return response.status(200).send(respUtil.successResponse(rspObj))
-    }
-  ])
+  //   function (CBW) {
+  //     LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'flagContentAPI',
+  //       'Request to content provider to flag the content', {
+  //         contentId: data.contentId,
+  //         body: ekStepReqData,
+  //         headers: req.headers
+  //       }))
+  //     contentProvider.flagContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
+  //       if (err || res.responseCode !== responseCode.SUCCESS) {
+  //         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'flagContentAPI',
+  //           'Getting error from content provider', res))
+  //         rspObj.errCode = res && res.params ? res.params.err : contentMessage.FLAG.FAILED_CODE
+  //         rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.FLAG.FAILED_MESSAGE
+  //         rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+  //         var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+  //         rspObj = utilsService.getErrorResponse(rspObj, res)
+  //         return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+  //       } else {
+  //         CBW(null, res)
+  //       }
+  //     })
+  //   },
+  //   function (res) {
+  //     rspObj.result = res.result
+  //     emailService.createFlagContentEmail(req, function () { })
+  //     LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'flagContentAPI',
+  //       'Sending response back to user'))
+  //     return response.status(200).send(respUtil.successResponse(rspObj))
+  //   }
+  // ])
+  return response.status(200)
 }
 
 function acceptFlagContentAPI (req, response) {
