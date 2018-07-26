@@ -158,25 +158,3 @@ const telemetryConfig = {
 }
 
 telemetry.init(telemetryConfig)
-<<<<<<< df0169189c9c340a97fe37bcdc892b09e8f54537
-=======
-
-// function to generate the search filter and return JSON Object
-function getMetaFilterConfig () {
-// Check if the Filter Config service data is defined, if yes, create Object with it
-  if (filterConfigService !== undefined) {
-    return getFilterJSONfromConfigService()
-  } else {
-    // Call getFilterJSONFromEnv to generate a JSON Object
-    return getFilterJSONFromEnv()
-  }
-}
-
-function getFilterJSONFromEnv () {
-  // Generate JSON and return
-}
-
-function getFilterJSONfromConfigService () {
-  // Generate JSON from Config Service and return
-}
->>>>>>> Issue #SB-3715 fix: review fixes
