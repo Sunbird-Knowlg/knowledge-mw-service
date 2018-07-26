@@ -6,7 +6,7 @@ var istanbul = require('gulp-istanbul')
 var paths = {
   scripts: ['middlewares/*.js', 'helpers/*.js', 'models/*.js', 'routes/*.js',
     'service/*.js', 'app.js', '!service/conceptService.js'],
-  tests: ['test/helpers/*.js'],
+  tests: ['test/*.js', 'test/**/*.js'],
   coverage: 'coverage'
 }
 
