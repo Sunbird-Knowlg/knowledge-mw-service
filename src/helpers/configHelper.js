@@ -34,36 +34,38 @@ function getRootOrgs (requestObj, cb) {
 /**
  * This function returns the config string based on condition for channel filters which
  * contains the whitelisted channels
- * @returns Js object or array which contains the allowed whitelisted channels
+ * @returns Promise which contains the allowed whitelisted channels
  */
-function getFilterConfig (cb) {
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'environment info', process.env))
-  var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
-  var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-  if (_.includes(allowedChannels, '$.instance.all')) {
-    if (channelRefreshCronStr && !ischannelRefreshEnabled) {
-      setChannelRefreshTask()
-      ischannelRefreshEnabled = true
-    }
+function getFilterConfig () {
+  return new Promise(function (resolve, reject) {
     LOG.info(utilsService.getLoggerData({}, 'INFO',
-      filename, 'getFilterConfig', 'allowed channels', allowedChannels))
-    getAllChannelsFromAPI(function (err, allChannels) {
-      if (err) {
+      filename, 'getFilterConfig', 'environment info', process.env))
+    var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
+    var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
+    if (_.includes(allowedChannels, '$.instance.all')) {
+      if (channelRefreshCronStr && !ischannelRefreshEnabled) {
+        setChannelRefreshTask()
+        ischannelRefreshEnabled = true
+      }
+      LOG.info(utilsService.getLoggerData({}, 'INFO',
+        filename, 'getFilterConfig', 'allowed channels', allowedChannels))
+      getAllChannelsFromAPI().then(allChannels => {
+        allowedChannels = _.pull(allowedChannels, '$.instance.all').concat(allChannels)
+        LOG.info(utilsService.getLoggerData({}, 'INFO',
+          filename, 'getFilterConfig', 'all whitelisted channels count', allowedChannels.length))
+        resolve(getconfigStringFromChannels(allowedChannels, blackListedChannels))
+      }, (err) => {
         console.log(err)
         LOG.error(utilsService.getLoggerData({}, 'ERROR',
           filename, 'getFilterConfig', 'getAllChannelsFromAPI callback', err))
-      }
-      allowedChannels = _.pull(allowedChannels, '$.instance.all').concat(allChannels)
+        reject(err)
+      })
+    } else {
       LOG.info(utilsService.getLoggerData({}, 'INFO',
-        filename, 'getFilterConfig', 'all whitelisted channels count', allowedChannels.length))
-      cb(null, getconfigStringFromChannels(allowedChannels, blackListedChannels))
-    })
-  } else {
-    LOG.info(utilsService.getLoggerData({}, 'INFO',
-      filename, 'getFilterConfig', 'allowed channels', allowedChannels))
-    cb(null, getconfigStringFromChannels(allowedChannels, blackListedChannels))
-  }
+        filename, 'getFilterConfig', 'allowed channels', allowedChannels))
+      resolve(getconfigStringFromChannels(allowedChannels, blackListedChannels))
+    }
+  })
 }
 
 /**
@@ -90,56 +92,59 @@ function getconfigStringFromChannels (allowedChannels, blackListedChannels) {
  * This method gets all channels through 'getRootOrgs' method response
  * data asynchronously and return callback
  * @param cb callback method which takes error and allchannels as param
- * @returns callback
+ * @returns promise
  */
-function getAllChannelsFromAPI (cb) {
-  var limit = 200
-  var offset = 0
-  var allChannels = []
-  var channelReqObj = {
-    'request': {
-      'filters': { 'isRootOrg': true },
-      'offset': offset,
-      'limit': limit
-    }
-  }
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getAllChannelsFromAPI', 'fetching all channels req', channelReqObj))
-  getRootOrgs(channelReqObj, function (err, res) {
-    if (err) {
-      cb(err, null)
-    }
-    const orgCount = res.result.response.count
-    allChannels = _.without(_.map(res.result.response.content, 'hashTagId'), null)
-    // if more orgs are there get them iteratively using async
-    if (limit < orgCount) {
-      var channelReqArr = []
-      while ((offset + limit) < orgCount) {
-        offset = offset + limit
-        channelReqObj.request.offset = offset
-        channelReqArr.push(_.cloneDeep(channelReqObj))
+function getAllChannelsFromAPI () {
+  return new Promise(function (resolve, reject) {
+    var limit = 200
+    var offset = 0
+    var allChannels = []
+    var channelReqObj = {
+      'request': {
+        'filters': { 'isRootOrg': true },
+        'offset': offset,
+        'limit': limit
       }
-      async.map(channelReqArr, getRootOrgs, function (err, mappedResArr) {
-        if (err) {
-          LOG.error(utilsService.getLoggerData({}, 'ERROR',
-            filename, 'getFilterConfig', 'getAllChannelsFromAPI callback', err))
+    }
+    LOG.info(utilsService.getLoggerData({}, 'INFO',
+      filename, 'getAllChannelsFromAPI', 'fetching all channels req', channelReqObj))
+    getRootOrgs(channelReqObj, function (err, res) {
+      if (err) {
+        reject(err)
+      }
+      const orgCount = res.result.response.count
+      allChannels = _.without(_.map(res.result.response.content, 'hashTagId'), null)
+      // if more orgs are there get them iteratively using async
+      if (limit < orgCount) {
+        var channelReqArr = []
+        while ((offset + limit) < orgCount) {
+          offset = offset + limit
+          channelReqObj.request.offset = offset
+          channelReqArr.push(_.cloneDeep(channelReqObj))
         }
-        /** extract hashTagId which represents the channelID from each response
-        * of responseMap to generate the whitelisted channels array
-        * */
-        _.forEach(mappedResArr, function (item) {
-          allChannels.push(_.map(item.result.response.content, 'hashTagId'))
+        async.map(channelReqArr, getRootOrgs, function (err, mappedResArr) {
+          if (err) {
+            LOG.error(utilsService.getLoggerData({}, 'ERROR',
+              filename, 'getFilterConfig', 'getAllChannelsFromAPI callback', err))
+          }
+          /**
+           * extract hashTagId which represents the channelID from each response
+           * of responseMap to generate the whitelisted channels array
+           * */
+          _.forEach(mappedResArr, function (item) {
+            allChannels.push(_.map(item.result.response.content, 'hashTagId'))
+          })
+          allChannels = _.without(_.flatten(allChannels), null)
+          LOG.info(utilsService.getLoggerData({}, 'INFO',
+            filename, 'getAllChannelsFromAPI', 'all channels arr', allChannels))
+          resolve(allChannels)
         })
-        allChannels = _.without(_.flatten(allChannels), null)
+      } else {
         LOG.info(utilsService.getLoggerData({}, 'INFO',
           filename, 'getAllChannelsFromAPI', 'all channels arr', allChannels))
-        cb(null, allChannels)
-      })
-    } else {
-      LOG.info(utilsService.getLoggerData({}, 'INFO',
-        filename, 'getAllChannelsFromAPI', 'all channels arr', allChannels))
-      cb(null, allChannels)
-    }
+        resolve(allChannels)
+      }
+    })
   })
 }
 
@@ -148,14 +153,13 @@ function getAllChannelsFromAPI (cb) {
  * @param configString configstring which contains the whitelisted channels
  */
 function updateConfig () {
-  getFilterConfig(function (err, configString) {
-    if (err) {
-      LOG.error(utilsService.getLoggerData({}, 'ERROR',
-        filename, 'updateConfig', 'error', err))
-    }
+  getFilterConfig().then((configString) => {
     LOG.info(utilsService.getLoggerData({}, 'INFO',
       filename, 'updateConfig', 'config string', configString))
     configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
+  }, (err) => {
+    LOG.error(utilsService.getLoggerData({}, 'ERROR',
+      filename, 'updateConfig', 'error', err))
   })
 }
 
