@@ -8,11 +8,8 @@ var TelemetryUtil = require('sb_telemetry_util')
 var telemetry = new TelemetryUtil()
 var fs = require('fs')
 var configUtil = require('sb-config-util')
-var _ = require('underscore')
-var filename = path.basename(__filename)
-var utilsService = require('./service/utilsService')
-var LOG = require('sb_logger_util')
 const contentProvider = require('sb_content_provider_util')
+var configHelper = require('./helpers/configHelper')
 // TODO below configuration should to be refactored in a seperate file
 
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
@@ -35,10 +32,6 @@ const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_bas
 
 const searchServiceBaseUrl = process.env.sunbird_search_service_api_base_url || 'https://qa.ekstep.in/api/search'
 const dialServiceBaseUrl = process.env.sunbird_dial_service_api_base_url || 'https://qa.ekstep.in/api'
-
-const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
-const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
-
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
@@ -67,7 +60,9 @@ const bodyParserJsonMiddleware = function () {
     if (isEkStepProxyRequest(req)) {
       return next()
     } else {
-      return bodyParser.json({limit: reqDataLimitOfContentUpload})(req, res, next)
+      return bodyParser.json({
+        limit: reqDataLimitOfContentUpload
+      })(req, res, next)
     }
   }
 }
@@ -124,7 +119,7 @@ if (defaultChannel) {
           'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
           process.exit(1)
         }
-        updateConfig(getFilterConfig())
+        configHelper.updateConfig()
       })
     } else {
       console.log('error in fetching default channel', defaultChannel, err, res)
@@ -164,27 +159,3 @@ const telemetryConfig = {
 }
 
 telemetry.init(telemetryConfig)
-
-// function to update the config
-function updateConfig (configString) {
-  configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
-}
-
-// function to generate the search string
-function getFilterConfig () {
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'environment info', process.env))
-  var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
-  var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-  var configString = {}
-  if ((allowedChannels && allowedChannels.length > 0) && (blackListedChannels && blackListedChannels.length > 0)) {
-    configString = _.difference(allowedChannels, blackListedChannels)
-  } else if (allowedChannels && allowedChannels.length > 0) {
-    configString = allowedChannels
-  } else if (blackListedChannels && blackListedChannels.length > 0) {
-    configString = { 'ne': blackListedChannels }
-  }
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'config string', configString))
-  return configString
-}
