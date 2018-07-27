@@ -1,5 +1,4 @@
 var server = require('../app.js')
-var _ = require('underscore')
 var request = require('request')
 var host = 'http://localhost:5000'
 
