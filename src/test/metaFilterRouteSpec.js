@@ -87,8 +87,8 @@ describe('Check for all required route to call the AddMetaFilter', function () {
         filterMiddleware.addMetaFilters(req, res, function next () {
           var filterQuery = generateConfigArray
           // channels
-          if (contentMetaConfig.allowedChannels && (contentMetaConfig.allowedChannels).length > 0 && contentMetaConfig.blackListedChannels &&
-           (contentMetaConfig.blackListedChannels).length > 0) {
+          if (contentMetaConfig.allowedChannels && (contentMetaConfig.allowedChannels).length > 0 &&
+           contentMetaConfig.blackListedChannels && (contentMetaConfig.blackListedChannels).length > 0) {
             expect(req.body.request.filters.channel).toEqual(filterQuery.channel)
           } else if (contentMetaConfig.allowedChannels && (contentMetaConfig.allowedChannels).length > 0) {
             expect(req.body.request.filters.channel).toEqual(contentMetaConfig.allowedChannels)
@@ -97,8 +97,8 @@ describe('Check for all required route to call the AddMetaFilter', function () {
           }
 
           // framework
-          if (contentMetaConfig.allowedFramework && (contentMetaConfig.allowedFramework).length > 0 && contentMetaConfig.blackListedFramework &&
-           (contentMetaConfig.blackListedFramework).length > 0) {
+          if (contentMetaConfig.allowedFramework && (contentMetaConfig.allowedFramework).length > 0 &&
+           contentMetaConfig.blackListedFramework && (contentMetaConfig.blackListedFramework).length > 0) {
             expect(req.body.request.filters.framework).toEqual(filterQuery.framework)
           } else if (contentMetaConfig.allowedFramework && (contentMetaConfig.allowedFramework).length > 0) {
             expect(req.body.request.filters.framework).toEqual(contentMetaConfig.allowedFramework)
@@ -111,7 +111,8 @@ describe('Check for all required route to call the AddMetaFilter', function () {
             expect(req.body.request.filters.contentType).toEqual(filterQuery.contentType)
           } else if (contentMetaConfig.allowedContenttype && (contentMetaConfig.allowedContenttype).length > 0) {
             expect(req.body.request.filters.contentType).toEqual(contentMetaConfig.allowedContenttype)
-          } else if (contentMetaConfig.blackListedContenttype && (contentMetaConfig.blackListedContenttype).length > 0) {
+          } else if (contentMetaConfig.blackListedContenttype &&
+            (contentMetaConfig.blackListedContenttype).length > 0) {
             expect(req.body.request.filters.contentType).toEqual(contentMetaConfig.blackListedContenttype)
           }
 
@@ -129,7 +130,8 @@ describe('Check for all required route to call the AddMetaFilter', function () {
             expect(req.body.request.filters.resourceType).toEqual(filterQuery.resourceType)
           } else if (contentMetaConfig.allowedResourcetype && (contentMetaConfig.allowedResourcetype).length > 0) {
             expect(req.body.request.filters.resourceType).toEqual(contentMetaConfig.allowedResourcetype)
-          } else if (contentMetaConfig.blackListedResourcetype && (contentMetaConfig.blackListedResourcetype).length > 0) {
+          } else if (contentMetaConfig.blackListedResourcetype &&
+            (contentMetaConfig.blackListedResourcetype).length > 0) {
             expect(req.body.request.filters.resourceType).toEqual(contentMetaConfig.blackListedResourcetype)
           }
         })
@@ -174,7 +176,6 @@ describe('Check for routes not to call the AddMetaFilter', function () {
   })
 })
 describe('Check for routes not to call the AddMetaFilter', function () {
-  // it('if framework filter calls the route, addMetaFilter should not be called ', function () {
   async.forEach(nonFilterRoutes, function (route, callback) {
     describe('Composite search services for non filters', function (done) {
       var req
