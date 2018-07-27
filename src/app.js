@@ -11,6 +11,7 @@ var configUtil = require('sb-config-util')
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
+var configHelper = require('./helpers/configHelper')
 // TODO below configuration should to be refactored in a seperate file
 
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
@@ -61,7 +62,9 @@ const bodyParserJsonMiddleware = function () {
     if (isEkStepProxyRequest(req)) {
       return next()
     } else {
-      return bodyParser.json({limit: reqDataLimitOfContentUpload})(req, res, next)
+      return bodyParser.json({
+        limit: reqDataLimitOfContentUpload
+      })(req, res, next)
     }
   }
 }
@@ -119,6 +122,7 @@ if (defaultChannel) {
           process.exit(1)
         }
         configUtil.setConfig('META_FILTER_REQUEST_JSON', contentMetaProvider.getMetaFilterConfig())
+        configHelper.updateConfig()
       })
     } else {
       console.log('error in fetching default channel', defaultChannel, err, res)
