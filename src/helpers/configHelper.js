@@ -5,12 +5,6 @@ var LOG = require('sb_logger_util')
 const contentProvider = require('sb_content_provider_util')
 var async = require('async')
 var _ = require('lodash')
-var configUtil = require('sb-config-util')
-var channelRefreshCronStr = process.env.sunbird_content_service_channel_refresh_cron
-var cron = require('node-cron')
-const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
-const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
-var ischannelRefreshEnabled = false
 
 /**
  * This function executes the org search lms API to get all orgs
@@ -32,66 +26,8 @@ function getRootOrgs (requestObj, cb) {
 }
 
 /**
- * This function returns the config string based on condition for channel filters which
- * contains the whitelisted channels
- * @returns Promise which contains the allowed whitelisted channels
- */
-function getFilterConfig () {
-  return new Promise(function (resolve, reject) {
-    LOG.info(utilsService.getLoggerData({}, 'INFO',
-      filename, 'getFilterConfig', 'environment info', process.env))
-    var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
-    var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-    if (_.includes(allowedChannels, '$.instance.all')) {
-      if (channelRefreshCronStr && !ischannelRefreshEnabled) {
-        setChannelRefreshTask()
-        ischannelRefreshEnabled = true
-      }
-      LOG.info(utilsService.getLoggerData({}, 'INFO',
-        filename, 'getFilterConfig', 'allowed channels', allowedChannels))
-      getAllChannelsFromAPI().then(allChannels => {
-        allowedChannels = _.pull(allowedChannels, '$.instance.all').concat(allChannels)
-        LOG.info(utilsService.getLoggerData({}, 'INFO',
-          filename, 'getFilterConfig', 'all whitelisted channels count', allowedChannels.length))
-        resolve(getconfigStringFromChannels(allowedChannels, blackListedChannels))
-      }, (err) => {
-        console.log(err)
-        LOG.error(utilsService.getLoggerData({}, 'ERROR',
-          filename, 'getFilterConfig', 'getAllChannelsFromAPI callback', err))
-        reject(err)
-      })
-    } else {
-      LOG.info(utilsService.getLoggerData({}, 'INFO',
-        filename, 'getFilterConfig', 'allowed channels', allowedChannels))
-      resolve(getconfigStringFromChannels(allowedChannels, blackListedChannels))
-    }
-  })
-}
-
-/**
- * This function generates the config string for given allowed and blacklisted channels
- * @param allowedChannels  array of channels to be allowed in filters
- * @param blacklistedchannels  array of channels to be blacklisted or ignored
- * @returns Js object or array which contains the allowed whitelisted channels
- */
-function getconfigStringFromChannels (allowedChannels, blackListedChannels) {
-  var configString = {}
-  if ((allowedChannels && allowedChannels.length > 0) && (blackListedChannels && blackListedChannels.length > 0)) {
-    configString = _.difference(allowedChannels, blackListedChannels)
-  } else if (allowedChannels && allowedChannels.length > 0) {
-    configString = allowedChannels
-  } else if (blackListedChannels && blackListedChannels.length > 0) {
-    configString = { 'ne': blackListedChannels }
-  }
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getconfigStringFromChannels', 'config string', configString))
-  return configString
-}
-
-/**
  * This method gets all channels through 'getRootOrgs' method response
- * data asynchronously and return callback
- * @param cb callback method which takes error and allchannels as param
+ * data asynchronously and return back a promise
  * @returns promise
  */
 function getAllChannelsFromAPI () {
@@ -148,34 +84,6 @@ function getAllChannelsFromAPI () {
   })
 }
 
-/**
- * This method sets the given channel filter value to the config utils
- * @param configString configstring which contains the whitelisted channels
- */
-function updateConfig () {
-  getFilterConfig().then((configString) => {
-    LOG.info(utilsService.getLoggerData({}, 'INFO',
-      filename, 'updateConfig', 'config string', configString))
-    configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
-  }, (err) => {
-    LOG.error(utilsService.getLoggerData({}, 'ERROR',
-      filename, 'updateConfig', 'error', err))
-  })
-}
-
-/**
- * This function executes the scheduler cron job to refresh the whitelisted
- * channels based given cron interval string 'channelRefreshCronStr'
- */
-function setChannelRefreshTask () {
-  cron.schedule(channelRefreshCronStr, function () {
-    LOG.info(utilsService.getLoggerData({}, 'INFO',
-      filename, 'setChannelRefreshTask', 'running scheduler task', channelRefreshCronStr))
-    updateConfig()
-  })
-}
-
 module.exports = {
-  updateConfig: updateConfig,
-  getFilterConfig: getFilterConfig
+  getAllChannelsFromAPI: getAllChannelsFromAPI
 }
