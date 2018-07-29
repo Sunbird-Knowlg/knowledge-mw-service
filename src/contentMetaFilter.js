@@ -3,29 +3,67 @@ var LOG = require('sb_logger_util')
 var path = require('path')
 var filename = path.basename(__filename)
 var _ = require('lodash')
-
+var configHelper = require('./helpers/configHelper.js')
+var cron = require('node-cron')
+var channelRefreshCronStr = process.env.sunbird_content_service_channel_refresh_cron
+var ischannelRefreshEnabled = false
+var async = require('asyncawait/async');
+var await = require('asyncawait/await');
 // Function to generate the Config Array
-function generateConfigString (metaFiltersArray) {
-  var configArray = {}
-  _.forOwn(metaFiltersArray, function (value, key) {
-    const allowedMetadata = value[0]
-    const blackListedMetadata = value[1]
-    if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
-      configArray[key] = _.difference(allowedMetadata, blackListedMetadata)
-    } else if (allowedMetadata && allowedMetadata.length > 0) {
-      configArray[key] = allowedMetadata
-    } else if (blackListedMetadata && blackListedMetadata.length > 0) {
-      configArray[key] = { 'ne': blackListedMetadata }
-    }
-  })
+
+var generateConfigString = async(function(metaFiltersArray) {
+    var configArray = {}
+    _.forOwn(metaFiltersArray, function (value, key) {
+      var allowedMetadata = value[0]
+      var blackListedMetadata = value[1]
+      if (key === 'channel' && _.includes(allowedMetadata, '$.instance.all')) {
+        if (channelRefreshCronStr && !ischannelRefreshEnabled) {
+          setChannelRefreshTask()
+          ischannelRefreshEnabled = true
+        }
+        LOG.info(utilsService.getLoggerData({}, 'INFO',
+          filename, 'generateConfigString', 'allowed channels', allowedMetadata))
+          var allChannels = await(configHelper.getAllChannelsFromAPI())
+          allowedMetadata = _.pull(allowedMetadata, '$.instance.all').concat(allChannels)
+          LOG.info(utilsService.getLoggerData({}, 'INFO',
+            filename, 'generateConfigString', 'all whitelisted channels count', allowedMetadata.length))
+              configArray[key] = getconfigStringFromMeta(allowedMetadata, blackListedMetadata)
+       
+      } else {
+        LOG.info(utilsService.getLoggerData({}, 'INFO',
+          filename, 'generateConfigString', 'allowed metadata', allowedMetadata))
+        configArray[key] = getconfigStringFromMeta(allowedMetadata, blackListedMetadata)
+      }
+    })
+    LOG.info(utilsService.getLoggerData({}, 'INFO',
+      filename, 'generateConfigString', 'config array', configArray))
+    return configArray
+})
+
+/**
+ * This function generates the config string for given allowed and blacklisted channels
+ * @param allowedMetadata  array of metadata item to be allowed in filters
+ * @param blackListedMetadata  array of metadata item to be blacklisted or ignored
+ * @returns Js object or array which contains the allowed whitelisted meta items
+ */
+function getconfigStringFromMeta (allowedMetadata, blackListedMetadata) {
+  var configString = {}
+  if ((allowedMetadata && allowedMetadata.length > 0) && (blackListedMetadata && blackListedMetadata.length > 0)) {
+    configString = _.difference(allowedMetadata, blackListedMetadata)
+  } else if (allowedMetadata && allowedMetadata.length > 0) {
+    configString = allowedMetadata
+  } else if (blackListedMetadata && blackListedMetadata.length > 0) {
+    configString = { 'ne': blackListedMetadata }
+  }
   LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'config array', configArray))
-  return configArray
+    filename, 'getconfigStringFromMeta', 'config string', configString))
+  return configString
 }
+
 // function to generate the search filter and return JSON Object
 function getMetaFilterConfig () {
   LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'environment info', process.env))
+    filename, 'getMetaFilterConfig', 'environment info', process.env))
   var allowedChannels = process.env.sunbird_content_service_whitelisted_channels
     ? process.env.sunbird_content_service_whitelisted_channels.split(',') : []
   var blackListedChannels = process.env.sunbird_content_service_blacklisted_channels
@@ -68,6 +106,18 @@ function getMetaFilterConfig () {
 function getFilterJSONfromConfigService () {
   // Generate JSON from Config Service and return the filter Object else throw errors
   throw new Error('Config service is unavailable')
+}
+
+/**
+ * This function executes the scheduler cron job to refresh the whitelisted
+ * channels based given cron interval string 'channelRefreshCronStr'
+ */
+function setChannelRefreshTask () {
+  cron.schedule(channelRefreshCronStr, function () {
+    LOG.info(utilsService.getLoggerData({}, 'INFO',
+      filename, 'setChannelRefreshTask', 'running scheduler task', channelRefreshCronStr))
+    getMetaFilterConfig()
+  })
 }
 
 module.exports.getMetaFilterConfig = getMetaFilterConfig

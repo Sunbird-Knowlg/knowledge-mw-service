@@ -11,7 +11,6 @@ var configUtil = require('sb-config-util')
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
-var configHelper = require('./helpers/configHelper')
 // TODO below configuration should to be refactored in a seperate file
 
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
@@ -121,8 +120,12 @@ if (defaultChannel) {
           'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
           process.exit(1)
         }
-        configUtil.setConfig('META_FILTER_REQUEST_JSON', contentMetaProvider.getMetaFilterConfig())
-        configHelper.updateConfig()
+        contentMetaProvider.getMetaFilterConfig().then((configStr) => {
+          configUtil.setConfig('META_FILTER_REQUEST_JSON', configStr)
+        }).catch((err) => {
+          console.log('error in getting meta filters', err)
+          process.exit(1)
+        })
       })
     } else {
       console.log('error in fetching default channel', defaultChannel, err, res)
