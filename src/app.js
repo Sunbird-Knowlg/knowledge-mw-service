@@ -24,16 +24,16 @@ const defaultChannel = process.env.sunbird_default_channel || 'sunbird'
 const telemetryBaseUrl = process.env.sunbird_telemetry_service_local_url ? process.env.sunbird_telemetry_service_local_url : 'http://telemetry-service:9001/'
 globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://qa.ekstep.in'
 
-const contentRepoBaseUrl = process.env.sunbird_content_repo_api_base_url || 'https://dev.ekstep.in/api'
+const contentRepoBaseUrl = process.env.sunbird_content_repo_api_base_url || 'https://qa.ekstep.in/api'
 const contentRepoApiKey = process.env.sunbird_content_repo_api_key
 
 const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_base_url
   ? process.env.sunbird_learner_service_local_base_url
   : 'http://learner-service:9000'
 
-const searchServiceBaseUrl = process.env.sunbird_search_service_api_base_url || 'https://dev.ekstep.in/api/search'
+const searchServiceBaseUrl = process.env.sunbird_search_service_api_base_url || 'https://qa.ekstep.in/api/search'
 const dialRepoBaseUrl = process.env.sunbird_dial_repo_api_base_url || 'https://qa.ekstep.in/api'
-const pluginRepoBaseUrl = process.env.sunbird_plugin_repo_api_base_url || 'https://dev.ekstep.in/api'
+const pluginRepoBaseUrl = process.env.sunbird_plugin_repo_api_base_url || 'https://qa.ekstep.in/api'
 const dataServiceBaseUrl = process.env.sunbird_data_service_api_base_url || 'https://qa.ekstep.in/api'
 
 const searchServiceApiKey = process.env.sunbird_search_service_api_key
