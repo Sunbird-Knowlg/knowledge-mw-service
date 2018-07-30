@@ -2,7 +2,7 @@
     "API": {
         "CREATE_CONTENT_URI": "/content/v3/create",
         "SEARCH_CONTENT_URI": "/content/v3/search",
-        "COMPOSITE_SEARCH_URI": "/v3/search",
+        "SEARCH_URI": "/v3/search",
         "UPDATE_CONTENT_URI": "/content/v3/update",
         "GET_CONTENT_URI": "/content/v3/read",
         "REVIEW_CONTENT_URI": "/content/v3/review",
@@ -62,11 +62,12 @@
         "TELEMETRY": "v1/telemetry",
 
 
-        "SUBMIT_DATA_EXHAUST_URI": "/data/v2/dataset/request/submit",
-        "LIST_DATA_EXHAUST_URI": "/data/v2/dataset/request/list",
-        "READ_DATA_EXHAUST_URI": "/data/v2/dataset/request/read",
-        "CHANNEL_DATA_EXHAUST_URI": "/data/v2/dataset/request",
+        "SUBMIT_DATA_EXHAUST_URI": "/data/v3/dataset/request/submit",
+        "LIST_DATA_EXHAUST_URI": "/data/v3/dataset/request/list",
+        "READ_DATA_EXHAUST_URI": "/data/v3/dataset/request/read",
+        "CHANNEL_DATA_EXHAUST_URI": "/data/v3/dataset/request",
         "SYSTEM_UPDATE_CONTENT_URI": "/system/v3/content/update",
-        "COPY_CONTENT_URI": "/content/v3/copy"
+        "COPY_CONTENT_URI": "/content/v3/copy",
+        "PLUGINS_SEARCH_URI": "/composite/v3/search"
     }
-}    
+}   

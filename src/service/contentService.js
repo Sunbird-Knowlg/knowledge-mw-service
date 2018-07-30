@@ -1274,6 +1274,62 @@ function copyContentAPI (req, response) {
   ])
 }
 
+function searchPluginsAPI (req, response, objectType) {
+  var data = req.body
+  var rspObj = req.rspObj
+
+  if (!data.request || !data.request.filters) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
+      'Error due to required params are missing', data.request))
+
+    rspObj.errCode = contentMessage.SESEARCH_PLUGINSARCH.MISSING_CODE
+    rspObj.errMsg = contentMessage.SEARCH_PLUGINS.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+
+  data.request.filters.objectType = ['content']
+  data.request.filters.contentType = ['plugin']
+
+  var requestData = {
+    request: data.request
+  }
+
+  async.waterfall([
+
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchPluginsAPI',
+        'Request to content provider to search the plugins', {
+          body: requestData,
+          headers: req.headers
+        }))
+      contentProvider.pluginsSearch(requestData, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchPluginsAPI',
+            'Getting error from content provider', res))
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH_PLUGINS.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH_PLUGINS.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj = utilsService.getErrorResponse(rspObj, res)
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    },
+
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchPluginsAPI',
+        'Content searched successfully, We got ' + rspObj.result.count + ' results', {
+          contentCount: rspObj.result.count
+        }))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
+}
+
 module.exports.searchAPI = searchAPI
 module.exports.searchContentAPI = searchContentAPI
 module.exports.createContentAPI = createContentAPI
@@ -1293,3 +1349,4 @@ module.exports.unlistedPublishContentAPI = unlistedPublishContentAPI
 module.exports.assignBadgeAPI = assignBadge
 module.exports.revokeBadgeAPI = revokeBadge
 module.exports.copyContentAPI = copyContentAPI
+module.exports.searchPluginsAPI = searchPluginsAPI
