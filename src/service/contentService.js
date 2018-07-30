@@ -1282,7 +1282,7 @@ function searchPluginsAPI (req, response, objectType) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
       'Error due to required params are missing', data.request))
 
-    rspObj.errCode = contentMessage.SESEARCH_PLUGINSARCH.MISSING_CODE
+    rspObj.errCode = contentMessage.SEARCH_PLUGINS.MISSING_CODE
     rspObj.errMsg = contentMessage.SEARCH_PLUGINS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     return response.status(400).send(respUtil.errorResponse(rspObj))
