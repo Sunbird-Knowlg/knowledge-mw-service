@@ -15,7 +15,7 @@ module.exports = function (app) {
     .get(requestMiddleware.createAndValidateRequestBody, frameworkCategoryInstanceService.getFrameworkCategoryInstance)
 
   app.route(baseUrl + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
+    .post(requestMiddleware.createAndValidateRequestBody,
       frameworkCategoryInstanceService.frameworkCategoryInstanceSearch)
 
   app.route(baseUrl + '/create')

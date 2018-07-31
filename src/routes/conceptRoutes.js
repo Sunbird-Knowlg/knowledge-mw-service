@@ -27,7 +27,7 @@ module.exports = function (app) {
     .get(requestMiddleware.createAndValidateRequestBody, domainService.getConceptByIdAPI)
 
   app.route(BASE_URL_V1 + '/domains/:domainId/:objectType/search')
-    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
+    .post(requestMiddleware.createAndValidateRequestBody,
       domainService.searchObjectTypeAPI)
 
   app.route(BASE_URL_V1 + '/domains/:domainId/:objectType')
