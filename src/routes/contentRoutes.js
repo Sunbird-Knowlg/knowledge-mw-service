@@ -12,7 +12,7 @@ var BASE_URL = '/v1/content'
 
 module.exports = function (app) {
   app.route(BASE_URL + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody,
+    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       contentService.searchContentAPI)
 
   app.route(BASE_URL + '/create')
