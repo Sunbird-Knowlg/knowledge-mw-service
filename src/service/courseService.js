@@ -102,6 +102,7 @@ function searchCourseAPI (req, response) {
   }
 
   data.request.filters.contentType = getContentTypeForCourse()
+  data.request.filters.objectType = ['Course']
   var ekStepReqData = {
     request: data.request
   }

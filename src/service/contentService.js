@@ -56,7 +56,7 @@ function searchAPI (req, response) {
 }
 
 function searchContentAPI (req, response) {
-  return search(getContentTypeForContent(), req, response, ['content'])
+  return search(getContentTypeForContent(), req, response, ['Content'])
 }
 
 // This function used for performance log

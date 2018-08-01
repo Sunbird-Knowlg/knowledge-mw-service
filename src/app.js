@@ -8,6 +8,7 @@ var TelemetryUtil = require('sb_telemetry_util')
 var telemetry = new TelemetryUtil()
 var fs = require('fs')
 var configUtil = require('sb-config-util')
+var _ = require('lodash')
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
@@ -125,35 +126,37 @@ require('./routes/pluginsRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-// Create server
-if (defaultChannel) {
-  contentProvider.getChannel(defaultChannel, (err, res) => {
-    if (res && res.result.response.count > 0 && res.result.response.content[0].hashTagId) {
-      configUtil.setConfig('DEFAULT_CHANNEL', res.result.response.content[0].hashTagId)
-      console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
-      this.server = http.createServer(app).listen(port, function () {
-        console.log('server running at PORT [%d]', port)
-        if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
-          console.error('please set environment variable sunbird_environment, sunbird_instance' +
-          'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
-          process.exit(1)
-        }
-        contentMetaProvider.getMetaFilterConfig().then((configStr) => {
-          configUtil.setConfig('META_FILTER_REQUEST_JSON', configStr)
-        }).catch((err) => {
-          console.log('error in getting meta filters', err)
-          process.exit(1)
-        })
-      })
-    } else {
-      console.log('error in fetching default channel', defaultChannel, err, res)
+function startServer () {
+  this.server = http.createServer(app).listen(port, function () {
+    console.log('server running at PORT [%d]', port)
+    if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
+      console.error('please set environment variable sunbird_environment, sunbird_instance' +
+      'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
       process.exit(1)
     }
+    contentMetaProvider.getMetaFilterConfig().then((configStr) => {
+      configUtil.setConfig('META_FILTER_REQUEST_JSON', configStr)
+    }).catch((err) => {
+      console.log('error in getting meta filters', err)
+      process.exit(1)
+    })
+  })
+}
+
+// Create server
+configUtil.setConfig('DEFAULT_CHANNEL', 'sunbird')
+if (defaultChannel) {
+  contentProvider.getChannel(defaultChannel, (err, res) => {
+    var defaultHashTagId = _.get(res, 'result.response.content[0].hashTagId')
+    if (defaultHashTagId) {
+      configUtil.setConfig('DEFAULT_CHANNEL', defaultHashTagId)
+    }
+    console.log('Error fetching default channel', err)
+    console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
+    startServer()
   })
 } else {
-  console.error('please set environment variable sunbird_default_channel ' +
-  'start service Eg: sunbird_default_channel = sunbird')
-  process.exit(1)
+  startServer()
 }
 
 // Close server, when we start for test cases
