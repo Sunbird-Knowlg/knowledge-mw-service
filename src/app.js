@@ -40,7 +40,7 @@ const searchServiceApiKey = process.env.sunbird_search_service_api_key
 const dialRepoApiKey = process.env.sunbird_dial_repo_api_key
 const pluginRepoApiKey = process.env.sunbird_plugin_repo_api_key
 const dataServiceApiKey = process.env.sunbird_data_service_api_key
-const loggerEnabled = process.env.sunbird_content_service_logger_enabled
+const enableLogging = process.env.sunbird_content_service_enable_logging
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
@@ -59,7 +59,7 @@ configUtil.setConfig('SEARCH_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + searchSer
 configUtil.setConfig('DIAL_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + dialRepoApiKey)
 configUtil.setConfig('PLUGIN_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + pluginRepoApiKey)
 configUtil.setConfig('DATA_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + dataServiceApiKey)
-configUtil.setConfig('SERVICE_LOGGER_ENABLED', loggerEnabled)
+configUtil.setConfig('ENABLE_LOGGING', enableLogging)
 
 process.env.sunbird_cassandra_ips = process.env.sunbird_cassandra_ips || '127.0.0.1'
 process.env.sunbird_cassandra_port = process.env.sunbird_cassandra_port || 9042
