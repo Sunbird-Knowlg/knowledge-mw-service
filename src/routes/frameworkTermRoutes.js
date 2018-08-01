@@ -15,7 +15,7 @@ module.exports = function (app) {
     .get(requestMiddleware.createAndValidateRequestBody, frameworkTermService.getFrameworkTerm)
 
   app.route(baseUrl + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody,
+    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       frameworkTermService.frameworkTermSearch)
 
   app.route(baseUrl + '/create')

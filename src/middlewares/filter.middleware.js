@@ -22,8 +22,6 @@ function addMetaFilters (req, res, next) {
     }
     if (req.body.request.filters.resourceType === undefined) {
       fetchFilterQuery(req, 'resourceType')
-    } else {
-      next()
     }
     LOG.info(utilsService.getLoggerData({}, 'INFO',
       filename, 'addMetaFilters', 'added content meta filter', req.body.request.filters))
