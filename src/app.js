@@ -40,9 +40,7 @@ const searchServiceApiKey = process.env.sunbird_search_service_api_key
 const dialRepoApiKey = process.env.sunbird_dial_repo_api_key
 const pluginRepoApiKey = process.env.sunbird_plugin_repo_api_key
 const dataServiceApiKey = process.env.sunbird_data_service_api_key
-
-const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
-const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
+const loggerEnabled = process.env.sunbird_content_service_logger_enabled
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
@@ -61,6 +59,7 @@ configUtil.setConfig('SEARCH_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + searchSer
 configUtil.setConfig('DIAL_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + dialRepoApiKey)
 configUtil.setConfig('PLUGIN_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + pluginRepoApiKey)
 configUtil.setConfig('DATA_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + dataServiceApiKey)
+configUtil.setConfig('SERVICE_LOGGER_ENABLED', loggerEnabled)
 
 process.env.sunbird_cassandra_ips = process.env.sunbird_cassandra_ips || '127.0.0.1'
 process.env.sunbird_cassandra_port = process.env.sunbird_cassandra_port || 9042
@@ -184,27 +183,3 @@ const telemetryConfig = {
 }
 
 telemetry.init(telemetryConfig)
-
-// function to update the config
-function updateConfig (configString) {
-  configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
-}
-
-// function to generate the search string
-// function getFilterConfig () {
-//   LOG.info(utilsService.getLoggerData({}, 'INFO',
-//     filename, 'getFilterConfig', 'environment info', process.env))
-//   var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
-//   var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-//   var configString = {}
-//   if ((allowedChannels && allowedChannels.length > 0) && (blackListedChannels && blackListedChannels.length > 0)) {
-//     configString = _.difference(allowedChannels, blackListedChannels)
-//   } else if (allowedChannels && allowedChannels.length > 0) {
-//     configString = allowedChannels
-//   } else if (blackListedChannels && blackListedChannels.length > 0) {
-//     configString = { 'ne': blackListedChannels }
-//   }
-//   LOG.info(utilsService.getLoggerData({}, '',
-//     'app.js', 'getFilterConfig', 'config string', configString))
-//   return configString
-// }
