@@ -11,6 +11,8 @@ module.exports = function (app) {
   var contentRepoApiKey = configUtil.getConfig('CONTENT_REPO_AUTHORIZATION_TOKEN')
   var dialRepoApiKey = configUtil.getConfig('DIAL_REPO_AUTHORIZATION_TOKEN')
   var reqDataLimitOfContentUpload = configUtil.getConfig('CONTENT_UPLOAD_REQ_LIMIT')
+  var searchServiceBaseUrl = configUtil.getConfig('SEARCH_SERVICE_BASE_URL')
+  var searchServiceApiKey = configUtil.getConfig('SEARCH_SERVICE_AUTHORIZATION_TOKEN')
 
   app.use('/api/*', proxy(contentRepoBaseUrl, {
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -96,6 +98,19 @@ module.exports = function (app) {
       var originalUrl = req.originalUrl
       originalUrl = originalUrl.replace('action/', '')
       return require('url').parse(dialRepoBaseUrl + originalUrl).path
+    }
+  }))
+
+  app.use('/action/composite/*', proxy(searchServiceBaseUrl, {
+    limit: reqDataLimitOfContentUpload,
+    proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+      proxyReqOpts.headers['Authorization'] = searchServiceApiKey
+      return proxyReqOpts
+    },
+    proxyReqPathResolver: function (req) {
+      var originalUrl = req.originalUrl
+      originalUrl = originalUrl.replace('action/composite/', '')
+      return require('url').parse(searchServiceBaseUrl + originalUrl).path
     }
   }))
 
