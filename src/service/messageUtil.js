@@ -240,6 +240,13 @@ exports.CONTENT = {
     MISSING_MESSAGE: 'Content Id is missing for copying content',
     FAILED_CODE: 'ERR_CONTENT_COPY_FAILED',
     FAILED_MESSAGE: 'content copy failed'
+  },
+
+  SEARCH_PLUGINS: {
+    MISSING_CODE: 'ERR_PLUGINS_SEARCH_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for search plugins are missing',
+    FAILED_CODE: 'ERR_PLUGINS_SEARCH_FAILED',
+    FAILED_MESSAGE: 'Searching plugins failed'
   }
 }
 

@@ -8,11 +8,10 @@ var TelemetryUtil = require('sb_telemetry_util')
 var telemetry = new TelemetryUtil()
 var fs = require('fs')
 var configUtil = require('sb-config-util')
-var _ = require('underscore')
-var filename = path.basename(__filename)
-var utilsService = require('./service/utilsService')
-var LOG = require('sb_logger_util')
+var _ = require('lodash')
+
 const contentProvider = require('sb_content_provider_util')
+var contentMetaProvider = require('./contentMetaFilter')
 // TODO below configuration should to be refactored in a seperate file
 
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
@@ -22,29 +21,47 @@ const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'con
 var reqDataLimitOfContentUpload = '50mb'
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000
-const defaultChannel = process.env.sunbird_default_channel
+const defaultChannel = process.env.sunbird_default_channel || 'sunbird'
 const telemetryBaseUrl = process.env.sunbird_telemetry_service_local_url ? process.env.sunbird_telemetry_service_local_url : 'http://telemetry-service:9001/'
 globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process.env.sunbird_content_plugin_base_url : 'https://qa.ekstep.in'
 
-const contentProviderBaseUrl = process.env.sunbird_content_provider_api_base_url ? process.env.sunbird_content_provider_api_base_url : 'https://qa.ekstep.in/api'
-const contentProviderApiKey = process.env.sunbird_content_provider_api_key
+const contentRepoBaseUrl = process.env.sunbird_content_repo_api_base_url || 'https://qa.ekstep.in/api'
+const contentRepoApiKey = process.env.sunbird_content_repo_api_key
 
 const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_base_url
   ? process.env.sunbird_learner_service_local_base_url
   : 'http://learner-service:9000'
 
-const whiteListedChannelList = process.env.sunbird_content_service_whitelisted_channels
-const blackListedChannelList = process.env.sunbird_content_service_blacklisted_channels
+const searchServiceBaseUrl = process.env.sunbird_search_service_api_base_url || 'https://qa.ekstep.in/api/search'
+const dialRepoBaseUrl = process.env.sunbird_dial_repo_api_base_url || 'https://qa.ekstep.in/api'
+const pluginRepoBaseUrl = process.env.sunbird_plugin_repo_api_base_url || 'https://qa.ekstep.in/api'
+const dataServiceBaseUrl = process.env.sunbird_data_service_api_base_url || 'https://qa.ekstep.in/api'
+
+const searchServiceApiKey = process.env.sunbird_search_service_api_key
+const dialRepoApiKey = process.env.sunbird_dial_repo_api_key
+const pluginRepoApiKey = process.env.sunbird_plugin_repo_api_key
+const dataServiceApiKey = process.env.sunbird_data_service_api_key
+const enableLogging = process.env.sunbird_content_service_enable_logging
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
-configUtil.setConfig('BASE_URL', contentProviderBaseUrl)
+configUtil.setConfig('CONTENT_REPO_BASE_URL', contentRepoBaseUrl)
 configUtil.setConfig('TELEMETRY_BASE_URL', telemetryBaseUrl)
-configUtil.setConfig('Authorization_TOKEN', 'Bearer ' + contentProviderApiKey)
+configUtil.setConfig('CONTENT_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + contentRepoApiKey)
 configUtil.setConfig('LEARNER_SERVICE_LOCAL_BASE_URL', learnerServiceLocalBaseUrl)
 configUtil.setConfig('DIALCODE_GENERATE_MAX_COUNT', 20000)
 configUtil.setConfig('CONTENT_UPLOAD_REQ_LIMIT', reqDataLimitOfContentUpload)
+configUtil.setConfig('SEARCH_SERVICE_BASE_URL', searchServiceBaseUrl)
+configUtil.setConfig('DIAL_REPO_BASE_URL', dialRepoBaseUrl)
+configUtil.setConfig('PLUGIN_REPO_BASE_URL', pluginRepoBaseUrl)
+configUtil.setConfig('DATA_SERVICE_BASE_URL', dataServiceBaseUrl)
+configUtil.setConfig('SEARCH_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + searchServiceApiKey)
+configUtil.setConfig('DIAL_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + dialRepoApiKey)
+configUtil.setConfig('PLUGIN_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + pluginRepoApiKey)
+configUtil.setConfig('DATA_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + dataServiceApiKey)
+configUtil.setConfig('ENABLE_LOGGING', enableLogging)
+
 process.env.sunbird_cassandra_ips = process.env.sunbird_cassandra_ips || '127.0.0.1'
 process.env.sunbird_cassandra_port = process.env.sunbird_cassandra_port || 9042
 process.env.dial_code_image_temp_folder = 'temp'
@@ -62,7 +79,9 @@ const bodyParserJsonMiddleware = function () {
     if (isEkStepProxyRequest(req)) {
       return next()
     } else {
-      return bodyParser.json({limit: reqDataLimitOfContentUpload})(req, res, next)
+      return bodyParser.json({
+        limit: reqDataLimitOfContentUpload
+      })(req, res, next)
     }
   }
 }
@@ -103,33 +122,41 @@ require('./routes/frameworkCategoryInstanceRoutes')(app)
 require('./routes/dataExhaustRoutes')(app)
 require('./routes/formRoutes')(app)
 require('./routes/externalUrlMetaRoute')(app)
+require('./routes/pluginsRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-// Create server
-if (defaultChannel) {
-  contentProvider.getChannel(defaultChannel, (err, res) => {
-    if (res && res.result.response.count > 0 && res.result.response.content[0].hashTagId) {
-      configUtil.setConfig('DEFAULT_CHANNEL', res.result.response.content[0].hashTagId)
-      console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
-      this.server = http.createServer(app).listen(port, function () {
-        console.log('server running at PORT [%d]', port)
-        if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
-          console.error('please set environment variable sunbird_environment, sunbird_instance' +
-          'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
-          process.exit(1)
-        }
-        updateConfig(getFilterConfig())
-      })
-    } else {
-      console.log('error in fetching default channel', defaultChannel, err, res)
+function startServer () {
+  this.server = http.createServer(app).listen(port, function () {
+    console.log('server running at PORT [%d]', port)
+    if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
+      console.error('please set environment variable sunbird_environment, sunbird_instance' +
+      'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
       process.exit(1)
     }
+    contentMetaProvider.getMetaFilterConfig().then((configStr) => {
+      configUtil.setConfig('META_FILTER_REQUEST_JSON', configStr)
+    }).catch((err) => {
+      console.log('error in getting meta filters', err)
+      process.exit(1)
+    })
+  })
+}
+
+// Create server
+configUtil.setConfig('DEFAULT_CHANNEL', 'sunbird')
+if (defaultChannel) {
+  contentProvider.getChannel(defaultChannel, (err, res) => {
+    var defaultHashTagId = _.get(res, 'result.response.content[0].hashTagId')
+    if (defaultHashTagId) {
+      configUtil.setConfig('DEFAULT_CHANNEL', defaultHashTagId)
+    }
+    console.log('Error fetching default channel', err)
+    console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
+    startServer()
   })
 } else {
-  console.error('please set environment variable sunbird_default_channel ' +
-  'start service Eg: sunbird_default_channel = sunbird')
-  process.exit(1)
+  startServer()
 }
 
 // Close server, when we start for test cases
@@ -155,31 +182,7 @@ const telemetryConfig = {
   batchsize: telemetryBatchSize,
   endpoint: configUtil.getConfig('TELEMETRY'),
   host: configUtil.getConfig('TELEMETRY_BASE_URL'),
-  authtoken: configUtil.getConfig('Authorization_TOKEN')
+  authtoken: configUtil.getConfig('CONTENT_REPO_AUTHORIZATION_TOKEN')
 }
 
 telemetry.init(telemetryConfig)
-
-// function to update the config
-function updateConfig (configString) {
-  configUtil.setConfig('CHANNEL_FILTER_QUERY_STRING', configString)
-}
-
-// function to generate the search string
-function getFilterConfig () {
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'environment info', process.env))
-  var allowedChannels = whiteListedChannelList ? whiteListedChannelList.split(',') : []
-  var blackListedChannels = blackListedChannelList ? blackListedChannelList.split(',') : []
-  var configString = {}
-  if ((allowedChannels && allowedChannels.length > 0) && (blackListedChannels && blackListedChannels.length > 0)) {
-    configString = _.difference(allowedChannels, blackListedChannels)
-  } else if (allowedChannels && allowedChannels.length > 0) {
-    configString = allowedChannels
-  } else if (blackListedChannels && blackListedChannels.length > 0) {
-    configString = { 'ne': blackListedChannels }
-  }
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getFilterConfig', 'config string', configString))
-  return configString
-}

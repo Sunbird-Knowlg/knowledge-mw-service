@@ -1,6 +1,6 @@
 {
   "name": "content-service",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "description": "This service used to perform CRUD operations on content",
   "main": "app.js",
   "scripts": {
@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.4.0",
+    "asyncawait": "^1.0.7",
     "azure-storage": "2.7.0",
     "body-parser": "^1.14.2",
     "cassandra-driver": "^3.4.1",

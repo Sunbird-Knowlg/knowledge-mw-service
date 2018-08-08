@@ -6,6 +6,7 @@
 
 var frameworkCategoryInstanceService = require('../service/frameworkCategoryInstanceService')
 var requestMiddleware = require('../middlewares/request.middleware')
+var filterMiddleware = require('../middlewares/filter.middleware')
 
 var baseUrl = '/v1/framework/category'
 
@@ -14,7 +15,7 @@ module.exports = function (app) {
     .get(requestMiddleware.createAndValidateRequestBody, frameworkCategoryInstanceService.getFrameworkCategoryInstance)
 
   app.route(baseUrl + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.addChannelFilters,
+    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       frameworkCategoryInstanceService.frameworkCategoryInstanceSearch)
 
   app.route(baseUrl + '/create')

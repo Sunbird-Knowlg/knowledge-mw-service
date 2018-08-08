@@ -6,9 +6,9 @@
  */
 var configUtil = require('sb-config-util')
 
-function getChannelSearchString (callback) {
-  var searchString = configUtil.getConfig('CHANNEL_FILTER_QUERY_STRING')
-  callback(null, searchString)
+function getMetadataFilterQuery (callback) {
+  var filterQuery = configUtil.getConfig('META_FILTER_REQUEST_JSON')
+  callback(null, filterQuery)
 }
 
-module.exports.getChannelSearchString = getChannelSearchString
+module.exports.getMetadataFilterQuery = getMetadataFilterQuery
