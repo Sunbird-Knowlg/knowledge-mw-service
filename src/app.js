@@ -116,12 +116,7 @@ function startServer () {
       'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
       process.exit(1)
     }
-    contentMetaProvider.getMetaFilterConfig().then((configStr) => {
-      configUtil.setConfig('META_FILTER_REQUEST_JSON', configStr)
-    }).catch((err) => {
-      console.log('error in getting meta filters', err)
-      process.exit(1)
-    })
+    updateConfig(getFilterConfig())
   })
 }
 
