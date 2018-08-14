@@ -5,20 +5,26 @@ var requestMiddleware = require('../middlewares/request.middleware')
 var configUtil = require('sb-config-util')
 
 module.exports = function (app) {
-  var contentProviderBaseUrl = configUtil.getConfig('BASE_URL')
+  var contentRepoBaseUrl = configUtil.getConfig('CONTENT_REPO_BASE_URL')
+  var dialRepoBaseUrl = configUtil.getConfig('DIAL_REPO_BASE_URL')
   var ekstepProxyUrl = globalEkstepProxyBaseUrl
-  var contentProviderApiKey = configUtil.getConfig('Authorization_TOKEN')
+  var contentRepoApiKey = configUtil.getConfig('CONTENT_REPO_AUTHORIZATION_TOKEN')
+  var dialRepoApiKey = configUtil.getConfig('DIAL_REPO_AUTHORIZATION_TOKEN')
   var reqDataLimitOfContentUpload = configUtil.getConfig('CONTENT_UPLOAD_REQ_LIMIT')
+  var searchServiceBaseUrl = configUtil.getConfig('SEARCH_SERVICE_BASE_URL')
+  var searchServiceApiKey = configUtil.getConfig('SEARCH_SERVICE_AUTHORIZATION_TOKEN')
+  var languageServiceBaseUrl = configUtil.getConfig('LANGUAGE_SERVICE_BASE_URL')
+  var languageServiceApiKey = configUtil.getConfig('LANGUAGE_SERVICE_AUTHORIZATION_TOKEN')
 
-  app.use('/api/*', proxy(contentProviderBaseUrl, {
+  app.use('/api/*', proxy(contentRepoBaseUrl, {
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-      proxyReqOpts.headers['Authorization'] = contentProviderApiKey
+      proxyReqOpts.headers['Authorization'] = contentRepoApiKey
       return proxyReqOpts
     },
     proxyReqPathResolver: function (req) {
       var originalUrl = req.originalUrl
       originalUrl = originalUrl.replace('api/', '/')
-      return require('url').parse(contentProviderBaseUrl + originalUrl).path
+      return require('url').parse(contentRepoBaseUrl + originalUrl).path
     }
   }))
 
@@ -82,26 +88,80 @@ module.exports = function (app) {
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, contentService.unlistedPublishContentAPI)
 
-  app.use('/action/*', proxy(contentProviderBaseUrl, {
+  app.use('/action/dialcode/*', proxy(dialRepoBaseUrl, {
     limit: reqDataLimitOfContentUpload,
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-      proxyReqOpts.headers['Authorization'] = contentProviderApiKey
+      if (dialRepoApiKey) {
+        proxyReqOpts.headers['Authorization'] = dialRepoApiKey
+      }
       return proxyReqOpts
     },
     proxyReqPathResolver: function (req) {
       var originalUrl = req.originalUrl
       originalUrl = originalUrl.replace('action/', '')
-      return require('url').parse(contentProviderBaseUrl + originalUrl).path
+      return require('url').parse(dialRepoBaseUrl + originalUrl).path
     }
   }))
 
-  app.use('/v1/telemetry', proxy(contentProviderBaseUrl, {
+  app.use('/action/composite/*', proxy(searchServiceBaseUrl, {
+    limit: reqDataLimitOfContentUpload,
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-      proxyReqOpts.headers['Authorization'] = contentProviderApiKey
+      proxyReqOpts.headers['Authorization'] = searchServiceApiKey
       return proxyReqOpts
     },
     proxyReqPathResolver: function (req) {
-      return require('url').parse(contentProviderBaseUrl + '/data/v3/telemetry').path
+      var originalUrl = req.originalUrl
+      originalUrl = originalUrl.replace('action/composite/', '')
+      return require('url').parse(searchServiceBaseUrl + originalUrl).path
+    }
+  }))
+
+  app.use('/action/language/v3/list', proxy(contentRepoBaseUrl, {
+    limit: reqDataLimitOfContentUpload,
+    proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+      proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+      return proxyReqOpts
+    },
+    proxyReqPathResolver: function (req) {
+      var originalUrl = req.originalUrl
+      originalUrl = originalUrl.replace('action/', '')
+      return require('url').parse(contentRepoBaseUrl + originalUrl).path
+    }
+  }))
+
+  app.use('/action/language/*', proxy(languageServiceBaseUrl, {
+    limit: reqDataLimitOfContentUpload,
+    proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+      proxyReqOpts.headers['Authorization'] = languageServiceApiKey
+      return proxyReqOpts
+    },
+    proxyReqPathResolver: function (req) {
+      var originalUrl = req.originalUrl
+      originalUrl = originalUrl.replace('action/language/', '')
+      return require('url').parse(languageServiceBaseUrl + originalUrl).path
+    }
+  }))
+
+  app.use('/action/*', proxy(contentRepoBaseUrl, {
+    limit: reqDataLimitOfContentUpload,
+    proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+      proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+      return proxyReqOpts
+    },
+    proxyReqPathResolver: function (req) {
+      var originalUrl = req.originalUrl
+      originalUrl = originalUrl.replace('action/', '')
+      return require('url').parse(contentRepoBaseUrl + originalUrl).path
+    }
+  }))
+
+  app.use('/v1/telemetry', proxy(contentRepoBaseUrl, {
+    proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+      proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+      return proxyReqOpts
+    },
+    proxyReqPathResolver: function (req) {
+      return require('url').parse(contentRepoBaseUrl + '/data/v3/telemetry').path
     }
   }))
 }

@@ -56,7 +56,7 @@ function searchAPI (req, response) {
 }
 
 function searchContentAPI (req, response) {
-  return search(getContentTypeForContent(), req, response)
+  return search(getContentTypeForContent(), req, response, ['Content'])
 }
 
 // This function used for performance log
@@ -67,7 +67,7 @@ function searchContentAPI (req, response) {
 //   }
 // }
 
-function search (defaultContentTypes, req, response) {
+function search (defaultContentTypes, req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -83,6 +83,9 @@ function search (defaultContentTypes, req, response) {
 
   if (!data.request.filters) {
     data.request.filters.contentType = defaultContentTypes
+  }
+  if (objectType) {
+    data.request.filters.objectType = objectType
   }
   //    if(!data.request.filters.mimeType) {
   //        data.request.filters.mimeType = getMimeTypeForContent();
@@ -753,60 +756,61 @@ function rejectContentAPI (req, response) {
 }
 
 function flagContentAPI (req, response) {
-  var data = req.body
-  data.contentId = req.params.contentId
-  var rspObj = req.rspObj
-  // Adding objectData in telemetry
-  if (rspObj.telemetryData) {
-    rspObj.telemetryData.object = utilsService.getObjectData(data.contentId, 'content', '', {})
-  }
+  // var data = req.body
+  // data.contentId = req.params.contentId
+  // var rspObj = req.rspObj
+  // // Adding objectData in telemetry
+  // if (rspObj.telemetryData) {
+  //   rspObj.telemetryData.object = utilsService.getObjectData(data.contentId, 'content', '', {})
+  // }
 
-  if (!data.contentId || !data.request || !data.request.flaggedBy || !data.request.versionKey) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'flagContentAPI',
-      'Error due to required params are missing', {
-        contentId: data.contentId
-      }))
-    rspObj.errCode = contentMessage.FLAG.MISSING_CODE
-    rspObj.errMsg = contentMessage.FLAG.MISSING_MESSAGE
-    rspObj.responseCode = responseCode.CLIENT_ERROR
-    return response.status(400).send(respUtil.errorResponse(rspObj))
-  }
-  var ekStepReqData = {
-    request: data.request
-  }
+  // if (!data.contentId || !data.request || !data.request.flaggedBy || !data.request.versionKey) {
+  //   LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'flagContentAPI',
+  //     'Error due to required params are missing', {
+  //       contentId: data.contentId
+  //     }))
+  //   rspObj.errCode = contentMessage.FLAG.MISSING_CODE
+  //   rspObj.errMsg = contentMessage.FLAG.MISSING_MESSAGE
+  //   rspObj.responseCode = responseCode.CLIENT_ERROR
+  //   return response.status(400).send(respUtil.errorResponse(rspObj))
+  // }
+  // var ekStepReqData = {
+  //   request: data.request
+  // }
 
-  async.waterfall([
+  // async.waterfall([
 
-    function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'flagContentAPI',
-        'Request to content provider to flag the content', {
-          contentId: data.contentId,
-          body: ekStepReqData,
-          headers: req.headers
-        }))
-      contentProvider.flagContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'flagContentAPI',
-            'Getting error from content provider', res))
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.FLAG.FAILED_CODE
-          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.FLAG.FAILED_MESSAGE
-          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-          rspObj = utilsService.getErrorResponse(rspObj, res)
-          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
-        } else {
-          CBW(null, res)
-        }
-      })
-    },
-    function (res) {
-      rspObj.result = res.result
-      emailService.createFlagContentEmail(req, function () { })
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'flagContentAPI',
-        'Sending response back to user'))
-      return response.status(200).send(respUtil.successResponse(rspObj))
-    }
-  ])
+  //   function (CBW) {
+  //     LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'flagContentAPI',
+  //       'Request to content provider to flag the content', {
+  //         contentId: data.contentId,
+  //         body: ekStepReqData,
+  //         headers: req.headers
+  //       }))
+  //     contentProvider.flagContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
+  //       if (err || res.responseCode !== responseCode.SUCCESS) {
+  //         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'flagContentAPI',
+  //           'Getting error from content provider', res))
+  //         rspObj.errCode = res && res.params ? res.params.err : contentMessage.FLAG.FAILED_CODE
+  //         rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.FLAG.FAILED_MESSAGE
+  //         rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+  //         var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+  //         rspObj = utilsService.getErrorResponse(rspObj, res)
+  //         return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+  //       } else {
+  //         CBW(null, res)
+  //       }
+  //     })
+  //   },
+  //   function (res) {
+  //     rspObj.result = res.result
+  //     emailService.createFlagContentEmail(req, function () { })
+  //     LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'flagContentAPI',
+  //       'Sending response back to user'))
+  //     return response.status(200).send(respUtil.successResponse(rspObj))
+  //   }
+  // ])
+  return response.status(200).send(respUtil.successResponse({}))
 }
 
 function acceptFlagContentAPI (req, response) {
@@ -1270,6 +1274,62 @@ function copyContentAPI (req, response) {
   ])
 }
 
+function searchPluginsAPI (req, response, objectType) {
+  var data = req.body
+  var rspObj = req.rspObj
+
+  if (!data.request || !data.request.filters) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
+      'Error due to required params are missing', data.request))
+
+    rspObj.errCode = contentMessage.SEARCH_PLUGINS.MISSING_CODE
+    rspObj.errMsg = contentMessage.SEARCH_PLUGINS.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+
+  data.request.filters.objectType = ['content']
+  data.request.filters.contentType = ['plugin']
+
+  var requestData = {
+    request: data.request
+  }
+
+  async.waterfall([
+
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchPluginsAPI',
+        'Request to content provider to search the plugins', {
+          body: requestData,
+          headers: req.headers
+        }))
+      contentProvider.pluginsSearch(requestData, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchPluginsAPI',
+            'Getting error from content provider', res))
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH_PLUGINS.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH_PLUGINS.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj = utilsService.getErrorResponse(rspObj, res)
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    },
+
+    function (res) {
+      rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchPluginsAPI',
+        'Content searched successfully, We got ' + rspObj.result.count + ' results', {
+          contentCount: rspObj.result.count
+        }))
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
+}
+
 module.exports.searchAPI = searchAPI
 module.exports.searchContentAPI = searchContentAPI
 module.exports.createContentAPI = createContentAPI
@@ -1289,3 +1349,4 @@ module.exports.unlistedPublishContentAPI = unlistedPublishContentAPI
 module.exports.assignBadgeAPI = assignBadge
 module.exports.revokeBadgeAPI = revokeBadge
 module.exports.copyContentAPI = copyContentAPI
+module.exports.searchPluginsAPI = searchPluginsAPI
