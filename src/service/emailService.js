@@ -235,6 +235,9 @@ function publishedContentEmail (req, callback) {
     },
     function (CBW) {
       var cData = data.request.contentData
+
+      
+    //  console.log(cData)
       var eData = emailMessage.PUBLISHED_CONTENT
       var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
