@@ -429,6 +429,7 @@ function reviewContentAPI (req, response) {
     function (res) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
+      emailService.reviewContentEmail(req, function () { })
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'reviewContentAPI',
         'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
