@@ -297,7 +297,6 @@ function publishedContentEmail (req, callback) {
       var subject = eData.subject
       var body = eData.body
       var contentLink = constructLiveUrl(cData)
-      console.log(contentLink)
       subject = subject.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
       body = body.replace(/{{Content type}}/g, cData.contentType)
@@ -308,7 +307,6 @@ function publishedContentEmail (req, callback) {
         request: getEmailData(null, subject, body, null, null, null,
           [cData.createdBy], data.templateConfig.result.form.data.templateName, eData.logo)
       }
-      console.log('lsEmailData', lsEmailData)
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           callback(new Error('Sorry! Sending email failed'), null)
@@ -382,8 +380,6 @@ function reviewContentEmail (req, callback) {
           'organisations.roles': ['CONTENT_REVIEWER']
         }
       }
-
-      console.log('requestbody', lsEmailData)
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           callback(new Error('Sorry! Sending email failed'), null)
@@ -424,9 +420,6 @@ function rejectContentEmail (req, callback) {
       'rootOrgId': req.headers['x-channel-id']
     }
   }
-
-  console.log('formRequest', formRequest)
-
   async.waterfall([
     function (callback) {
       async.parallel({
