@@ -219,7 +219,6 @@ function rejectFlagContentEmail (req, callback) {
 function getContentDetails (req) {
   return function (callback) {
     contentProvider.getContent(req.params.contentId, req.headers, function (err, result) {
-      // console.log('getContentDetails', err, result)
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Invalid content id'), null)
       } else {
@@ -236,7 +235,6 @@ function getContentDetails (req) {
 function getTemplateConfig (formRequest) {
   return function (callback) {
     contentProvider.learnerServiceGetForm(formRequest, {}, function (err, result) {
-      // console.log('getTemplateConfig', err, result)
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Form API failed'), null)
       } else {
@@ -308,12 +306,10 @@ function publishedContentEmail (req, callback) {
         .replace(/{{Content link}}/g, contentLink)
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null,
-          [cData.createdBy], 'publishContent', eData.logo)
-        // [cData.createdBy], data.templateConfig.result.form.data.templateName, eData.logo)
+          [cData.createdBy], data.templateConfig.result.form.data.templateName, eData.logo)
       }
       console.log('lsEmailData', lsEmailData)
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
-        // console.log('Sending email failed---', err, res)
         if (err || res.responseCode !== responseCode.SUCCESS) {
           callback(new Error('Sorry! Sending email failed'), null)
         } else {
@@ -479,58 +475,6 @@ function rejectContentEmail (req, callback) {
     }
   })
 }
-// function rejectContentEmail(req, callback) {
-//   var data = req.body
-//   data.contentId = req.params.contentId
-//   var rspObj = req.rspObj
-
-//   if (data.contentId) {
-//     callback(new Error('Content id is missing'), null)
-//   }
-//   async.waterfall([
-//     function (CBW) {
-//       contentProvider.getContent(data.contentId, req.headers, function (err, res) {
-//         if (err || res.responseCode !== responseCode.SUCCESS) {
-//           callback(new Error('Invalid content id'), null)
-//         } else {
-//           data.contentData = res.result.content
-//           CBW()
-//         }
-//       })
-//     },
-//     function (CBW) {
-//       var cData = data.contentData
-//       var eData = emailMessage.REJECT_CONTENT
-//       var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType)
-//         .replace(/{{Content title}}/g, cData.name)
-//       var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
-//         .replace(/{{Content title}}/g, cData.name)
-//         .replace(/{{Content status}}/g, cData.status)
-//       var lsEmailData = {
-//         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
-//       }
-//       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'rejectContentEmail',
-//         'Request to Leaner service to send email', {
-//           body: lsEmailData
-//         }))
-//       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
-//         if (err || res.responseCode !== responseCode.SUCCESS) {
-//           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'rejectContentEmail',
-//             'Sending email failed', res))
-//           callback(new Error('Sending email failed'), null)
-//         } else {
-//           CBW(null, res)
-//         }
-//       })
-//     },
-
-//     function (res) {
-//       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'rejectContentEmail',
-//         'Email sent successfully', rspObj))
-//       callback(null, true)
-//     }
-//   ])
-// }
 
 /**
  * [getBase64Url Return base64 url for unlisted content share]
