@@ -389,7 +389,7 @@ function reviewContentEmail (req, callback) {
       }
       lsEmailData.request.recipientSearchQuery = {
         'filters': {
-          'channel': req.headers['x-channel-id'],
+          'channel': req.get('x-channel-id'),
           'organisations.roles': ['CONTENT_REVIEWER']
         }
       }
