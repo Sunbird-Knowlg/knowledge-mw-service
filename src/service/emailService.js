@@ -266,7 +266,6 @@ function constructDraftUrl (content) {
     'application/vnd.ekstep.h5p-archive', 'video/webm', 'text/x-url'
   ]
   var baseUrl = `${configUtil.getConfig('CONTENT_REPO_BASE_URL')}/workspace/content/edit`
-  // var baseUrl = 'https://dev.open-sunbird.org/workspace/content/edit'
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     return `${baseUrl}/collection/${content.identifier}/${content.contentType}/draft/
     ${content.framework}`
