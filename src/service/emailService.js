@@ -244,35 +244,30 @@ function getTemplateConfig (formRequest) {
   }
 }
 
-function constructLiveUrl (content) {
-  var baseUrl = configUtil.getConfig('CONTENT_REPO_BASE_URL')
+function getPublisedContentUrl (content) {
+  var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL')
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     if (content.contentType !== 'Course') {
-      return `${baseUrl}/resources/play/collection/${content.identifier}`
+      return baseUrl + '/resources/play/collection/' + content.identifier
     } else {
-      return `${baseUrl}/learn/course/${content.identifier}`
+      return baseUrl + '/learn/course/' + content.identifier
     }
   } else if (content.mimeType === 'application/vnd.ekstep.ecml-archive') {
-    return `${baseUrl}/resources/play/content/${content.identifier}`
+    return baseUrl + '/resources/play/content/' + content.identifier
   } else {
-    return `${baseUrl}/resources/play/content/${content.identifier}`
+    return baseUrl + '/resources/play/content/' + content.identifier
   }
 }
 
-function constructDraftUrl (content) {
-  var genricMimeType = [
-    'application/pdf', 'video/mp4', 'video/x-youtube', 'video/youtube',
-    'application/vnd.ekstep.html-archive', 'application/epub',
-    'application/vnd.ekstep.h5p-archive', 'video/webm', 'text/x-url'
-  ]
-  var baseUrl = `${configUtil.getConfig('CONTENT_REPO_BASE_URL')}/workspace/content/edit`
+function getDraftContentUrl (content) {
+  var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/workspace/content/edit'
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
-    return `${baseUrl}/collection/${content.identifier}/${content.contentType}/draft/
-    ${content.framework}`
+    return baseUrl + '/collection/' + content.identifier + '/' + content.contentType +
+    '/draft/' + content.framework
   } else if (content.mimeType === 'application/vnd.ekstep.ecml-archive') {
-    return `${baseUrl}/content/${content.identifier}/draft/${content.framework}`
-  } else if ((genricMimeType).includes(content.mimeType)) {
-    return `${baseUrl}/genric/${content.identifier}/draft/${content.framework}`
+    return baseUrl + '/content/' + content.identifier + '/draft/' + content.framework
+  } else {
+    return baseUrl + '/genric/' + content.identifier + '/draft/' + content.framework
   }
 }
 
@@ -283,15 +278,16 @@ function constructDraftUrl (content) {
  */
 function publishedContentEmail (req, callback) {
   if (!req.params.contentId) {
+    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'publishedTemplate',
+      'Content id is missing', null))
     callback(new Error('Content id is missing'), null)
   }
-  var rspObj = req.rspObj
   var formRequest = {
     request: {
       'type': 'notification',
       'action': 'publish',
       'subType': 'email',
-      'rootOrgId': req.headers['x-channel-id']
+      'rootOrgId': req.get('x-channel-id')
     }
   }
 
@@ -313,12 +309,11 @@ function publishedContentEmail (req, callback) {
       var eData = data.templateConfig.result.form.data.fields[0]
       var subject = eData.subject
       var body = eData.body
-      var contentLink = constructLiveUrl(cData)
+      var contentLink = getPublisedContentUrl(cData)
       subject = subject.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
       body = body.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
-        .replace(/{{Content status}}/g, cData.status)
         .replace(/{{Content link}}/g, contentLink)
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null,
@@ -326,7 +321,7 @@ function publishedContentEmail (req, callback) {
       }
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          callback(new Error('Sorry! Sending email failed'), null)
+          callback(new Error('Sending email failed!'), null)
         } else {
           callback(null, data)
         }
@@ -335,7 +330,7 @@ function publishedContentEmail (req, callback) {
   ], function (err, data) {
     if (err) {
       console.log('Sending email failed')
-      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'publishedTemplate',
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'publishedTemplate',
         'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
@@ -352,15 +347,16 @@ function publishedContentEmail (req, callback) {
  */
 function reviewContentEmail (req, callback) {
   if (!req.params.contentId) {
+    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReviewTemplate',
+      'Content id is missing', null))
     callback(new Error('Content id is missing'), null)
   }
-  var rspObj = req.rspObj
   var formRequest = {
     request: {
       'type': 'notification',
       'action': 'sendForReview',
       'subType': 'email',
-      'rootOrgId': req.headers['x-channel-id']
+      'rootOrgId': req.get('x-channel-id')
     }
   }
 
@@ -399,7 +395,7 @@ function reviewContentEmail (req, callback) {
       }
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          callback(new Error('Sorry! Sending email failed'), null)
+          callback(new Error('Sending email failed!'), null)
         } else {
           callback(null, data)
         }
@@ -408,7 +404,7 @@ function reviewContentEmail (req, callback) {
   ], function (err, data) {
     if (err) {
       console.log('Sending email failed')
-      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'sendForReviewTemplate',
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReviewTemplate',
         'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
@@ -424,17 +420,17 @@ function reviewContentEmail (req, callback) {
  * @param {function} callback
  */
 function rejectContentEmail (req, callback) {
-  console.log('came here')
   if (!req.params.contentId) {
+    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'requestForChangesTemplate',
+      'Content id is missing', null))
     callback(new Error('Content id is missing'), null)
   }
-  var rspObj = req.rspObj
   var formRequest = {
     request: {
       'type': 'notification',
       'action': 'requestForChanges',
       'subType': 'email',
-      'rootOrgId': req.headers['x-channel-id']
+      'rootOrgId': req.get('x-channel-id')
     }
   }
   async.waterfall([
@@ -455,7 +451,7 @@ function rejectContentEmail (req, callback) {
       var eData = data.templateConfig.result.form.data.fields[0]
       var subject = eData.subject
       var body = eData.body
-      var contentLink = constructDraftUrl(cData)
+      var contentLink = getDraftContentUrl(cData)
       subject = subject.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
       body = body.replace(/{{Content type}}/g, cData.contentType)
@@ -468,7 +464,7 @@ function rejectContentEmail (req, callback) {
       }
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          callback(new Error('Sorry! Sending email failed'), null)
+          callback(new Error('Sending email failed!'), null)
         } else {
           callback(null, data)
         }
@@ -477,7 +473,7 @@ function rejectContentEmail (req, callback) {
   ], function (err, data) {
     if (err) {
       console.log('Sending email failed')
-      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'requestForChangesTemplate',
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'requestForChangesTemplate',
         'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
