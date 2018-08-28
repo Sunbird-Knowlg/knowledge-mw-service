@@ -12,7 +12,7 @@ var reqMsg = messageUtil.REQUEST
 var responseCode = messageUtil.RESPONSE_CODE
 var apiVersions = messageUtil.API_VERSION
 var filename = path.basename(__filename)
-const jwt = require('jsonwebtoken')
+var jwt = require('jsonwebtoken')
 
 var keyCloakConfig = {
   'authServerUrl': process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : 'https://staging.open-sunbird.org/auth',
