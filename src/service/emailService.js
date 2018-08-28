@@ -244,7 +244,12 @@ function getTemplateConfig (formRequest) {
   }
 }
 
-function getPublisedContentUrl (content) {
+/**
+ * Below function is used construct content link which will be sent to the
+ * content creator after the content is published
+ * @param {object} content
+ */
+function getPublishedContentUrl (content) {
   var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL')
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     if (content.contentType !== 'Course') {
@@ -258,7 +263,11 @@ function getPublisedContentUrl (content) {
     return baseUrl + '/resources/play/content/' + content.identifier
   }
 }
-
+/**
+ * Below function is used construct content link which will be sent to creator
+ * after the content is rejected
+ * @param {object} content
+ */
 function getDraftContentUrl (content) {
   var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/workspace/content/edit'
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
@@ -268,6 +277,22 @@ function getDraftContentUrl (content) {
     return baseUrl + '/content/' + content.identifier + '/draft/' + content.framework
   } else {
     return baseUrl + '/genric/' + content.identifier + '/draft/' + content.framework
+  }
+}
+
+/**
+ * Below function is used construct content link which will be sent to reviewers
+ * @param {object} content
+ */
+function getReviewContentUrl (content) {
+  var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/workspace/content'
+  if (content.mimeType === 'application/vnd.ekstep.content-collection') {
+    return baseUrl + '/edit/collection/' + content.identifier + '/' + content.contentType +
+    '/upForReview/' + content.framework
+  } else if (content.mimeType === 'application/vnd.ekstep.ecml-archive') {
+    return baseUrl + '/upForReview/content/' + content.identifier
+  } else {
+    return baseUrl + '/upForReview/content/' + content.identifier
   }
 }
 
@@ -309,7 +334,7 @@ function publishedContentEmail (req, callback) {
       var eData = data.templateConfig.result.form.data.fields[0]
       var subject = eData.subject
       var body = eData.body
-      var contentLink = getPublisedContentUrl(cData)
+      var contentLink = getPublishedContentUrl(cData)
       subject = subject.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
       body = body.replace(/{{Content type}}/g, cData.contentType)
@@ -329,12 +354,10 @@ function publishedContentEmail (req, callback) {
     }
   ], function (err, data) {
     if (err) {
-      console.log('Sending email failed')
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'publishedTemplate',
         'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
-      console.log('finally email sent with data')
       callback(null, true)
     }
   })
@@ -378,11 +401,13 @@ function reviewContentEmail (req, callback) {
       var eData = data.templateConfig.result.form.data.fields[0]
       var subject = eData.subject
       var body = eData.body
+      var contentLink = getReviewContentUrl(cData)
       subject = subject.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
       body = body.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
         .replace(/{{Creator name}}/g, req.headers['userName'])
+        .replace(/{{Content link}}/g, contentLink)
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null,
           null, data.templateConfig.result.form.data.templateName, eData.logo)
@@ -403,12 +428,10 @@ function reviewContentEmail (req, callback) {
     }
   ], function (err, data) {
     if (err) {
-      console.log('Sending email failed')
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReviewTemplate',
         'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
-      console.log('finally email sent with data')
       callback(null, true)
     }
   })
@@ -472,12 +495,10 @@ function rejectContentEmail (req, callback) {
     }
   ], function (err, data) {
     if (err) {
-      console.log('Sending email failed')
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'requestForChangesTemplate',
         'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
-      console.log('finally email sent with data')
       callback(null, true)
     }
   })
