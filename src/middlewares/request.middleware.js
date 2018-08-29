@@ -12,6 +12,7 @@ var reqMsg = messageUtil.REQUEST
 var responseCode = messageUtil.RESPONSE_CODE
 var apiVersions = messageUtil.API_VERSION
 var filename = path.basename(__filename)
+var jwt = require('jsonwebtoken')
 
 var keyCloakConfig = {
   'authServerUrl': process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : 'https://staging.open-sunbird.org/auth',
@@ -100,11 +101,13 @@ function validateToken (req, res, next) {
       rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
       return res.status(401).send(respUtil.errorResponse(rspObj))
     } else {
+      var payload = jwt.decode(tokenData.token)
       delete req.headers['x-authenticated-userid']
       delete req.headers['x-authenticated-user-token']
       req.rspObj.userId = tokenData.userId
       rspObj.telemetryData.actor = utilsService.getTelemetryActorData(req)
       req.headers['x-authenticated-userid'] = tokenData.userId
+      req.headers['userName'] = payload.name
       req.rspObj = rspObj
       next()
     }
