@@ -417,13 +417,6 @@ function rejectContentEmail (req, callback) {
 }
 
 /**
- * [getBase64Url Return base64 url for unlisted content share]
- * @param  {[String]} type   [content type]
- * @param  {[String]} identifier [contentID]
- * @return {[String]}         [base64 string]
- */
-
-/**
  * [getUnlistedShareUrl Return share url for unlisted content]
  * @param  {[Object]} cData   [content data]
  * @param  {[String]} baseUri [base url]
