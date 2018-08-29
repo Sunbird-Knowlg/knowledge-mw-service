@@ -19,6 +19,7 @@ var configUtil = require('sb-config-util')
  * @param {string} emailArray
  * @param {string} recipientUserIds
  * @param {string} emailTemplateType
+ * @param {string} imageUrl
  */
 function getEmailData (name, subject, body, actionUrl, actionName, emailArray,
   recipientUserIds, emailTemplateType, imageUrl) {
