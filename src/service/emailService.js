@@ -298,11 +298,12 @@ function getReviewContentUrl (content) {
 }
 
 /**
- * Below function is used for send email when published content api called
+ * Below function is used to send email
  * @param {object} req
+ * @param {function} action
  * @param {function} callback
  */
-function publishedContentEmail (req, callback) {
+function sendContentEmail (req, action, callback) {
   if (!req.params.contentId) {
     LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'publishedTemplate',
       'Content id is missing', null))
@@ -311,12 +312,11 @@ function publishedContentEmail (req, callback) {
   var formRequest = {
     request: {
       'type': 'notification',
-      'action': 'publish',
+      'action': action,
       'subType': 'email',
       'rootOrgId': req.get('x-channel-id')
     }
   }
-
   async.waterfall([
     function (callback) {
       async.parallel({
@@ -335,15 +335,40 @@ function publishedContentEmail (req, callback) {
       var eData = data.templateConfig.result.form.data.fields[0]
       var subject = eData.subject
       var body = eData.body
-      var contentLink = getPublishedContentUrl(cData)
+
+      // Creating content link for email template
+      var contentLink = ''
+      if (action === 'sendForReview') {
+        contentLink = getReviewContentUrl(cData)
+      } else if (action === 'requestForChanges') {
+        contentLink = getDraftContentUrl(cData)
+      } else if (action === 'publish') {
+        contentLink = getPublishedContentUrl(cData)
+      }
+
+      // Replacing dynamic content data with email template
       subject = subject.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
       body = body.replace(/{{Content type}}/g, cData.contentType)
         .replace(/{{Content title}}/g, cData.name)
         .replace(/{{Content link}}/g, contentLink)
+        .replace(/{{Creator name}}/g, req.headers['userName'])
+        .replace(/{{Reviewer name}}/g, req.headers['userName'])
+
+      // Fetching email request body for sending email
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null,
           [cData.createdBy], data.templateConfig.result.form.data.templateName, eData.logo)
+      }
+
+      // Attaching recipientSearchQuery for send for review in email request body
+      if (action === 'sendForReview') {
+        lsEmailData.request.recipientSearchQuery = {
+          'filters': {
+            'channel': req.get('x-channel-id'),
+            'organisations.roles': ['CONTENT_REVIEWER']
+          }
+        }
       }
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
@@ -365,77 +390,21 @@ function publishedContentEmail (req, callback) {
 }
 
 /**
+ * Below function is used for send email when published content api called
+ * @param {object} req
+ * @param {function} callback
+ */
+function publishedContentEmail (req, callback) {
+  sendContentEmail(req, 'publish', callback)
+}
+
+/**
  * Below function is used for send email when review content api called
  * @param {object} req
  * @param {function} callback
  */
 function reviewContentEmail (req, callback) {
-  if (!req.params.contentId) {
-    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReviewTemplate',
-      'Content id is missing', null))
-    callback(new Error('Content id is missing'), null)
-  }
-  var formRequest = {
-    request: {
-      'type': 'notification',
-      'action': 'sendForReview',
-      'subType': 'email',
-      'rootOrgId': req.get('x-channel-id')
-    }
-  }
-
-  async.waterfall([
-    function (callback) {
-      async.parallel({
-        contentDetails: getContentDetails(req),
-        templateConfig: getTemplateConfig(formRequest)
-      }, function (err, results) {
-        if (err) {
-          callback(err, null)
-        } else {
-          callback(null, results)
-        }
-      })
-    },
-    function (data, callback) {
-      var cData = data.contentDetails.result.content
-      var eData = data.templateConfig.result.form.data.fields[0]
-      var subject = eData.subject
-      var body = eData.body
-      var contentLink = getReviewContentUrl(cData)
-      subject = subject.replace(/{{Content type}}/g, cData.contentType)
-        .replace(/{{Content title}}/g, cData.name)
-      body = body.replace(/{{Content type}}/g, cData.contentType)
-        .replace(/{{Content title}}/g, cData.name)
-        .replace(/{{Creator name}}/g, req.headers['userName'])
-        .replace(/{{Content link}}/g, contentLink)
-      var lsEmailData = {
-        request: getEmailData(null, subject, body, null, null, null,
-          null, data.templateConfig.result.form.data.templateName, eData.logo)
-      }
-      lsEmailData.request.recipientSearchQuery = {
-        'filters': {
-          'channel': req.get('x-channel-id'),
-          'organisations.roles': ['CONTENT_REVIEWER']
-        }
-      }
-      contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
-          callback(new Error('Sending email failed!'), null)
-        } else {
-          callback(null, data)
-        }
-      })
-    }
-  ], function (err, data) {
-    if (err) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReviewTemplate',
-        'Sending email failed', err))
-      callback(new Error('Sending email failed'), null)
-    } else {
-      callback(null, true)
-    }
-  })
+  sendContentEmail(req, 'sendForReview', callback)
 }
 
 /**
@@ -444,65 +413,7 @@ function reviewContentEmail (req, callback) {
  * @param {function} callback
  */
 function rejectContentEmail (req, callback) {
-  if (!req.params.contentId) {
-    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'requestForChangesTemplate',
-      'Content id is missing', null))
-    callback(new Error('Content id is missing'), null)
-  }
-  var formRequest = {
-    request: {
-      'type': 'notification',
-      'action': 'requestForChanges',
-      'subType': 'email',
-      'rootOrgId': req.get('x-channel-id')
-    }
-  }
-  async.waterfall([
-    function (callback) {
-      async.parallel({
-        contentDetails: getContentDetails(req),
-        templateConfig: getTemplateConfig(formRequest)
-      }, function (err, results) {
-        if (err) {
-          callback(err, null)
-        } else {
-          callback(null, results)
-        }
-      })
-    },
-    function (data, callback) {
-      var cData = data.contentDetails.result.content
-      var eData = data.templateConfig.result.form.data.fields[0]
-      var subject = eData.subject
-      var body = eData.body
-      var contentLink = getDraftContentUrl(cData)
-      subject = subject.replace(/{{Content type}}/g, cData.contentType)
-        .replace(/{{Content title}}/g, cData.name)
-      body = body.replace(/{{Content type}}/g, cData.contentType)
-        .replace(/{{Content title}}/g, cData.name)
-        .replace(/{{Reviewer name}}/g, req.headers['userName'])
-        .replace(/{{Content link}}/g, contentLink)
-      var lsEmailData = {
-        request: getEmailData(null, subject, body, null, null, null,
-          [cData.createdBy], data.templateConfig.result.form.data.templateName, eData.logo)
-      }
-      contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
-          callback(new Error('Sending email failed!'), null)
-        } else {
-          callback(null, data)
-        }
-      })
-    }
-  ], function (err, data) {
-    if (err) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'requestForChangesTemplate',
-        'Sending email failed', err))
-      callback(new Error('Sending email failed'), null)
-    } else {
-      callback(null, true)
-    }
-  })
+  sendContentEmail(req, 'requestForChanges', callback)
 }
 
 /**
@@ -511,9 +422,6 @@ function rejectContentEmail (req, callback) {
  * @param  {[String]} identifier [contentID]
  * @return {[String]}         [base64 string]
  */
-// var getBase64Url = function (type, identifier) {
-//   return Buffer.from(type + '/' + identifier).toString('base64')
-// }
 
 /**
  * [getUnlistedShareUrl Return share url for unlisted content]
@@ -521,16 +429,6 @@ function rejectContentEmail (req, callback) {
  * @param  {[String]} baseUri [base url]
  * @return {[String]}         [share url]
  */
-// var getUnlistedShareUrl = function (cData, baseUri) {
-//   if (cData.contentType === 'Course') {
-//     return baseUri + '/unlisted' + '/' + getBase64Url('course', cData.identifier)
-//   } else if (cData.mimeType === 'application/vnd.ekstep.content-collection') {
-//     return baseUri + '/unlisted' + '/' + getBase64Url('collection', cData.identifier)
-//   } else {
-//     return baseUri + '/unlisted' + '/' + getBase64Url('content', cData.identifier)
-//   }
-// }
-
 var getUnlistedShareUrl = function (cData, baseUri) {
   if (cData.contentType === 'Course') {
     return baseUri + '/learn/course' + '/' + cData.identifier + '/Unlisted'
