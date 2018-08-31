@@ -240,9 +240,7 @@ function getContentDetails (req) {
  */
 function getTemplateConfig (formRequest) {
   return function (callback) {
-    contentProvider.learnerServiceGetForm(formRequest, {}, function (err, result) {
-      LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Form API request',
-        'Check Template config form request', formRequest))
+    contentProvider.getForm(formRequest, {}, function (err, result) {
       LOG.error(utilsService.getLoggerData(formRequest, 'ERROR', filename, 'Form API error',
         'Check Template config error', err))
       LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Form API success',
