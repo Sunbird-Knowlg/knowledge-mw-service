@@ -220,6 +220,11 @@ function rejectFlagContentEmail (req, callback) {
 function getContentDetails (req) {
   return function (callback) {
     contentProvider.getContent(req.params.contentId, req.headers, function (err, result) {
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Get content details error',
+        'Get content details error', err))
+      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Get content details success',
+        'Get content details result', result))
+
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Invalid content id'), null)
       } else {
@@ -236,6 +241,11 @@ function getContentDetails (req) {
 function getTemplateConfig (formRequest) {
   return function (callback) {
     contentProvider.learnerServiceGetForm(formRequest, {}, function (err, result) {
+      LOG.error(utilsService.getLoggerData(formRequest, 'ERROR', filename, 'Form API error',
+        'Check Template config error', err))
+      LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Form API success',
+        'Check Template config result', result))
+
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Form API failed'), null)
       } else {
@@ -305,7 +315,7 @@ function getReviewContentUrl (content) {
  */
 function sendContentEmail (req, action, callback) {
   if (!req.params.contentId) {
-    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'publishedTemplate',
+    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
       'Content id is missing', null))
     callback(new Error('Content id is missing'), null)
   }
@@ -371,6 +381,11 @@ function sendContentEmail (req, action, callback) {
         }
       }
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
+        console.log('-----', err, res)
+        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
+          'Sending email failed', err))
+        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, action,
+          'Check email went or not', res))
         if (err || res.responseCode !== responseCode.SUCCESS) {
           callback(new Error('Sending email failed!'), null)
         } else {
@@ -379,11 +394,17 @@ function sendContentEmail (req, action, callback) {
       })
     }
   ], function (err, data) {
+    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
+      'Finally sending email failed', err))
+    LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, action,
+      'Finally email sent', data))
     if (err) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'publishedTemplate',
-        'Sending email failed', err))
+      console.log('Email failed')
+      // LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
+      //   'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
+      console.log('Email sent')
       callback(null, true)
     }
   })
