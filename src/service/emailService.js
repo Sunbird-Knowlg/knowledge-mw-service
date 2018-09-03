@@ -8,6 +8,7 @@ var messageUtils = require('./messageUtil')
 var emailMessage = messageUtils.EMAIL
 var responseCode = messageUtils.RESPONSE_CODE
 var configUtil = require('sb-config-util')
+var lodash = require('lodash')
 
 /**
  * Below function is used to create email request object
@@ -224,6 +225,10 @@ function rejectFlagContentEmail (req, callback) {
 function getContentDetails (req) {
   return function (callback) {
     contentProvider.getContent(req.params.contentId, req.headers, function (err, result) {
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
+        'Getting content details failed', err))
+      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
+        'Getting content details success', err))
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Invalid content id'), null)
       } else {
@@ -240,6 +245,10 @@ function getContentDetails (req) {
 function getTemplateConfig (formRequest) {
   return function (callback) {
     contentProvider.getForm(formRequest, {}, function (err, result) {
+      LOG.error(utilsService.getLoggerData(formRequest, 'ERROR', filename, 'Call Form API',
+        'Getting template failed', err))
+      LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Call Form API',
+        'Getting template success', err))
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Form API failed'), null)
       } else {
@@ -335,9 +344,8 @@ function sendContentEmail (req, action, callback) {
       })
     },
     function (data, callback) {
-      if (data.contentDetails.result && data.contentDetails.result.content &&
-        data.templateConfig.result && data.templateConfig.result.form &&
-        data.templateConfig.result.form.data) {
+      if (lodash.get(data.contentDetails, 'result.content') &&
+      lodash.get(data.templateConfig, 'result.form.data.fields[0]')) {
         var cData = data.contentDetails.result.content
         var eData = data.templateConfig.result.form.data.fields[0]
         var subject = eData.subject
@@ -380,6 +388,10 @@ function sendContentEmail (req, action, callback) {
         }
         contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
+            LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
+              'Sending email failed', err))
+            LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, action,
+              'Sent email successfully', res))
             callback(new Error('Sending email failed!'), null)
           } else {
             callback(null, data)
