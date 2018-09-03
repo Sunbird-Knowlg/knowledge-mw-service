@@ -20,9 +20,11 @@ var configUtil = require('sb-config-util')
  * @param {string} recipientUserIds
  * @param {string} emailTemplateType
  * @param {string} imageUrl
+ * @param {string} orgName
+ * @param {string} fromEmail
  */
 function getEmailData (name, subject, body, actionUrl, actionName, emailArray,
-  recipientUserIds, emailTemplateType, imageUrl) {
+  recipientUserIds, emailTemplateType, imageUrl, orgName, fromEmail) {
   var request = {
     name: name,
     subject: subject,
@@ -32,7 +34,9 @@ function getEmailData (name, subject, body, actionUrl, actionName, emailArray,
     recipientEmails: emailArray,
     recipientUserIds: recipientUserIds,
     emailTemplateType: emailTemplateType,
-    orgImageUrl: imageUrl
+    orgImageUrl: imageUrl,
+    orgName: orgName,
+    fromEmail: fromEmail
   }
   return request
 }
@@ -220,11 +224,6 @@ function rejectFlagContentEmail (req, callback) {
 function getContentDetails (req) {
   return function (callback) {
     contentProvider.getContent(req.params.contentId, req.headers, function (err, result) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Get content details error',
-        'Get content details error', err))
-      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Get content details success',
-        'Get content details result', result))
-
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Invalid content id'), null)
       } else {
@@ -241,13 +240,6 @@ function getContentDetails (req) {
 function getTemplateConfig (formRequest) {
   return function (callback) {
     contentProvider.getForm(formRequest, {}, function (err, result) {
-      LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Form API request',
-        'Check Template config form request', formRequest))
-      LOG.error(utilsService.getLoggerData(formRequest, 'ERROR', filename, 'Form API error',
-        'Check Template config error', err))
-      LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Form API success',
-        'Check Template config result', result))
-
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Form API failed'), null)
       } else {
@@ -370,7 +362,8 @@ function sendContentEmail (req, action, callback) {
       // Fetching email request body for sending email
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null,
-          [cData.createdBy], data.templateConfig.result.form.data.templateName, eData.logo)
+          [cData.createdBy], data.templateConfig.result.form.data.templateName,
+          eData.logo, eData.orgName, eData.fromEmail)
       }
 
       // Attaching recipientSearchQuery for send for review in email request body
@@ -383,11 +376,6 @@ function sendContentEmail (req, action, callback) {
         }
       }
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
-        console.log('-----', err, res)
-        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
-          'Sending email failed', err))
-        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, action,
-          'Check email went or not', res))
         if (err || res.responseCode !== responseCode.SUCCESS) {
           callback(new Error('Sending email failed!'), null)
         } else {
@@ -396,17 +384,11 @@ function sendContentEmail (req, action, callback) {
       })
     }
   ], function (err, data) {
-    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
-      'Finally sending email failed', err))
-    LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, action,
-      'Finally email sent', data))
     if (err) {
-      console.log('Email failed')
-      // LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
-      //   'Sending email failed', err))
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
+        'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
-      console.log('Email sent')
       callback(null, true)
     }
   })
