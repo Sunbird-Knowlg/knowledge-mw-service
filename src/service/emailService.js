@@ -8,6 +8,7 @@ var messageUtils = require('./messageUtil')
 var emailMessage = messageUtils.EMAIL
 var responseCode = messageUtils.RESPONSE_CODE
 var configUtil = require('sb-config-util')
+var lodash = require('lodash')
 
 /**
  * Below function is used to create email request object
@@ -20,9 +21,11 @@ var configUtil = require('sb-config-util')
  * @param {string} recipientUserIds
  * @param {string} emailTemplateType
  * @param {string} imageUrl
+ * @param {string} orgName
+ * @param {string} fromEmail
  */
 function getEmailData (name, subject, body, actionUrl, actionName, emailArray,
-  recipientUserIds, emailTemplateType, imageUrl) {
+  recipientUserIds, emailTemplateType, imageUrl, orgName, fromEmail) {
   var request = {
     name: name,
     subject: subject,
@@ -32,7 +35,9 @@ function getEmailData (name, subject, body, actionUrl, actionName, emailArray,
     recipientEmails: emailArray,
     recipientUserIds: recipientUserIds,
     emailTemplateType: emailTemplateType,
-    orgImageUrl: imageUrl
+    orgImageUrl: imageUrl,
+    orgName: orgName,
+    fromEmail: fromEmail
   }
   return request
 }
@@ -220,11 +225,10 @@ function rejectFlagContentEmail (req, callback) {
 function getContentDetails (req) {
   return function (callback) {
     contentProvider.getContent(req.params.contentId, req.headers, function (err, result) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Get content details error',
-        'Get content details error', err))
-      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Get content details success',
-        'Get content details result', result))
-
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
+        'Getting content details failed', err))
+      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
+        'Getting content details success', err))
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Invalid content id'), null)
       } else {
@@ -241,13 +245,10 @@ function getContentDetails (req) {
 function getTemplateConfig (formRequest) {
   return function (callback) {
     contentProvider.getForm(formRequest, {}, function (err, result) {
-      LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Form API request',
-        'Check Template config form request', formRequest))
-      LOG.error(utilsService.getLoggerData(formRequest, 'ERROR', filename, 'Form API error',
-        'Check Template config error', err))
-      LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Form API success',
-        'Check Template config result', result))
-
+      LOG.error(utilsService.getLoggerData(formRequest, 'ERROR', filename, 'Call Form API',
+        'Getting template failed', err))
+      LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Call Form API',
+        'Getting template success', err))
       if (err || result.responseCode !== responseCode.SUCCESS) {
         callback(new Error('Form API failed'), null)
       } else {
@@ -343,70 +344,69 @@ function sendContentEmail (req, action, callback) {
       })
     },
     function (data, callback) {
-      var cData = data.contentDetails.result.content
-      var eData = data.templateConfig.result.form.data.fields[0]
-      var subject = eData.subject
-      var body = eData.body
+      if (lodash.get(data.contentDetails, 'result.content') &&
+      lodash.get(data.templateConfig, 'result.form.data.fields[0]')) {
+        var cData = data.contentDetails.result.content
+        var eData = data.templateConfig.result.form.data.fields[0]
+        var subject = eData.subject
+        var body = eData.body
 
-      // Creating content link for email template
-      var contentLink = ''
-      if (action === 'sendForReview') {
-        contentLink = getReviewContentUrl(cData)
-      } else if (action === 'requestForChanges') {
-        contentLink = getDraftContentUrl(cData)
-      } else if (action === 'publish') {
-        contentLink = getPublishedContentUrl(cData)
-      }
+        // Creating content link for email template
+        var contentLink = ''
+        if (action === 'sendForReview') {
+          contentLink = getReviewContentUrl(cData)
+        } else if (action === 'requestForChanges') {
+          contentLink = getDraftContentUrl(cData)
+        } else if (action === 'publish') {
+          contentLink = getPublishedContentUrl(cData)
+        }
 
-      // Replacing dynamic content data with email template
-      subject = subject.replace(/{{Content type}}/g, cData.contentType)
-        .replace(/{{Content title}}/g, cData.name)
-      body = body.replace(/{{Content type}}/g, cData.contentType)
-        .replace(/{{Content title}}/g, cData.name)
-        .replace(/{{Content link}}/g, contentLink)
-        .replace(/{{Creator name}}/g, req.headers['userName'])
-        .replace(/{{Reviewer name}}/g, req.headers['userName'])
+        // Replacing dynamic content data with email template
+        subject = subject.replace(/{{Content type}}/g, cData.contentType)
+          .replace(/{{Content title}}/g, cData.name)
+        body = body.replace(/{{Content type}}/g, cData.contentType)
+          .replace(/{{Content title}}/g, cData.name)
+          .replace(/{{Content link}}/g, contentLink)
+          .replace(/{{Creator name}}/g, req.headers['userName'])
+          .replace(/{{Reviewer name}}/g, req.headers['userName'])
 
-      // Fetching email request body for sending email
-      var lsEmailData = {
-        request: getEmailData(null, subject, body, null, null, null,
-          [cData.createdBy], data.templateConfig.result.form.data.templateName, eData.logo)
-      }
+        // Fetching email request body for sending email
+        var lsEmailData = {
+          request: getEmailData(null, subject, body, null, null, null,
+            [cData.createdBy], data.templateConfig.result.form.data.templateName,
+            eData.logo, eData.orgName, eData.fromEmail)
+        }
 
-      // Attaching recipientSearchQuery for send for review in email request body
-      if (action === 'sendForReview') {
-        lsEmailData.request.recipientSearchQuery = {
-          'filters': {
-            'channel': req.get('x-channel-id'),
-            'organisations.roles': ['CONTENT_REVIEWER']
+        // Attaching recipientSearchQuery for send for review in email request body
+        if (action === 'sendForReview') {
+          lsEmailData.request.recipientSearchQuery = {
+            'filters': {
+              'channel': req.get('x-channel-id'),
+              'organisations.roles': ['CONTENT_REVIEWER']
+            }
           }
         }
+        contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
+          if (err || res.responseCode !== responseCode.SUCCESS) {
+            LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
+              'Sending email failed', err))
+            LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, action,
+              'Sent email successfully', res))
+            callback(new Error('Sending email failed!'), null)
+          } else {
+            callback(null, data)
+          }
+        })
+      } else {
+        callback(new Error('All data not found for sending email'), null)
       }
-      contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
-        console.log('-----', err, res)
-        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
-          'Sending email failed', err))
-        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, action,
-          'Check email went or not', res))
-        if (err || res.responseCode !== responseCode.SUCCESS) {
-          callback(new Error('Sending email failed!'), null)
-        } else {
-          callback(null, data)
-        }
-      })
     }
   ], function (err, data) {
-    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
-      'Finally sending email failed', err))
-    LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, action,
-      'Finally email sent', data))
     if (err) {
-      console.log('Email failed')
-      // LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
-      //   'Sending email failed', err))
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
+        'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
-      console.log('Email sent')
       callback(null, true)
     }
   })
