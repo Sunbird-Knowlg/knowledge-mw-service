@@ -335,53 +335,59 @@ function sendContentEmail (req, action, callback) {
       })
     },
     function (data, callback) {
-      var cData = data.contentDetails.result.content
-      var eData = data.templateConfig.result.form.data.fields[0]
-      var subject = eData.subject
-      var body = eData.body
+      if (data.contentDetails.result && data.contentDetails.result.content &&
+        data.templateConfig.result && data.templateConfig.result.form &&
+        data.templateConfig.result.form.data) {
+        var cData = data.contentDetails.result.content
+        var eData = data.templateConfig.result.form.data.fields[0]
+        var subject = eData.subject
+        var body = eData.body
 
-      // Creating content link for email template
-      var contentLink = ''
-      if (action === 'sendForReview') {
-        contentLink = getReviewContentUrl(cData)
-      } else if (action === 'requestForChanges') {
-        contentLink = getDraftContentUrl(cData)
-      } else if (action === 'publish') {
-        contentLink = getPublishedContentUrl(cData)
-      }
+        // Creating content link for email template
+        var contentLink = ''
+        if (action === 'sendForReview') {
+          contentLink = getReviewContentUrl(cData)
+        } else if (action === 'requestForChanges') {
+          contentLink = getDraftContentUrl(cData)
+        } else if (action === 'publish') {
+          contentLink = getPublishedContentUrl(cData)
+        }
 
-      // Replacing dynamic content data with email template
-      subject = subject.replace(/{{Content type}}/g, cData.contentType)
-        .replace(/{{Content title}}/g, cData.name)
-      body = body.replace(/{{Content type}}/g, cData.contentType)
-        .replace(/{{Content title}}/g, cData.name)
-        .replace(/{{Content link}}/g, contentLink)
-        .replace(/{{Creator name}}/g, req.headers['userName'])
-        .replace(/{{Reviewer name}}/g, req.headers['userName'])
+        // Replacing dynamic content data with email template
+        subject = subject.replace(/{{Content type}}/g, cData.contentType)
+          .replace(/{{Content title}}/g, cData.name)
+        body = body.replace(/{{Content type}}/g, cData.contentType)
+          .replace(/{{Content title}}/g, cData.name)
+          .replace(/{{Content link}}/g, contentLink)
+          .replace(/{{Creator name}}/g, req.headers['userName'])
+          .replace(/{{Reviewer name}}/g, req.headers['userName'])
 
-      // Fetching email request body for sending email
-      var lsEmailData = {
-        request: getEmailData(null, subject, body, null, null, null,
-          [cData.createdBy], data.templateConfig.result.form.data.templateName,
-          eData.logo, eData.orgName, eData.fromEmail)
-      }
+        // Fetching email request body for sending email
+        var lsEmailData = {
+          request: getEmailData(null, subject, body, null, null, null,
+            [cData.createdBy], data.templateConfig.result.form.data.templateName,
+            eData.logo, eData.orgName, eData.fromEmail)
+        }
 
-      // Attaching recipientSearchQuery for send for review in email request body
-      if (action === 'sendForReview') {
-        lsEmailData.request.recipientSearchQuery = {
-          'filters': {
-            'channel': req.get('x-channel-id'),
-            'organisations.roles': ['CONTENT_REVIEWER']
+        // Attaching recipientSearchQuery for send for review in email request body
+        if (action === 'sendForReview') {
+          lsEmailData.request.recipientSearchQuery = {
+            'filters': {
+              'channel': req.get('x-channel-id'),
+              'organisations.roles': ['CONTENT_REVIEWER']
+            }
           }
         }
+        contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
+          if (err || res.responseCode !== responseCode.SUCCESS) {
+            callback(new Error('Sending email failed!'), null)
+          } else {
+            callback(null, data)
+          }
+        })
+      } else {
+        callback(new Error('All data not found for sending email'), null)
       }
-      contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
-          callback(new Error('Sending email failed!'), null)
-        } else {
-          callback(null, data)
-        }
-      })
     }
   ], function (err, data) {
     if (err) {
