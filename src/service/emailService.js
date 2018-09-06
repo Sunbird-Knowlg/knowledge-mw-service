@@ -491,29 +491,30 @@ function reviewContentEmail (req, callback) {
           .replace(/{{Creator name}}/g, req.headers['userName'])
           .replace(/{{Reviewer name}}/g, req.headers['userName'])
 
-        getReviwerUserIds(req, data.userDetails.result.response.content[0], function (err, userIds) {
-          if (err) {
-            callback(new Error('All reviewers data not found'), null)
-          } else {
-            // Fetching email request body for sending email
-            var lsEmailData = {
-              request: getEmailData(null, subject, body, null, null, null,
-                userIds, data.templateConfig.result.form.data.templateName,
-                eData.logo, eData.orgName, eData.fromEmail)
-            }
-            contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
-              if (err || res.responseCode !== responseCode.SUCCESS) {
-                LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
-                  'Sending email failed', err))
-                LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'sendForReview',
-                  'Sent email successfully', res))
-                callback(new Error('Sending email failed!'), null)
-              } else {
-                callback(null, data)
+        getReviwerUserIds(req, data.userDetails.result.response.content[0],
+          data.contentDetails.result.content.contentType, function (err, userIds) {
+            if (err) {
+              callback(new Error('All reviewers data not found'), null)
+            } else {
+              // Fetching email request body for sending email
+              var lsEmailData = {
+                request: getEmailData(null, subject, body, null, null, null,
+                  userIds, data.templateConfig.result.form.data.templateName,
+                  eData.logo, eData.orgName, eData.fromEmail)
               }
-            })
-          }
-        })
+              contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                  LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
+                    'Sending email failed', err))
+                  LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'sendForReview',
+                    'Sent email successfully', res))
+                  callback(new Error('Sending email failed!'), null)
+                } else {
+                  callback(null, data)
+                }
+              })
+            }
+          })
       } else {
         callback(new Error('All data not found for sending email'), null)
       }
@@ -535,35 +536,37 @@ function reviewContentEmail (req, callback) {
  * @param {object} data
  * @param {function} callback
  */
-function getReviwerUserIds (req, data, callback) {
+function getReviwerUserIds (req, userdata, contentType, callback) {
+  var reviewerRoles = contentType === 'TextBook' ? 'BOOK_REVIEWER' : 'CONTENT_REVIEWER'
+  var creatorRoles = contentType === 'TextBook' ? 'BOOK_CREATOR' : 'CONTENT_CREATOR'
   var rootOrgReviewerRequest = {
     'request': {
       'filters': {
-        'rootOrgId': data.rootOrgId,
-        'organisations.roles': ['CONTENT_REVIEWER']
+        'rootOrgId': userdata.rootOrgId,
+        'organisations.roles': reviewerRoles
       },
       'limit': reviewerQueryLimit,
       'offset': 0
     }
   }
   var orgIds = []
-  if (lodash.get(data, 'organisations[0]')) {
-    lodash.forEach(data.organisations, function (value) {
-      if (lodash.includes(value.roles, 'CONTENT_CREATOR')) {
+  if (lodash.get(userdata, 'organisations[0]')) {
+    lodash.forEach(userdata.organisations, function (value) {
+      if (lodash.includes(value.roles, creatorRoles)) {
         orgIds.push(value.organisationId)
       }
     })
   }
 
   var fetchSubOrgReviewers = true
-  if (lodash.includes(data.roles, 'CONTENT_CREATOR') || orgIds) {
+  if (lodash.includes(userdata.roles, creatorRoles) || orgIds) {
     fetchSubOrgReviewers = false
   }
   var subOrgReviewerRequest = {
     'request': {
       'filters': {
         'organisation.organisationId': lodash.uniq(orgIds),
-        'organisations.roles': ['CONTENT_REVIEWER']
+        'organisations.roles': reviewerRoles
       },
       'limit': reviewerQueryLimit,
       'offset': 0
