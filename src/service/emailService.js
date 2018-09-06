@@ -9,6 +9,10 @@ var emailMessage = messageUtils.EMAIL
 var responseCode = messageUtils.RESPONSE_CODE
 var configUtil = require('sb-config-util')
 var lodash = require('lodash')
+/**
+ * Offset for fetching reviewer list
+ */
+var reviewerQueryLimit = 200
 
 /**
  * Below function is used to create email request object
@@ -259,6 +263,29 @@ function getTemplateConfig (formRequest) {
 }
 
 /**
+ * Below function is used to fetch user details
+ * @param {object} formRequest
+ */
+function getUserDetails (req) {
+  return function (callback) {
+    var data = {
+      'request': {
+        'filters': {
+          'userId': req.get('x-authenticated-userid')
+        }
+      }
+    }
+    contentProvider.userSearch(data, req.headers, function (err, result) {
+      if (err || result.responseCode !== responseCode.SUCCESS) {
+        callback(new Error('User Search failed'), null)
+      } else {
+        callback(null, result)
+      }
+    })
+  }
+}
+
+/**
  * Below function is used construct content link which will be sent to the
  * content creator after the content is published
  * @param {object} content
@@ -353,9 +380,7 @@ function sendContentEmail (req, action, callback) {
 
         // Creating content link for email template
         var contentLink = ''
-        if (action === 'sendForReview') {
-          contentLink = getReviewContentUrl(cData)
-        } else if (action === 'requestForChanges') {
+        if (action === 'requestForChanges') {
           contentLink = getDraftContentUrl(cData)
         } else if (action === 'publish') {
           contentLink = getPublishedContentUrl(cData)
@@ -377,15 +402,6 @@ function sendContentEmail (req, action, callback) {
             eData.logo, eData.orgName, eData.fromEmail)
         }
 
-        // Attaching recipientSearchQuery for send for review in email request body
-        if (action === 'sendForReview') {
-          lsEmailData.request.recipientSearchQuery = {
-            'filters': {
-              'channel': req.get('x-channel-id'),
-              'organisations.roles': ['CONTENT_REVIEWER']
-            }
-          }
-        }
         contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
@@ -427,7 +443,218 @@ function publishedContentEmail (req, callback) {
  * @param {function} callback
  */
 function reviewContentEmail (req, callback) {
-  sendContentEmail(req, 'sendForReview', callback)
+  if (!req.params.contentId) {
+    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
+      'Content id is missing', null))
+    callback(new Error('Content id is missing'), null)
+  }
+  var formRequest = {
+    request: {
+      'type': 'notification',
+      'action': 'sendForReview',
+      'subType': 'email',
+      'rootOrgId': req.get('x-channel-id')
+    }
+  }
+  async.waterfall([
+    function (callback) {
+      async.parallel({
+        contentDetails: getContentDetails(req),
+        templateConfig: getTemplateConfig(formRequest),
+        userDetails: getUserDetails(req)
+      }, function (err, results) {
+        if (err) {
+          callback(err, null)
+        } else {
+          callback(null, results)
+        }
+      })
+    },
+    function (data, callback) {
+      if (lodash.get(data.contentDetails, 'result.content') &&
+      lodash.get(data.templateConfig, 'result.form.data.fields[0]') &&
+      lodash.get(data.userDetails, 'result.response.content[0].rootOrgId')) {
+        var cData = data.contentDetails.result.content
+        var eData = data.templateConfig.result.form.data.fields[0]
+        var subject = eData.subject
+        var body = eData.body
+
+        // Creating content link for email template
+        var contentLink = getReviewContentUrl(cData)
+
+        // Replacing dynamic content data with email template
+        subject = subject.replace(/{{Content type}}/g, cData.contentType)
+          .replace(/{{Content title}}/g, cData.name)
+        body = body.replace(/{{Content type}}/g, cData.contentType)
+          .replace(/{{Content title}}/g, cData.name)
+          .replace(/{{Content link}}/g, contentLink)
+          .replace(/{{Creator name}}/g, req.headers['userName'])
+          .replace(/{{Reviewer name}}/g, req.headers['userName'])
+
+        getReviwerUserIds(req, data.userDetails.result.response.content[0],
+          data.contentDetails.result.content.contentType, function (err, userIds) {
+            if (err) {
+              callback(new Error('All reviewers data not found'), null)
+            } else {
+              // Fetching email request body for sending email
+              var lsEmailData = {
+                request: getEmailData(null, subject, body, null, null, null,
+                  userIds, data.templateConfig.result.form.data.templateName,
+                  eData.logo, eData.orgName, eData.fromEmail)
+              }
+              contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
+                if (err || res.responseCode !== responseCode.SUCCESS) {
+                  LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
+                    'Sending email failed', err))
+                  LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'sendForReview',
+                    'Sent email successfully', res))
+                  callback(new Error('Sending email failed!'), null)
+                } else {
+                  callback(null, data)
+                }
+              })
+            }
+          })
+      } else {
+        callback(new Error('All data not found for sending email'), null)
+      }
+    }
+  ], function (err, data) {
+    if (err) {
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
+        'Sending email failed', err))
+      callback(new Error('Sending email failed'), null)
+    } else {
+      callback(null, true)
+    }
+  })
+}
+
+/**
+ * Below function is used to get all content reviwer ids
+ * @param {object} req
+ * @param {object} data
+ * @param {function} callback
+ */
+function getReviwerUserIds (req, userdata, contentType, callback) {
+  var reviewerRoles = contentType === 'TextBook' ? 'BOOK_REVIEWER' : 'CONTENT_REVIEWER'
+  var creatorRoles = contentType === 'TextBook' ? 'BOOK_CREATOR' : 'CONTENT_CREATOR'
+  var rootOrgReviewerRequest = {
+    'request': {
+      'filters': {
+        'rootOrgId': userdata.rootOrgId,
+        'organisations.roles': reviewerRoles
+      },
+      'limit': reviewerQueryLimit,
+      'offset': 0
+    }
+  }
+  var orgIds = []
+  if (lodash.get(userdata, 'organisations[0]')) {
+    lodash.forEach(userdata.organisations, function (value) {
+      if (lodash.includes(value.roles, creatorRoles)) {
+        orgIds.push(value.organisationId)
+      }
+    })
+  }
+
+  var fetchSubOrgReviewers = true
+  if (lodash.includes(userdata.roles, creatorRoles) || orgIds) {
+    fetchSubOrgReviewers = false
+  }
+  var subOrgReviewerRequest = {
+    'request': {
+      'filters': {
+        'organisation.organisationId': lodash.uniq(orgIds),
+        'organisations.roles': reviewerRoles
+      },
+      'limit': reviewerQueryLimit,
+      'offset': 0
+    }
+  }
+  async.parallel({
+    rootOrgReviewers: getUserIds(req, rootOrgReviewerRequest, true),
+    subOrgReviewers: getUserIds(req, subOrgReviewerRequest, fetchSubOrgReviewers)
+  }, function (err, results) {
+    if (err) {
+      callback(err, null)
+    } else {
+      var rootOrgReviewersId = lodash.map(results.rootOrgReviewers, 'id')
+      var subOrgReviewersId = lodash.map(results.subOrgReviewers, 'id')
+      var allReviewerIds = lodash.union(rootOrgReviewersId, subOrgReviewersId)
+      callback(null, allReviewerIds)
+    }
+  })
+}
+
+/**
+ * Below function is used to get reviewer ids recursively if count is more than 200
+ * @param {object} req
+ * @param {object} body
+ * @param {boolean} fetchDetailsFlag
+ */
+function getUserIds (req, body, fetchDetailsFlag) {
+  if (fetchDetailsFlag) {
+    return function (CBW) {
+      async.waterfall([
+        function (callback) {
+          contentProvider.userSearch(body, req.headers, function (err, result) {
+            if (err || result.responseCode !== responseCode.SUCCESS) {
+              callback(new Error('User Search failed'), null)
+            } else {
+              callback(null, {count: result.result.response.count, content: result.result.response.content})
+            }
+          })
+        },
+        function (data, callback) {
+          if (data.count < reviewerQueryLimit) {
+            callback(null, data.content)
+          } else {
+            var totalCount = 0
+            var userDetails = data.content
+            totalCount = Math.ceil(data.count / reviewerQueryLimit)
+            var parallelFunctions = []
+            for (var i = 1; i <= totalCount; i++) {
+              var fetchUserIds = function (request) {
+                return function (cb) {
+                  contentProvider.userSearch(request, req.headers, function (err, result) {
+                    if (err || result.responseCode !== responseCode.SUCCESS) {
+                      cb(new Error('User Search failed'), null)
+                    } else {
+                      cb(null, result.result.response.content)
+                    }
+                  })
+                }
+              }
+              var reqBody = lodash.cloneDeep(body)
+              reqBody.request.offset = reviewerQueryLimit * i
+              parallelFunctions.push(fetchUserIds(reqBody))
+            }
+            async.parallel(parallelFunctions, function (err, data) {
+              if (err) {
+                callback(new Error('User Search failed'), null)
+              } else {
+                lodash.forEach(data, function (userData) {
+                  userDetails = userDetails.concat(userData)
+                })
+                callback(null, userDetails)
+              }
+            })
+          }
+        }
+      ], function (err, data) {
+        if (err) {
+          CBW(new Error('Get user data failed'), null)
+        } else {
+          CBW(null, data)
+        }
+      })
+    }
+  } else {
+    return function (callback) {
+      callback(null, [])
+    }
+  }
 }
 
 /**

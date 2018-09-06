@@ -103,7 +103,12 @@ function validateToken (req, res, next) {
     } else {
       var payload = jwt.decode(tokenData.token)
       delete req.headers['x-authenticated-userid']
-      delete req.headers['x-authenticated-user-token']
+      var url = req.path
+      if (!url.includes('/content/v3/review') &&
+      !url.includes('/v1/content/review') &&
+      !url.includes('/v1/course/review')) {
+        delete req.headers['x-authenticated-user-token']
+      }
       req.rspObj.userId = tokenData.userId
       rspObj.telemetryData.actor = utilsService.getTelemetryActorData(req)
       req.headers['x-authenticated-userid'] = tokenData.userId
