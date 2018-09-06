@@ -516,12 +516,10 @@ function reviewContentEmail (req, callback) {
     }
   ], function (err, data) {
     if (err) {
-      console.log('email failed')
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
         'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
-      console.log('email sent')
       callback(null, true)
     }
   })
@@ -534,13 +532,14 @@ function reviewContentEmail (req, callback) {
  * @param {function} callback
  */
 function getReviwerUserIds (req, data, callback) {
-  var rootOrgReviewer = {
+  var reviewerQueryLimit = 200
+  var rootOrgReviewerRequest = {
     'request': {
       'filters': {
         'rootOrgId': data.rootOrgId,
         'organisations.roles': ['CONTENT_REVIEWER']
       },
-      'limit': 200,
+      'limit': reviewerQueryLimit,
       'offset': 0
     }
   }
@@ -553,23 +552,23 @@ function getReviwerUserIds (req, data, callback) {
     })
   }
 
-  var fetchDetailsFlag = true
-  if (lodash.includes(data.roles, 'CONTENT_CREATOR')) {
-    fetchDetailsFlag = false
+  var fetchSubOrgReviewers = true
+  if (lodash.includes(data.roles, 'CONTENT_CREATOR') || orgIds) {
+    fetchSubOrgReviewers = false
   }
-  var subOrgReviewer = {
+  var subOrgReviewerRequest = {
     'request': {
       'filters': {
         'organisation.organisationId': lodash.uniq(orgIds),
         'organisations.roles': ['CONTENT_REVIEWER']
       },
-      'limit': 200,
+      'limit': reviewerQueryLimit,
       'offset': 0
     }
   }
   async.parallel({
-    rootOrgReviewers: getUserIds(req, rootOrgReviewer, true),
-    subOrgReviewers: getUserIds(req, subOrgReviewer, fetchDetailsFlag)
+    rootOrgReviewers: getUserIds(req, rootOrgReviewerRequest, reviewerQueryLimit, true),
+    subOrgReviewers: getUserIds(req, subOrgReviewerRequest, reviewerQueryLimit, fetchSubOrgReviewers)
   }, function (err, results) {
     if (err) {
       callback(err, null)
@@ -586,14 +585,14 @@ function getReviwerUserIds (req, data, callback) {
  * Below function is used to get reviewer ids recursively if count is more than 200
  * @param {object} req
  * @param {object} body
- * @param {function} callback
+ * @param {string} reviewerQueryLimit
+ * @param {boolean} fetchDetailsFlag
  */
-function getUserIds (req, body, fetchDetailsFlag) {
+function getUserIds (req, body, reviewerQueryLimit, fetchDetailsFlag) {
   if (fetchDetailsFlag) {
     return function (CBW) {
-      var totalCount = 0
       async.waterfall([
-        function getFirst200 (callback) {
+        function (callback) {
           contentProvider.userSearch(body, req.headers, function (err, result) {
             if (err || result.responseCode !== responseCode.SUCCESS) {
               callback(new Error('User Search failed'), null)
@@ -602,41 +601,38 @@ function getUserIds (req, body, fetchDetailsFlag) {
             }
           })
         },
-        function recursiveUserCalling (data, callback) {
-          if (data.count < 200) {
+        function (data, callback) {
+          if (data.count < reviewerQueryLimit) {
             callback(null, data.content)
           } else {
+            var totalCount = 0
             var userDetails = data.content
-            totalCount = data.count / 200
+            totalCount = Math.ceil(data.count / reviewerQueryLimit)
             var parallelFunctions = []
             for (var i = 1; i <= totalCount; i++) {
-              var parallelFun = function (request) {
-                return function (callback1) {
+              var fetchUserIds = function (request) {
+                return function (cb) {
                   contentProvider.userSearch(request, req.headers, function (err, result) {
                     if (err || result.responseCode !== responseCode.SUCCESS) {
-                      callback1(new Error('User Search failed'), null)
+                      cb(new Error('User Search failed'), null)
                     } else {
-                      callback1(null, result.result.response.content)
+                      cb(null, result.result.response.content)
                     }
                   })
                 }
               }
               var reqBody = lodash.cloneDeep(body)
-              reqBody.request.offset = 25 * i
-              parallelFunctions.push(parallelFun(reqBody))
+              reqBody.request.offset = reviewerQueryLimit * i
+              parallelFunctions.push(fetchUserIds(reqBody))
             }
             async.parallel(parallelFunctions, function (err, data) {
               if (err) {
                 callback(new Error('User Search failed'), null)
               } else {
-                var userData = []
-                lodash.forEach(data, function (value) {
-                  lodash.forEach(value, function (res) {
-                    userData.push(res)
-                  })
+                lodash.forEach(data, function (userData) {
+                  userDetails = userDetails.concat(userData)
                 })
-                var allUserDetails = userDetails.concat(userData)
-                callback(null, allUserDetails)
+                callback(null, userDetails)
               }
             })
           }
