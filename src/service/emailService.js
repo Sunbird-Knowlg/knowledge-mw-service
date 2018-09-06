@@ -9,6 +9,10 @@ var emailMessage = messageUtils.EMAIL
 var responseCode = messageUtils.RESPONSE_CODE
 var configUtil = require('sb-config-util')
 var lodash = require('lodash')
+/**
+ * Offset for fetching reviewer list
+ */
+var reviewerQueryLimit = 200
 
 /**
  * Below function is used to create email request object
@@ -532,7 +536,6 @@ function reviewContentEmail (req, callback) {
  * @param {function} callback
  */
 function getReviwerUserIds (req, data, callback) {
-  var reviewerQueryLimit = 200
   var rootOrgReviewerRequest = {
     'request': {
       'filters': {
@@ -567,8 +570,8 @@ function getReviwerUserIds (req, data, callback) {
     }
   }
   async.parallel({
-    rootOrgReviewers: getUserIds(req, rootOrgReviewerRequest, reviewerQueryLimit, true),
-    subOrgReviewers: getUserIds(req, subOrgReviewerRequest, reviewerQueryLimit, fetchSubOrgReviewers)
+    rootOrgReviewers: getUserIds(req, rootOrgReviewerRequest, true),
+    subOrgReviewers: getUserIds(req, subOrgReviewerRequest, fetchSubOrgReviewers)
   }, function (err, results) {
     if (err) {
       callback(err, null)
@@ -585,10 +588,9 @@ function getReviwerUserIds (req, data, callback) {
  * Below function is used to get reviewer ids recursively if count is more than 200
  * @param {object} req
  * @param {object} body
- * @param {string} reviewerQueryLimit
  * @param {boolean} fetchDetailsFlag
  */
-function getUserIds (req, body, reviewerQueryLimit, fetchDetailsFlag) {
+function getUserIds (req, body, fetchDetailsFlag) {
   if (fetchDetailsFlag) {
     return function (CBW) {
       async.waterfall([
