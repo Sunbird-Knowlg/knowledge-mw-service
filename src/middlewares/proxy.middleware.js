@@ -74,7 +74,7 @@ module.exports = function (app) {
 
   app.route('/action' + configUtil.getConfig('REVIEW_CONTENT_URI') + '/:contentId')
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
-      requestMiddleware.apiAccessForCreatorUser)
+      requestMiddleware.apiAccessForCreatorUser, contentService.reviewContentAPI)
 
   app.route('/action' + configUtil.getConfig('CONTENT_UPLOAD_URL_URI') + '/:contentId')
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
