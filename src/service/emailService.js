@@ -465,9 +465,9 @@ function reviewContentEmail (req, callback) {
   async.waterfall([
     function (callback) {
       async.parallel({
+        userDetails: getUserDetails(req),
         contentDetails: getContentDetails(req),
-        templateConfig: getTemplateConfig(formRequest),
-        userDetails: getUserDetails(req)
+        templateConfig: getTemplateConfig(formRequest)
       }, function (err, results) {
         if (err) {
           LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'get 3 parallel details error',
