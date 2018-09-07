@@ -388,6 +388,9 @@ function uploadContentAPI (req, response) {
 }
 
 function reviewContentAPI (req, response) {
+  console.log('-------------------reviewContentAPI came')
+  LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'reviewContentAPI call came',
+    'Request for review came', null))
   var data = {
     body: req.body
   }
