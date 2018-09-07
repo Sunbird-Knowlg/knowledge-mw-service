@@ -275,9 +275,6 @@ function getUserDetails (req) {
         }
       }
     }
-    console.log(data)
-    LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserDetails headers info',
-      'getUserDetails headers', req.headers))
     contentProvider.userSearch(data, req.headers, function (err, result) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
         LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserDetails failed',
@@ -450,7 +447,6 @@ function publishedContentEmail (req, callback) {
  * @param {function} callback
  */
 function reviewContentEmail (req, callback) {
-  console.log('-------------------reviewContentAPI email service came')
   if (!req.params.contentId) {
     LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
       'Content id is missing', null))
