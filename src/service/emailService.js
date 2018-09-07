@@ -229,13 +229,13 @@ function rejectFlagContentEmail (req, callback) {
 function getContentDetails (req) {
   return function (callback) {
     contentProvider.getContent(req.params.contentId, req.headers, function (err, result) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
-        'Getting content details failed', err))
-      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
-        'Getting content details success', err))
       if (err || result.responseCode !== responseCode.SUCCESS) {
+        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
+          'Getting content details failed', err))
         callback(new Error('Invalid content id'), null)
       } else {
+        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
+          'Getting content details success', result))
         callback(null, result)
       }
     })
@@ -249,13 +249,13 @@ function getContentDetails (req) {
 function getTemplateConfig (formRequest) {
   return function (callback) {
     contentProvider.getForm(formRequest, {}, function (err, result) {
-      LOG.error(utilsService.getLoggerData(formRequest, 'ERROR', filename, 'Call Form API',
-        'Getting template failed', err))
-      LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Call Form API',
-        'Getting template success', err))
       if (err || result.responseCode !== responseCode.SUCCESS) {
+        LOG.error(utilsService.getLoggerData(formRequest, 'ERROR', filename, 'Call Form API failed',
+          'Getting template failed', err))
         callback(new Error('Form API failed'), null)
       } else {
+        LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Call Form API success',
+          'Getting template success', result))
         callback(null, result)
       }
     })
@@ -275,14 +275,16 @@ function getUserDetails (req) {
         }
       }
     }
+    LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserDetails headers info',
+      'getUserDetails headers', req.headers))
     contentProvider.userSearch(data, req.headers, function (err, result) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserDetails failed',
-        'getUserDetails failed', err))
-      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserDetails success',
-        'getUserDetails success', result))
       if (err || result.responseCode !== responseCode.SUCCESS) {
+        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserDetails failed',
+          'getUserDetails failed', err))
         callback(new Error('User Search failed'), null)
       } else {
+        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserDetails success',
+          'getUserDetails success', result))
         callback(null, result)
       }
     })
@@ -467,18 +469,20 @@ function reviewContentEmail (req, callback) {
         templateConfig: getTemplateConfig(formRequest),
         userDetails: getUserDetails(req)
       }, function (err, results) {
-        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'get 3 parallel details error',
-          'get 3 parallel details failed', err))
-        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'get 3 parallel details success',
-          'get 3 parallel details success', results))
         if (err) {
+          LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'get 3 parallel details error',
+            'get 3 parallel details failed', err))
           callback(err, null)
         } else {
+          LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'get 3 parallel details success',
+            'get 3 parallel details success', results))
           callback(null, results)
         }
       })
     },
     function (data, callback) {
+      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'get all data',
+        'get all data', data))
       if (lodash.get(data.contentDetails, 'result.content') &&
       lodash.get(data.templateConfig, 'result.form.data.fields[0]') &&
       lodash.get(data.userDetails, 'result.response.content[0].rootOrgId')) {
@@ -501,31 +505,29 @@ function reviewContentEmail (req, callback) {
 
         getReviwerUserIds(req, data.userDetails.result.response.content[0],
           data.contentDetails.result.content.contentType, function (err, userIds) {
-            LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'userIds error',
-              'userIds failed', err))
-            LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'userIds success',
-              'userIds success', userIds))
             if (err) {
+              LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'userIds error',
+                'userIds failed', err))
               callback(new Error('All reviewers data not found'), null)
             } else {
+              LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'userIds success',
+                'userIds success', userIds))
               // Fetching email request body for sending email
               var lsEmailData = {
                 request: getEmailData(null, subject, body, null, null, null,
                   userIds, data.templateConfig.result.form.data.templateName,
                   eData.logo, eData.orgName, eData.fromEmail)
               }
+              LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'lsEmailData success',
+                'lsEmailData success', lsEmailData))
               contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
-                LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendEmail error',
-                  'sendEmail failed', err))
-                LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'sendEmail success',
-                  'sendEmail success', userIds))
                 if (err || res.responseCode !== responseCode.SUCCESS) {
                   LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
                     'Sending email failed', err))
-                  LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'sendForReview',
-                    'Sent email successfully', res))
                   callback(new Error('Sending email failed!'), null)
                 } else {
+                  LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'sendForReview',
+                    'Sent email successfully', res))
                   callback(null, data)
                 }
               })
@@ -536,15 +538,13 @@ function reviewContentEmail (req, callback) {
       }
     }
   ], function (err, data) {
-    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'final sendEmail error',
-      'final sendEmail failed', err))
-    LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'final sendEmail success',
-      'final sendEmail success', data))
     if (err) {
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
         'Sending email failed', err))
       callback(new Error('Sending email failed'), null)
     } else {
+      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'final sendEmail success',
+        'final sendEmail success', data))
       callback(null, true)
     }
   })
@@ -596,13 +596,13 @@ function getReviwerUserIds (req, userdata, contentType, callback) {
     rootOrgReviewers: getUserIds(req, rootOrgReviewerRequest, true),
     subOrgReviewers: getUserIds(req, subOrgReviewerRequest, fetchSubOrgReviewers)
   }, function (err, results) {
-    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getReviwerUserIds error',
-      'getReviwerUserIds failed', err))
-    LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getReviwerUserIds success',
-      'getReviwerUserIds success', results))
     if (err) {
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getReviwerUserIds error',
+        'getReviwerUserIds failed', err))
       callback(err, null)
     } else {
+      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getReviwerUserIds success',
+        'getReviwerUserIds success', results))
       var rootOrgReviewersId = lodash.map(results.rootOrgReviewers, 'id')
       var subOrgReviewersId = lodash.map(results.subOrgReviewers, 'id')
       var allReviewerIds = lodash.union(rootOrgReviewersId, subOrgReviewersId)
@@ -623,13 +623,13 @@ function getUserIds (req, body, fetchDetailsFlag) {
       async.waterfall([
         function (callback) {
           contentProvider.userSearch(body, req.headers, function (err, result) {
-            LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds 1st 200 error',
-              'getUserIds 1st 200 failed', err))
-            LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds 1st 200 success',
-              'getUserIds 1st 200 success', result))
             if (err || result.responseCode !== responseCode.SUCCESS) {
+              LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds 1st 200 error',
+                'getUserIds 1st 200 failed', err))
               callback(new Error('User Search failed'), null)
             } else {
+              LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds 1st 200 success',
+                'getUserIds 1st 200 success', result))
               callback(null, {count: result.result.response.count, content: result.result.response.content})
             }
           })
@@ -646,13 +646,13 @@ function getUserIds (req, body, fetchDetailsFlag) {
               var fetchUserIds = function (request) {
                 return function (cb) {
                   contentProvider.userSearch(request, req.headers, function (err, result) {
-                    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds recursive error',
-                      'getUserIds recursive failed', err))
-                    LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds recursive success',
-                      'getUserIds recursive success', result))
                     if (err || result.responseCode !== responseCode.SUCCESS) {
+                      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds recursive error',
+                        'getUserIds recursive failed', err))
                       cb(new Error('User Search failed'), null)
                     } else {
+                      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds recursive success',
+                        'getUserIds recursive success', result))
                       cb(null, result.result.response.content)
                     }
                   })
@@ -663,13 +663,13 @@ function getUserIds (req, body, fetchDetailsFlag) {
               parallelFunctions.push(fetchUserIds(reqBody))
             }
             async.parallel(parallelFunctions, function (err, data) {
-              LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds parallel error',
-                'getUserIds parallel failed', err))
-              LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds parallel success',
-                'getUserIds parallel success', data))
               if (err) {
+                LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds parallel error',
+                  'getUserIds parallel failed', err))
                 callback(new Error('User Search failed'), null)
               } else {
+                LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds parallel success',
+                  'getUserIds parallel success', data))
                 lodash.forEach(data, function (userData) {
                   userDetails = userDetails.concat(userData)
                 })
@@ -679,13 +679,13 @@ function getUserIds (req, body, fetchDetailsFlag) {
           }
         }
       ], function (err, data) {
-        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds final error',
-          'getUserIds final failed', err))
-        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds final success',
-          'getUserIds final success', data))
         if (err) {
+          LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds final error',
+            'getUserIds final failed', err))
           CBW(new Error('Get user data failed'), null)
         } else {
+          LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds final success',
+            'getUserIds final success', data))
           CBW(null, data)
         }
       })
