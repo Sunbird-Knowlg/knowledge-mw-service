@@ -555,8 +555,9 @@ function reviewContentEmail (req, callback) {
  * @param {function} callback
  */
 function getReviwerUserIds (req, userdata, contentType, callback) {
-  var reviewerRoles = contentType === 'TextBook' ? 'BOOK_REVIEWER' : 'CONTENT_REVIEWER'
-  var creatorRoles = contentType === 'TextBook' ? 'BOOK_CREATOR' : 'CONTENT_CREATOR'
+  var reviewerRoles = contentType === 'TextBook' ? ['BOOK_REVIEWER'] : ['CONTENT_REVIEWER', 'CONTENT_REVIEW']
+  var creatorRoles = contentType === 'TextBook' ? ['BOOK_CREATOR'] : ['CONTENT_CREATOR',
+    'CONTENT_CREATION', 'CONTENT_REVIEWER', 'CONTENT_REVIEW']
   var rootOrgReviewerRequest = {
     'request': {
       'filters': {
@@ -570,20 +571,22 @@ function getReviwerUserIds (req, userdata, contentType, callback) {
   var orgIds = []
   if (lodash.get(userdata, 'organisations[0]')) {
     lodash.forEach(userdata.organisations, function (value) {
-      if (lodash.includes(value.roles, creatorRoles)) {
+      var result = value.roles.some((e) => { return creatorRoles.indexOf(e) !== -1 })
+      if (result) {
         orgIds.push(value.organisationId)
       }
     })
   }
 
   var fetchSubOrgReviewers = true
-  if (lodash.includes(userdata.roles, creatorRoles) || orgIds) {
+  var isRoles = userdata.roles.some((e) => { return creatorRoles.indexOf(e) !== -1 })
+  if (isRoles || !orgIds.length) {
     fetchSubOrgReviewers = false
   }
   var subOrgReviewerRequest = {
     'request': {
       'filters': {
-        'organisation.organisationId': lodash.uniq(orgIds),
+        'organisations.organisationId': lodash.uniq(orgIds),
         'organisations.roles': reviewerRoles
       },
       'limit': reviewerQueryLimit,
