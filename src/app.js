@@ -36,14 +36,17 @@ const searchServiceBaseUrl = process.env.sunbird_search_service_api_base_url || 
 const dialRepoBaseUrl = process.env.sunbird_dial_repo_api_base_url || 'https://qa.ekstep.in/api'
 const pluginRepoBaseUrl = process.env.sunbird_plugin_repo_api_base_url || 'https://qa.ekstep.in/api'
 const dataServiceBaseUrl = process.env.sunbird_data_service_api_base_url || 'https://qa.ekstep.in/api'
+const languageServiceBaseUrl = process.env.sunbird_language_service_api_base_url || 'https://qa.ekstep.in/api/language'
 
 const searchServiceApiKey = process.env.sunbird_search_service_api_key
 const dialRepoApiKey = process.env.sunbird_dial_repo_api_key
 const pluginRepoApiKey = process.env.sunbird_plugin_repo_api_key
 const dataServiceApiKey = process.env.sunbird_data_service_api_key
 const enableLogging = process.env.sunbird_content_service_enable_logging
+const languageServiceApiKey = process.env.sunbird_language_service_api_key
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
+const sunbirdPortalBaseUrl = process.env.sunbird_portal_base_url || 'https://staging.open-sunbird.org'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('CONTENT_REPO_BASE_URL', contentRepoBaseUrl)
@@ -61,6 +64,9 @@ configUtil.setConfig('DIAL_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + dialRepoApiKey
 configUtil.setConfig('PLUGIN_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + pluginRepoApiKey)
 configUtil.setConfig('DATA_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + dataServiceApiKey)
 configUtil.setConfig('ENABLE_LOGGING', enableLogging)
+configUtil.setConfig('LANGUAGE_SERVICE_BASE_URL', languageServiceBaseUrl)
+configUtil.setConfig('LANGUAGE_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + languageServiceApiKey)
+configUtil.setConfig('SUNBIRD_PORTAL_BASE_URL', sunbirdPortalBaseUrl)
 
 process.env.sunbird_cassandra_ips = process.env.sunbird_cassandra_ips || '127.0.0.1'
 process.env.sunbird_cassandra_port = process.env.sunbird_cassandra_port || 9042
