@@ -4,6 +4,8 @@ var path = require('path')
 var filename = path.basename(__filename)
 var contactPoints = process.env.sunbird_cassandra_ips.split(',')
 var cassandra = require('cassandra-driver')
+var consistency = getConsistencyLevel(process.env.sunbird_cassandra_consistency_level)
+var replicationStrategy = getReplicationStrategy(process.env.sunbird_cassandra_replication_strategy)
 
 models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind(
   {
@@ -11,13 +13,10 @@ models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind
       contactPoints: contactPoints,
       protocolOptions: { port: process.env.sunbird_cassandra_port },
       keyspace: 'dialcodes',
-      queryOptions: { consistency: models.consistencies.one }
+      queryOptions: { consistency: consistency }
     },
     ormOptions: {
-      defaultReplicationStrategy: {
-        class: 'SimpleStrategy',
-        replication_factor: 1
-      },
+      defaultReplicationStrategy: replicationStrategy,
       migration: 'safe'
     }
   },
@@ -43,6 +42,27 @@ function checkCassandraDBHealth (callback) {
       client.shutdown()
       callback(err, false)
     })
+}
+
+function getConsistencyLevel (consistency) {
+  let consistencyValue = models.consistencies.one
+  if (consistency && contactPoints && contactPoints.length > 1) {
+    if (models.consistencies[consistency]) {
+      consistencyValue = models.consistencies[consistency]
+    }
+  }
+  return consistencyValue
+}
+
+function getReplicationStrategy (replicationStrategy) {
+  let replicationStrategyValue = {}
+  if (replicationStrategy && contactPoints && contactPoints.length > 1) {
+    replicationStrategyValue = JSON.parse(replicationStrategy)
+    if (!Object.keys(replicationStrategyValue).length) {
+      replicationStrategyValue = {}
+    }
+  }
+  return replicationStrategyValue
 }
 
 module.exports = models
