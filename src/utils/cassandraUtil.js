@@ -7,6 +7,9 @@ var cassandra = require('cassandra-driver')
 var consistency = getConsistencyLevel(process.env.sunbird_cassandra_consistency_level)
 var replicationStrategy = getReplicationStrategy(process.env.sunbird_cassandra_replication_strategy)
 
+console.log('consistency', consistency)
+console.log('replicationStrategy', replicationStrategy)
+
 models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind(
   {
     clientOptions: {
