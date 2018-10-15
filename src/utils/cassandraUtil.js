@@ -1,6 +1,7 @@
 var models = require('express-cassandra')
 var LOG = require('sb_logger_util')
 var path = require('path')
+var _ = require('lodash')
 var filename = path.basename(__filename)
 var contactPoints = process.env.sunbird_cassandra_ips.split(',')
 var cassandra = require('cassandra-driver')
@@ -45,19 +46,15 @@ function checkCassandraDBHealth (callback) {
 }
 
 function getConsistencyLevel (consistency) {
-  let consistencyValue = models.consistencies.one
-  if (consistency) {
-    if (models.consistencies[consistency]) {
-      consistencyValue = models.consistencies[consistency]
-    }
-  }
-  return consistencyValue
+  let consistencyValue = consistency && _.get(models, `consistencies.${consistency}`) ? _.get(models, `consistencies.${consistency}`):  models.consistencies.one
+  return consistencyValue;
 }
 
 function getReplicationStrategy (replicationStrategy) {
   try {
     return JSON.parse(replicationStrategy)
   } catch (e) {
+    console.log("err in getReplicationStrategy",e)
     return {'class': 'SimpleStrategy', 'replication_factor': '1'}
   }
 }
