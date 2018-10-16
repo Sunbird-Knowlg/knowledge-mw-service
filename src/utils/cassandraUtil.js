@@ -1,9 +1,12 @@
 var models = require('express-cassandra')
 var LOG = require('sb_logger_util')
 var path = require('path')
+var _ = require('lodash')
 var filename = path.basename(__filename)
 var contactPoints = process.env.sunbird_cassandra_ips.split(',')
 var cassandra = require('cassandra-driver')
+var consistency = getConsistencyLevel(process.env.sunbird_cassandra_consistency_level)
+var replicationStrategy = getReplicationStrategy(process.env.sunbird_cassandra_replication_strategy)
 
 models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind(
   {
@@ -11,13 +14,10 @@ models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind
       contactPoints: contactPoints,
       protocolOptions: { port: process.env.sunbird_cassandra_port },
       keyspace: 'dialcodes',
-      queryOptions: { consistency: models.consistencies.one }
+      queryOptions: { consistency: consistency }
     },
     ormOptions: {
-      defaultReplicationStrategy: {
-        class: 'SimpleStrategy',
-        replication_factor: 1
-      },
+      defaultReplicationStrategy: replicationStrategy,
       migration: 'safe'
     }
   },
@@ -43,6 +43,20 @@ function checkCassandraDBHealth (callback) {
       client.shutdown()
       callback(err, false)
     })
+}
+
+function getConsistencyLevel (consistency) {
+  let consistencyValue = consistency && _.get(models, `consistencies.${consistency}`) ? _.get(models, `consistencies.${consistency}`):  models.consistencies.one
+  return consistencyValue;
+}
+
+function getReplicationStrategy (replicationStrategy) {
+  try {
+    return JSON.parse(replicationStrategy)
+  } catch (e) {
+    console.log("err in getReplicationStrategy",e)
+    return {'class': 'SimpleStrategy', 'replication_factor': '1'}
+  }
 }
 
 module.exports = models
