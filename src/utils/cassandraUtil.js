@@ -6,7 +6,8 @@ var filename = path.basename(__filename)
 var contactPoints = process.env.sunbird_cassandra_urls.split(',')
 var cassandra = require('cassandra-driver')
 var consistency = getConsistencyLevel(process.env.sunbird_cassandra_consistency_level)
-var replicationStrategy = getReplicationStrategy(process.env.sunbird_cassandra_replication_strategy)
+var envReplicationStrategy = process.env.sunbird_cassandra_replication_strategy || '{"class":"SimpleStrategy","replication_factor":1}'
+var replicationStrategy = getReplicationStrategy(envReplicationStrategy)
 
 models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind(
   {
@@ -50,13 +51,13 @@ function getConsistencyLevel (consistency) {
   return consistencyValue
 }
 
-function getReplicationStrategy (replicationStrategy) {
-  try {
-    return JSON.parse(replicationStrategy)
-  } catch (e) {
-    console.log('err in getReplicationStrategy', e)
-    return {'class': 'SimpleStrategy', 'replication_factor': 1}
-  }
+function getReplicationStrategy (replicationstrategy) {
+    try {
+      return JSON.parse(replicationstrategy)
+    } catch (e) {
+      console.log('err in getReplicationStrategy', e)
+      return {'class': 'SimpleStrategy', 'replication_factor': 1}
+    }
 }
 
 module.exports = models
