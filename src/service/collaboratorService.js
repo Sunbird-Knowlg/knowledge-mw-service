@@ -113,6 +113,13 @@ function updateCollaborators (req, response) {
   ])
 }
 
+/**
+ * Below function is used find the added and removed collaborators list
+ * @param {object} req
+ * @param {object} contentInfo
+ * @param {array} oldCollaboratorsArray
+ * @param {array} newCollaboratorsArray
+ */
 function compareCollaborators (req, contentInfo, oldCollaboratorsArray, newCollaboratorsArray) {
   var addedCollaborators = lodash.difference(newCollaboratorsArray, oldCollaboratorsArray)
   var removedCollaborators = lodash.difference(oldCollaboratorsArray, newCollaboratorsArray)
@@ -120,6 +127,13 @@ function compareCollaborators (req, contentInfo, oldCollaboratorsArray, newColla
   notifyCollaborators(req, contentInfo, removedCollaborators, 'removeCollaborators')
 }
 
+/**
+ * Below function is used send emails to collaborators
+ * @param {object} req
+ * @param {object} cData
+ * @param {array} collaboratorsArray
+ * @param {string} emailType
+ */
 function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
   if (!lodash.isEmpty(collaboratorsArray)) {
     var rspObj = req.rspObj
@@ -162,8 +176,7 @@ function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
 }
 
 /**
- * Below function is used construct content link which will be sent to creator
- * after the content is rejected
+ * Below function is used construct content link which will be sent to collaborators
  * @param {object} content
  */
 function getContentUrl (content) {
