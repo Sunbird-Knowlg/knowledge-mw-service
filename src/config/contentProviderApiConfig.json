@@ -35,6 +35,7 @@
         "CREATE_PUBLISHER_URI": "/dialcode/v3/publisher/create",
         "GET_PUBLISHER_URI": "/dialcode/v3/publisher/read",
         "UPDATE_PUBLISHER_URI": "/dialcode/v3/publisher/update",
+        "UPDATE_COLLABORATOR": "/content/v1/collaborate/update",
         
         "CHANNEL_URI": "/channel/v3/read",
         "CHANNEL_LIST_URI": "/channel/v3/list",
