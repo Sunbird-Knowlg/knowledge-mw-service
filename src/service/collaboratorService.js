@@ -149,7 +149,7 @@ function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
           .replace(/{{Content link}}/g, getContentUrl(cData))
           .replace(/{{User}}/g, req.headers.userName)
         var lsEmailData = {
-          request: getEmailData(null, subject, body, null, null, null, collaboratorsArray, eData.TEMPLATE)
+          request: getEmailData(subject, body, collaboratorsArray, eData.TEMPLATE)
         }
         LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, emailType,
           'Request to Leaner service to send email', {
@@ -193,24 +193,15 @@ function getContentUrl (content) {
 
 /**
  * Below function is used to create email request object
- * @param {string} name
  * @param {string} subject
  * @param {string} body
- * @param {string} actionUrl
- * @param {string} actionName
- * @param {string} emailArray
  * @param {string} recipientUserIds
  * @param {string} emailTemplateType
  */
-function getEmailData (name, subject, body, actionUrl, actionName, emailArray,
-  recipientUserIds, emailTemplateType) {
+function getEmailData (subject, body, recipientUserIds, emailTemplateType) {
   var request = {
-    name: name,
     subject: subject,
     body: body,
-    actionUrl: actionUrl,
-    actionName: actionName,
-    recipientEmails: emailArray,
     recipientUserIds: recipientUserIds,
     emailTemplateType: emailTemplateType
   }
