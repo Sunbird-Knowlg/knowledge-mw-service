@@ -192,7 +192,7 @@ function getContentUrl (content) {
 }
 
 /**
- * Below function is used to create email request object
+ * Below function is used to create email request body
  * @param {string} subject
  * @param {string} body
  * @param {string} recipientUserIds
