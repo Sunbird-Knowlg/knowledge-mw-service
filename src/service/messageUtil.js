@@ -247,6 +247,13 @@ exports.CONTENT = {
     MISSING_MESSAGE: 'Required fields for search plugins are missing',
     FAILED_CODE: 'ERR_PLUGINS_SEARCH_FAILED',
     FAILED_MESSAGE: 'Searching plugins failed'
+  },
+
+  COLLABORATORS: {
+    MISSING_CODE: 'ERR_CONTENT_COLLABORATORS_UPDATE_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for update collaborators are missing',
+    FAILED_CODE: 'ERR_CONTENT_COLLABORATORS_UPDATE_FAILED',
+    FAILED_MESSAGE: 'Update collaborators failed'
   }
 }
 
@@ -426,6 +433,22 @@ exports.EMAIL = {
             '<b>Content Type: </b>{{Content type}}<br>  ' +
             '<b>Title: </b>{{Content title}}<br>',
     TEMPLATE: 'unlistedPublishContent'
+  },
+  ADD_COLLABORATORS: {
+    FAILED_CODE: 'ERR_SEND_ADD_COLLABORATORS_EMAIL',
+    FAILED_MESSAGE: 'Sending email failed for adding collaborators',
+    SUBJECT: 'You have been added as collaborator: Content Type: {{Content type}}, Title: {{Content title}}',
+    BODY: '{{User}} has added you as a collaborator for the ' +
+    '{{Content type}}: {{Content title}}. View this in {{Content link}}.',
+    TEMPLATE: 'default'
+  },
+  REMOVE_COLLABORATORS: {
+    FAILED_CODE: 'ERR_SEND_REMOVE_COLLABORATORS_EMAIL',
+    FAILED_MESSAGE: 'Sending email failed for removing collaborators',
+    SUBJECT: 'You have been removed as collaborator: Content Type: {{Content type}}, Title: {{Content title}}',
+    BODY: '{{User}} has removed you as a collaborator for the ' +
+    '{{Content type}}: {{Content title}}.',
+    TEMPLATE: 'default'
   }
 }
 
