@@ -128,7 +128,7 @@ require('./routes/dataExhaustRoutes')(app)
 require('./routes/formRoutes')(app)
 require('./routes/externalUrlMetaRoute')(app)
 require('./routes/pluginsRoutes')(app)
-require('./routes/collaboratorsRoutes')(app)
+require('./routes/collaborationRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 

@@ -443,8 +443,8 @@ exports.EMAIL = {
     TEMPLATE: 'default'
   },
   REMOVE_COLLABORATORS: {
-    FAILED_CODE: 'ERR_SEND_ADD_COLLABORATORS_EMAIL',
-    FAILED_MESSAGE: 'Sending email failed for adding collaborators',
+    FAILED_CODE: 'ERR_SEND_REMOVE_COLLABORATORS_EMAIL',
+    FAILED_MESSAGE: 'Sending email failed for removing collaborators',
     SUBJECT: 'You have been removed as collaborator: Content Type: {{Content type}}, Title: {{Content title}}',
     BODY: '{{User}} has removed you as a collaborator for the ' +
     '{{Content type}}: {{Content title}}.',

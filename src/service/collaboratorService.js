@@ -1,6 +1,6 @@
 /**
  * @name : collaboratorService.js
- * @description :: Responsible for handle collaborators service
+ * @description :: Service responsible for updating collaborators for a content
  * @author      :: Sourav Dey
  */
 
