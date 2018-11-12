@@ -67,7 +67,7 @@ function updateCollaborators (req, response) {
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
           data.request.content.versionKey = res.result.content.versionKey
-          data.request.content.collaborators = data.request.content.collaborators
+          data.request.content.collaborators = lodash.uniq(data.request.content.collaborators)
           var contentInfo = { contentTitle: res.result.content.name,
             contentType: res.result.content.contentType,
             identifier: data.contentId,
