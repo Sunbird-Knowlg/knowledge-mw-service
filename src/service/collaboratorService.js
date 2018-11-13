@@ -67,7 +67,7 @@ function updateCollaborators (req, response) {
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
           data.request.content.versionKey = res.result.content.versionKey
-          data.request.content.collaborators = data.request.content.collaborators
+          data.request.content.collaborators = lodash.uniq(data.request.content.collaborators)
           var contentInfo = { contentTitle: res.result.content.name,
             contentType: res.result.content.contentType,
             identifier: data.contentId,
@@ -142,8 +142,7 @@ function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
       function (CBW) {
         var eData = emailType === 'addCollaborators' ? emailMessage.ADD_COLLABORATORS
           : emailMessage.REMOVE_COLLABORATORS
-        var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType)
-          .replace(/{{Content title}}/g, cData.contentTitle)
+        var subject = eData.SUBJECT
         var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
           .replace(/{{Content title}}/g, cData.contentTitle)
           .replace(/{{Content link}}/g, getContentUrl(cData))
