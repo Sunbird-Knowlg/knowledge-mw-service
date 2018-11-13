@@ -142,8 +142,7 @@ function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
       function (CBW) {
         var eData = emailType === 'addCollaborators' ? emailMessage.ADD_COLLABORATORS
           : emailMessage.REMOVE_COLLABORATORS
-        var subject = eData.SUBJECT.replace(/{{Content type}}/g, cData.contentType)
-          .replace(/{{Content title}}/g, cData.contentTitle)
+        var subject = eData.SUBJECT
         var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
           .replace(/{{Content title}}/g, cData.contentTitle)
           .replace(/{{Content link}}/g, getContentUrl(cData))
