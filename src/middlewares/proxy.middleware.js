@@ -1,5 +1,6 @@
 var proxy = require('express-http-proxy')
 var contentService = require('../service/contentService')
+var collaboratorService = require('../service/collaboratorService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var configUtil = require('sb-config-util')
 
@@ -289,4 +290,15 @@ module.exports = function (app) {
       }
     })
   )
+
+  app
+    .route(
+      configUtil.getConfig('UPDATE_COLLABORATOR') + '/:contentId'
+    )
+    .post(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      requestMiddleware.apiAccessForCreatorUser,
+      collaboratorService.updateCollaborators
+    )
 }

@@ -9,6 +9,10 @@ module.exports.CONTENT = {
 
   UPDATE: {
     versionKey: 'required|string'
+  },
+
+  COLLABORATORS: {
+    collaborators: 'required|array'
   }
 
 }

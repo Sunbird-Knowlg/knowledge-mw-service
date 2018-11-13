@@ -68,8 +68,7 @@ configUtil.setConfig('LANGUAGE_SERVICE_BASE_URL', languageServiceBaseUrl)
 configUtil.setConfig('LANGUAGE_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + languageServiceApiKey)
 configUtil.setConfig('SUNBIRD_PORTAL_BASE_URL', sunbirdPortalBaseUrl)
 
-process.env.sunbird_cassandra_ips = process.env.sunbird_cassandra_ips || '127.0.0.1'
-process.env.sunbird_cassandra_port = process.env.sunbird_cassandra_port || 9042
+process.env.sunbird_cassandra_urls = process.env.sunbird_cassandra_urls || '127.0.0.1'
 process.env.dial_code_image_temp_folder = 'temp'
 
 var app = express()
@@ -129,6 +128,7 @@ require('./routes/dataExhaustRoutes')(app)
 require('./routes/formRoutes')(app)
 require('./routes/externalUrlMetaRoute')(app)
 require('./routes/pluginsRoutes')(app)
+require('./routes/collaborationRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
