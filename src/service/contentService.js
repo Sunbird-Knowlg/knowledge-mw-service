@@ -70,54 +70,6 @@ function searchContentAPI (req, response) {
 //   }
 // }
 
-function getsearchDetails (ekStepReqData, req) {
-  return function (callback) {
-    var rspObj = req.rspObj
-    contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
-      if (err || res.responseCode !== responseCode.SUCCESS) {
-        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
-          'Getting error from content provider', res))
-        callback(new Error('Search failed'), null)
-      } else {
-        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'searchContentAPI',
-          'Search success', res))
-        callback(null, res)
-      }
-    })
-  }
-}
-
-function getframeworkDetails (req) {
-  return function (callback) {
-    if (req.query.framework) {
-      var rspObj = req.rspObj
-      cacheManager.get(req.query.framework, function (err, data) {
-        if (err || !data) {
-          contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, res) {
-            if (err || res.responseCode !== responseCode.SUCCESS) {
-              LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'Framework details',
-                'Getting error from Framework API', res))
-              callback(new Error('Search failed'), null)
-            } else {
-              LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Framework details',
-                'Framework API success', res))
-              cacheManager.set({ key: req.query.framework, value: res },
-                function (err, data) {
-                  console.log(err, data)
-                })
-              callback(null, res)
-            }
-          })
-        } else {
-          callback(null, data)
-        }
-      })
-    } else {
-      callback(null, null)
-    }
-  }
-}
-
 function search (defaultContentTypes, req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
@@ -147,36 +99,83 @@ function search (defaultContentTypes, req, response, objectType) {
   }
 
   async.waterfall([
-    function (callback) {
-      async.parallel({
-        searchDetails: getsearchDetails(ekStepReqData, req),
-        frameworkDetails: getframeworkDetails(req)
-      }, function (err, results) {
-        if (err) {
-          callback(err, null)
+
+    function (CBW) {
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchContentAPI',
+        'Request to content provider to search the content', {
+          body: ekStepReqData,
+          headers: req.headers
+        }))
+      contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
+            'Getting error from content provider', res))
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj = utilsService.getErrorResponse(rspObj, res)
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
-          var language = req.query.lang ? req.query.lang : 'en'
-          if (lodash.get(results.searchDetails, 'result.facets') &&
-          lodash.get(results.frameworkDetails, 'result.framework.categories')) {
-            modifyFacetsData(results.searchDetails.result.facets,
-              results.frameworkDetails.result.framework.categories, language)
+          if (req.query.framework) {
+            getFrameworkDetails(req, function (err, data) {
+              if (err || res.responseCode !== responseCode.SUCCESS) {
+                rspObj.result = res.result
+                return response.status(206).send(respUtil.successResponse(rspObj))
+              } else {
+                var language = req.query.lang ? req.query.lang : 'en'
+                if (lodash.get(res, 'result.facets') &&
+                lodash.get(data, 'result.framework.categories')) {
+                  modifyFacetsData(res.result.facets, data.result.framework.categories, language)
+                }
+                CBW(null, res)
+              }
+            })
+          } else {
+            CBW(null, res)
           }
-          callback(null, results.searchDetails)
         }
       })
-    }], function (err, res) {
-    if (err) {
-      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
-        'Getting error from content provider', res))
-      rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE
-      rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
-      rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-      var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-      rspObj = utilsService.getErrorResponse(rspObj, res)
-      return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
-    } else {
+    },
+
+    function (res) {
       rspObj.result = res.result
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchContentAPI',
+        'Content searched successfully, We got ' + rspObj.result.count + ' results', {
+          contentCount: rspObj.result.count
+        }))
       return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
+}
+
+function getFrameworkDetails (req, CBW) {
+  cacheManager.get(req.query.framework, function (err, data) {
+    if (err || !data) {
+      contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, result) {
+        if (err || result.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'framework API failed',
+            'Fetching framework data failed' + req.query.framework, err))
+          CBW(new Error('Fetching framework data failed'), null)
+        } else {
+          LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'framework API success',
+            'Fetching framework data success - ' + req.query.framework, result))
+          cacheManager.set({ key: req.query.framework, value: result },
+            function (err, data) {
+              if (err) {
+                LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Setting framework cache failed',
+                  'Setting framework cache data failed' + req.query.framework, err))
+              } else {
+                LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename,
+                  'Setting framework cache data success',
+                  'Setting framework cache data success - ' + req.query.framework, result))
+              }
+            })
+          CBW(null, result)
+        }
+      })
+    } else {
+      CBW(null, data)
     }
   })
 }
