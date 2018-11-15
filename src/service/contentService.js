@@ -192,13 +192,18 @@ function modifyFacetsData (searchData, frameworkData, language) {
             }
           })
         })
+        facets.values = lodash.orderBy(facets.values, ['index'], ['asc'])
       }
     })
   })
 }
 
 function parseTranslationData (data, language) {
-  return lodash.get(JSON.parse(data), language) || null
+  try {
+    return lodash.get(JSON.parse(data), language) || null
+  } catch (e) {
+    console.warn(e)
+  }
 }
 
 /**
