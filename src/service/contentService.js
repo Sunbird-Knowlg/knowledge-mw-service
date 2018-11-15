@@ -93,7 +93,7 @@ function getframeworkDetails (req) {
       var rspObj = req.rspObj
       cacheManager.get(req.query.framework, function (err, data) {
         if (err || !data) {
-          contentProvider.getFramework(req.query.framework, req.headers, function (err, res) {
+          contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, res) {
             if (err || res.responseCode !== responseCode.SUCCESS) {
               LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'Framework details',
                 'Getting error from Framework API', res))
