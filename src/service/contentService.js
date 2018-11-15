@@ -21,6 +21,9 @@ var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 var emailService = require('./emailService')
 
+var CacheManager = require('sb_cache_manager')
+var cacheManager = new CacheManager({})
+
 var filename = path.basename(__filename)
 var contentMessage = messageUtils.CONTENT
 var compositeMessage = messageUtils.COMPOSITE
@@ -67,6 +70,54 @@ function searchContentAPI (req, response) {
 //   }
 // }
 
+function getsearchDetails (ekStepReqData, req) {
+  return function (callback) {
+    var rspObj = req.rspObj
+    contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
+      if (err || res.responseCode !== responseCode.SUCCESS) {
+        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
+          'Getting error from content provider', res))
+        callback(new Error('Search failed'), null)
+      } else {
+        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'searchContentAPI',
+          'Search success', res))
+        callback(null, res)
+      }
+    })
+  }
+}
+
+function getframeworkDetails (req) {
+  return function (callback) {
+    if (req.query.framework) {
+      var rspObj = req.rspObj
+      cacheManager.get(req.query.framework, function (err, data) {
+        if (err || !data) {
+          contentProvider.getFramework(req.query.framework, req.headers, function (err, res) {
+            if (err || res.responseCode !== responseCode.SUCCESS) {
+              LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'Framework details',
+                'Getting error from Framework API', res))
+              callback(new Error('Search failed'), null)
+            } else {
+              LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Framework details',
+                'Framework API success', res))
+              cacheManager.set({ key: req.query.framework, value: res },
+                function (err, data) {
+                  console.log(err, data)
+                })
+              callback(null, res)
+            }
+          })
+        } else {
+          callback(null, data)
+        }
+      })
+    } else {
+      callback(null, null)
+    }
+  }
+}
+
 function search (defaultContentTypes, req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
@@ -96,38 +147,60 @@ function search (defaultContentTypes, req, response, objectType) {
   }
 
   async.waterfall([
-
-    function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchContentAPI',
-        'Request to content provider to search the content', {
-          body: ekStepReqData,
-          headers: req.headers
-        }))
-      contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
-            'Getting error from content provider', res))
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE
-          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
-          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-          rspObj = utilsService.getErrorResponse(rspObj, res)
-          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+    function (callback) {
+      async.parallel({
+        searchDetails: getsearchDetails(ekStepReqData, req),
+        frameworkDetails: getframeworkDetails(req)
+      }, function (err, results) {
+        if (err) {
+          callback(err, null)
         } else {
-          CBW(null, res)
+          var language = req.query.lang ? req.query.lang : 'en'
+          if (lodash.get(results.searchDetails, 'result.facets') &&
+          lodash.get(results.frameworkDetails, 'result.framework.categories')) {
+            modifyFacetsData(results.searchDetails.result.facets,
+              results.frameworkDetails.result.framework.categories, language)
+          }
+          callback(null, results.searchDetails)
         }
       })
-    },
-
-    function (res) {
+    }], function (err, res) {
+    if (err) {
+      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
+        'Getting error from content provider', res))
+      rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE
+      rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
+      rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+      var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+      rspObj = utilsService.getErrorResponse(rspObj, res)
+      return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+    } else {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchContentAPI',
-        'Content searched successfully, We got ' + rspObj.result.count + ' results', {
-          contentCount: rspObj.result.count
-        }))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
-  ])
+  })
+}
+
+function modifyFacetsData (searchData, frameworkData, language) {
+  lodash.forEach(searchData, (facets) => {
+    lodash.forEach(frameworkData, (categories) => {
+      if (categories.code === facets.name) {
+        lodash.forEach(facets.values, (values) => {
+          lodash.forEach(categories.terms, (terms) => {
+            if (values.name.toLowerCase() === terms.name.toLowerCase()) {
+              Object.assign(values, terms)
+              values.translations = parseTranslationData(terms.translations, language)
+            }
+          })
+        })
+      }
+    })
+  })
+  return searchData
+}
+
+function parseTranslationData (data, language) {
+  return lodash.get(JSON.parse(data), language) || null
 }
 
 /**
