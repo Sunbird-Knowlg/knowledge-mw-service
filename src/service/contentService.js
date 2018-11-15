@@ -196,7 +196,6 @@ function modifyFacetsData (searchData, frameworkData, language) {
       }
     })
   })
-  return searchData
 }
 
 function parseTranslationData (data, language) {
