@@ -47,7 +47,7 @@ function updateCollaborators (req, response) {
     function (CBW) {
       var qs = {
         mode: 'edit',
-        fields: 'versionKey, collaborators, contentType, name, mimeType, framework'
+        fields: 'versionKey, collaborators, contentType, name, mimeType, framework, status'
       }
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCollaboratorsAPI',
         'Request to content provider to get the latest version key', {
@@ -66,6 +66,12 @@ function updateCollaborators (req, response) {
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
+          if (res.result.content.status !== 'Draft') {
+            rspObj.errCode = contentMessage.COLLABORATORS.FAILED_CODE
+            rspObj.errMsg = contentMessage.COLLABORATORS.FAILED_MESSAGE
+            rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
+            return response.status(404).send(respUtil.errorResponse(rspObj))
+          }
           data.request.content.versionKey = res.result.content.versionKey
           data.request.content.collaborators = lodash.uniq(data.request.content.collaborators)
           var contentInfo = { contentTitle: res.result.content.name,
