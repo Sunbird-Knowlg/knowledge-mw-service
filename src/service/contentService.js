@@ -203,6 +203,7 @@ function parseTranslationData (data, language) {
     return lodash.get(JSON.parse(data), language) || null
   } catch (e) {
     console.warn(e)
+    return null
   }
 }
 
