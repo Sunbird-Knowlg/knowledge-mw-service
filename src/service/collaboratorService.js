@@ -69,8 +69,11 @@ function updateCollaborators (req, response) {
           if (res.result.content.status !== 'Draft') {
             rspObj.errCode = contentMessage.COLLABORATORS.FAILED_CODE
             rspObj.errMsg = contentMessage.COLLABORATORS.FAILED_MESSAGE
-            rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
-            return response.status(404).send(respUtil.errorResponse(rspObj))
+            rspObj.responseCode = res.result.content.status === 'Retired'
+              ? responseCode.RESOURCE_NOT_FOUND : contentMessage.COLLABORATORS.FORBIDDEN
+            httpStatus = res.result.content.status === 'Retired'
+              ? 404 : 403
+            return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           }
           data.request.content.versionKey = res.result.content.versionKey
           data.request.content.collaborators = lodash.uniq(data.request.content.collaborators)
