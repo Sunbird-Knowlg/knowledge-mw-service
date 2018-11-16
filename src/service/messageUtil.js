@@ -253,7 +253,8 @@ exports.CONTENT = {
     MISSING_CODE: 'ERR_CONTENT_COLLABORATORS_UPDATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for update collaborators are missing',
     FAILED_CODE: 'ERR_CONTENT_COLLABORATORS_UPDATE_FAILED',
-    FAILED_MESSAGE: 'Update collaborators failed'
+    FAILED_MESSAGE: 'Update collaborators failed',
+    FORBIDDEN: 'FORBIDDEN'
   }
 }
 

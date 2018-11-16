@@ -120,6 +120,8 @@ function search (defaultContentTypes, req, response, objectType) {
           if (req.query.framework) {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
+                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'Framework API failed',
+                  'Framework API failed with framework - ' + req.query.framework, {'err': err, 'res': res}))
                 rspObj.result = res.result
                 return response.status(206).send(respUtil.successResponse(rspObj))
               } else {
@@ -187,6 +189,8 @@ function modifyFacetsData (searchData, frameworkData, language) {
         lodash.forEach(facets.values, (values) => {
           lodash.forEach(categories.terms, (terms) => {
             if (values.name.toLowerCase() === terms.name.toLowerCase()) {
+              terms = lodash.pick(terms, ['name', 'translations', 'description',
+                'index', 'count'])
               Object.assign(values, terms)
               values.translations = parseTranslationData(terms.translations, language)
             }
