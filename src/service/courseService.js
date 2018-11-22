@@ -128,7 +128,7 @@ function searchCourseAPI (req, response) {
       })
     },
     function (res, CBW) {
-      if (req.query && req.query.orgdetails) {
+      if (req.query && req.query.orgdetails && res.result && res.result.content) {
         var fields = req.query.orgdetails
         configHelper.populateOrgDetailsByHasTag(res.result.content, fields, function (err, courseswithorgdetails) {
           if (!err) {
@@ -600,7 +600,7 @@ function getCourseHierarchyAPI (req, response) {
       })
     },
     function (res, CBW) {
-      if (req.query && req.query.orgdetails) {
+      if (req.query && req.query.orgdetails && res.result && res.result.content) {
         var fields = req.query.orgdetails
         // sending res.result.content as array bec populateOrgDetailsByHasTag expects data as array
         configHelper.populateOrgDetailsByHasTag([res.result.content], fields, function (err, courseswithorgdetails) {
