@@ -1,0 +1,5 @@
+{
+    "orgCacheKeyName": "allRootOrgs",
+    "orgCacheExpiryTime": "",
+    "orgfieldsAllowed": ["email","orgName"]
+}   

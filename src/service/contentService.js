@@ -20,6 +20,7 @@ var contentModel = require('../models/contentModel').CONTENT
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 var emailService = require('./emailService')
+var configHelper = require('../helpers/configHelper')
 
 var CacheManager = require('sb_cache_manager')
 var cacheManager = new CacheManager({})
@@ -130,7 +131,18 @@ function search (defaultContentTypes, req, response, objectType) {
                 lodash.get(data, 'result.framework.categories')) {
                   modifyFacetsData(res.result.facets, data.result.framework.categories, language)
                 }
-                CBW(null, res)
+                if (req.query && req.query.orgdetails) {
+                  var fields = req.query.orgdetails
+                  configHelper.populateOrgDetailsByHasTag(res.result.content, fields, function
+                    (err, contentwithorgdetails) {
+                    if (!err) {
+                      res.result.content = contentwithorgdetails
+                    }
+                    CBW(null, res)
+                  })
+                } else {
+                  CBW(null, res)
+                }
               }
             })
           } else {
@@ -623,6 +635,19 @@ function getContentAPI (req, response) {
           CBW(null, res)
         }
       })
+    },
+    function (res, CBW) {
+      if (req.query && req.query.orgdetails) {
+        var fields = req.query.orgdetails
+        configHelper.populateOrgDetailsByHasTag([res.result.content], fields, function (err, courseswithorgdetails) {
+          if (!err) {
+            res.result.content = courseswithorgdetails[0]
+          }
+          CBW(null, res)
+        })
+      } else {
+        CBW(null, res)
+      };
     },
     function (res) {
       rspObj.result = res.result

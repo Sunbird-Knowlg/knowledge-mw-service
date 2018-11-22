@@ -16,6 +16,7 @@ var _ = require('underscore')
 var courseModel = require('../models/courseModel').COURSE
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
+var configHelper = require('../helpers/configHelper')
 
 var filename = path.basename(__filename)
 var courseMessage = messageUtils.COURSE
@@ -126,7 +127,19 @@ function searchCourseAPI (req, response) {
         }
       })
     },
-
+    function (res, CBW) {
+      if (req.query && req.query.orgdetails) {
+        var fields = req.query.orgdetails
+        configHelper.populateOrgDetailsByHasTag(res.result.content, fields, function (err, courseswithorgdetails) {
+          if (!err) {
+            res.result.content = courseswithorgdetails
+          }
+          CBW(null, res)
+        })
+      } else {
+        CBW(null, res)
+      };
+    },
     function (res) {
       rspObj.result = res.result
       if (res.result.content) {
@@ -457,7 +470,19 @@ function getCourseAPI (req, response) {
         }
       })
     },
-
+    function (res, CBW) {
+      if (req.query && req.query.orgdetails) {
+        var fields = req.query.orgdetails
+        configHelper.populateOrgDetailsByHasTag(res.result.content, fields, function (err, courseswithorgdetails) {
+          if (!err) {
+            res.result.content = courseswithorgdetails
+          }
+          CBW(null, res)
+        })
+      } else {
+        CBW(null, res)
+      };
+    },
     function (res) {
       rspObj.result = transformResBody(res.result, 'content', 'course')
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseAPI',
@@ -574,7 +599,20 @@ function getCourseHierarchyAPI (req, response) {
         }
       })
     },
-
+    function (res, CBW) {
+      if (req.query && req.query.orgdetails) {
+        var fields = req.query.orgdetails
+        // sending res.result.content as array bec populateOrgDetailsByHasTag expects data as array
+        configHelper.populateOrgDetailsByHasTag([res.result.content], fields, function (err, courseswithorgdetails) {
+          if (!err) {
+            res.result.content = courseswithorgdetails[0]
+          }
+          CBW(null, res)
+        })
+      } else {
+        CBW(null, res)
+      };
+    },
     function (res) {
       rspObj.result = res.result
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseHierarchyAPI',

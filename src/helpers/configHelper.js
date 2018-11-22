@@ -5,6 +5,9 @@ var LOG = require('sb_logger_util')
 const contentProvider = require('sb_content_provider_util')
 var async = require('async')
 var _ = require('lodash')
+var CacheManager = require('sb_cache_manager')
+var cacheManager = new CacheManager({})
+var configData = require('../config/constants')
 
 /**
  * This function executes the org search lms API to get all orgs
@@ -23,6 +26,75 @@ function getRootOrgs (requestObj, cb) {
       process.exit(1)
     }
   })
+}
+
+/**
+ * This function tries to get the orgdetails from cache if not exits fetches from api and sets to cache
+ * @param requestObj is not needed bec all rootorgdetails are fetched here
+ * @param CBW callback after success or error
+ */
+function getRootOrgsFromCache (CBW) {
+  cacheManager.get(configData.orgCacheKeyName, function (err, cachedata) {
+    if (err || !cachedata) {
+      var inputObj = {
+        'request': {
+          // 'limit': 50,
+          'filters': { 'isRootOrg': true }
+        }
+      }
+      getRootOrgs(inputObj, function (err, res) {
+        if (err) {
+          CBW(err)
+        } else {
+          cacheManager.set({ key: configData.orgCacheKeyName, value: res.result.response.content },
+            function (err, data) {
+              if (err) {
+                LOG.error(utilsService.getLoggerData('', 'ERROR', filename, 'Setting allRootOrgs cache failed',
+                  'Setting allRootOrgs cache data failed', err))
+              } else {
+                LOG.info(utilsService.getLoggerData('', 'INFO', filename,
+                  'Setting allRootOrgs cache data success'))
+              }
+            })
+          CBW(null, res.result.response.content)
+        }
+      })
+    } else {
+      CBW(null, cachedata)
+    }
+  })
+}
+
+/**
+ * This function loops each object from the input and maps channel id with hasTagId from orgdetails and prepares orgDetails obj for each obj in the array
+ * @param data is array of objects, it might be content or course
+ * @param cb callback after success or error
+ */
+function populateOrgDetailsByHasTag (data, inputfields, cb) {
+  inputfields = inputfields.split(',')
+  var fields = configData.orgfieldsAllowed.filter(eachfield => inputfields.includes(eachfield))
+  if (fields && fields.length) {
+    getRootOrgsFromCache(function (err, orgdata) {
+      if (!err) {
+        if (orgdata) {
+          var orgDetails = _.keyBy(orgdata, 'hashTagId')
+          _.forEach(data, (eachcontent, index) => {
+            if (eachcontent.channel) {
+              var eachorgdetail = orgDetails[eachcontent.channel]
+              if (eachorgdetail) {
+                data[index].orgDetails = _.pick(eachorgdetail, fields)
+              }
+            }
+          })
+        }
+        cb(null, data)
+      } else {
+        cb(err)
+      }
+    })
+  } else {
+    cb(null, data)
+  }
 }
 
 /**
@@ -85,5 +157,6 @@ function getAllChannelsFromAPI () {
 }
 
 module.exports = {
-  getAllChannelsFromAPI: getAllChannelsFromAPI
+  getAllChannelsFromAPI: getAllChannelsFromAPI,
+  populateOrgDetailsByHasTag: populateOrgDetailsByHasTag
 }
