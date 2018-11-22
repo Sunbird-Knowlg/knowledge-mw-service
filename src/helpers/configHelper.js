@@ -38,7 +38,6 @@ function getRootOrgsFromCache (CBW) {
     if (err || !cachedata) {
       var inputObj = {
         'request': {
-          // 'limit': 50,
           'filters': { 'isRootOrg': true }
         }
       }
@@ -49,10 +48,10 @@ function getRootOrgsFromCache (CBW) {
           cacheManager.set({ key: configData.orgCacheKeyName, value: res.result.response.content },
             function (err, data) {
               if (err) {
-                LOG.error(utilsService.getLoggerData('', 'ERROR', filename, 'Setting allRootOrgs cache failed',
+                LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'Setting allRootOrgs cache failed',
                   'Setting allRootOrgs cache data failed', err))
               } else {
-                LOG.info(utilsService.getLoggerData('', 'INFO', filename,
+                LOG.info(utilsService.getLoggerData({}, 'INFO', filename,
                   'Setting allRootOrgs cache data success'))
               }
             })
@@ -73,7 +72,7 @@ function getRootOrgsFromCache (CBW) {
 function populateOrgDetailsByHasTag (data, inputfields, cb) {
   inputfields = inputfields.split(',')
   var fields = configData.orgfieldsAllowed.filter(eachfield => inputfields.includes(eachfield))
-  if (fields && fields.length) {
+  if (fields && fields.length && data.length) {
     getRootOrgsFromCache(function (err, orgdata) {
       if (!err) {
         if (orgdata) {
