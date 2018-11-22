@@ -1,4 +1,5 @@
 module.exports = {
+  table_name: 'dialcode_images',
   fields: {
     filename: 'text',
     created_on: {
