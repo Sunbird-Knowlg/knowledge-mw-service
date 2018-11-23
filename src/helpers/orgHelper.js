@@ -18,7 +18,7 @@ function getRootOrgs (requestObj, cb) {
     filename, 'getRootOrgs', 'getRootOrgs called', requestObj))
   contentProvider.getAllRootOrgs(requestObj, (err, res) => {
     if (!err && res && res.result.response.count > 0 && res.result.response.content) {
-      cb(err, res)
+      return cb(err, res)
     } else {
       LOG.error(utilsService.getLoggerData({}, 'ERROR',
         filename, 'getRootOrgs', 'error in getting root orgs.', err))
@@ -32,7 +32,7 @@ function getRootOrgs (requestObj, cb) {
  * @param requestObj is not needed bec all rootorgdetails are fetched here
  * @param CBW callback after success or error
  */
-function getRootOrgsFromCache (CBW) {
+function getRootOrgsFromCache (cb) {
   cacheManager.get(configData.orgCacheKeyName, function (err, cachedata) {
     if (err || !cachedata) {
       var inputObj = {
@@ -42,7 +42,7 @@ function getRootOrgsFromCache (CBW) {
       }
       getRootOrgs(inputObj, function (err, res) {
         if (err) {
-          CBW(err)
+          return cb(err)
         } else {
           var cacheinputdata = {
             key: configData.orgCacheKeyName,
@@ -58,11 +58,11 @@ function getRootOrgsFromCache (CBW) {
                 'Setting allRootOrgs cache data success'))
             }
           })
-          CBW(null, res.result.response.content)
+          return cb(null, res.result.response.content)
         }
       })
     } else {
-      CBW(null, cachedata)
+      return cb(null, cachedata)
     }
   })
 }
@@ -86,10 +86,10 @@ function populateOrgDetailsByHasTag (inputdata, inputfields, cb) {
           }
         })
       };
-      cb(null, inputdata)
+      return cb(null, inputdata)
     })
   } else {
-    cb(null, inputdata)
+    return cb(null, inputdata)
   }
 }
 
@@ -109,10 +109,10 @@ function includeOrgDetails (req, res, cb) {
       if (!err) {
         res.result.content = inputContentIsArray ? contentwithorgdetails : contentwithorgdetails[0]
       }
-      cb(null, res)
+      return cb(null, res)
     })
   } else {
-    cb(null, res)
+    return cb(null, res)
   }
 }
 
