@@ -10,6 +10,9 @@ var replicationStrategy = getReplicationStrategy(envReplicationStrategy)
 var keyspaceConfig = [{
   'name': 'dialcodes',
   'schemaPath': require('./../models/cassandra/dialcodes')
+}, {
+  'name': 'lock',
+  'schemaPath': require('./../models/cassandra/lock')
 }]
 
 var connection = {}

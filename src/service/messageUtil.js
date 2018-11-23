@@ -255,6 +255,14 @@ exports.CONTENT = {
     FAILED_CODE: 'ERR_CONTENT_COLLABORATORS_UPDATE_FAILED',
     FAILED_MESSAGE: 'Update collaborators failed',
     FORBIDDEN: 'FORBIDDEN'
+  },
+
+  CREATE_LOCK: {
+    MISSING_CODE: 'ERR_LOCK_CREATION_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for creating lock',
+    FAILED_CODE: 'ERR_LOCK_CREATION_FAILED',
+    FAILED_MESSAGE: 'Creating lock failed',
+    ALREADY_LOCKED: 'The content is already locked by {{Name}}'
   }
 }
 

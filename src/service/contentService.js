@@ -1414,6 +1414,30 @@ function searchPluginsAPI (req, response, objectType) {
   ])
 }
 
+function validateContentLock (req, response) {
+  var rspObj = req.rspObj
+  var userId = req.headers['x-authenticated-userid']
+  contentProvider.getContent(req.body.request.resourceId, req.headers, function (err, res) {
+    if (err || res.responseCode !== responseCode.SUCCESS) {
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
+        'Getting content details failed', err))
+      rspObj.result.validation = false
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    } else {
+      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
+        'Getting content details success', res))
+      if (res.result.content.status === 'Draft' && (res.result.content.createdBy === userId ||
+        lodash.includes(res.result.content.collaborators, userId))) {
+        rspObj.result.validation = true
+        return response.status(200).send(respUtil.successResponse(rspObj))
+      } else {
+        rspObj.result.validation = false
+        return response.status(200).send(respUtil.successResponse(rspObj))
+      }
+    }
+  })
+}
+
 module.exports.searchAPI = searchAPI
 module.exports.searchContentAPI = searchContentAPI
 module.exports.createContentAPI = createContentAPI
@@ -1434,3 +1458,4 @@ module.exports.assignBadgeAPI = assignBadge
 module.exports.revokeBadgeAPI = revokeBadge
 module.exports.copyContentAPI = copyContentAPI
 module.exports.searchPluginsAPI = searchPluginsAPI
+module.exports.validateContentLock = validateContentLock
