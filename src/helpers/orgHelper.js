@@ -44,16 +44,20 @@ function getRootOrgsFromCache (CBW) {
         if (err) {
           CBW(err)
         } else {
-          cacheManager.set({ key: configData.orgCacheKeyName, value: res.result.response.content },
-            function (err, data) {
-              if (err) {
-                LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'Setting allRootOrgs cache failed',
-                  'Setting allRootOrgs cache data failed', err))
-              } else {
-                LOG.info(utilsService.getLoggerData({}, 'INFO', filename,
-                  'Setting allRootOrgs cache data success'))
-              }
-            })
+          var cacheinputdata = {
+            key: configData.orgCacheKeyName,
+            value: res.result.response.content,
+            ttl: configData.orgCacheExpiryTime
+          }
+          cacheManager.set(cacheinputdata, function (err, data) {
+            if (err) {
+              LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'Setting allRootOrgs cache failed',
+                'Setting allRootOrgs cache data failed', err))
+            } else {
+              LOG.info(utilsService.getLoggerData({}, 'INFO', filename,
+                'Setting allRootOrgs cache data success'))
+            }
+          })
           CBW(null, res.result.response.content)
         }
       })
@@ -70,32 +74,50 @@ function getRootOrgsFromCache (CBW) {
  */
 function populateOrgDetailsByHasTag (inputdata, inputfields, cb) {
   inputfields = inputfields.split(',')
-  var fieldsToPopulate = configData.orgfieldsAllowed.filter(eachfield => inputfields.includes(eachfield))
-  if (fieldsToPopulate && fieldsToPopulate.length && inputdata.length) {
+  var fieldsToPopulate = configData.orgfieldsAllowedToSend.filter(eachfield => inputfields.includes(eachfield))
+  if (_.size(fieldsToPopulate) > 0 && _.size(inputdata) > 0) {
     getRootOrgsFromCache(function (err, orgdata) {
-      if (!err) {
-        if (orgdata) {
-          var orgDetails = _.keyBy(orgdata, 'hashTagId')
-          _.forEach(inputdata, (eachcontent, index) => {
-            if (eachcontent.channel) {
-              var eachorgdetail = orgDetails['01258430492140339266']
-              if (eachorgdetail) {
-                inputdata[index].orgDetails = _.pick(eachorgdetail, fieldsToPopulate)
-              }
-            }
-          })
-        }
-        cb(null, inputdata)
-      } else {
-        cb(null, inputdata)
-      }
+      if (!err && orgdata) {
+        var orgDetails = _.keyBy(orgdata, 'hashTagId')
+        _.forEach(inputdata, (eachcontent, index) => {
+          if (eachcontent.channel) {
+            var eachorgdetail = orgDetails[eachcontent.channel]
+            inputdata[index].orgDetails = eachorgdetail ? _.pick(eachorgdetail, fieldsToPopulate) : {}
+          }
+        })
+      };
+      cb(null, inputdata)
     })
   } else {
     cb(null, inputdata)
   }
 }
 
+/**
+ * This function loops each object from the input and includes org details in it
+ * @param inputdata is req object and res object
+ * @param cb there will be no error callback , always returns success
+ */
+function includeOrgDetails (req, res, cb) {
+  if (_.get(req, 'query.orgdetails') && _.get(res, 'result.content')) {
+    var fields = req.query.orgdetails
+    var inputContentIsArray = _.isArray(res.result.content)
+    // res.result.content need to send as array bec populateOrgDetailsByHasTag expects data as array
+    res.result.content = inputContentIsArray ? res.result.content : [res.result.content]
+    populateOrgDetailsByHasTag(res.result.content, fields, function
+      (err, contentwithorgdetails) {
+      if (!err) {
+        res.result.content = inputContentIsArray ? contentwithorgdetails : contentwithorgdetails[0]
+      }
+      cb(null, res)
+    })
+  } else {
+    cb(null, res)
+  }
+}
+
 module.exports = {
   getRootOrgs: getRootOrgs,
+  includeOrgDetails: includeOrgDetails,
   populateOrgDetailsByHasTag: populateOrgDetailsByHasTag
 }

@@ -131,22 +131,11 @@ function search (defaultContentTypes, req, response, objectType) {
                 lodash.get(data, 'result.framework.categories')) {
                   modifyFacetsData(res.result.facets, data.result.framework.categories, language)
                 }
-                if (req.query && req.query.orgdetails && res.result && res.result.content) {
-                  var fields = req.query.orgdetails
-                  orgHelper.populateOrgDetailsByHasTag(res.result.content, fields, function
-                    (err, contentwithorgdetails) {
-                    if (!err) {
-                      res.result.content = contentwithorgdetails
-                    }
-                    CBW(null, res)
-                  })
-                } else {
-                  CBW(null, res)
-                }
+                orgHelper.includeOrgDetails(req, res, CBW)
               }
             })
           } else {
-            CBW(null, res)
+            orgHelper.includeOrgDetails(req, res, CBW)
           }
         }
       })
@@ -637,18 +626,7 @@ function getContentAPI (req, response) {
       })
     },
     function (res, CBW) {
-      if (req.query && req.query.orgdetails && res.result && res.result.content) {
-        var fields = req.query.orgdetails
-        // sending res.result.content as array bec populateOrgDetailsByHasTag expects data as array
-        orgHelper.populateOrgDetailsByHasTag([res.result.content], fields, function (err, courseswithorgdetails) {
-          if (!err) {
-            res.result.content = courseswithorgdetails[0]
-          }
-          CBW(null, res)
-        })
-      } else {
-        CBW(null, res)
-      };
+      orgHelper.includeOrgDetails(req, res, CBW)
     },
     function (res) {
       rspObj.result = res.result

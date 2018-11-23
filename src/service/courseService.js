@@ -128,17 +128,7 @@ function searchCourseAPI (req, response) {
       })
     },
     function (res, CBW) {
-      if (req.query && req.query.orgdetails && res.result && res.result.content) {
-        var fields = req.query.orgdetails
-        orgHelper.populateOrgDetailsByHasTag(res.result.content, fields, function (err, courseswithorgdetails) {
-          if (!err) {
-            res.result.content = courseswithorgdetails
-          }
-          CBW(null, res)
-        })
-      } else {
-        CBW(null, res)
-      };
+      orgHelper.includeOrgDetails(req, res, CBW)
     },
     function (res) {
       rspObj.result = res.result
@@ -471,17 +461,7 @@ function getCourseAPI (req, response) {
       })
     },
     function (res, CBW) {
-      if (req.query && req.query.orgdetails) {
-        var fields = req.query.orgdetails
-        orgHelper.populateOrgDetailsByHasTag(res.result.content, fields, function (err, courseswithorgdetails) {
-          if (!err) {
-            res.result.content = courseswithorgdetails
-          }
-          CBW(null, res)
-        })
-      } else {
-        CBW(null, res)
-      };
+      orgHelper.includeOrgDetails(req, res, CBW)
     },
     function (res) {
       rspObj.result = transformResBody(res.result, 'content', 'course')
@@ -600,18 +580,7 @@ function getCourseHierarchyAPI (req, response) {
       })
     },
     function (res, CBW) {
-      if (req.query && req.query.orgdetails && res.result && res.result.content) {
-        var fields = req.query.orgdetails
-        // sending res.result.content as array bec populateOrgDetailsByHasTag expects data as array
-        orgHelper.populateOrgDetailsByHasTag([res.result.content], fields, function (err, courseswithorgdetails) {
-          if (!err) {
-            res.result.content = courseswithorgdetails[0]
-          }
-          CBW(null, res)
-        })
-      } else {
-        CBW(null, res)
-      };
+      orgHelper.includeOrgDetails(req, res, CBW)
     },
     function (res) {
       rspObj.result = res.result
