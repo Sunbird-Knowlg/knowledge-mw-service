@@ -20,7 +20,7 @@ var contentModel = require('../models/contentModel').CONTENT
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 var emailService = require('./emailService')
-var configHelper = require('../helpers/configHelper')
+var orgHelper = require('../helpers/orgHelper')
 
 var CacheManager = require('sb_cache_manager')
 var cacheManager = new CacheManager({})
@@ -133,7 +133,7 @@ function search (defaultContentTypes, req, response, objectType) {
                 }
                 if (req.query && req.query.orgdetails && res.result && res.result.content) {
                   var fields = req.query.orgdetails
-                  configHelper.populateOrgDetailsByHasTag(res.result.content, fields, function
+                  orgHelper.populateOrgDetailsByHasTag(res.result.content, fields, function
                     (err, contentwithorgdetails) {
                     if (!err) {
                       res.result.content = contentwithorgdetails
@@ -640,7 +640,7 @@ function getContentAPI (req, response) {
       if (req.query && req.query.orgdetails && res.result && res.result.content) {
         var fields = req.query.orgdetails
         // sending res.result.content as array bec populateOrgDetailsByHasTag expects data as array
-        configHelper.populateOrgDetailsByHasTag([res.result.content], fields, function (err, courseswithorgdetails) {
+        orgHelper.populateOrgDetailsByHasTag([res.result.content], fields, function (err, courseswithorgdetails) {
           if (!err) {
             res.result.content = courseswithorgdetails[0]
           }

@@ -16,7 +16,7 @@ var _ = require('underscore')
 var courseModel = require('../models/courseModel').COURSE
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
-var configHelper = require('../helpers/configHelper')
+var orgHelper = require('../helpers/orgHelper')
 
 var filename = path.basename(__filename)
 var courseMessage = messageUtils.COURSE
@@ -130,7 +130,7 @@ function searchCourseAPI (req, response) {
     function (res, CBW) {
       if (req.query && req.query.orgdetails && res.result && res.result.content) {
         var fields = req.query.orgdetails
-        configHelper.populateOrgDetailsByHasTag(res.result.content, fields, function (err, courseswithorgdetails) {
+        orgHelper.populateOrgDetailsByHasTag(res.result.content, fields, function (err, courseswithorgdetails) {
           if (!err) {
             res.result.content = courseswithorgdetails
           }
@@ -473,7 +473,7 @@ function getCourseAPI (req, response) {
     function (res, CBW) {
       if (req.query && req.query.orgdetails) {
         var fields = req.query.orgdetails
-        configHelper.populateOrgDetailsByHasTag(res.result.content, fields, function (err, courseswithorgdetails) {
+        orgHelper.populateOrgDetailsByHasTag(res.result.content, fields, function (err, courseswithorgdetails) {
           if (!err) {
             res.result.content = courseswithorgdetails
           }
@@ -603,7 +603,7 @@ function getCourseHierarchyAPI (req, response) {
       if (req.query && req.query.orgdetails && res.result && res.result.content) {
         var fields = req.query.orgdetails
         // sending res.result.content as array bec populateOrgDetailsByHasTag expects data as array
-        configHelper.populateOrgDetailsByHasTag([res.result.content], fields, function (err, courseswithorgdetails) {
+        orgHelper.populateOrgDetailsByHasTag([res.result.content], fields, function (err, courseswithorgdetails) {
           if (!err) {
             res.result.content = courseswithorgdetails[0]
           }
