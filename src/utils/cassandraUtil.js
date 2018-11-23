@@ -1,38 +1,48 @@
-var models = require('express-cassandra')
-var LOG = require('sb_logger_util')
-var path = require('path')
+var cassandra = require('express-cassandra')
 var _ = require('lodash')
-var filename = path.basename(__filename)
 var contactPoints = process.env.sunbird_cassandra_urls.split(',')
-var cassandra = require('cassandra-driver')
+var cassandraDriver = require('cassandra-driver')
 var consistency = getConsistencyLevel(process.env.sunbird_cassandra_consistency_level)
-var envReplicationStrategy = process.env.sunbird_cassandra_replication_strategy || '{"class":"SimpleStrategy","replication_factor":1}'
+var envReplicationStrategy = process.env.sunbird_cassandra_replication_strategy ||
+'{"class":"SimpleStrategy","replication_factor":1}'
 var replicationStrategy = getReplicationStrategy(envReplicationStrategy)
 
-models.setDirectory(path.join(__dirname, '.', '..', 'models', 'cassandra')).bind(
-  {
+var keyspaceConfig = [{
+  'name': 'dialcodes',
+  'schemaPath': require('./../models/cassandra/dialcodes')
+}]
+
+var connection = {}
+_.forEach(keyspaceConfig, config => {
+  var models = cassandra.createClient({
     clientOptions: {
       contactPoints: contactPoints,
-      keyspace: 'dialcodes',
+      keyspace: config.name,
       queryOptions: { consistency: consistency }
     },
     ormOptions: {
       defaultReplicationStrategy: replicationStrategy,
       migration: 'safe'
     }
-  },
-  function (err) {
-    if (err) {
-      LOG.error({ filename, 'Error connecting to the database: ': err })
-      throw err
-    } else {
-      LOG.info({ filename, 'connecting to database': 'success' })
-    }
-  }
-)
+  })
+
+  _.forEach(config.schemaPath, schema => {
+    models.loadSchema(schema.table_name, schema)
+    models.instance[schema.table_name].syncDB((err, result) => {
+      if (err) {
+        console.log('sync failed for keyspace and table', schema.table_name)
+      }
+    })
+    connection[config.name] = models
+  })
+})
+
+function getConnections (keyspace) {
+  return connection[keyspace]
+}
 
 function checkCassandraDBHealth (callback) {
-  const client = new cassandra.Client({ contactPoints: contactPoints })
+  const client = new cassandraDriver.Client({ contactPoints: contactPoints })
   client.connect()
     .then(function () {
       client.shutdown()
@@ -46,19 +56,18 @@ function checkCassandraDBHealth (callback) {
 }
 
 function getConsistencyLevel (consistency) {
-  let consistencyValue = consistency && _.get(models, `consistencies.${consistency}`)
-    ? _.get(models, `consistencies.${consistency}`) : models.consistencies.one
+  let consistencyValue = consistency && _.get(cassandra, `consistencies.${consistency}`)
+    ? _.get(cassandra, `consistencies.${consistency}`) : cassandra.consistencies.one
   return consistencyValue
 }
 
 function getReplicationStrategy (replicationstrategy) {
-    try {
-      return JSON.parse(replicationstrategy)
-    } catch (e) {
-      console.log('err in getReplicationStrategy', e)
-      return {'class': 'SimpleStrategy', 'replication_factor': 1}
-    }
+  try {
+    return JSON.parse(replicationstrategy)
+  } catch (e) {
+    console.log('err in getReplicationStrategy', e)
+    return { 'class': 'SimpleStrategy', 'replication_factor': 1 }
+  }
 }
 
-module.exports = models
-module.exports.checkCassandraDBHealth = checkCassandraDBHealth
+module.exports = { getConnections, checkCassandraDBHealth }

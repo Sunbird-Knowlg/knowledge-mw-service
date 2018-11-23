@@ -1,7 +1,7 @@
 var _ = require('lodash')
 var ColorUtil = require('./../../utils/colorUtil')
 var colorConvert = new ColorUtil()
-var dbModel = require('./../../utils/cassandraUtil')
+var dbModel = require('./../../utils/cassandraUtil').getConnections('dialcodes')
 var messageUtils = require('./../messageUtil')
 var respUtil = require('response_util')
 var LOG = require('sb_logger_util')

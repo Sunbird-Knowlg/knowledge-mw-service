@@ -3,7 +3,7 @@ var LOG = require('sb_logger_util')
 var path = require('path')
 var _ = require('lodash')
 var filename = path.basename(__filename)
-var dbModel = require('./../../utils/cassandraUtil')
+var dbModel = require('./../../utils/cassandraUtil').getConnections('dialcodes')
 
 var task = null
 
