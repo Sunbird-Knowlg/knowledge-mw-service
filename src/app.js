@@ -131,6 +131,7 @@ require('./routes/formRoutes')(app)
 require('./routes/externalUrlMetaRoute')(app)
 require('./routes/pluginsRoutes')(app)
 require('./routes/collaborationRoutes')(app)
+require('./routes/lockRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
