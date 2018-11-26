@@ -262,7 +262,23 @@ exports.CONTENT = {
     MISSING_MESSAGE: 'Required fields for creating lock',
     FAILED_CODE: 'ERR_LOCK_CREATION_FAILED',
     FAILED_MESSAGE: 'Creating lock failed',
-    ALREADY_LOCKED: 'The content is already locked by {{Name}}'
+    ALREADY_LOCKED: 'The resource is already locked by {{Name}}'
+  },
+
+  REFRESH_LOCK: {
+    MISSING_CODE: 'ERR_LOCK_REFRESHING_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for refreshing lock',
+    FAILED_CODE: 'ERR_LOCK_REFRESHING_FAILED',
+    FAILED_MESSAGE: 'Refreshing lock failed',
+    NOT_FOUND_FAILED_MESSAGE: 'Either resource id is not valid or resource is not locked'
+  },
+
+  RETIRE_LOCK: {
+    MISSING_CODE: 'ERR_LOCK_RETIRING_FIELDS_MISSING',
+    MISSING_MESSAGE: 'Required fields for retiring lock',
+    FAILED_CODE: 'ERR_LOCK_RETIRING_FAILED',
+    FAILED_MESSAGE: 'Retiring lock failed',
+    NOT_FOUND_FAILED_MESSAGE: 'Either resource id is not valid or resource is not locked'
   }
 }
 

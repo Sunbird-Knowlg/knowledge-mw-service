@@ -22,6 +22,11 @@ module.exports.CONTENT = {
     'createdBy': 'required|string',
     'creatorInfo': 'required|string',
     'deviceId': 'required|string'
+  },
+
+  REFRESH_LOCK: {
+    'resourceId': 'required|string',
+    'resourceType': 'required|string'
   }
 
 }

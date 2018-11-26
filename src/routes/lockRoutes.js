@@ -14,15 +14,15 @@ module.exports = function (app) {
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       lockService.createLock)
 
-  // app.route(BASE_URL + '/refresh')
-  //   .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
-  //     collaboratorService.updateCollaborators)
+  app.route(BASE_URL + '/refresh')
+    .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+      lockService.refreshLock)
 
-  // app.route(BASE_URL + '/retire')
-  //   .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
-  //     collaboratorService.updateCollaborators)
+  app.route(BASE_URL + '/retire')
+    .delete(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+      lockService.retireLock)
 
-  // app.route(BASE_URL + '/list')
-  //   .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
-  //     collaboratorService.updateCollaborators)
+  app.route(BASE_URL + '/list')
+    .get(requestMiddleware.createAndValidateRequestBody,
+      lockService.listLock)
 }
