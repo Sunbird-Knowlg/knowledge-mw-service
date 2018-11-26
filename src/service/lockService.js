@@ -24,7 +24,6 @@ var responseCode = messageUtils.RESPONSE_CODE
 var defaultLockExpiryTime = configUtil.getConfig('LOCK_EXPIRY_TIME')
 
 function createLock (req, response) {
-  // var oldDateObj = new Date()
   var newDateObj = createExpiryTime()
   var data = req.body
 
@@ -44,7 +43,6 @@ function createLock (req, response) {
   }
 
   async.waterfall([
-
     function (CBW) {
       checkResourceTypeValidation(req, function (res) {
         if (!res) {
