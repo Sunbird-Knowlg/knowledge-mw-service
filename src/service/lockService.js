@@ -337,7 +337,10 @@ function listLock (req, response) {
     rspObj.telemetryData.object = utilsService.getObjectData(data, 'listLock', '', {})
   }
 
-  dbModel.instance.create_lock.find({}, function (error, result) {
+  var reqObject = {}
+  if (req.query.resourceId) reqObject = { resourceId: req.query.resourceId }
+
+  dbModel.instance.create_lock.find(reqObject, function (error, result) {
     if (error) {
       LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
         'error while fetching lock list data from db', data))
