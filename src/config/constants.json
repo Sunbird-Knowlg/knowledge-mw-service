@@ -1,5 +1,5 @@
 {
-    "orgCacheKeyName": "allRootOrgs",
     "orgCacheExpiryTime": 1800,
-    "orgfieldsAllowedToSend": ["email","orgName"]
+    "orgfieldsAllowedToSend": ["email","orgName"],
+    "orgCacheKeyNamePrefix" : "orgdata-"
 }   
