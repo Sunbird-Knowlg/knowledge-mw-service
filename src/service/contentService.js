@@ -1422,7 +1422,7 @@ function validateContentLock (req, response) {
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
         'Getting content details failed', err))
       rspObj.result.validation = false
-      rspObj.result.message = 'Unable to fetch content details, for locking content'
+      rspObj.result.message = 'Unable to fetch content details'
       return response.status(200).send(respUtil.successResponse(rspObj))
     } else if (res && res.responseCode !== responseCode.SUCCESS) {
       rspObj.result.validation = false
@@ -1433,12 +1433,12 @@ function validateContentLock (req, response) {
         'Getting content details success', res))
       if (res.result.content.status !== 'Draft') {
         rspObj.result.validation = false
-        rspObj.result.message = 'Cannot lock this content as it is not in draft state'
+        rspObj.result.message = 'The operation cannot be completed as content is not in draft state'
         return response.status(200).send(respUtil.successResponse(rspObj))
       } else if (res.result.content.createdBy !== userId &&
         !lodash.includes(res.result.content.collaborators, userId)) {
         rspObj.result.validation = false
-        rspObj.result.message = 'You dont have access to lock this content'
+        rspObj.result.message = 'You are not authorized'
         return response.status(200).send(respUtil.successResponse(rspObj))
       } else {
         rspObj.result.validation = true
