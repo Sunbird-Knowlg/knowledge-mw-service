@@ -235,6 +235,12 @@ function retireLock (req, response) {
             rspObj.responseCode = responseCode.SERVER_ERROR
             return response.status(500).send(respUtil.errorResponse(rspObj))
           } else if (result) {
+            if (result.createdBy !== req.headers['x-authenticated-userid']) {
+              rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
+              rspObj.errMsg = contentMessage.RETIRE_LOCK.FAILED_MESSAGE
+              rspObj.responseCode = responseCode.SERVER_ERROR
+              return response.status(403).send(respUtil.errorResponse(rspObj))
+            }
             dbModel.instance.create_lock.delete({ resourceId: data.request.resourceId },
               { resourceType: data.request.resourceType }, function (err) {
                 if (err) {
