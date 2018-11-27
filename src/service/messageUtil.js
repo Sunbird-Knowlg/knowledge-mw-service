@@ -259,26 +259,38 @@ exports.CONTENT = {
 
   CREATE_LOCK: {
     MISSING_CODE: 'ERR_LOCK_CREATION_FIELDS_MISSING',
-    MISSING_MESSAGE: 'Required fields for creating lock',
+    MISSING_MESSAGE: 'request is required',
     FAILED_CODE: 'ERR_LOCK_CREATION_FAILED',
     FAILED_MESSAGE: 'Creating lock failed',
-    ALREADY_LOCKED: 'The resource is already locked by {{Name}}'
+    ALREADY_LOCKED: 'The resource is already locked by {{Name}}',
+    DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
+    SAME_USER_ERR_MSG: 'The resource is already locked by you in a different window/device'
   },
 
   REFRESH_LOCK: {
     MISSING_CODE: 'ERR_LOCK_REFRESHING_FIELDS_MISSING',
-    MISSING_MESSAGE: 'Required fields for refreshing lock',
+    MISSING_MESSAGE: 'request is required',
     FAILED_CODE: 'ERR_LOCK_REFRESHING_FAILED',
     FAILED_MESSAGE: 'Refreshing lock failed',
-    NOT_FOUND_FAILED_MESSAGE: 'Either resource id is not valid or resource is not locked'
+    NOT_FOUND_FAILED_MESSAGE: 'Resource is not locked',
+    DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
+    UNAUTHORIZED: 'You are not authorized to refresh this resource'
   },
 
   RETIRE_LOCK: {
     MISSING_CODE: 'ERR_LOCK_RETIRING_FIELDS_MISSING',
-    MISSING_MESSAGE: 'Required fields for retiring lock',
+    MISSING_MESSAGE: 'request is required',
     FAILED_CODE: 'ERR_LOCK_RETIRING_FAILED',
     FAILED_MESSAGE: 'Retiring lock failed',
-    NOT_FOUND_FAILED_MESSAGE: 'Either resource id is not valid or resource is not locked'
+    NOT_FOUND_FAILED_MESSAGE: 'Resource is not locked',
+    DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
+    UNAUTHORIZED: 'You are not authorized to refresh this resource'
+  },
+
+  LIST_LOCK: {
+    FAILED_CODE: 'ERR_LISTING_LOCK_FAILED',
+    FAILED_MESSAGE: 'Listing lock failed',
+    DEVICE_ID_MISSING: 'X-device-Id is missing in headers'
   }
 }
 

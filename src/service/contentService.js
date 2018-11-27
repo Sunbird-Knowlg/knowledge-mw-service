@@ -1418,20 +1418,31 @@ function validateContentLock (req, response) {
   var rspObj = req.rspObj
   var userId = req.headers['x-authenticated-userid']
   contentProvider.getContent(req.body.request.resourceId, req.headers, function (err, res) {
-    if (err || res.responseCode !== responseCode.SUCCESS) {
+    if (err) {
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
         'Getting content details failed', err))
       rspObj.result.validation = false
+      rspObj.result.message = 'Unable to fetch content details, for locking content'
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    } else if (res && res.responseCode !== responseCode.SUCCESS) {
+      rspObj.result.validation = false
+      rspObj.result.message = res.params.errmsg
       return response.status(200).send(respUtil.successResponse(rspObj))
     } else {
       LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
         'Getting content details success', res))
-      if (res.result.content.status === 'Draft' && (res.result.content.createdBy === userId ||
-        lodash.includes(res.result.content.collaborators, userId))) {
-        rspObj.result.validation = true
+      if (res.result.content.status !== 'Draft') {
+        rspObj.result.validation = false
+        rspObj.result.message = 'Cannot lock this content as it is not in draft state'
+        return response.status(200).send(respUtil.successResponse(rspObj))
+      } else if (res.result.content.createdBy !== userId &&
+        !lodash.includes(res.result.content.collaborators, userId)) {
+        rspObj.result.validation = false
+        rspObj.result.message = 'You dont have access to lock this content'
         return response.status(200).send(respUtil.successResponse(rspObj))
       } else {
-        rspObj.result.validation = false
+        rspObj.result.validation = true
+        rspObj.result.message = null
         return response.status(200).send(respUtil.successResponse(rspObj))
       }
     }

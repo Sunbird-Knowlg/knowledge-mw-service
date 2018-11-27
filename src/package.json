@@ -27,6 +27,7 @@
     "fs-extra": "5.0.0",
     "gm": "1.23.1",
     "https": "^1.0.0",
+    "joi": "^14.3.0",
     "jsonwebtoken": "8.2.0",
     "lodash": "4.17.4",
     "method-override": "^2.3.5",
