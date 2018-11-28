@@ -8,7 +8,7 @@ var dbModel = require('./../../utils/cassandraUtil').getConnections('dialcodes')
 var task = null
 
 function addUnproccessedItems () {
-  dbModel.instance.dialcode_batch.find({status: 0, $limit: 100}, {allow_filtering: true, raw: true},function (error, batches) {
+  dbModel.instance.dialcode_batch.find({status: 0, $limit: 100}, {allow_filtering: true, raw: true}, function (error, batches) {
     if (error) {
       LOG.error({filename, 'error while getting data from db for scheduled process ': error})
     } else {
