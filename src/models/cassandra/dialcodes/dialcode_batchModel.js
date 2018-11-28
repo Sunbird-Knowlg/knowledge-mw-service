@@ -1,4 +1,5 @@
 module.exports = {
+  table_name: 'dialcode_batch',
   fields: {
     processid: {
       type: 'uuid',

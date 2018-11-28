@@ -23,7 +23,7 @@ function getRootOrgs (requestObj, cb) {
     } else {
       LOG.error(utilsService.getLoggerData({}, 'ERROR',
         filename, 'getRootOrgs', 'error in getting root orgs.', err))
-      return cb(err)
+      process.exit(1)
     }
   })
 }
@@ -44,6 +44,10 @@ function getRootOrgsFromCache (orgfetchquery, tryfromcache, inputdata, cb) {
           if (!err && _.size(cachedata) > 0) {
             return cb(null, cachedata)
           } else {
+            if (err) {
+              LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'getRootOrgsFromCache',
+                'Feching Org details from cache failed.', err))
+            }
             CBW()
           }
         })
@@ -56,21 +60,29 @@ function getRootOrgsFromCache (orgfetchquery, tryfromcache, inputdata, cb) {
         if (err) {
           return cb(err)
         } else {
-          var cacheinputdata = prepareCacheDataToInsert(res.result.response.content)
-          cacheManager.mset({data: cacheinputdata, ttl: configData.orgCacheExpiryTime}, function (err, data) {
-            if (err) {
-              LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'Setting allRootOrgs cache failed',
-                'Setting allRootOrgs cache data failed', err))
-            } else {
-              LOG.info(utilsService.getLoggerData({}, 'INFO', filename,
-                'Setting allRootOrgs cache data success'))
-            }
+          if (_.get(res, 'result.response') && _.get(res.result, 'response.content')) {
+            var cacheinputdata = prepareCacheDataToInsert(res.result.response.content)
+            insertDataToCache(cacheinputdata)
             return cb(null, res.result.response.content)
-          })
+          } else {
+            return cb(null, [])
+          }
         }
       })
     }
   ])
+}
+
+function insertDataToCache (cacheinputdata) {
+  cacheManager.mset({data: cacheinputdata, ttl: configData.orgCacheExpiryTime}, function (err, data) {
+    if (err) {
+      LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'Setting allRootOrgs cache failed',
+        'Setting allRootOrgs cache data failed', err))
+    } else {
+      LOG.info(utilsService.getLoggerData({}, 'INFO', filename,
+        'Setting allRootOrgs cache data success'))
+    }
+  })
 }
 
 /**
@@ -78,66 +90,60 @@ function getRootOrgsFromCache (orgfetchquery, tryfromcache, inputdata, cb) {
  * @param inputdata is array of objects, it might be content or course
  * @param cb callback after success or error
  */
-function populateOrgDetailsByHasTag (inputdata, inputfields, cb) {
-  inputfields = inputfields.split(',')
-  var fieldsToPopulate = configData.orgfieldsAllowedToSend.filter(eachfield => inputfields.includes(eachfield))
-  if (_.size(fieldsToPopulate) > 0 && _.size(inputdata) > 0) {
-    var orgDetails = []
-    var orgFetchQuery = {
-      'request': {
-        'filters': { 'isRootOrg': true }
-      }
+function populateOrgDetailsByHasTag (contents, inputfields, cb) {
+  var orgDetails = []
+  var orgFetchQuery = {
+    'request': {
+      'filters': { 'isRootOrg': true }
     }
-    var tryFromCache = true
-    async.waterfall([
-      // intially fetch all the orgs till the default limit
-      function (CBW) {
-        getRootOrgsFromCache(orgFetchQuery, tryFromCache, inputdata, function (err, orgdata) {
+  }
+  var tryFromCache = true
+  async.waterfall([
+    // intially fetch all the orgs till the default limit
+    function (CBW) {
+      getRootOrgsFromCache(orgFetchQuery, tryFromCache, contents, function (err, orgdata) {
+        if (!err && orgdata) {
+          orgDetails = orgdata
+          return CBW()
+        } else {
+          return cb(null, contents)
+        }
+      })
+    },
+    // fetch the orgs which are not fetched from initial api call
+    function (CBW) {
+      var inputHashTagIds = _.uniq(_.map(contents, 'channel'))
+      var fetchedhashTagIds = _.uniq(_.map(orgDetails, 'hashTagId'))
+      // diff of channels which doesnt exists in inital fetch
+      var hasTagIdsNeedToFetch = _.difference(inputHashTagIds, fetchedhashTagIds)
+      orgFetchQuery.request.filters.hashTagId = hasTagIdsNeedToFetch
+      if (hasTagIdsNeedToFetch.length) {
+        // fetch directly from api , as hashTagIdsNeedToFetch are the data which are not found from first api query
+        tryFromCache = false
+        getRootOrgsFromCache(orgFetchQuery, tryFromCache, contents, function (err, orgdata) {
           if (!err && orgdata) {
-            orgDetails = orgdata
+            orgDetails = _.concat(orgDetails, orgdata)
             return CBW()
           } else {
-            return cb(null, inputdata)
+            return cb(null, contents)
           }
         })
-      },
-      // fetch the orgs which are not fetched from initial api call
-      function (CBW) {
-        var inputHashTagIds = _.uniq(_.map(inputdata, 'channel'))
-        var fetchedhashTagIds = _.uniq(_.map(orgDetails, 'hashTagId'))
-        // diff of channels which doesnt exists in inital fetch
-        var hasTagIdsNeedToFetch = _.difference(inputHashTagIds, fetchedhashTagIds)
-        orgFetchQuery.request.filters.hashTagId = hasTagIdsNeedToFetch
-        if (hasTagIdsNeedToFetch.length) {
-          // fetch directly from api , as hashTagIdsNeedToFetch are the data which are not found from first api query
-          tryFromCache = false
-          getRootOrgsFromCache(orgFetchQuery, tryFromCache, inputdata, function (err, orgdata) {
-            if (!err && orgdata) {
-              orgDetails = _.concat(orgDetails, orgdata)
-              return CBW()
-            } else {
-              return cb(null, inputdata)
-            }
-          })
-        } else {
-          CBW()
-        }
-      },
-      // mapping channel with orgdetails in inputdata
-      function (CBW) {
-        var orgDetailsWithKey = _.keyBy(orgDetails, 'hashTagId')
-        _.forEach(inputdata, (eachcontent, index) => {
-          if (eachcontent.channel) {
-            var eachorgdetail = orgDetailsWithKey[eachcontent.channel]
-            inputdata[index].orgDetails = eachorgdetail ? _.pick(eachorgdetail, fieldsToPopulate) : {}
-          }
-        })
-        return cb(null, inputdata)
+      } else {
+        CBW()
       }
-    ])
-  } else {
-    return cb(null, inputdata)
-  }
+    },
+    // mapping channel with orgdetails in contents
+    function (CBW) {
+      var orgDetailsWithKey = _.keyBy(orgDetails, 'hashTagId')
+      _.forEach(contents, (eachcontent, index) => {
+        if (eachcontent.channel) {
+          var eachorgdetail = orgDetailsWithKey[eachcontent.channel]
+          contents[index].orgDetails = eachorgdetail ? _.pick(eachorgdetail, inputfields) : {}
+        }
+      })
+      return cb(null, contents)
+    }
+  ])
 }
 
 /**
@@ -147,17 +153,22 @@ function populateOrgDetailsByHasTag (inputdata, inputfields, cb) {
  */
 function includeOrgDetails (req, res, cb) {
   if (_.get(req, 'query.orgdetails') && _.get(res, 'result.content')) {
-    var fields = req.query.orgdetails
+    var inputfields = req.query.orgdetails.split(',')
+    var fieldsToPopulate = configData.orgfieldsAllowedToSend.filter(eachfield => inputfields.includes(eachfield))
     var inputContentIsArray = _.isArray(res.result.content)
-    // res.result.content need to send as array bec populateOrgDetailsByHasTag expects data as array
-    res.result.content = inputContentIsArray ? res.result.content : [res.result.content]
-    populateOrgDetailsByHasTag(res.result.content, fields, function
-      (err, contentwithorgdetails) {
-      if (!err) {
-        res.result.content = inputContentIsArray ? contentwithorgdetails : contentwithorgdetails[0]
-      }
+    // contents need to send as array bec populateOrgDetailsByHasTag expects data as array
+    var contents = inputContentIsArray ? res.result.content : [res.result.content]
+    if (_.size(fieldsToPopulate) && _.size(contents)) {
+      populateOrgDetailsByHasTag(contents, fieldsToPopulate, function
+        (err, contentwithorgdetails) {
+        if (!err) {
+          res.result.content = inputContentIsArray ? contentwithorgdetails : contentwithorgdetails[0]
+        }
+        return cb(null, res)
+      })
+    } else {
       return cb(null, res)
-    })
+    }
   } else {
     return cb(null, res)
   }
