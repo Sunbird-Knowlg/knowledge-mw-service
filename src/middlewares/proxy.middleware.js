@@ -317,7 +317,7 @@ module.exports = function (app) {
     .route(
       '/action' + configUtil.getConfig('REFRESH_LOCK')
     )
-    .post(
+    .patch(
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       lockService.refreshLock
@@ -327,7 +327,7 @@ module.exports = function (app) {
     .route(
       '/action' + configUtil.getConfig('RETIRE_LOCK')
     )
-    .post(
+    .delete(
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       lockService.retireLock

@@ -1420,18 +1420,20 @@ function searchPluginsAPI (req, response, objectType) {
 
 function validateContentLock (req, response) {
   var rspObj = req.rspObj
-  var userId = req.headers['x-authenticated-userid']
+  var userId = req.get('x-authenticated-userid')
   contentProvider.getContent(req.body.request.resourceId, req.headers, function (err, res) {
     if (err) {
+      console.log(1)
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
         'Getting content details failed', err))
       rspObj.result.validation = false
       rspObj.result.message = 'Unable to fetch content details'
-      return response.status(200).send(respUtil.successResponse(rspObj))
+      return response.status(500).send(respUtil.errorResponse(rspObj))
     } else if (res && res.responseCode !== responseCode.SUCCESS) {
+      console.log(2)
       rspObj.result.validation = false
       rspObj.result.message = res.params.errmsg
-      return response.status(200).send(respUtil.successResponse(rspObj))
+      return response.status(500).send(respUtil.errorResponse(rspObj))
     } else {
       LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
         'Getting content details success', res))

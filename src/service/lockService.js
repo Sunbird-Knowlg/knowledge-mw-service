@@ -25,10 +25,9 @@ var defaultLockExpiryTime = configUtil.getConfig('LOCK_EXPIRY_TIME')
 function createLock (req, response) {
   var newDateObj = createExpiryTime()
   var data = req.body
-
   var rspObj = req.rspObj
 
-  if (!req.headers['x-device-id']) {
+  if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.CREATE_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -82,8 +81,8 @@ function createLock (req, response) {
             rspObj.responseCode = responseCode.SERVER_ERROR
             return response.status(500).send(respUtil.errorResponse(rspObj))
           } else if (result) {
-            if (req.headers['x-device-id'] === result.deviceId &&
-            req.headers['x-authenticated-userid'] === result.createdBy) {
+            if (req.get('x-device-id') === result.deviceId &&
+            req.get('x-authenticated-userid') === result.createdBy) {
               rspObj.errMsg = contentMessage.CREATE_LOCK.SAME_USER_ERR_MSG
               var statusCode = 400
             } else {
@@ -104,7 +103,7 @@ function createLock (req, response) {
               resourceInfo: data.request.resourceInfo,
               createdBy: data.request.createdBy,
               creatorInfo: data.request.creatorInfo,
-              deviceId: req.headers['x-device-id'],
+              deviceId: req.get('x-device-id'),
               created_on: new Date(),
               expiresAt: newDateObj
             })
@@ -133,10 +132,9 @@ function createLock (req, response) {
 function refreshLock (req, response) {
   var newDateObj = createExpiryTime()
   var data = req.body
-
   var rspObj = req.rspObj
 
-  if (!req.headers['x-device-id']) {
+  if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.REFRESH_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -190,7 +188,7 @@ function refreshLock (req, response) {
             rspObj.responseCode = responseCode.SERVER_ERROR
             return response.status(500).send(respUtil.errorResponse(rspObj))
           } else if (result) {
-            if (result.createdBy !== req.headers['x-authenticated-userid']) {
+            if (result.createdBy !== req.get('x-authenticated-userid')) {
               rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
               rspObj.errMsg = contentMessage.REFRESH_LOCK.UNAUTHORIZED
               rspObj.responseCode = responseCode.SERVER_ERROR
@@ -230,10 +228,9 @@ function refreshLock (req, response) {
 
 function retireLock (req, response) {
   var data = req.body
-
   var rspObj = req.rspObj
 
-  if (!req.headers['x-device-id']) {
+  if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.RETIRE_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -287,7 +284,7 @@ function retireLock (req, response) {
             rspObj.responseCode = responseCode.SERVER_ERROR
             return response.status(500).send(respUtil.errorResponse(rspObj))
           } else if (result) {
-            if (result.createdBy !== req.headers['x-authenticated-userid']) {
+            if (result.createdBy !== req.get('x-authenticated-userid')) {
               rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
               rspObj.errMsg = contentMessage.RETIRE_LOCK.UNAUTHORIZED
               rspObj.responseCode = responseCode.SERVER_ERROR
@@ -325,7 +322,7 @@ function listLock (req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
-  if (!req.headers['x-device-id']) {
+  if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.LIST_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.LIST_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -337,10 +334,16 @@ function listLock (req, response) {
     rspObj.telemetryData.object = utilsService.getObjectData(data, 'listLock', '', {})
   }
 
-  var reqObject = {}
-  if (req.query.resourceId) reqObject = { resourceId: req.query.resourceId }
+  var query = {}
+  if (lodash.get(data, 'request.filters')) {
+    if (typeof data.request.filters === 'string') {
+      query = { resourceId: { '$in': [ data.request.filters ] } }
+    } else {
+      query = { resourceId: { '$in': data.request.filters } }
+    }
+  }
 
-  dbModel.instance.create_lock.find(reqObject, function (error, result) {
+  dbModel.instance.create_lock.find(query, function (error, result) {
     if (error) {
       LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
         'error while fetching lock list data from db', data))
@@ -383,7 +386,7 @@ function checkResourceTypeValidation (req, CBW) {
   switch (lodash.lowerCase(req.body.request.resourceType)) {
   case 'content':
     var httpOptions = {
-      url: configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/api/v1/content/getContentLock',
+      url: configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/api/v1/content/getContentLockValidation',
       headers: req.headers,
       method: 'POST',
       body: req.body,

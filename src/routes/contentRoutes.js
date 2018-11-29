@@ -73,6 +73,6 @@ module.exports = function (app) {
     .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       contentService.copyContentAPI)
 
-  app.route(BASE_URL + '/getContentLock')
+  app.route(BASE_URL + '/getContentLockValidation')
     .post(requestMiddleware.createAndValidateRequestBody, contentService.validateContentLock)
 }
