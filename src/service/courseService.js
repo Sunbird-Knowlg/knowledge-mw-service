@@ -16,6 +16,7 @@ var _ = require('underscore')
 var courseModel = require('../models/courseModel').COURSE
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
+var orgHelper = require('../helpers/orgHelper')
 
 var filename = path.basename(__filename)
 var courseMessage = messageUtils.COURSE
@@ -126,7 +127,9 @@ function searchCourseAPI (req, response) {
         }
       })
     },
-
+    function (res, CBW) {
+      orgHelper.includeOrgDetails(req, res, CBW)
+    },
     function (res) {
       rspObj.result = res.result
       if (res.result.content) {
@@ -457,7 +460,9 @@ function getCourseAPI (req, response) {
         }
       })
     },
-
+    function (res, CBW) {
+      orgHelper.includeOrgDetails(req, res, CBW)
+    },
     function (res) {
       rspObj.result = transformResBody(res.result, 'content', 'course')
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseAPI',
@@ -574,7 +579,9 @@ function getCourseHierarchyAPI (req, response) {
         }
       })
     },
-
+    function (res, CBW) {
+      orgHelper.includeOrgDetails(req, res, CBW)
+    },
     function (res) {
       rspObj.result = res.result
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseHierarchyAPI',

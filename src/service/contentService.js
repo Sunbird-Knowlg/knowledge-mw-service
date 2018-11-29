@@ -20,6 +20,7 @@ var contentModel = require('../models/contentModel').CONTENT
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 var emailService = require('./emailService')
+var orgHelper = require('../helpers/orgHelper')
 
 var CacheManager = require('sb_cache_manager')
 var cacheManager = new CacheManager({})
@@ -130,11 +131,11 @@ function search (defaultContentTypes, req, response, objectType) {
                 lodash.get(data, 'result.framework.categories')) {
                   modifyFacetsData(res.result.facets, data.result.framework.categories, language)
                 }
-                CBW(null, res)
+                orgHelper.includeOrgDetails(req, res, CBW)
               }
             })
           } else {
-            CBW(null, res)
+            orgHelper.includeOrgDetails(req, res, CBW)
           }
         }
       })
@@ -623,6 +624,9 @@ function getContentAPI (req, response) {
           CBW(null, res)
         }
       })
+    },
+    function (res, CBW) {
+      orgHelper.includeOrgDetails(req, res, CBW)
     },
     function (res) {
       rspObj.result = res.result
