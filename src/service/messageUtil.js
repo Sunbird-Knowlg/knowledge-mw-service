@@ -590,6 +590,11 @@ exports.DIALCODE = {
     MISSING_MESSAGE: 'Required fields for get publisher are missing',
     FAILED_CODE: 'ERR_GET_PUBLISHER_DIALCODE_FAILED',
     FAILED_MESSAGE: 'GET publisher failed'
+  },
+
+  RELEASE: {
+    FAILED_CODE: 'ERR_RELEASING_DIALCODE_FAILED',
+    FAILED_MESSAGE: 'Unable to release the dial code'
   }
 }
 

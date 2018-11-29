@@ -1,6 +1,7 @@
 var proxy = require('express-http-proxy')
 var contentService = require('../service/contentService')
 var collaboratorService = require('../service/collaboratorService')
+var dialCodeService = require('../service/dialCodeService')
 var lockService = require('../service/lockService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var configUtil = require('sb-config-util')
@@ -301,6 +302,26 @@ module.exports = function (app) {
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser,
       collaboratorService.updateCollaborators
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('RESERVE_DIALCODE') + '/:contentId'
+    )
+    .post(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      dialCodeService.reserveDialCode
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('RELEASE_DIALCODE') + '/:contentId'
+    )
+    .patch(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      dialCodeService.releaseDialCode
     )
 
   app
