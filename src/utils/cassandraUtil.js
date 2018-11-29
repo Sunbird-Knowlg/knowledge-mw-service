@@ -11,7 +11,7 @@ var keyspaceConfig = [{
   'name': 'dialcodes',
   'schemaPath': require('./../models/cassandra/dialcodes')
 }, {
-  'name': 'lock',
+  'name': 'lock_db',
   'schemaPath': require('./../models/cassandra/lock')
 }]
 

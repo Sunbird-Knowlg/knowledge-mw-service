@@ -14,7 +14,7 @@ var request = require('request')
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 var lodash = require('lodash')
-var dbModel = require('./../utils/cassandraUtil').getConnections('lock')
+var dbModel = require('./../utils/cassandraUtil').getConnections('lock_db')
 var Joi = require('joi')
 
 var filename = path.basename(__filename)
@@ -71,7 +71,7 @@ function createLock (req, response) {
       })
     },
     function (CBW) {
-      dbModel.instance.create_lock.findOne({ resourceId: data.request.resourceId },
+      dbModel.instance.lock.findOne({ resourceId: data.request.resourceId },
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
@@ -97,7 +97,7 @@ function createLock (req, response) {
             rspObj.responseCode = responseCode.CLIENT_ERROR
             return response.status(statusCode).send(respUtil.errorResponse(rspObj))
           } else {
-            var lockObject = new dbModel.instance.create_lock({
+            var lockObject = new dbModel.instance.lock({
               resourceId: data.request.resourceId,
               resourceType: data.request.resourceType,
               resourceInfo: data.request.resourceInfo,
@@ -178,7 +178,7 @@ function refreshLock (req, response) {
       })
     },
     function (CBW) {
-      dbModel.instance.create_lock.findOne({ resourceId: data.request.resourceId },
+      dbModel.instance.lock.findOne({ resourceId: data.request.resourceId },
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
@@ -195,7 +195,7 @@ function refreshLock (req, response) {
               return response.status(403).send(respUtil.errorResponse(rspObj))
             }
             var options = { ttl: defaultLockExpiryTime, if_exists: true }
-            dbModel.instance.create_lock.update(
+            dbModel.instance.lock.update(
               { resourceId: data.request.resourceId },
               { expiresAt: newDateObj }, options, function (err) {
                 if (err) {
@@ -274,7 +274,7 @@ function retireLock (req, response) {
       })
     },
     function (CBW) {
-      dbModel.instance.create_lock.findOne({ resourceId: data.request.resourceId },
+      dbModel.instance.lock.findOne({ resourceId: data.request.resourceId },
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
@@ -290,7 +290,7 @@ function retireLock (req, response) {
               rspObj.responseCode = responseCode.SERVER_ERROR
               return response.status(403).send(respUtil.errorResponse(rspObj))
             }
-            dbModel.instance.create_lock.delete({ resourceId: data.request.resourceId },
+            dbModel.instance.lock.delete({ resourceId: data.request.resourceId },
               { resourceType: data.request.resourceType }, function (err) {
                 if (err) {
                   LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while deleting data to db',
@@ -343,7 +343,7 @@ function listLock (req, response) {
     }
   }
 
-  dbModel.instance.create_lock.find(query, function (error, result) {
+  dbModel.instance.lock.find(query, function (error, result) {
     if (error) {
       LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
         'error while fetching lock list data from db', data))
@@ -379,7 +379,9 @@ function validateCommonRequestBody (request) {
 }
 
 function createExpiryTime () {
-  return new Date().setTime(new Date().getTime() + (defaultLockExpiryTime * 1000))
+  var dateObj = new Date()
+  dateObj.setTime(new Date().getTime() + (defaultLockExpiryTime * 1000))
+  return dateObj
 }
 
 function checkResourceTypeValidation (req, CBW) {

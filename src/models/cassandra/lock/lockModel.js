@@ -1,5 +1,5 @@
 module.exports = {
-  table_name: 'create_lock',
+  table_name: 'lock',
   fields: {
     resourceId: 'text',
     resourceType: 'text',
