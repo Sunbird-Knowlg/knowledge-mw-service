@@ -52,4 +52,12 @@ module.exports = function (app) {
 
   app.route(BASE_URL + '/process/status/:processId')
     .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.getProcessIdStatusAPI)
+
+  app.route(BASE_URL + '/reserve/:contentId')
+    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+      dialCodeService.reserveDialCode)
+
+  app.route(BASE_URL + '/release/:contentId')
+    .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+      dialCodeService.releaseDialCode)
 }
