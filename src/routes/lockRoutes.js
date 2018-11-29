@@ -23,6 +23,6 @@ module.exports = function (app) {
       lockService.retireLock)
 
   app.route(BASE_URL + '/list')
-    .get(requestMiddleware.createAndValidateRequestBody,
+    .post(requestMiddleware.createAndValidateRequestBody,
       lockService.listLock)
 }
