@@ -6,7 +6,7 @@ module.exports = {
     resourceInfo: 'text',
     createdBy: 'text',
     creatorInfo: 'text',
-    created_on: 'timestamp',
+    createdOn: 'timestamp',
     deviceId: 'text',
     expiresAt: 'timestamp'
   },

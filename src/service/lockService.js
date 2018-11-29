@@ -104,7 +104,7 @@ function createLock (req, response) {
               createdBy: data.request.createdBy,
               creatorInfo: data.request.creatorInfo,
               deviceId: req.get('x-device-id'),
-              created_on: new Date(),
+              createdOn: new Date(),
               expiresAt: newDateObj
             })
 
@@ -123,7 +123,7 @@ function createLock (req, response) {
     },
 
     function () {
-      rspObj.result.expiresIn = new Date(newDateObj).getTime()
+      rspObj.result.expiresAt = newDateObj
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -220,7 +220,7 @@ function refreshLock (req, response) {
     },
 
     function () {
-      rspObj.result.expiresIn = new Date(newDateObj).getTime()
+      rspObj.result.expiresAt = newDateObj
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -335,11 +335,11 @@ function listLock (req, response) {
   }
 
   var query = {}
-  if (lodash.get(data, 'request.filters')) {
+  if (lodash.get(data, 'request.filters.resourceId')) {
     if (typeof data.request.filters === 'string') {
-      query = { resourceId: { '$in': [ data.request.filters ] } }
+      query = { resourceId: { '$in': [ data.request.filters.resourceId ] } }
     } else {
-      query = { resourceId: { '$in': data.request.filters } }
+      query = { resourceId: { '$in': data.request.filters.resourceId } }
     }
   }
 
@@ -400,7 +400,7 @@ function checkResourceTypeValidation (req, CBW) {
     })
     break
   default:
-    return false
+    CBW(false, 'Resource type is not valid')
   }
 }
 
