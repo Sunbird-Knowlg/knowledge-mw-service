@@ -320,6 +320,6 @@ module.exports = function (app) {
     .patch(
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
-      dialCodeService.reserveDialCode
+      dialCodeService.releaseDialCode
     )
 }
