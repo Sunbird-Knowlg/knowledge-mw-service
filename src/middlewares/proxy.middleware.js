@@ -305,7 +305,7 @@ module.exports = function (app) {
 
   app
     .route(
-      configUtil.getConfig('CREATE_LOCK')
+      '/action' + configUtil.getConfig('CREATE_LOCK')
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -315,7 +315,7 @@ module.exports = function (app) {
 
   app
     .route(
-      configUtil.getConfig('REFRESH_LOCK')
+      '/action' + configUtil.getConfig('REFRESH_LOCK')
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -325,7 +325,7 @@ module.exports = function (app) {
 
   app
     .route(
-      configUtil.getConfig('RETIRE_LOCK')
+      '/action' + configUtil.getConfig('RETIRE_LOCK')
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -335,7 +335,7 @@ module.exports = function (app) {
 
   app
     .route(
-      configUtil.getConfig('LIST_LOCK')
+      '/action' + configUtil.getConfig('LIST_LOCK')
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
