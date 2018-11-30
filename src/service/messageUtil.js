@@ -255,6 +255,42 @@ exports.CONTENT = {
     FAILED_CODE: 'ERR_CONTENT_COLLABORATORS_UPDATE_FAILED',
     FAILED_MESSAGE: 'Update collaborators failed',
     FORBIDDEN: 'FORBIDDEN'
+  },
+
+  CREATE_LOCK: {
+    MISSING_CODE: 'ERR_LOCK_CREATION_FIELDS_MISSING',
+    MISSING_MESSAGE: 'request is required',
+    FAILED_CODE: 'ERR_LOCK_CREATION_FAILED',
+    FAILED_MESSAGE: 'Creating lock failed',
+    ALREADY_LOCKED: 'The resource is already locked by {{Name}}',
+    DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
+    SAME_USER_ERR_MSG: 'The resource is already locked by you in a different window/device'
+  },
+
+  REFRESH_LOCK: {
+    MISSING_CODE: 'ERR_LOCK_REFRESHING_FIELDS_MISSING',
+    MISSING_MESSAGE: 'request is required',
+    FAILED_CODE: 'ERR_LOCK_REFRESHING_FAILED',
+    FAILED_MESSAGE: 'Refreshing lock failed',
+    NOT_FOUND_FAILED_MESSAGE: 'Resource is not locked',
+    DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
+    UNAUTHORIZED: 'You are not authorized to refresh this resource'
+  },
+
+  RETIRE_LOCK: {
+    MISSING_CODE: 'ERR_LOCK_RETIRING_FIELDS_MISSING',
+    MISSING_MESSAGE: 'request is required',
+    FAILED_CODE: 'ERR_LOCK_RETIRING_FAILED',
+    FAILED_MESSAGE: 'Retiring lock failed',
+    NOT_FOUND_FAILED_MESSAGE: 'Resource is not locked',
+    DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
+    UNAUTHORIZED: 'You are not authorized to retire this resource'
+  },
+
+  LIST_LOCK: {
+    FAILED_CODE: 'ERR_LISTING_LOCK_FAILED',
+    FAILED_MESSAGE: 'Listing lock failed',
+    DEVICE_ID_MISSING: 'X-device-Id is missing in headers'
   }
 }
 

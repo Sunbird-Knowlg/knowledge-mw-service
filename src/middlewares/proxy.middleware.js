@@ -2,6 +2,7 @@ var proxy = require('express-http-proxy')
 var contentService = require('../service/contentService')
 var collaboratorService = require('../service/collaboratorService')
 var dialCodeService = require('../service/dialCodeService')
+var lockService = require('../service/lockService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var configUtil = require('sb-config-util')
 
@@ -321,5 +322,44 @@ module.exports = function (app) {
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser,
       collaboratorService.updateCollaborators
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('CREATE_LOCK')
+    )
+    .post(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      lockService.createLock
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('REFRESH_LOCK')
+    )
+    .patch(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      lockService.refreshLock
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('RETIRE_LOCK')
+    )
+    .delete(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      lockService.retireLock
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('LIST_LOCK')
+    )
+    .post(
+      requestMiddleware.createAndValidateRequestBody,
+      lockService.listLock
     )
 }
