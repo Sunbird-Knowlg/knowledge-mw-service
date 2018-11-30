@@ -197,6 +197,26 @@ module.exports = function (app) {
     })
   )
 
+  app
+    .route(
+      '/action' + configUtil.getConfig('RESERVE_DIALCODE') + '/:contentId'
+    )
+    .post(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      dialCodeService.reserveDialCode
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('RELEASE_DIALCODE') + '/:contentId'
+    )
+    .patch(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      dialCodeService.releaseDialCode
+    )
+
   app.use(
     '/action/dialcode/*',
     proxy(dialRepoBaseUrl, {
@@ -302,26 +322,6 @@ module.exports = function (app) {
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser,
       collaboratorService.updateCollaborators
-    )
-
-  app
-    .route(
-      '/action' + configUtil.getConfig('RESERVE_DIALCODE') + '/:contentId'
-    )
-    .post(
-      requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
-      dialCodeService.reserveDialCode
-    )
-
-  app
-    .route(
-      '/action' + configUtil.getConfig('RELEASE_DIALCODE') + '/:contentId'
-    )
-    .patch(
-      requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
-      dialCodeService.releaseDialCode
     )
 
   app

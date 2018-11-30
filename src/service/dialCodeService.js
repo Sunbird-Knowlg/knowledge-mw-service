@@ -758,15 +758,21 @@ function reserveDialCode (req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
+  LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'reserveDialCode',
+    'Came in reserveDialcode API'))
+
   async.waterfall([
 
     function (CBW) {
       contentProvider.reserveDialcode(req.params.contentId, data, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reserveDialCode',
+            'Error while fetching data from reserve dialcode API', 'err = ' + err + ', res = ' + res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RELEASE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RELEASE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.CLIENT_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          if (res && res.result) rspObj.result = res.result
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
           CBW(null, res)
@@ -788,7 +794,7 @@ function reserveDialCode (req, response) {
         batchImageService.createRequest(res.result.reservedDialcodes, channel, requestObj.publisher, rspObj,
           function (err, processId) {
             if (err) {
-              LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+              LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reserveDialCode',
                 'Error while creating request to child process for images creation', err))
               res.responseCode = responseCode.PARTIAL_SUCCESS
               return response.status(207).send(respUtil.successResponse(res))
@@ -811,12 +817,16 @@ function reserveDialCode (req, response) {
 function releaseDialCode (req, response) {
   var data = req.body
   var rspObj = req.rspObj
+  LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'releaseDialCode',
+    'Came in releaseDialcode API'))
 
   async.waterfall([
 
     function (CBW) {
       contentProvider.releaseDialcode(req.params.contentId, data, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'releaseDialCode',
+            'Error while fetching release dial code API', 'err = ' + err + ', res = ' + res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RELEASE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RELEASE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.CLIENT_ERROR
