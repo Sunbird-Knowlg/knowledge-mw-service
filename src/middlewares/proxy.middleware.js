@@ -198,7 +198,7 @@ module.exports = function (app) {
 
   app
     .route(
-      '/action' + configUtil.getConfig('RESERVE_DIALCODE') + '/:contentId'
+      '/action/dialcode/reserve/:contentId'
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -208,7 +208,7 @@ module.exports = function (app) {
 
   app
     .route(
-      '/action' + configUtil.getConfig('RELEASE_DIALCODE') + '/:contentId'
+      '/action/dialcode/release/:contentId'
     )
     .patch(
       requestMiddleware.createAndValidateRequestBody,
