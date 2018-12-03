@@ -388,7 +388,7 @@ function checkResourceTypeValidation (req, CBW) {
   switch (lodash.lowerCase(req.body.request.resourceType)) {
   case 'content':
     var httpOptions = {
-      url: configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/api/v1/content/getContentLockValidation',
+      url: configUtil.getConfig('CONTENT_SERVICE_LOCAL_BASE_URL') + '/v1/content/getContentLockValidation',
       headers: req.headers,
       method: 'POST',
       body: req.body,
