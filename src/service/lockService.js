@@ -397,6 +397,10 @@ function checkResourceTypeValidation (req, CBW) {
     request(httpOptions, function (err, httpResponse, body) {
       if (err) {
         CBW(false, err)
+      } else if (lodash.get(body, 'result.message')) {
+        CBW(body.result.validation, body.result.message)
+      } else {
+        CBW(false, body)
       }
       CBW(httpResponse.body.result.validation, httpResponse.body.result.message)
     })
