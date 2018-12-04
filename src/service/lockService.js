@@ -396,7 +396,7 @@ function checkResourceTypeValidation (req, CBW) {
     }
     request(httpOptions, function (err, httpResponse, body) {
       if (err) {
-        CBW(false, null)
+        CBW(false, err)
       }
       CBW(httpResponse.body.result.validation, httpResponse.body.result.message)
     })
