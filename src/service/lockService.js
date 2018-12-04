@@ -402,7 +402,6 @@ function checkResourceTypeValidation (req, CBW) {
       } else {
         CBW(false, body)
       }
-      CBW(httpResponse.body.result.validation, httpResponse.body.result.message)
     })
     break
   default:
