@@ -1422,6 +1422,41 @@ function searchPluginsAPI (req, response, objectType) {
   ])
 }
 
+function validateContentLock (req, response) {
+  var rspObj = req.rspObj
+  var userId = req.get('x-authenticated-userid')
+  contentProvider.getContent(req.body.request.resourceId, req.headers, function (err, res) {
+    if (err) {
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
+        'Getting content details failed', err))
+      rspObj.result.validation = false
+      rspObj.result.message = 'Unable to fetch content details'
+      return response.status(500).send(respUtil.errorResponse(rspObj))
+    } else if (res && res.responseCode !== responseCode.SUCCESS) {
+      rspObj.result.validation = false
+      rspObj.result.message = res.params.errmsg
+      return response.status(500).send(respUtil.errorResponse(rspObj))
+    } else {
+      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
+        'Getting content details success', res))
+      if (res.result.content.status !== 'Draft') {
+        rspObj.result.validation = false
+        rspObj.result.message = 'The operation cannot be completed as content is not in draft state'
+        return response.status(200).send(respUtil.successResponse(rspObj))
+      } else if (res.result.content.createdBy !== userId &&
+        !lodash.includes(res.result.content.collaborators, userId)) {
+        rspObj.result.validation = false
+        rspObj.result.message = 'You are not authorized'
+        return response.status(200).send(respUtil.successResponse(rspObj))
+      } else {
+        rspObj.result.validation = true
+        rspObj.result.message = null
+        return response.status(200).send(respUtil.successResponse(rspObj))
+      }
+    }
+  })
+}
+
 module.exports.searchAPI = searchAPI
 module.exports.searchContentAPI = searchContentAPI
 module.exports.createContentAPI = createContentAPI
@@ -1442,3 +1477,4 @@ module.exports.assignBadgeAPI = assignBadge
 module.exports.revokeBadgeAPI = revokeBadge
 module.exports.copyContentAPI = copyContentAPI
 module.exports.searchPluginsAPI = searchPluginsAPI
+module.exports.validateContentLock = validateContentLock

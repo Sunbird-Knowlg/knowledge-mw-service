@@ -36,6 +36,8 @@
         "GET_PUBLISHER_URI": "/dialcode/v3/publisher/read",
         "UPDATE_PUBLISHER_URI": "/dialcode/v3/publisher/update",
         "UPDATE_COLLABORATOR": "/content/v1/collaborator/update",
+        "RESERVE_DIALCODE": "/content/v3/dialcode/reserve",
+        "RELEASE_DIALCODE": "/content/v3/dialcode/release",
         
         "CHANNEL_URI": "/channel/v3/read",
         "CHANNEL_LIST_URI": "/channel/v3/list",
@@ -69,6 +71,11 @@
         "CHANNEL_DATA_EXHAUST_URI": "/data/v3/dataset/request",
         "SYSTEM_UPDATE_CONTENT_URI": "/system/v3/content/update",
         "COPY_CONTENT_URI": "/content/v3/copy",
-        "PLUGINS_SEARCH_URI": "/composite/v3/search"
+        "PLUGINS_SEARCH_URI": "/composite/v3/search",
+
+        "CREATE_LOCK": "/lock/v1/create",
+        "REFRESH_LOCK": "/lock/v1/refresh",
+        "RETIRE_LOCK": "/lock/v1/retire",
+        "LIST_LOCK": "/lock/v1/list"
     }
 }   
