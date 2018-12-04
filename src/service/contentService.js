@@ -74,7 +74,6 @@ function searchContentAPI (req, response) {
 function search (defaultContentTypes, req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
-
   if (!data.request || !data.request.filters) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchContentAPI',
       'Error due to required params are missing', data.request))
@@ -87,6 +86,11 @@ function search (defaultContentTypes, req, response, objectType) {
 
   if (!data.request.filters) {
     data.request.filters.contentType = defaultContentTypes
+  }
+
+  // if fields exists it has to be sent as array to lp
+  if (req.query.fields) {
+    data.request.fields = req.query.fields.split(',')
   }
   if (objectType) {
     data.request.filters.objectType = objectType
