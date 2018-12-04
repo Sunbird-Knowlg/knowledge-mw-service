@@ -768,8 +768,8 @@ function reserveDialCode (req, response) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reserveDialCode',
             'Error while fetching data from reserve dialcode API', 'err = ' + err + ', res = ' + res))
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RELEASE.FAILED_CODE
-          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RELEASE.FAILED_MESSAGE
+          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RESERVE.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RESERVE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.CLIENT_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           if (res && res.result) rspObj.result = res.result

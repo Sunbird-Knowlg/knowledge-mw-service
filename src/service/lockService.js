@@ -61,7 +61,7 @@ function createLock (req, response) {
       checkResourceTypeValidation(req, function (res, msg) {
         if (!res) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createLockAPI',
-            'Error due to required params are missing', data.request))
+            'Error as resource type validation failed', 'res = ' + res + ', msg = ' + msg))
           rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
           rspObj.errMsg = msg
           rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -74,7 +74,7 @@ function createLock (req, response) {
       dbModel.instance.lock.findOne({ resourceId: data.request.resourceId },
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createLockAPI',
               'error while getting data from db', data.request))
             rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.CREATE_LOCK.FAILED_MESSAGE
@@ -110,7 +110,7 @@ function createLock (req, response) {
 
             lockObject.save({ ttl: defaultLockExpiryTime }, function (err) {
               if (err) {
-                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while saving data to db',
+                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createLockAPI',
                   'error while saving lock data from db', err))
                 rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
                 rspObj.errMsg = contentMessage.CREATE_LOCK.FAILED_MESSAGE
@@ -142,7 +142,7 @@ function refreshLock (req, response) {
   }
 
   if (!data.request) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createLockAPI',
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
       'Error due to required params are missing', data.request))
     rspObj.errCode = contentMessage.REFRESH_LOCK.MISSING_CODE
     rspObj.errMsg = contentMessage.REFRESH_LOCK.MISSING_MESSAGE
@@ -168,7 +168,7 @@ function refreshLock (req, response) {
       checkResourceTypeValidation(req, function (res, msg) {
         if (!res) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
-            'Error due to required params are missing', data.request))
+            'Error as resource type validation failed', 'res = ' + res + ', msg = ' + msg))
           rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
           rspObj.errMsg = msg
           rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -181,7 +181,7 @@ function refreshLock (req, response) {
       dbModel.instance.lock.findOne({ resourceId: data.request.resourceId },
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
               'error while getting data from db for refreshing lock', data.request))
             rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.REFRESH_LOCK.FAILED_MESSAGE
@@ -199,7 +199,7 @@ function refreshLock (req, response) {
               { resourceId: data.request.resourceId },
               { expiresAt: newDateObj }, options, function (err) {
                 if (err) {
-                  LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while updating data to db',
+                  LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
                     'error while updating lock data from db', err))
                   rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
                   rspObj.errMsg = contentMessage.REFRESH_LOCK.FAILED_MESSAGE
@@ -209,7 +209,7 @@ function refreshLock (req, response) {
                 CBW()
               })
           } else {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'no data found from db',
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
               'no data found from db for refreshing lock', data.request))
             rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.REFRESH_LOCK.NOT_FOUND_FAILED_MESSAGE
@@ -238,7 +238,7 @@ function retireLock (req, response) {
   }
 
   if (!data.request) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createLockAPI',
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retireLockAPI',
       'Error due to required params are missing', data.request))
     rspObj.errCode = contentMessage.RETIRE_LOCK.MISSING_CODE
     rspObj.errMsg = contentMessage.RETIRE_LOCK.MISSING_MESSAGE
@@ -263,8 +263,8 @@ function retireLock (req, response) {
     function (CBW) {
       checkResourceTypeValidation(req, function (res, msg) {
         if (!res) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
-            'Error due to required params are missing', data.request))
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retireLockAPI',
+            'Error as resource type validation failed', 'res = ' + res + ', msg = ' + msg))
           rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
           rspObj.errMsg = msg
           rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -277,7 +277,7 @@ function retireLock (req, response) {
       dbModel.instance.lock.findOne({ resourceId: data.request.resourceId },
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retireLockAPI',
               'error while getting data from db for retiring lock', data.request))
             rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.RETIRE_LOCK.FAILED_MESSAGE
@@ -293,7 +293,7 @@ function retireLock (req, response) {
             dbModel.instance.lock.delete({ resourceId: data.request.resourceId },
               { resourceType: data.request.resourceType }, function (err) {
                 if (err) {
-                  LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while deleting data to db',
+                  LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retireLockAPI',
                     'error while deleting lock data from db', err))
                   rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
                   rspObj.errMsg = contentMessage.RETIRE_LOCK.FAILED_MESSAGE
@@ -302,7 +302,7 @@ function retireLock (req, response) {
                 } else CBW()
               })
           } else {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'no data found from db',
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retireLockAPI',
               'no data found from db for retiring lock', data.request))
             rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.RETIRE_LOCK.NOT_FOUND_FAILED_MESSAGE
@@ -331,7 +331,7 @@ function listLock (req, response) {
 
   // Adding objectData in telemetry
   if (rspObj.telemetryData) {
-    rspObj.telemetryData.object = utilsService.getObjectData(data, 'listLock', '', {})
+    rspObj.telemetryData.object = utilsService.getObjectData(data, 'ListLockAPI', '', {})
   }
 
   var query = {}
@@ -345,7 +345,7 @@ function listLock (req, response) {
 
   dbModel.instance.lock.find(query, function (error, result) {
     if (error) {
-      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'error while getting data from db',
+      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'ListLockAPI',
         'error while fetching lock list data from db', data))
       rspObj.errCode = contentMessage.LIST_LOCK.FAILED_CODE
       rspObj.errMsg = contentMessage.LIST_LOCK.FAILED_MESSAGE

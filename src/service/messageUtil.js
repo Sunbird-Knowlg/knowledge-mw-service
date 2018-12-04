@@ -595,6 +595,11 @@ exports.DIALCODE = {
   RELEASE: {
     FAILED_CODE: 'ERR_RELEASING_DIALCODE_FAILED',
     FAILED_MESSAGE: 'Unable to release the dial code'
+  },
+
+  RESERVE: {
+    FAILED_CODE: 'ERR_RESERVING_DIALCODE_FAILED',
+    FAILED_MESSAGE: 'Unable to reserve the dial code'
   }
 }
 
