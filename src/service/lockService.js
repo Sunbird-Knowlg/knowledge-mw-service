@@ -75,7 +75,7 @@ function createLock (req, response) {
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createLockAPI',
-              'error while getting data from db', data.request))
+              'error while getting data from db', error))
             rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.CREATE_LOCK.FAILED_MESSAGE
             rspObj.responseCode = responseCode.SERVER_ERROR
@@ -182,7 +182,7 @@ function refreshLock (req, response) {
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
-              'error while getting data from db for refreshing lock', data.request))
+              'error while getting data from db for refreshing lock', error))
             rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.REFRESH_LOCK.FAILED_MESSAGE
             rspObj.responseCode = responseCode.SERVER_ERROR
@@ -278,7 +278,7 @@ function retireLock (req, response) {
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retireLockAPI',
-              'error while getting data from db for retiring lock', data.request))
+              'error while getting data from db for retiring lock', error))
             rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.RETIRE_LOCK.FAILED_MESSAGE
             rspObj.responseCode = responseCode.SERVER_ERROR
@@ -346,7 +346,7 @@ function listLock (req, response) {
   dbModel.instance.lock.find(query, function (error, result) {
     if (error) {
       LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'ListLockAPI',
-        'error while fetching lock list data from db', data))
+        'error while fetching lock list data from db', error))
       rspObj.errCode = contentMessage.LIST_LOCK.FAILED_CODE
       rspObj.errMsg = contentMessage.LIST_LOCK.FAILED_MESSAGE
       rspObj.responseCode = responseCode.SERVER_ERROR
@@ -396,6 +396,8 @@ function checkResourceTypeValidation (req, CBW) {
     }
     request(httpOptions, function (err, httpResponse, body) {
       if (err) {
+        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'checkResourceTypeValidation',
+          'error in lock service in checkResourceTypeValidation', err))
         CBW(false, err)
       } else if (lodash.get(body, 'result.message')) {
         CBW(body.result.validation, body.result.message)
