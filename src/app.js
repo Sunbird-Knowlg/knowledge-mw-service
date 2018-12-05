@@ -104,7 +104,7 @@ app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS')
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization,' +
-                                              'cid, user-id, x-auth, Cache-Control, X-Requested-With, *')
+    'cid, user-id, x-auth, Cache-Control, X-Requested-With, *')
 
   if (req.method === 'OPTIONS') {
     res.sendStatus(200)
@@ -137,12 +137,12 @@ require('./routes/lockRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer () {
+function startServer() {
   this.server = http.createServer(app).listen(port, function () {
     console.log('server running at PORT [%d]', port)
     if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
       console.error('please set environment variable sunbird_environment, sunbird_instance' +
-      'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
+        'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
       process.exit(1)
     }
     contentMetaProvider.getMetaFilterConfig().then((configStr) => {
@@ -174,15 +174,6 @@ if (defaultChannel) {
 exports.close = function () {
   this.server.close()
 }
-
-// schedular to run the failed and queued dialcode items in batch
-require('./service/dialCode/scheduledBatchProcessor')
-
-global.imageBatchProcess = cp.fork(path.join('service', 'dialCode', 'batchImageProcessor.js'))
-
-global.imageBatchProcess.on('exit', function () {
-  global.imageBatchProcess = cp.fork(path.join('service', 'dialCode', 'batchImageProcessor.js'))
-})
 
 // Telemetry initialization
 const telemetryBatchSize = parseInt(process.env.sunbird_telemetry_sync_batch_size, 10) || 20

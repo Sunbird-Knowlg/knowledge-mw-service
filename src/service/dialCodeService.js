@@ -14,21 +14,78 @@ var configUtil = require('sb-config-util')
 
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
-var ImageService = require('./dialCode/imageService')
 var BatchImageService = require('./dialCode/batchImageService')
 var dialCodeServiceHelper = require('./dialCode/dialCodeServiceHelper')
-
+var dbModel = require('./../utils/cassandraUtil').getConnections('dialcodes')
+var ImageService = require('./dialCode/imageService.js')
 var filename = path.basename(__filename)
 var dialCodeMessage = messageUtils.DIALCODE
 var responseCode = messageUtils.RESPONSE_CODE
 
+
+
+function getBatchImageInstance(req){
+  let defaultConfig = {
+    "errorCorrectionLevel": "H",
+    "pixelsPerBlock": 2,
+    "qrCodeMargin": 3,
+    "textFontName": "Verdana",
+    "textFontSize": 11,
+    "textCharacterSpacing": 0.1,
+    "imageFormat": "png",
+    "colourModel": "Grayscale",
+    "imageBorderSize": 1
+  }
+  let config = _.merge(defaultConfig, req.qrCodeSpec);
+  let batchImageService = new BatchImageService(config);
+  return batchImageService;
+}
+
+function prepareQRCodeRequestData(dialcodes, config, channel, publisher, contentId, cb){
+  let imageService = new ImageService(config);
+  //get dialcodes data from DB
+  let tasks = {}
+  let data = {}
+  let dialCodesMap = []
+  for (let index = 0; index < dialcodes.length; index++) {
+    const element = dialcodes[index];
+    tasks[element] = function(callback){
+       imageService.insertImg(element, channel, publisher, callback)
+    }
+  }
+  
+  async.parallelLimit(tasks, 50 ,function(err, results) {
+    // results is now equals to: {one: 1, two: 2}
+    if(err) {
+      cb(err)
+    } else {
+      _.forIn(results, function(fileName, key){
+        let dialData = {
+          "data": process.env.sunbird_dial_code_registry_url+key,
+          "text": key,
+          "id": fileName,
+        };
+        dialCodesMap.push(dialData);
+      })
+      data['dialcodes'] = dialCodesMap;
+      data['objectId'] = contentId || channel;
+      data['config'] = config;
+      data['storage'] = {
+        'container' : 'dial',
+      }
+      data['storage']['path'] = publisher ? (channel + '/' + publisher + '/') : (channel + '/');
+      cb(null, data);
+    }
+});
+
+}
 /**
  * This function helps to generate dialcode
  * @param {type} req
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function generateDialCodeAPI (req, response) {
+function generateDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -80,28 +137,30 @@ function generateDialCodeAPI (req, response) {
     }, function (res, CBW) {
       var requestObj = data && data.request && data.request.dialcodes ? data.request.dialcodes : {}
       if (requestObj.qrCodeSpec && !_.isEmpty(requestObj.qrCodeSpec) && res.result.dialcodes &&
-       res.result.dialcodes.length) {
-        var batchImageService = new BatchImageService({
-          width: requestObj.qrCodeSpec.width,
-          height: requestObj.qrCodeSpec.height,
-          border: requestObj.qrCodeSpec.border,
-          text: requestObj.qrCodeSpec.text,
-          errCorrectionLevel: requestObj.qrCodeSpec.errCorrectionLevel,
-          color: requestObj.qrCodeSpec.color
-        })
-        var channel = _.clone(req.headers['x-channel-id'])
-        batchImageService.createRequest(res.result.dialcodes, channel, requestObj.publisher, rspObj,
-          function (err, processId) {
-            if (err) {
-              LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
-                'Error while creating request to child process for images creation', err))
+        res.result.dialcodes.length) {
+          var channel = req.get('x-channel-id');
+        var batchImageService = getBatchImageInstance(requestObj);
+        prepareQRCodeRequestData(res.result.dialcodes, batchImageService.config, channel, requestObj.publisher, null, function(error, data){
+          if(error) {
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+                'Error while creating image bacth request', err))
               res.responseCode = responseCode.PARTIAL_SUCCESS
               return response.status(207).send(respUtil.successResponse(res))
-            } else {
-              res.result.processId = processId
-              CBW(null, res)
-            }
-          })
+          } else {
+              batchImageService.createRequest(data, channel, requestObj.publisher, rspObj,
+            function (err, processId) {
+              if (err) {
+                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+                  'Error while creating image bacth request', err))
+                res.responseCode = responseCode.PARTIAL_SUCCESS
+                return response.status(207).send(respUtil.successResponse(res))
+              } else {
+                res.result.processId = processId
+                CBW(null, res)
+              }
+            })
+          }
+        })
       } else {
         CBW(null, res)
       }
@@ -126,11 +185,11 @@ function generateDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function dialCodeListAPI (req, response) {
+function dialCodeListAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   var qrCodeFlag = !!(data && data.request && data.request.search && data.request.search.qrCodeSpec &&
-     !_.isEmpty(data.request.search.qrCodeSpec))
+    !_.isEmpty(data.request.search.qrCodeSpec))
   var qrCodeConfig = {}
   if (qrCodeFlag) {
     var requestObj = data.request.search
@@ -184,18 +243,28 @@ function dialCodeListAPI (req, response) {
       })
     }, function (res, CBW) {
       if (qrCodeFlag && res.result.dialcodes && res.result.dialcodes.length) {
-        var batchImageService = new BatchImageService(qrCodeConfig)
-        var channel = _.clone(req.headers['x-channel-id'])
+        var batchImageService = getBatchImageInstance(requestObj);
+        var channel = _.clone(req.get('x-channel-id'))
         var dialcodes = _.map(res.result.dialcodes, 'identifier')
-        batchImageService.createRequest(dialcodes, channel, requestObj.publisher, rspObj, function (err, processId) {
-          if (err) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI',
-              'Error while creating request to child process for images creation', err))
-            res.responseCode = responseCode.PARTIAL_SUCCESS
-            return response.status(207).send(respUtil.successResponse(res))
+        prepareQRCodeRequestData(dialcodes, batchImageService.config, channel, requestObj.publisher, null, function(error, data){
+          if(error) {
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+                'Error while creating image bacth request', err))
+              res.responseCode = responseCode.PARTIAL_SUCCESS
+              return response.status(207).send(respUtil.successResponse(res))
           } else {
-            res.result.processId = processId
-            CBW(null, res)
+              batchImageService.createRequest(data, channel, requestObj.publisher, rspObj,
+            function (err, processId) {
+              if (err) {
+                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+                  'Error while creating image bacth request', err))
+                res.responseCode = responseCode.PARTIAL_SUCCESS
+                return response.status(207).send(respUtil.successResponse(res))
+              } else {
+                res.result.processId = processId
+                CBW(null, res)
+              }
+            })
           }
         })
       } else {
@@ -217,7 +286,7 @@ function dialCodeListAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function updateDialCodeAPI (req, response) {
+function updateDialCodeAPI(req, response) {
   var data = req.body
   data.dialCodeId = req.params.dialCodeId
   var rspObj = req.rspObj
@@ -277,7 +346,7 @@ function updateDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function getDialCodeAPI (req, response) {
+function getDialCodeAPI(req, response) {
   var data = {}
   data.body = req.body
   data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
@@ -323,35 +392,6 @@ function getDialCodeAPI (req, response) {
         }
       })
     },
-    function (res, CBW) {
-      var qrCodeSpec = _.get(req, 'body.request.dialcode.qrCodeSpec')
-      if (qrCodeSpec && !_.isEmpty(qrCodeSpec)) {
-        var imgService = new ImageService(
-          { width: qrCodeSpec.width,
-            height: qrCodeSpec.height,
-            border: qrCodeSpec.border,
-            text: qrCodeSpec.text,
-            errCorrectionLevel: qrCodeSpec.errCorrectionLevel,
-            color: qrCodeSpec.color
-          })
-        var dialcode = res.result.dialcode.identifier
-        var channel = res.result.dialcode.channel
-        var publisher = res.result.dialcode.publisher
-        imgService.getImage(dialcode, channel, publisher, undefined, undefined, true, function (err, image) {
-          if (err) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDialCodeAPI',
-              'Generating image error', err))
-            res.responseCode = responseCode.PARTIAL_SUCCESS
-            return response.status(207).send(respUtil.successResponse(res))
-          } else {
-            res.result.dialcode.image = image.url
-            CBW(null, res)
-          }
-        })
-      } else {
-        CBW(null, res)
-      }
-    },
     function (res) {
       rspObj.result = res.result
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDialCodeAPI',
@@ -366,7 +406,7 @@ function getDialCodeAPI (req, response) {
  * @param {type} data
  * @returns {boolean} return response boolean value true or false
  */
-function checkContentLinkRequest (data) {
+function checkContentLinkRequest(data) {
   if (!data.request || !data.request.content || !data.request.content.identifier || !data.request.content.dialcode) {
     return false
   }
@@ -385,7 +425,7 @@ function checkContentLinkRequest (data) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function contentLinkDialCodeAPI (req, response) {
+function contentLinkDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -440,7 +480,7 @@ function contentLinkDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function getProcessIdStatusAPI (req, response) {
+function getProcessIdStatusAPI(req, response) {
   var data = {}
   data.body = req.body
   data.processId = req.params.processId
@@ -476,7 +516,7 @@ function getProcessIdStatusAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function searchDialCodeAPI (req, response) {
+function searchDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -530,7 +570,7 @@ function searchDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function publishDialCodeAPI (req, response) {
+function publishDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   data.dialCodeId = req.params.dialCodeId
@@ -590,7 +630,7 @@ function publishDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function createPublisherAPI (req, response) {
+function createPublisherAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -649,7 +689,7 @@ function createPublisherAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function updatePublisherAPI (req, response) {
+function updatePublisherAPI(req, response) {
   var data = req.body
   data.publisherId = req.params.publisherId
   var rspObj = req.rspObj
@@ -705,7 +745,7 @@ function updatePublisherAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function getPublisherAPI (req, response) {
+function getPublisherAPI(req, response) {
   var data = {}
   data.publisherId = req.params.publisherId
   var rspObj = req.rspObj
@@ -754,12 +794,9 @@ function getPublisherAPI (req, response) {
   ])
 }
 
-function reserveDialCode (req, response) {
+function reserveDialCode(req, response) {
   var data = req.body
   var rspObj = req.rspObj
-
-  LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'reserveDialCode',
-    'Came in reserveDialcode API'))
 
   async.waterfall([
 
@@ -772,7 +809,6 @@ function reserveDialCode (req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RESERVE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.CLIENT_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-          if (res && res.result) rspObj.result = res.result
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
           CBW(null, res)
@@ -782,30 +818,62 @@ function reserveDialCode (req, response) {
       var requestObj = data && data.request && data.request.dialcodes ? data.request.dialcodes : {}
       if (requestObj.qrCodeSpec && !_.isEmpty(requestObj.qrCodeSpec) && res.result.reservedDialcodes &&
         res.result.reservedDialcodes.length) {
-        var batchImageService = new BatchImageService({
-          width: requestObj.qrCodeSpec.width,
-          height: requestObj.qrCodeSpec.height,
-          border: requestObj.qrCodeSpec.border,
-          text: requestObj.qrCodeSpec.text,
-          errCorrectionLevel: requestObj.qrCodeSpec.errCorrectionLevel,
-          color: requestObj.qrCodeSpec.color
-        })
-        var channel = _.clone(req.headers['x-channel-id'])
-        batchImageService.createRequest(res.result.reservedDialcodes, channel, requestObj.publisher, rspObj,
-          function (err, processId) {
-            if (err) {
-              LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reserveDialCode',
-                'Error while creating request to child process for images creation', err))
+        var batchImageService = getBatchImageInstance(requestObj);
+        var channel = _.clone(req.get('x-channel-id'))
+        prepareQRCodeRequestData(res.result.reservedDialcodes, batchImageService.config, channel, requestObj.publisher, req.params.contentId, function(error, data){
+          if(error) {
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+                'Error while creating image bacth request', err))
               res.responseCode = responseCode.PARTIAL_SUCCESS
               return response.status(207).send(respUtil.successResponse(res))
-            } else {
-              res.result.processId = processId
-              CBW(null, res)
-            }
-          })
+          } else {
+              batchImageService.createRequest(data, channel, requestObj.publisher, rspObj,
+            function (err, processId) {
+              if (err) {
+                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
+                  'Error while creating image bacth request', err))
+                res.responseCode = responseCode.PARTIAL_SUCCESS
+                return response.status(207).send(respUtil.successResponse(res))
+              } else {
+                res.result.processId = processId
+                CBW(null, res)
+              }
+            })
+          }
+        })
       } else {
         CBW(null, res)
       }
+    },
+    function (res, CBW) {
+      if(_.get(res, 'result.processId') && _.get(res, 'result.versionKey')){
+        var ekStepReqData ={
+                        "request": {
+                          "content": {
+                            "versionKey": _.get(res, 'result.versionKey'),
+                            "qrCodeProcessId": _.get(res, 'result.processId')
+                          }
+                        }
+                      };
+      contentProvider.updateContent(ekStepReqData, req.params.contentId, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateContentAPI',
+            'Getting error from content provider', res))
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj = utilsService.getErrorResponse(rspObj, res)
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+      } else {
+        CBW(null, res)
+      }
+      
+      
     },
     function (res) {
       rspObj.result = res.result
@@ -814,19 +882,15 @@ function reserveDialCode (req, response) {
   ])
 }
 
-function releaseDialCode (req, response) {
+function releaseDialCode(req, response) {
   var data = req.body
   var rspObj = req.rspObj
-  LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'releaseDialCode',
-    'Came in releaseDialcode API'))
 
   async.waterfall([
 
     function (CBW) {
       contentProvider.releaseDialcode(req.params.contentId, data, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'releaseDialCode',
-            'Error while fetching release dial code API', 'err = ' + err + ', res = ' + res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RELEASE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RELEASE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.CLIENT_ERROR
