@@ -207,6 +207,9 @@ module.exports = function (app) {
       dialCodeService.reserveDialCode
     )
 
+app.route('/action/dialcode/v1/process/status/:processId')
+   .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.getProcessIdStatusAPI);
+
   app
     .route(
       '/action/dialcode/v1/release/:contentId'

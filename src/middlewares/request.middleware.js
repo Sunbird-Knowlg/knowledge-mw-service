@@ -67,7 +67,7 @@ function createAndValidateRequestBody (req, res, next) {
     delete req.headers[e]
   })
 
-  var requestedData = {body: req.body, params: req.body.params, headers: req.headers}
+  var requestedData = { body: req.body, params: req.body.params, headers: req.headers }
   LOG.info(utilsService.getLoggerData(rspObj, 'INFO',
     filename, 'createAndValidateRequestBody', 'API request come', requestedData))
 
@@ -84,39 +84,39 @@ function createAndValidateRequestBody (req, res, next) {
 function validateToken (req, res, next) {
   var token = req.headers['x-authenticated-user-token']
   var rspObj = req.rspObj
+  next()
+  // if (!token) {
+  //   LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'API failed due to missing token'))
+  //   rspObj.errCode = reqMsg.TOKEN.MISSING_CODE
+  //   rspObj.errMsg = reqMsg.TOKEN.MISSING_MESSAGE
+  //   rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+  //   return res.status(401).send(respUtil.errorResponse(rspObj))
+  // }
 
-  if (!token) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'API failed due to missing token'))
-    rspObj.errCode = reqMsg.TOKEN.MISSING_CODE
-    rspObj.errMsg = reqMsg.TOKEN.MISSING_MESSAGE
-    rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
-    return res.status(401).send(respUtil.errorResponse(rspObj))
-  }
-
-  apiInterceptor.validateToken(token, function (err, tokenData) {
-    if (err) {
-      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'Invalid token', err))
-      rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
-      rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
-      rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
-      return res.status(401).send(respUtil.errorResponse(rspObj))
-    } else {
-      var payload = jwt.decode(tokenData.token)
-      delete req.headers['x-authenticated-userid']
-      var url = req.path
-      if (!url.includes('/content/v3/review') &&
-      !url.includes('/v1/content/review') &&
-      !url.includes('/v1/course/review')) {
-        delete req.headers['x-authenticated-user-token']
-      }
-      req.rspObj.userId = tokenData.userId
-      rspObj.telemetryData.actor = utilsService.getTelemetryActorData(req)
-      req.headers['x-authenticated-userid'] = tokenData.userId
-      req.headers['userName'] = payload.name
-      req.rspObj = rspObj
-      next()
-    }
-  })
+  // apiInterceptor.validateToken(token, function (err, tokenData) {
+  //   if (err) {
+  //     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'Invalid token', err))
+  //     rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
+  //     rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
+  //     rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+  //     return res.status(401).send(respUtil.errorResponse(rspObj))
+  //   } else {
+  //     var payload = jwt.decode(tokenData.token)
+  //     delete req.headers['x-authenticated-userid']
+  //     var url = req.path
+  //     if (!url.includes('/content/v3/review') &&
+  //     !url.includes('/v1/content/review') &&
+  //     !url.includes('/v1/course/review')) {
+  //       delete req.headers['x-authenticated-user-token']
+  //     }
+  //     req.rspObj.userId = tokenData.userId
+  //     rspObj.telemetryData.actor = utilsService.getTelemetryActorData(req)
+  //     req.headers['x-authenticated-userid'] = tokenData.userId
+  //     req.headers['userName'] = payload.name
+  //     req.rspObj = rspObj
+  //     next()
+  //   }
+  // })
 }
 
 /**
@@ -135,7 +135,7 @@ function apiAccessForCreatorUser (req, response, next) {
   var contentMessage = messageUtil.CONTENT
 
   data.contentId = req.params.contentId
-
+  console.log('req.headers:', req.headers)
   async.waterfall([
 
     function (CBW) {
@@ -158,7 +158,7 @@ function apiAccessForCreatorUser (req, response, next) {
       if (res.result.content.createdBy !== userId) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR',
           filename, 'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
-          {createBy: res.result.content.createdBy, userId: userId}))
+          { createBy: res.result.content.createdBy, userId: userId }))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
@@ -248,7 +248,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
   data.contentId = _.findKey(hierarchy, function (item) {
     if (item.root === true) return item
   })
-
+  console.log('req.headers:', req.headers)
   async.waterfall([
     function (CBW) {
       contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function (err, res) {
@@ -269,7 +269,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
       if (res.result.content.createdBy !== userId) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
           'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
-          {createBy: res.result.content.createdBy, userId: userId}))
+          { createBy: res.result.content.createdBy, userId: userId }))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
