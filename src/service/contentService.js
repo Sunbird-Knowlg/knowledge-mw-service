@@ -1427,17 +1427,19 @@ function validateContentLock (req, response) {
   var userId = req.get('x-authenticated-userid')
   contentProvider.getContent(req.body.request.resourceId, req.headers, function (err, res) {
     if (err) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'validateContentLock',
         'Getting content details failed', err))
       rspObj.result.validation = false
       rspObj.result.message = 'Unable to fetch content details'
       return response.status(500).send(respUtil.errorResponse(rspObj))
     } else if (res && res.responseCode !== responseCode.SUCCESS) {
+      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'validateContentLock',
+        'Getting content details failed', res))
       rspObj.result.validation = false
       rspObj.result.message = res.params.errmsg
       return response.status(500).send(respUtil.errorResponse(rspObj))
     } else {
-      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
+      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'validateContentLock',
         'Getting content details success', res))
       if (res.result.content.status !== 'Draft') {
         rspObj.result.validation = false
@@ -1450,7 +1452,7 @@ function validateContentLock (req, response) {
         return response.status(200).send(respUtil.successResponse(rspObj))
       } else {
         rspObj.result.validation = true
-        rspObj.result.message = null
+        rspObj.result.message = 'Content successfully validated'
         return response.status(200).send(respUtil.successResponse(rspObj))
       }
     }

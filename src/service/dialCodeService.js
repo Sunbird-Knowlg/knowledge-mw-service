@@ -806,6 +806,7 @@ function reserveDialCode (req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RESERVE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.CLIENT_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          if (res && res.result) rspObj.result = res.result
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
           CBW(null, res)
@@ -817,27 +818,28 @@ function reserveDialCode (req, response) {
         res.result.reservedDialcodes.length) {
         var batchImageService = getBatchImageInstance(requestObj)
         var channel = _.clone(req.get('x-channel-id'))
-        prepareQRCodeRequestData(res.result.reservedDialcodes, batchImageService.config, channel, requestObj.publisher, req.params.contentId, function (error, data) {
-          if (error) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
-              'Error while creating image bacth request', err))
-            res.responseCode = responseCode.PARTIAL_SUCCESS
-            return response.status(207).send(respUtil.successResponse(res))
-          } else {
-            batchImageService.createRequest(data, channel, requestObj.publisher, rspObj,
-              function (err, processId) {
-                if (err) {
-                  LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
-                    'Error while creating image bacth request', err))
-                  res.responseCode = responseCode.PARTIAL_SUCCESS
-                  return response.status(207).send(respUtil.successResponse(res))
-                } else {
-                  res.result.processId = processId
-                  CBW(null, res)
-                }
-              })
-          }
-        })
+        prepareQRCodeRequestData(res.result.reservedDialcodes, batchImageService.config, channel,
+          requestObj.publisher, req.params.contentId, function (error, data) {
+            if (error) {
+              LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reserveDialCodeAPI',
+                'Error while creating image bacth request in reserveDialCodeAPI', error))
+              res.responseCode = responseCode.PARTIAL_SUCCESS
+              return response.status(207).send(respUtil.successResponse(res))
+            } else {
+              batchImageService.createRequest(data, channel, requestObj.publisher, rspObj,
+                function (err, processId) {
+                  if (err) {
+                    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reserveDialCodeAPI',
+                      'Error while creating image bacth request in reserveDialCodeAPI', err))
+                    res.responseCode = responseCode.PARTIAL_SUCCESS
+                    return response.status(207).send(respUtil.successResponse(res))
+                  } else {
+                    res.result.processId = processId
+                    CBW(null, res)
+                  }
+                })
+            }
+          })
       } else {
         CBW(null, res)
       }
@@ -854,10 +856,10 @@ function reserveDialCode (req, response) {
         }
         contentProvider.updateContent(ekStepReqData, req.params.contentId, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateContentAPI',
-              'Getting error from content provider', res))
-            rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
-            rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
+            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reserveDialCodeAPI',
+              'Getting error in update content in reserveDialCode API', 'err = ' + err + ', res = ' + res))
+            rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RESERVE.FAILED_CODE
+            rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RESERVE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -886,6 +888,8 @@ function releaseDialCode (req, response) {
     function (CBW) {
       contentProvider.releaseDialcode(req.params.contentId, data, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'releaseDialCodeAPI',
+            'Getting error from releaseDialCode API', 'err = ' + err + ', res = ' + res))
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RELEASE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RELEASE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.CLIENT_ERROR
