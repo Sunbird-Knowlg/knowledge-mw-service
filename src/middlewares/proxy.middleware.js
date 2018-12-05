@@ -315,7 +315,7 @@ module.exports = function (app) {
 
   app
     .route(
-      configUtil.getConfig('UPDATE_COLLABORATOR') + '/:contentId'
+      '/action' + configUtil.getConfig('UPDATE_COLLABORATOR') + '/:contentId'
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,

@@ -143,7 +143,7 @@ function apiAccessForCreatorUser (req, response, next) {
         function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-              'apiAccessForCreatorUser', 'Getting error from content provider', res))
+              'apiAccessForCreatorUser', 'Getting error from content provider', 'err = ' + err + ', res = ' + res))
             rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -194,7 +194,7 @@ function apiAccessForReviewerUser (req, response, next) {
         function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-              'apiAccessForReviewerUser', 'Getting error from content provider', res))
+              'apiAccessForReviewerUser', 'Getting error from content provider', 'err = ' + err + ', res = ' + res))
             rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -254,7 +254,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
       contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-            'apiAccessForCreatorUser', 'Getting error from content provider', res))
+            'apiAccessForCreatorUser', 'Getting error from content provider', 'err = ' + err + ', res = ' + res))
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
