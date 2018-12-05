@@ -37,12 +37,11 @@ const KafkaService = {
     const record = [
       {
         topic: process.env.sunbird_qrimage_topic, // "sunbirddev.qrimage.request",
-        messages: event,
+        messages: JSON.stringify(event),
         key: data.objectId
 
       }
     ]
-
     LOG.info({'kafkaRecord': record})
     // Send record to Kafka and log result/error
     producer.send(record, callback)
