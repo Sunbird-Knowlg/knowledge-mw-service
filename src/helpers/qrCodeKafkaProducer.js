@@ -4,7 +4,7 @@ const _ = require('lodash')
 var LOG = require('sb_logger_util')
 
 const client = new kafka.KafkaClient({
-  kafkaHost: process.env.sunbird_kafkaHost || 'localhost:9092',
+  kafkaHost: process.env.sunbird_kafka_host || 'localhost:9092',
   maxAsyncRequests: 100
 })
 
