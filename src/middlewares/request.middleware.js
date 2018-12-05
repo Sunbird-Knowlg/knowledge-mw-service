@@ -36,7 +36,7 @@ var apiInterceptor = new ApiInterceptor(keyCloakConfig, cacheConfig)
  * @param {type} next
  * @returns {unresolved}
  */
-function createAndValidateRequestBody(req, res, next) {
+function createAndValidateRequestBody (req, res, next) {
   req.body.ts = new Date()
   req.body.url = req.url
   req.body.path = req.route.path
@@ -81,7 +81,7 @@ function createAndValidateRequestBody(req, res, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function validateToken(req, res, next) {
+function validateToken (req, res, next) {
   var token = req.headers['x-authenticated-user-token']
   var rspObj = req.rspObj
   next()
@@ -125,7 +125,7 @@ function validateToken(req, res, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForCreatorUser(req, response, next) {
+function apiAccessForCreatorUser (req, response, next) {
   var userId = req.headers['x-authenticated-userid']
   var data = {}
   var rspObj = req.rspObj
@@ -176,7 +176,7 @@ function apiAccessForCreatorUser(req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForReviewerUser(req, response, next) {
+function apiAccessForReviewerUser (req, response, next) {
   var userId = req.headers['x-authenticated-userid']
   var data = {}
   var rspObj = req.rspObj
@@ -226,7 +226,7 @@ function apiAccessForReviewerUser(req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function hierarchyUpdateApiAccess(req, response, next) {
+function hierarchyUpdateApiAccess (req, response, next) {
   var userId = req.headers['x-authenticated-userid']
   var data = req.body
   var rspObj = req.rspObj
@@ -287,7 +287,7 @@ function hierarchyUpdateApiAccess(req, response, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function checkChannelID(req, res, next) {
+function checkChannelID (req, res, next) {
   var channelID = req.headers['x-channel-id']
   var rspObj = req.rspObj
 
