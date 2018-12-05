@@ -318,7 +318,7 @@ app.route('/action/dialcode/v1/process/status/:processId')
 
   app
     .route(
-      configUtil.getConfig('UPDATE_COLLABORATOR') + '/:contentId'
+      '/action' + configUtil.getConfig('UPDATE_COLLABORATOR') + '/:contentId'
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
