@@ -858,8 +858,8 @@ function reserveDialCode (req, response) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reserveDialCodeAPI',
               'Getting error in update content in reserveDialCode API', 'err = ' + err + ', res = ' + res))
-            rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RELEASE.FAILED_CODE
-            rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RELEASE.FAILED_MESSAGE
+            rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RESERVE.FAILED_CODE
+            rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RESERVE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj = utilsService.getErrorResponse(rspObj, res)
