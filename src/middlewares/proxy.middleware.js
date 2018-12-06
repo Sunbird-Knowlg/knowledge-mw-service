@@ -207,8 +207,8 @@ module.exports = function (app) {
       dialCodeService.reserveDialCode
     )
 
-app.route('/action/dialcode/v1/process/status/:processId')
-   .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.getProcessIdStatusAPI);
+  app.route('/action/dialcode/v1/process/status/:processId')
+    .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.getProcessIdStatusAPI)
 
   app
     .route(
@@ -218,6 +218,56 @@ app.route('/action/dialcode/v1/process/status/:processId')
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       dialCodeService.releaseDialCode
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('UPDATE_COLLABORATOR') + '/:contentId'
+    )
+    .patch(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      requestMiddleware.apiAccessForCreatorUser,
+      collaboratorService.updateCollaborators
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('CREATE_LOCK')
+    )
+    .post(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      lockService.createLock
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('REFRESH_LOCK')
+    )
+    .patch(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      lockService.refreshLock
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('RETIRE_LOCK')
+    )
+    .delete(
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      lockService.retireLock
+    )
+
+  app
+    .route(
+      '/action' + configUtil.getConfig('LIST_LOCK')
+    )
+    .post(
+      requestMiddleware.createAndValidateRequestBody,
+      lockService.listLock
     )
 
   app.use(
@@ -315,54 +365,4 @@ app.route('/action/dialcode/v1/process/status/:processId')
       }
     })
   )
-
-  app
-    .route(
-      '/action' + configUtil.getConfig('UPDATE_COLLABORATOR') + '/:contentId'
-    )
-    .post(
-      requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
-      requestMiddleware.apiAccessForCreatorUser,
-      collaboratorService.updateCollaborators
-    )
-
-  app
-    .route(
-      '/action' + configUtil.getConfig('CREATE_LOCK')
-    )
-    .post(
-      requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
-      lockService.createLock
-    )
-
-  app
-    .route(
-      '/action' + configUtil.getConfig('REFRESH_LOCK')
-    )
-    .patch(
-      requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
-      lockService.refreshLock
-    )
-
-  app
-    .route(
-      '/action' + configUtil.getConfig('RETIRE_LOCK')
-    )
-    .delete(
-      requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
-      lockService.retireLock
-    )
-
-  app
-    .route(
-      '/action' + configUtil.getConfig('LIST_LOCK')
-    )
-    .post(
-      requestMiddleware.createAndValidateRequestBody,
-      lockService.listLock
-    )
 }
