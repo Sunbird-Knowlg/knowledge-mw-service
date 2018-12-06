@@ -396,8 +396,8 @@ function sendContentEmail (req, action, callback) {
         body = body.replace(/{{Content type}}/g, cData.contentType)
           .replace(/{{Content title}}/g, cData.name)
           .replace(/{{Content link}}/g, contentLink)
-          .replace(/{{Creator name}}/g, req.headers['userName'])
-          .replace(/{{Reviewer name}}/g, req.headers['userName'])
+          .replace(/{{Creator name}}/g, req.rspObj.userName)
+          .replace(/{{Reviewer name}}/g, req.rspObj.userName)
 
         // Fetching email request body for sending email
         var lsEmailData = {
@@ -498,8 +498,8 @@ function reviewContentEmail (req, callback) {
         body = body.replace(/{{Content type}}/g, cData.contentType)
           .replace(/{{Content title}}/g, cData.name)
           .replace(/{{Content link}}/g, contentLink)
-          .replace(/{{Creator name}}/g, req.headers['userName'])
-          .replace(/{{Reviewer name}}/g, req.headers['userName'])
+          .replace(/{{Creator name}}/g, req.rspObj.userName)
+          .replace(/{{Reviewer name}}/g, req.rspObj.userName)
 
         getReviwerUserIds(req, data.userDetails.result.response.content[0],
           data.contentDetails.result.content.contentType, function (err, userIds) {
