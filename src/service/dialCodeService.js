@@ -854,17 +854,20 @@ function reserveDialCode (req, response) {
             }
           }
         }
-        contentProvider.updateContent(ekStepReqData, req.params.contentId, req.headers, function (err, res) {
+        contentProvider.updateContent(ekStepReqData, req.params.contentId, req.headers, function (err, updateResponse) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reserveDialCodeAPI',
-              'Getting error in update content in reserveDialCode API', 'err = ' + err + ', res = ' + res))
-            rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RESERVE.FAILED_CODE
-            rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RESERVE.FAILED_MESSAGE
-            rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-            var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-            rspObj = utilsService.getErrorResponse(rspObj, res)
+              'Getting error in update content in reserveDialCode API', 'err = ' + err + ', res = ' + updateResponse))
+            rspObj.errCode = updateResponse && updateResponse.params ? updateResponse.params.err : dialCodeMessage.RESERVE.FAILED_CODE
+            rspObj.errMsg = updateResponse && updateResponse.params ? updateResponse.params.errmsg : dialCodeMessage.RESERVE.FAILED_MESSAGE
+            rspObj.responseCode = updateResponse && updateResponse.responseCode ? updateResponse.responseCode : responseCode.SERVER_ERROR
+            var httpStatus = updateResponse && updateResponse.statusCode >= 100 && updateResponse.statusCode < 600 ? updateResponse.statusCode : 500
+            rspObj = utilsService.getErrorResponse(rspObj, updateResponse)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           } else {
+            if(_.get(updateResponse, 'result.versionKey')){
+              res['result']['versionKey'] = _.get(updateResponse, 'result.versionKey');
+            }
             CBW(null, res)
           }
         })
