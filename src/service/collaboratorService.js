@@ -155,7 +155,7 @@ function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
         var body = eData.BODY.replace(/{{Content type}}/g, cData.contentType)
           .replace(/{{Content title}}/g, cData.contentTitle)
           .replace(/{{Content link}}/g, getContentUrl(cData))
-          .replace(/{{User}}/g, req.headers.userName)
+          .replace(/{{User}}/g, req.rspObj.userName)
         var lsEmailData = {
           request: getEmailData(subject, body, collaboratorsArray, eData.TEMPLATE)
         }
