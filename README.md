@@ -38,13 +38,8 @@ The code in this repository is licensed under AGPL-3.0 unless otherwise noted. P
 * sunbird_content_service_local_base_url e.g: 'http://localhost:5000'
 
 ##Setup Instructions
-* Clone the project.
+* Clone the project.eg .(git clone --recursive  url)
 * Run "git submodule foreach git pull origin master" to pull the latest sunbird-js-utils sub module
 * Change to src folder
 * Run `npm install`
 * Run `node app.js`
-
-
-
-
-
