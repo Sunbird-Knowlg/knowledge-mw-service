@@ -4,11 +4,11 @@ This is the repository for content management micro-service. This service uses E
 
 The code in this repository is licensed under AGPL-3.0 unless otherwise noted. Please see the [LICENSE](https://github.com/project-sunbird/sunbird-content-service/blob/master/LICENSE) file for details.
 
-##Pre Requirements
+## Pre Requirements
 1. Node
 2. Install imagemagick, graphicsmagick ref:https://www.npmjs.com/package/gm
 
-##Environment Variables:
+## Environment Variables:
 * sunbird_content_provider_api_base_url: content provider API base url. e.g.: https://qa.ekstep.in or https://api.ekstep.in
 * sunbird_content_repo_api_key:  API key for the  content provider URL
 * sunbird_search_service_api_key:  API key for the  search provider URL
@@ -37,7 +37,7 @@ The code in this repository is licensed under AGPL-3.0 unless otherwise noted. P
 * sunbird_learner_service_local_base_url e.g: 'http://learner-service:9000'
 * sunbird_content_service_local_base_url e.g: 'http://localhost:5000'
 
-##Setup Instructions
+## Setup Instructions
 * Clone the project.eg .(git clone --recursive  url)
 * Run "git submodule foreach git pull origin master" to pull the latest sunbird-js-utils sub module
 * Change to src folder
