@@ -34,6 +34,13 @@ function createLock (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
+  if (req.get('x-authenticated-userid') !== data.request.createdBy) {
+    rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
+    rspObj.errMsg = contentMessage.CREATE_LOCK.UNAUTHORIZED
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(403).send(respUtil.errorResponse(rspObj))
+  }
+
   if (!data.request) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createLockAPI',
       'Error due to required params are missing', data.request))
@@ -81,8 +88,7 @@ function createLock (req, response) {
             rspObj.responseCode = responseCode.SERVER_ERROR
             return response.status(500).send(respUtil.errorResponse(rspObj))
           } else if (result) {
-            if (req.get('x-device-id') === result.deviceId &&
-            req.get('x-authenticated-userid') === result.createdBy) {
+            if (req.get('x-authenticated-userid') === result.createdBy) {
               rspObj.errMsg = contentMessage.CREATE_LOCK.SAME_USER_ERR_MSG
               var statusCode = 400
             } else {
@@ -191,7 +197,7 @@ function refreshLock (req, response) {
             if (result.createdBy !== req.get('x-authenticated-userid')) {
               rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
               rspObj.errMsg = contentMessage.REFRESH_LOCK.UNAUTHORIZED
-              rspObj.responseCode = responseCode.SERVER_ERROR
+              rspObj.responseCode = responseCode.CLIENT_ERROR
               return response.status(403).send(respUtil.errorResponse(rspObj))
             }
             var options = { ttl: defaultLockExpiryTime, if_exists: true }
@@ -213,7 +219,7 @@ function refreshLock (req, response) {
               'no data found from db for refreshing lock', data.request))
             rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.REFRESH_LOCK.NOT_FOUND_FAILED_MESSAGE
-            rspObj.responseCode = responseCode.SERVER_ERROR
+            rspObj.responseCode = responseCode.CLIENT_ERROR
             return response.status(400).send(respUtil.errorResponse(rspObj))
           }
         })
@@ -287,7 +293,7 @@ function retireLock (req, response) {
             if (result.createdBy !== req.get('x-authenticated-userid')) {
               rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
               rspObj.errMsg = contentMessage.RETIRE_LOCK.UNAUTHORIZED
-              rspObj.responseCode = responseCode.SERVER_ERROR
+              rspObj.responseCode = responseCode.CLIENT_ERROR
               return response.status(403).send(respUtil.errorResponse(rspObj))
             }
             dbModel.instance.lock.delete({ resourceId: data.request.resourceId },
@@ -306,8 +312,8 @@ function retireLock (req, response) {
               'no data found from db for retiring lock', data.request))
             rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.RETIRE_LOCK.NOT_FOUND_FAILED_MESSAGE
-            rspObj.responseCode = responseCode.SERVER_ERROR
-            return response.status(500).send(respUtil.errorResponse(rspObj))
+            rspObj.responseCode = responseCode.CLIENT_ERROR
+            return response.status(400).send(respUtil.errorResponse(rspObj))
           }
         })
     },
