@@ -1453,6 +1453,7 @@ function validateContentLock (req, response) {
       } else {
         rspObj.result.validation = true
         rspObj.result.message = 'Content successfully validated'
+        rspObj.result.contentdata = res.result.content
         return response.status(200).send(respUtil.successResponse(rspObj))
       }
     }
