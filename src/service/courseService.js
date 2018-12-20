@@ -12,11 +12,14 @@ var respUtil = require('response_util')
 var validatorUtil = require('sb_req_validator_util')
 var LOG = require('sb_logger_util')
 var _ = require('underscore')
+var lodash = require('lodash')
 
 var courseModel = require('../models/courseModel').COURSE
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 var orgHelper = require('../helpers/orgHelper')
+var CacheManager = require('sb_cache_manager')
+var cacheManager = new CacheManager({})
 
 var filename = path.basename(__filename)
 var courseMessage = messageUtils.COURSE
@@ -123,12 +126,27 @@ function searchCourseAPI (req, response) {
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
-          CBW(null, res)
+          if (req.query.framework) {
+            getFrameworkDetails(req, function (err, data) {
+              if (err || res.responseCode !== responseCode.SUCCESS) {
+                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'Framework API failed',
+                  'Framework API failed with framework - ' + req.query.framework, {'err': err, 'res': res}))
+                rspObj.result = res.result
+                return response.status(200).send(respUtil.successResponse(rspObj))
+              } else {
+                var language = req.query.lang ? req.query.lang : 'en'
+                if (lodash.get(res, 'result.facets') &&
+                lodash.get(data, 'result.framework.categories')) {
+                  modifyFacetsData(res.result.facets, data.result.framework.categories, language)
+                }
+                orgHelper.includeOrgDetails(req, res, CBW)
+              }
+            })
+          } else {
+            orgHelper.includeOrgDetails(req, res, CBW)
+          }
         }
       })
-    },
-    function (res, CBW) {
-      orgHelper.includeOrgDetails(req, res, CBW)
     },
     function (res) {
       rspObj.result = res.result
@@ -143,6 +161,66 @@ function searchCourseAPI (req, response) {
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
+}
+
+function getFrameworkDetails (req, CBW) {
+  cacheManager.get(req.query.framework, function (err, data) {
+    if (err || !data) {
+      contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, result) {
+        if (err || result.responseCode !== responseCode.SUCCESS) {
+          LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'framework API failed',
+            'Fetching framework data failed' + req.query.framework, err))
+          CBW(new Error('Fetching framework data failed'), null)
+        } else {
+          LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'framework API success',
+            'Fetching framework data success - ' + req.query.framework, result))
+          cacheManager.set({ key: req.query.framework, value: result },
+            function (err, data) {
+              if (err) {
+                LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Setting framework cache failed',
+                  'Setting framework cache data failed' + req.query.framework, err))
+              } else {
+                LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename,
+                  'Setting framework cache data success',
+                  'Setting framework cache data success - ' + req.query.framework, result))
+              }
+            })
+          CBW(null, result)
+        }
+      })
+    } else {
+      CBW(null, data)
+    }
+  })
+}
+
+function modifyFacetsData (searchData, frameworkData, language) {
+  lodash.forEach(searchData, (facets) => {
+    lodash.forEach(frameworkData, (categories) => {
+      if (categories.code === facets.name) {
+        lodash.forEach(facets.values, (values) => {
+          lodash.forEach(categories.terms, (terms) => {
+            if (values.name.toLowerCase() === terms.name.toLowerCase()) {
+              terms = lodash.pick(terms, ['name', 'translations', 'description',
+                'index', 'count'])
+              Object.assign(values, terms)
+              values.translations = parseTranslationData(terms.translations, language)
+            }
+          })
+        })
+        facets.values = lodash.orderBy(facets.values, ['index'], ['asc'])
+      }
+    })
+  })
+}
+
+function parseTranslationData (data, language) {
+  try {
+    return lodash.get(JSON.parse(data), language) || null
+  } catch (e) {
+    console.warn(e)
+    return null
+  }
 }
 
 /**

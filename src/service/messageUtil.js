@@ -264,7 +264,8 @@ exports.CONTENT = {
     FAILED_MESSAGE: 'Creating lock failed',
     ALREADY_LOCKED: 'The resource is already locked by {{Name}}',
     DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
-    SAME_USER_ERR_MSG: 'The resource is already locked by you in a different window/device'
+    SAME_USER_ERR_MSG: 'The resource is already locked by you in a different window/device',
+    UNAUTHORIZED: 'You are not authorized to lock this resource'
   },
 
   REFRESH_LOCK: {
