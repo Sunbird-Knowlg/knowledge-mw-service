@@ -158,7 +158,7 @@ function createLock (req, response) {
           // Sending success CBW as content is already locked in db and ignoring content update error
           CBW(null, res)
         } else {
-          versionKey = res.result.versionKey
+          versionKey = lodash.get(res.result.versionKey)
           CBW(null, res)
         }
       })
