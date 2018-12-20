@@ -29,6 +29,7 @@ function createLock (req, response) {
   var data = req.body
   var rspObj = req.rspObj
   var contentBody = ''
+  var versionKey = ''
 
   if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
@@ -78,6 +79,7 @@ function createLock (req, response) {
           return response.status(412).send(respUtil.errorResponse(rspObj))
         }
         contentBody = body
+        versionKey = contentBody.contentdata.versionKey
         CBW()
       })
     },
@@ -92,7 +94,15 @@ function createLock (req, response) {
           rspObj.responseCode = responseCode.SERVER_ERROR
           return response.status(500).send(respUtil.errorResponse(rspObj))
         } else if (result) {
-          if (req.get('x-authenticated-userid') === result.createdBy) {
+          if (req.get('x-authenticated-userid') === result.createdBy &&
+          req.get('x-device-id') === result.deviceId &&
+          data.request.resourceType === result.resourceType) {
+            rspObj.result.lockKey = result.lockId
+            rspObj.result.expiresAt = result.expiresAt
+            rspObj.result.expiresIn = defaultLockExpiryTime / 60
+            rspObj.result.versionKey = versionKey
+            return response.status(200).send(respUtil.successResponse(rspObj))
+          } else if (req.get('x-authenticated-userid') === result.createdBy) {
             rspObj.errMsg = contentMessage.CREATE_LOCK.SAME_USER_ERR_MSG
             var statusCode = 400
           } else {
@@ -137,7 +147,7 @@ function createLock (req, response) {
         'request': {
           'content': {
             'lockKey': lockId,
-            'versionKey': contentBody.contentdata.versionKey
+            'versionKey': versionKey
           }
         }
       }
@@ -148,6 +158,7 @@ function createLock (req, response) {
           // Sending success CBW as content is already locked in db and ignoring content update error
           CBW(null, res)
         } else {
+          versionKey = res.result.versionKey
           CBW(null, res)
         }
       })
@@ -156,6 +167,7 @@ function createLock (req, response) {
       rspObj.result.lockKey = lockId
       rspObj.result.expiresAt = newDateObj
       rspObj.result.expiresIn = defaultLockExpiryTime / 60
+      rspObj.result.versionKey = versionKey
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -223,6 +235,7 @@ function refreshLock (req, response) {
           rspObj.responseCode = responseCode.SERVER_ERROR
           return response.status(500).send(respUtil.errorResponse(rspObj))
         } else if (result) {
+          lockId = result.lockId
           if (result.createdBy !== req.get('x-authenticated-userid')) {
             rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.REFRESH_LOCK.UNAUTHORIZED
