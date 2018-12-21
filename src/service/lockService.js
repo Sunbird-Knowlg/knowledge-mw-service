@@ -103,9 +103,11 @@ function createLock (req, response) {
             rspObj.result.versionKey = versionKey
             return response.status(200).send(respUtil.successResponse(rspObj))
           } else if (req.get('x-authenticated-userid') === result.createdBy) {
+            rspObj.errCode = contentMessage.CREATE_LOCK.SELF_LOCKED_CODE
             rspObj.errMsg = contentMessage.CREATE_LOCK.SAME_USER_ERR_MSG
             var statusCode = 400
           } else {
+            rspObj.errCode = contentMessage.CREATE_LOCK.LOCKED_CODE
             statusCode = 423
             try { var user = JSON.parse(result.creatorInfo).name } catch (e) {
               user = 'another user'
@@ -113,7 +115,6 @@ function createLock (req, response) {
             rspObj.errMsg = contentMessage.CREATE_LOCK.ALREADY_LOCKED.replace(/{{Name}}/g,
               user)
           }
-          rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
           rspObj.responseCode = responseCode.CLIENT_ERROR
           return response.status(statusCode).send(respUtil.errorResponse(rspObj))
         } else {

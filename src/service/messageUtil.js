@@ -265,7 +265,9 @@ exports.CONTENT = {
     ALREADY_LOCKED: 'The resource is already locked by {{Name}}',
     DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
     SAME_USER_ERR_MSG: 'The resource is already locked by you in a different window/device',
-    UNAUTHORIZED: 'You are not authorized to lock this resource'
+    UNAUTHORIZED: 'You are not authorized to lock this resource',
+    SELF_LOCKED_CODE: 'RESOURCE_SELF_LOCKED',
+    LOCKED_CODE: 'RESOURCE_LOCKED'
   },
 
   REFRESH_LOCK: {
