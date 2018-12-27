@@ -48,7 +48,7 @@ function prepareQRCodeRequestData(dialcodes, config, channel, publisher, content
   for (let index = 0; index < dialcodes.length; index++) {
     const element = dialcodes[index]
     tasks[element] = function (callback) {
-      imageService.insertImg(element, channel, publisher, (index + 1), callback)
+      imageService.insertImg(element, channel, publisher, callback)
     }
   }
 
