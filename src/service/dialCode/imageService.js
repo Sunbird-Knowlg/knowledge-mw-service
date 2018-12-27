@@ -31,8 +31,8 @@ ImageService.prototype.getImage = function generateImage(dialcode, channel, publ
 }
 
 
-ImageService.prototype.insertImg = function (dialcode, channel, publisher, fileNamePrefix, callback) {
-  var fileName = fileNamePrefix + '_' + dialcode;
+ImageService.prototype.insertImg = function (dialcode, channel, publisher, callback) {
+  var fileName = dialcode + '_' + uuid.v4();
   var image = new dbModel.instance.dialcode_images({
     dialcode: dialcode,
     config: this.configToString(),

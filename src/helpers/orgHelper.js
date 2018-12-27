@@ -14,7 +14,7 @@ var async = require('async')
  * @param requestObj  js object which contains the search request with filters,offset,limit,query etc
  * @param cb callback after success or error
  */
-function getRootOrgs (requestObj, cb) {
+function getRootOrgs (requestObj, cb, noExitOnError) {
   LOG.info(utilsService.getLoggerData({}, 'INFO',
     filename, 'getRootOrgs', 'getRootOrgs called', requestObj))
   contentProvider.getAllRootOrgs(requestObj, (err, res) => {
@@ -23,7 +23,7 @@ function getRootOrgs (requestObj, cb) {
     } else {
       LOG.error(utilsService.getLoggerData({}, 'ERROR',
         filename, 'getRootOrgs', 'error in getting root orgs.', err))
-      process.exit(1)
+      if (!noExitOnError) process.exit(1)
     }
   })
 }
@@ -68,13 +68,13 @@ function getRootOrgsFromCache (orgfetchquery, tryfromcache, inputdata, cb) {
             return cb(null, [])
           }
         }
-      })
+      }, true)
     }
   ])
 }
 
 function insertDataToCache (cacheinputdata) {
-  cacheManager.mset({data: cacheinputdata, ttl: configData.orgCacheExpiryTime}, function (err, data) {
+  cacheManager.mset({ data: cacheinputdata, ttl: configData.orgCacheExpiryTime }, function (err, data) {
     if (err) {
       LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'Setting allRootOrgs cache failed',
         'Setting allRootOrgs cache data failed', err))
