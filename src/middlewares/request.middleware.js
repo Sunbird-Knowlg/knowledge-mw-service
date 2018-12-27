@@ -13,6 +13,7 @@ var responseCode = messageUtil.RESPONSE_CODE
 var apiVersions = messageUtil.API_VERSION
 var filename = path.basename(__filename)
 var jwt = require('jsonwebtoken')
+var lodash = require('lodash')
 
 var keyCloakConfig = {
   'authServerUrl': process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : 'https://staging.open-sunbird.org/auth',
@@ -130,7 +131,7 @@ function apiAccessForCreatorUser (req, response, next) {
   var data = {}
   var rspObj = req.rspObj
   var qs = {
-    fields: 'createdBy'
+    fields: 'createdBy,collaborators'
   }
   var contentMessage = messageUtil.CONTENT
 
@@ -155,7 +156,7 @@ function apiAccessForCreatorUser (req, response, next) {
         })
     },
     function (res) {
-      if (res.result.content.createdBy !== userId) {
+      if (res.result.content.createdBy !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR',
           filename, 'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
           {createBy: res.result.content.createdBy, userId: userId}))
@@ -181,7 +182,7 @@ function apiAccessForReviewerUser (req, response, next) {
   var data = {}
   var rspObj = req.rspObj
   var qs = {
-    fields: 'createdBy'
+    fields: 'createdBy,collaborators'
   }
   var contentMessage = messageUtil.CONTENT
 
@@ -206,7 +207,7 @@ function apiAccessForReviewerUser (req, response, next) {
         })
     },
     function (res) {
-      if (res.result.content.createdBy === userId) {
+      if (res.result.content.createdBy === userId || lodash.includes(res.result.content.collaborators, userId)) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR',
           filename, 'apiAccessForReviewerUser', 'Content createdBy and userId are matched'))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
