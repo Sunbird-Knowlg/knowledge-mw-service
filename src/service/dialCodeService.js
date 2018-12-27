@@ -71,7 +71,36 @@ function prepareQRCodeRequestData(dialcodes, config, channel, publisher, content
         'container': 'dial'
       }
       data['storage']['path'] = publisher ? (channel + '/' + publisher + '/') : (channel + '/')
-      cb(null, data)
+
+      // if content id present then we will send zip file name 
+      if (contentId) {
+        var qs = {
+          fields: 'medium,subject,gradeLevel'
+        }
+        contentProvider.getContentUsingQuery(contentId, qs, req.headers,
+          function (err, res) {
+            if (err || res.responseCode !== responseCode.SUCCESS) {
+              LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
+                'reserveDialCode', 'Error while getting content', 'err = ' + err + ', res = ' + res))
+              cb(null, data)
+            } else {
+              let medium = _.get(res, 'result.content.medium');
+              let subject = _.get(res, 'result.content.subject');
+              let gradeLevel = _.get(res, 'result.content.gradeLevel');
+              let fileNameArray = [contentId, medium];
+              fileNameArray = _.concat(fileNameArray, gradeLevel);
+              fileNameArray.push(subject);
+              fileNameArray = _.compact(fileNameArray);
+
+              let fileName = _.join(fileNameArray, '_');
+              data['storage']['fileName'] = fileName;
+              cb(null, data)
+            }
+          })
+
+      } else {
+        cb(null, data)
+      }
     }
   })
 }
