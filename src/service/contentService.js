@@ -1425,7 +1425,10 @@ function searchPluginsAPI (req, response, objectType) {
 function validateContentLock (req, response) {
   var rspObj = req.rspObj
   var userId = req.get('x-authenticated-userid')
-  contentProvider.getContent(req.body.request.resourceId, req.headers, function (err, res) {
+  var qs = {
+    mode: 'edit'
+  }
+  contentProvider.getContentUsingQuery(req.body.request.resourceId, qs, req.headers, function (err, res) {
     if (err) {
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'validateContentLock',
         'Getting content details failed', err))

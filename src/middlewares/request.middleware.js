@@ -232,7 +232,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
   var data = req.body
   var rspObj = req.rspObj
   var qs = {
-    fields: 'createdBy'
+    fields: 'createdBy,collaborators'
   }
   var contentMessage = messageUtil.CONTENT
 
@@ -267,7 +267,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
       })
     },
     function (res) {
-      if (res.result.content.createdBy !== userId) {
+      if (res.result.content.createdBy !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
           'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
           {createBy: res.result.content.createdBy, userId: userId}))
