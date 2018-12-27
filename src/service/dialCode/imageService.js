@@ -13,16 +13,16 @@ var colorConvert = new ColorUtil()
 var currentFile = path.basename(__filename)
 var errorCorrectionLevels = ['L', 'M', 'Q', 'H']
 
-function ImageService (config) {
+function ImageService(config) {
   this.config = config;
 }
 
-ImageService.prototype.getImage = function generateImage (dialcode, channel, publisher, cb) {
-  
+ImageService.prototype.getImage = function generateImage(dialcode, channel, publisher, cb) {
+
   this.getImgFromDB(dialcode, channel, publisher, function (error, images) {
     var image = compareImageConfig(images, self.configToString())
     if (!error && image && image.url) {
-      cb(null, {url: image.url, 'created': false})
+      cb(null, { url: image.url, 'created': false })
     } else {
       cb(error, null);
     }
@@ -31,8 +31,8 @@ ImageService.prototype.getImage = function generateImage (dialcode, channel, pub
 }
 
 
-ImageService.prototype.insertImg = function (dialcode, channel, publisher, callback) {
-  var fileName = dialcode + '_' + uuid.v4();
+ImageService.prototype.insertImg = function (dialcode, channel, publisher, fileNamePrefix, callback) {
+  var fileName = fileNamePrefix + '_' + dialcode;
   var image = new dbModel.instance.dialcode_images({
     dialcode: dialcode,
     config: this.configToString(),
@@ -43,7 +43,8 @@ ImageService.prototype.insertImg = function (dialcode, channel, publisher, callb
   })
   image.save(function (error) {
     if (error) {
-      LOG.error({'Unable to insert data to images table : ': error,
+      LOG.error({
+        'Unable to insert data to images table : ': error,
         dialcode,
         channel,
         publisher
@@ -66,10 +67,11 @@ ImageService.prototype.getImgFromDB = function (dialcode, channel, publisher, ca
       channel: channel,
       publisher: publisher
     },
-    {allow_filtering: true},
+    { allow_filtering: true },
     function (error, images) {
       if (error) {
-        LOG.error({'Unable to query dial code images before creating one : ': error,
+        LOG.error({
+          'Unable to query dial code images before creating one : ': error,
           dialcode,
           channel,
           publisher

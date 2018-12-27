@@ -22,7 +22,7 @@ var filename = path.basename(__filename)
 var dialCodeMessage = messageUtils.DIALCODE
 var responseCode = messageUtils.RESPONSE_CODE
 
-function getBatchImageInstance (req) {
+function getBatchImageInstance(req) {
   let defaultConfig = {
     'errorCorrectionLevel': 'H',
     'pixelsPerBlock': 2,
@@ -39,7 +39,7 @@ function getBatchImageInstance (req) {
   return batchImageService
 }
 
-function prepareQRCodeRequestData (dialcodes, config, channel, publisher, contentId, cb) {
+function prepareQRCodeRequestData(dialcodes, config, channel, publisher, contentId, cb) {
   let imageService = new ImageService(config)
   // get dialcodes data from DB
   let tasks = {}
@@ -48,12 +48,11 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
   for (let index = 0; index < dialcodes.length; index++) {
     const element = dialcodes[index]
     tasks[element] = function (callback) {
-      imageService.insertImg(element, channel, publisher, callback)
+      imageService.insertImg(element, channel, publisher, (index + 1), callback)
     }
   }
 
-  async.parallelLimit(tasks, 50, function (err, results) {
-    // results is now equals to: {one: 1, two: 2}
+  async.parallelLimit(tasks, 100, function (err, results) {
     if (err) {
       cb(err)
     } else {
@@ -82,7 +81,7 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function generateDialCodeAPI (req, response) {
+function generateDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -182,7 +181,7 @@ function generateDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function dialCodeListAPI (req, response) {
+function dialCodeListAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   var qrCodeFlag = !!(data && data.request && data.request.search && data.request.search.qrCodeSpec &&
@@ -283,7 +282,7 @@ function dialCodeListAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function updateDialCodeAPI (req, response) {
+function updateDialCodeAPI(req, response) {
   var data = req.body
   data.dialCodeId = req.params.dialCodeId
   var rspObj = req.rspObj
@@ -343,7 +342,7 @@ function updateDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function getDialCodeAPI (req, response) {
+function getDialCodeAPI(req, response) {
   var data = {}
   data.body = req.body
   data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
@@ -403,7 +402,7 @@ function getDialCodeAPI (req, response) {
  * @param {type} data
  * @returns {boolean} return response boolean value true or false
  */
-function checkContentLinkRequest (data) {
+function checkContentLinkRequest(data) {
   if (!data.request || !data.request.content || !data.request.content.identifier || !data.request.content.dialcode) {
     return false
   }
@@ -422,7 +421,7 @@ function checkContentLinkRequest (data) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function contentLinkDialCodeAPI (req, response) {
+function contentLinkDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -477,7 +476,7 @@ function contentLinkDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function getProcessIdStatusAPI (req, response) {
+function getProcessIdStatusAPI(req, response) {
   var data = {}
   data.body = req.body
   data.processId = req.params.processId
@@ -513,7 +512,7 @@ function getProcessIdStatusAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function searchDialCodeAPI (req, response) {
+function searchDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -567,7 +566,7 @@ function searchDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function publishDialCodeAPI (req, response) {
+function publishDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   data.dialCodeId = req.params.dialCodeId
@@ -627,7 +626,7 @@ function publishDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function createPublisherAPI (req, response) {
+function createPublisherAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -686,7 +685,7 @@ function createPublisherAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function updatePublisherAPI (req, response) {
+function updatePublisherAPI(req, response) {
   var data = req.body
   data.publisherId = req.params.publisherId
   var rspObj = req.rspObj
@@ -742,7 +741,7 @@ function updatePublisherAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function getPublisherAPI (req, response) {
+function getPublisherAPI(req, response) {
   var data = {}
   data.publisherId = req.params.publisherId
   var rspObj = req.rspObj
@@ -791,7 +790,7 @@ function getPublisherAPI (req, response) {
   ])
 }
 
-function reserveDialCode (req, response) {
+function reserveDialCode(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -865,7 +864,7 @@ function reserveDialCode (req, response) {
             rspObj = utilsService.getErrorResponse(rspObj, updateResponse)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           } else {
-            if(_.get(updateResponse, 'result.versionKey')){
+            if (_.get(updateResponse, 'result.versionKey')) {
               res['result']['versionKey'] = _.get(updateResponse, 'result.versionKey');
             }
             CBW(null, res)
@@ -882,7 +881,7 @@ function reserveDialCode (req, response) {
   ])
 }
 
-function releaseDialCode (req, response) {
+function releaseDialCode(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
