@@ -258,7 +258,13 @@ function refreshLock(req, response) {
           var options = { ttl: defaultLockExpiryTime, if_exists: true }
           dbModel.instance.lock.update(
             { resourceId: data.request.resourceId, resourceType: data.request.resourceType },
-            { expiresAt: newDateObj }, options, function (err) {
+            { lockId: result.lockId,
+              resourceInfo: result.resourceInfo,
+              createdBy: result.createdBy,
+              creatorInfo: result.creatorInfo,
+              deviceId: result.deviceId,
+              createdOn: result.createdOn,
+              expiresAt: newDateObj }, options, function (err) {
               if (err) {
                 LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
                   'error while updating lock data from db', err))
