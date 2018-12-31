@@ -479,7 +479,7 @@ exports.EMAIL = {
     FAILED_MESSAGE: 'Sending email failed for adding collaborators',
     SUBJECT: 'Congratulations! You are now a Collaborator',
     BODY: '{{User}} has added you as a collaborator for the ' +
-    '{{Content type}}: {{Content title}}. View this in {{Content link}}.',
+    '{{Content type}}: {{Content title}}. View this in {{Content link}}',
     TEMPLATE: 'default'
   },
   REMOVE_COLLABORATORS: {
@@ -487,7 +487,7 @@ exports.EMAIL = {
     FAILED_MESSAGE: 'Sending email failed for removing collaborators',
     SUBJECT: 'Removed as Collaborator',
     BODY: '{{User}} has removed you as a collaborator for the ' +
-    '{{Content type}}: {{Content title}}.',
+    '{{Content type}}: {{Content title}}',
     TEMPLATE: 'default'
   }
 }
