@@ -195,7 +195,7 @@ function getContentUrl (content) {
   } else if (content.mimeType === 'application/vnd.ekstep.ecml-archive') {
     return baseUrl + '/content/' + content.identifier + '/collaborating-on/' + content.framework
   } else {
-    return baseUrl + '/generic/' + content.identifier + '/uploaded/' + content.framework
+    return baseUrl + '/generic/' + content.identifier + '/collaborating-on/' + content.framework
   }
 }
 
