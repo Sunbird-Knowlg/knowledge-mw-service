@@ -1444,7 +1444,7 @@ function validateContentLock (req, response) {
     } else {
       LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'validateContentLock',
         'Getting content details success', res))
-      if (res.result.content.status !== 'Draft') {
+      if (res.result.content.status !== 'Draft' && req.body.request.apiName !== 'retireLock') {
         rspObj.result.validation = false
         rspObj.result.message = 'The operation cannot be completed as content is not in draft state'
         return response.status(200).send(respUtil.successResponse(rspObj))

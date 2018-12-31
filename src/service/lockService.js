@@ -66,6 +66,7 @@ function createLock(req, response) {
   if (rspObj.telemetryData) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.request.resourceId, 'contentLock', '', {})
   }
+  req.body.request.apiName = 'createLock'
 
   async.waterfall([
     function (CBW) {
@@ -213,6 +214,7 @@ function refreshLock(req, response) {
   if (rspObj.telemetryData) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.request.resourceId, 'refreshLock', '', {})
   }
+  req.body.request.apiName = 'refreshLock'
 
   async.waterfall([
     function (CBW) {
@@ -339,6 +341,7 @@ function retireLock(req, response) {
   if (rspObj.telemetryData) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.request.resourceId, 'retireLock', '', {})
   }
+  req.body.request.apiName = 'retireLock'
 
   async.waterfall([
     function (CBW) {
