@@ -317,11 +317,11 @@ function getDraftContentUrl (content) {
   var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/workspace/content/edit'
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     return baseUrl + '/collection/' + content.identifier + '/' + content.contentType +
-    '/draft/' + content.framework
+    '/draft/' + content.framework + '/Draft'
   } else if (content.mimeType === 'application/vnd.ekstep.ecml-archive') {
-    return baseUrl + '/content/' + content.identifier + '/draft/' + content.framework
+    return baseUrl + '/content/' + content.identifier + '/draft/' + content.framework + '/Draft'
   } else {
-    return baseUrl + '/generic/' + content.identifier + '/uploaded/' + content.framework
+    return baseUrl + '/generic/' + content.identifier + '/uploaded/' + content.framework + '/Draft'
   }
 }
 
