@@ -444,6 +444,7 @@ function listLock(req, response) {
 }
 
 function validateCreateLockRequestBody(request) {
+  var body = lodash.pick(request, ['resourceId', 'resourceType', 'resourceInfo', 'createdBy', 'creatorInfo'])
   var schema = Joi.object().keys({
     resourceId: Joi.string().required(),
     resourceType: Joi.string().required(),
@@ -451,24 +452,26 @@ function validateCreateLockRequestBody(request) {
     createdBy: Joi.string().required(),
     creatorInfo: Joi.string().required()
   })
-  return Joi.validate(request, schema)
+  return Joi.validate(body, schema)
 }
 
 function validateRefreshLockRequestBody(request) {
+  var body = lodash.pick(request, ['lockId', 'resourceId', 'resourceType'])
   var schema = Joi.object().keys({
     lockId: Joi.string().required(),
     resourceId: Joi.string().required(),
     resourceType: Joi.string().required()
   })
-  return Joi.validate(request, schema)
+  return Joi.validate(body, schema)
 }
 
 function validateCommonRequestBody(request) {
+  var body = lodash.pick(request, ['resourceId', 'resourceType'])
   var schema = Joi.object().keys({
     resourceId: Joi.string().required(),
     resourceType: Joi.string().required()
   })
-  return Joi.validate(request, schema)
+  return Joi.validate(body, schema)
 }
 
 function createExpiryTime() {
