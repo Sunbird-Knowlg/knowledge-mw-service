@@ -6,6 +6,7 @@ RUN apk update \
 RUN apk add python make g++
 ADD src /opt/content/
 WORKDIR /opt/content/
+RUN npm set progress=false
 RUN npm install --unsafe-perm
 WORKDIR /opt
 CMD ["zip", "-r", "content_service.zip", "content"]
