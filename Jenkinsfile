@@ -17,6 +17,8 @@ node('build-slave') {
       stage('Build'){
         env.NODE_ENV = "build"
         print "Environment will be : ${env.NODE_ENV}"
+        sh('git submodule update --init')
+        sh('git submodule update --init --recursive --remote')
          sh('chmod 777 build.sh')
          sh("./build.sh ${commit_hash} ${branch_name} ${env.NODE_NAME} ${hub_org}")
 
