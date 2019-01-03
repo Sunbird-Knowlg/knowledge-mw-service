@@ -224,7 +224,7 @@ function dialCodeListAPI(req, response) {
     var requestObj = data.request.search
   }
 
-  if (!data.request || !data.request.search || !data.request.search.publisher) {
+  if (!data.request || !data.request.search) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'dialCodeListAPI',
       'Error due to required params are missing', data.request))
     rspObj.errCode = dialCodeMessage.LIST.MISSING_CODE
