@@ -36,15 +36,14 @@ node('build-slave') {
            checkout scm
            commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
            branch_name = sh(script: 'git name-rev --name-only HEAD | rev | cut -d "/" -f1| rev', returnStdout: true).trim()
+           build_tag = branch_name + "_" + commit_hash
          }
          else {
            def scmVars = checkout scm
            checkout scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.tag"]],  userRemoteConfigs: [[url: scmVars.GIT_URL]]]
-           commit_hash = params.tag
-           branch_name = "Blank"
+           build_tag = params.tag
          }
-         echo "Git Hash: "+commit_hash
-         echo "branch_name: "+branch_name
+         echo "build_tag: "+build_tag
        }
 
       stage('Build'){
@@ -53,9 +52,7 @@ node('build-slave') {
         sh('git submodule update --init')
         sh('git submodule update --init --recursive --remote')
          sh('chmod 777 build.sh')
-//         sh("./build.sh ${commit_hash} ${branch_name} ${env.NODE_NAME} ${hub_org}")
-         sh("./build.sh ${params.tag} ${branch_name} ${env.NODE_NAME} ${hub_org}")
-
+         sh("./build.sh ${build_tag} ${env.NODE_NAME} ${hub_org}")
       }
       stage('ArchiveArtifacts'){
            archiveArtifacts "metadata.json"
