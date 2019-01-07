@@ -1,0 +1,21 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: node:6-alpine
+    steps:
+      - checkout
+      - run: apk add zip git
+      - run: apk add python make g++
+      - run: git submodule update --init --recursive src/libs
+      - run: mkdir -p opt/content && cp -r src/* opt/content/
+      - run: cd opt/content/ && npm install --unsafe-perm
+      - run: cd opt && zip -r content.zip content
+      - store_artifacts:
+          path: opt/content.zip 
+          destination: content.zip
+workflows:
+  version: 2.1
+  build_and_test:
+    jobs:
+      - build
