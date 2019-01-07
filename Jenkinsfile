@@ -9,7 +9,6 @@ node('build-slave') {
            String ANSI_NORMAL = "\u001B[0m"
            String ANSI_BOLD = "\u001B[1m"
            String ANSI_RED = "\u001B[31m"
-           sh 'printenv'
 
          if (params.size() == 0){
             properties([[$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false], parameters([string(defaultValue: '', description: '<font color=teal size=2>If you want to build from a tag, specify the tag name. If this parameter is blank, latest commit hash will be used to build</font>', name: 'tag', trim: false)])])
@@ -33,14 +32,17 @@ node('build-slave') {
              println (ANSI_BOLD + ANSI_GREEN + "Found environment variable named hub_org with value as: " + hub_org + ANSI_NORMAL)
          }
          cleanWs()
-//         checkout scm
-         def scmVars = checkout scm
-         println scmVars
-         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.tag"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/msknext/sunbird-content-service.git']]]
-//                    checkout scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.tag"]]]
-         println params.tag
-         commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-         branch_name = sh(script: 'git name-rev --name-only HEAD | rev | cut -d "/" -f1| rev', returnStdout: true).trim()
+         if(params.tag == ""){
+           checkout scm
+           commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+           branch_name = sh(script: 'git name-rev --name-only HEAD | rev | cut -d "/" -f1| rev', returnStdout: true).trim()
+         }
+         else {
+           def scmVars = checkout scm
+           checkout scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.tag"]], [[url: scmVars.GIT_URL]]]
+           commit_hash = params.tag
+           branch_name = "Blank"
+         }
          echo "Git Hash: "+commit_hash
          echo "branch_name: "+branch_name
        }
