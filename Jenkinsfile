@@ -34,6 +34,8 @@ node('build-slave') {
          }
          cleanWs()
 //         checkout scm
+         def scmVars = checkout scm
+         println scmVars
          checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.tag"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/msknext/sunbird-content-service.git']]]
 //                    checkout scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.tag"]]]
          println params.tag
