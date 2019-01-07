@@ -39,7 +39,7 @@ node('build-slave') {
          }
          else {
            def scmVars = checkout scm
-           checkout scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.tag"]], [[url: scmVars.GIT_URL]]]
+           checkout scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.tag"]],  userRemoteConfigs: [[url: scmVars.GIT_URL]]]
            commit_hash = params.tag
            branch_name = "Blank"
          }
