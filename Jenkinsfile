@@ -20,7 +20,7 @@ node('build-slave') {
          }
          cleanWs()
 //         checkout scm
-         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.tag"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[]]]
+         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/tags/$params.tag']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/msknext/sunbird-content-service.git']]]
          println params.tag
          commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
          branch_name = sh(script: 'git name-rev --name-only HEAD | rev | cut -d "/" -f1| rev', returnStdout: true).trim()
