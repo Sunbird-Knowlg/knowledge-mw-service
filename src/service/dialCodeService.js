@@ -22,7 +22,7 @@ var filename = path.basename(__filename)
 var dialCodeMessage = messageUtils.DIALCODE
 var responseCode = messageUtils.RESPONSE_CODE
 
-function getBatchImageInstance (req) {
+function getBatchImageInstance(req) {
   let defaultConfig = {
     'errorCorrectionLevel': 'H',
     'pixelsPerBlock': 2,
@@ -39,7 +39,7 @@ function getBatchImageInstance (req) {
   return batchImageService
 }
 
-function prepareQRCodeRequestData (dialcodes, config, channel, publisher, contentId, cb) {
+function prepareQRCodeRequestData(dialcodes, config, channel, publisher, contentId, cb) {
   let imageService = new ImageService(config)
   // get dialcodes data from DB
   let tasks = {}
@@ -52,8 +52,7 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
     }
   }
 
-  async.parallelLimit(tasks, 50, function (err, results) {
-    // results is now equals to: {one: 1, two: 2}
+  async.parallelLimit(tasks, 100, function (err, results) {
     if (err) {
       cb(err)
     } else {
@@ -72,7 +71,41 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
         'container': 'dial'
       }
       data['storage']['path'] = publisher ? (channel + '/' + publisher + '/') : (channel + '/')
-      cb(null, data)
+
+      // if content id present then we will send zip file name
+      if (contentId) {
+        var qs = {
+          mode: 'edit',
+          fields: 'medium,subject,gradeLevel'
+        }
+        contentProvider.getContentUsingQuery(contentId, qs, {},
+          function (err, res) {
+            if (err || res.responseCode !== responseCode.SUCCESS) {
+              LOG.error({
+                'api': 'reserveDialCode',
+                'message': 'Error while getting content',
+                'err': err,
+                'res': res
+              })
+              cb(null, data)
+            } else {
+              let medium = _.get(res, 'result.content.medium')
+              let subject = _.get(res, 'result.content.subject')
+              let gradeLevel = _.get(res, 'result.content.gradeLevel')
+              let fileNameArray = [contentId, medium]
+              fileNameArray = _.concat(fileNameArray, gradeLevel)
+              fileNameArray.push(subject)
+              fileNameArray.push(Date.now())
+              fileNameArray = _.compact(fileNameArray)
+
+              let fileName = _.join(fileNameArray, '_')
+              data['storage']['fileName'] = fileName
+              cb(null, data)
+            }
+          })
+      } else {
+        cb(null, data)
+      }
     }
   })
 }
@@ -82,7 +115,7 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function generateDialCodeAPI (req, response) {
+function generateDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -140,7 +173,7 @@ function generateDialCodeAPI (req, response) {
         prepareQRCodeRequestData(res.result.dialcodes, batchImageService.config, channel, requestObj.publisher, null, function (error, data) {
           if (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
-              'Error while creating image bacth request', err))
+              'Error while creating image bacth request', error))
             res.responseCode = responseCode.PARTIAL_SUCCESS
             return response.status(207).send(respUtil.successResponse(res))
           } else {
@@ -182,22 +215,13 @@ function generateDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function dialCodeListAPI (req, response) {
+function dialCodeListAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   var qrCodeFlag = !!(data && data.request && data.request.search && data.request.search.qrCodeSpec &&
     !_.isEmpty(data.request.search.qrCodeSpec))
-  var qrCodeConfig = {}
   if (qrCodeFlag) {
     var requestObj = data.request.search
-    qrCodeConfig = {
-      width: _.clone(requestObj.qrCodeSpec.width),
-      height: _.clone(requestObj.qrCodeSpec.height),
-      border: _.clone(requestObj.qrCodeSpec.border),
-      text: _.clone(requestObj.qrCodeSpec.text),
-      errCorrectionLevel: _.clone(requestObj.qrCodeSpec.errCorrectionLevel),
-      color: _.clone(requestObj.qrCodeSpec.color)
-    }
   }
 
   if (!data.request || !data.request.search || !data.request.search.publisher) {
@@ -246,7 +270,7 @@ function dialCodeListAPI (req, response) {
         prepareQRCodeRequestData(dialcodes, batchImageService.config, channel, requestObj.publisher, null, function (error, data) {
           if (error) {
             LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'generateDialCodeAPI',
-              'Error while creating image bacth request', err))
+              'Error while creating image bacth request', error))
             res.responseCode = responseCode.PARTIAL_SUCCESS
             return response.status(207).send(respUtil.successResponse(res))
           } else {
@@ -283,7 +307,7 @@ function dialCodeListAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function updateDialCodeAPI (req, response) {
+function updateDialCodeAPI(req, response) {
   var data = req.body
   data.dialCodeId = req.params.dialCodeId
   var rspObj = req.rspObj
@@ -343,7 +367,7 @@ function updateDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function getDialCodeAPI (req, response) {
+function getDialCodeAPI(req, response) {
   var data = {}
   data.body = req.body
   data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
@@ -403,7 +427,7 @@ function getDialCodeAPI (req, response) {
  * @param {type} data
  * @returns {boolean} return response boolean value true or false
  */
-function checkContentLinkRequest (data) {
+function checkContentLinkRequest(data) {
   if (!data.request || !data.request.content || !data.request.content.identifier || !data.request.content.dialcode) {
     return false
   }
@@ -422,7 +446,7 @@ function checkContentLinkRequest (data) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function contentLinkDialCodeAPI (req, response) {
+function contentLinkDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -477,7 +501,7 @@ function contentLinkDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function getProcessIdStatusAPI (req, response) {
+function getProcessIdStatusAPI(req, response) {
   var data = {}
   data.body = req.body
   data.processId = req.params.processId
@@ -513,7 +537,7 @@ function getProcessIdStatusAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function searchDialCodeAPI (req, response) {
+function searchDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -567,7 +591,7 @@ function searchDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function publishDialCodeAPI (req, response) {
+function publishDialCodeAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   data.dialCodeId = req.params.dialCodeId
@@ -627,7 +651,7 @@ function publishDialCodeAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function createPublisherAPI (req, response) {
+function createPublisherAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -686,7 +710,7 @@ function createPublisherAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function updatePublisherAPI (req, response) {
+function updatePublisherAPI(req, response) {
   var data = req.body
   data.publisherId = req.params.publisherId
   var rspObj = req.rspObj
@@ -742,7 +766,7 @@ function updatePublisherAPI (req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function getPublisherAPI (req, response) {
+function getPublisherAPI(req, response) {
   var data = {}
   data.publisherId = req.params.publisherId
   var rspObj = req.rspObj
@@ -791,7 +815,7 @@ function getPublisherAPI (req, response) {
   ])
 }
 
-function reserveDialCode (req, response) {
+function reserveDialCode(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -865,8 +889,8 @@ function reserveDialCode (req, response) {
             rspObj = utilsService.getErrorResponse(rspObj, updateResponse)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           } else {
-            if(_.get(updateResponse, 'result.versionKey')){
-              res['result']['versionKey'] = _.get(updateResponse, 'result.versionKey');
+            if (_.get(updateResponse, 'result.versionKey')) {
+              res['result']['versionKey'] = _.get(updateResponse, 'result.versionKey')
             }
             CBW(null, res)
           }
@@ -882,7 +906,7 @@ function reserveDialCode (req, response) {
   ])
 }
 
-function releaseDialCode (req, response) {
+function releaseDialCode(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 

@@ -12,7 +12,7 @@ module.exports.CONTENT = {
   },
 
   COLLABORATORS: {
-    collaborators: 'required|array'
+    collaborators: 'array'
   }
 
 }

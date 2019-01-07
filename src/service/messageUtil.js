@@ -264,7 +264,10 @@ exports.CONTENT = {
     FAILED_MESSAGE: 'Creating lock failed',
     ALREADY_LOCKED: 'The resource is already locked by {{Name}}',
     DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
-    SAME_USER_ERR_MSG: 'The resource is already locked by you in a different window/device'
+    SAME_USER_ERR_MSG: 'The resource is already locked by you in a different window/device',
+    UNAUTHORIZED: 'You are not authorized to lock this resource',
+    SELF_LOCKED_CODE: 'RESOURCE_SELF_LOCKED',
+    LOCKED_CODE: 'RESOURCE_LOCKED'
   },
 
   REFRESH_LOCK: {
@@ -476,7 +479,7 @@ exports.EMAIL = {
     FAILED_MESSAGE: 'Sending email failed for adding collaborators',
     SUBJECT: 'Congratulations! You are now a Collaborator',
     BODY: '{{User}} has added you as a collaborator for the ' +
-    '{{Content type}}: {{Content title}}. View this in {{Content link}}.',
+    '{{Content type}}: {{Content title}}. View this in {{Content link}}',
     TEMPLATE: 'default'
   },
   REMOVE_COLLABORATORS: {
@@ -484,7 +487,7 @@ exports.EMAIL = {
     FAILED_MESSAGE: 'Sending email failed for removing collaborators',
     SUBJECT: 'Removed as Collaborator',
     BODY: '{{User}} has removed you as a collaborator for the ' +
-    '{{Content type}}: {{Content title}}.',
+    '{{Content type}}: {{Content title}}',
     TEMPLATE: 'default'
   }
 }

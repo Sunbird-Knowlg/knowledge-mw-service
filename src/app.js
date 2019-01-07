@@ -47,7 +47,7 @@ const languageServiceApiKey = process.env.sunbird_language_service_api_key
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 const sunbirdPortalBaseUrl = process.env.sunbird_portal_base_url || 'https://staging.open-sunbird.org'
-const lockExpiryTime = process.env.sunbird_lock_expiry_time || 1800
+const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://content-service:5000'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
@@ -137,7 +137,7 @@ require('./routes/lockRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer() {
+function startServer () {
   this.server = http.createServer(app).listen(port, function () {
     console.log('server running at PORT [%d]', port)
     if (!process.env.sunbird_environment || !process.env.sunbird_instance) {

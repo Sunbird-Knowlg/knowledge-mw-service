@@ -1,6 +1,7 @@
 module.exports = {
   table_name: 'lock',
   fields: {
+    lockId: 'uuid',
     resourceId: 'text',
     resourceType: 'text',
     resourceInfo: 'text',
@@ -10,5 +11,6 @@ module.exports = {
     deviceId: 'text',
     expiresAt: 'timestamp'
   },
-  key: ['resourceId']
+  key: ['resourceId', 'resourceType'],
+  indexes: ['lockId']
 }
