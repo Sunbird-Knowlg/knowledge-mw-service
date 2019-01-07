@@ -43,4 +43,3 @@ The code in this repository is licensed under MIT unless otherwise noted. Please
 * Change to src folder
 * Run `npm install`
 * Run `node app.js`
-
