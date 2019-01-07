@@ -1425,7 +1425,10 @@ function searchPluginsAPI (req, response, objectType) {
 function validateContentLock (req, response) {
   var rspObj = req.rspObj
   var userId = req.get('x-authenticated-userid')
-  contentProvider.getContent(req.body.request.resourceId, req.headers, function (err, res) {
+  var qs = {
+    mode: 'edit'
+  }
+  contentProvider.getContentUsingQuery(req.body.request.resourceId, qs, req.headers, function (err, res) {
     if (err) {
       LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'validateContentLock',
         'Getting content details failed', err))
@@ -1441,7 +1444,7 @@ function validateContentLock (req, response) {
     } else {
       LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'validateContentLock',
         'Getting content details success', res))
-      if (res.result.content.status !== 'Draft') {
+      if (res.result.content.status !== 'Draft' && req.body.request.apiName !== 'retireLock') {
         rspObj.result.validation = false
         rspObj.result.message = 'The operation cannot be completed as content is not in draft state'
         return response.status(200).send(respUtil.successResponse(rspObj))
@@ -1453,6 +1456,7 @@ function validateContentLock (req, response) {
       } else {
         rspObj.result.validation = true
         rspObj.result.message = 'Content successfully validated'
+        rspObj.result.contentdata = res.result.content
         return response.status(200).send(respUtil.successResponse(rspObj))
       }
     }
