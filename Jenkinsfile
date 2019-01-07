@@ -1,9 +1,4 @@
-#!groovy
-
 node('build-slave') {
-
-   currentBuild.result = "SUCCESS"
-
    try {
            String ANSI_GREEN = "\u001B[32m"
            String ANSI_NORMAL = "\u001B[0m"
