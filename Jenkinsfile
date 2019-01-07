@@ -5,24 +5,25 @@ node('build-slave') {
    currentBuild.result = "SUCCESS"
 
    try {
-      if (params.size() == 0){
-         properties([[$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false], parameters([string(defaultValue: '', description: '<font color=teal size=2>If you want to build from a tag, specify the tag name. If this parameter is blank, latest commit hash will be used to build</font>', name: 'tag', trim: false)])])
+           String ANSI_GREEN = "\u001B[32m"
+           String ANSI_NORMAL = "\u001B[0m"
+           String ANSI_BOLD = "\u001B[1m"
+           String ANSI_RED = "\u001B[31m"
 
-         ansiColor('xterm') {
+         if (params.size() == 0){
+            properties([[$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false], parameters([string(defaultValue: '', description: '<font color=teal size=2>If you want to build from a tag, specify the tag name. If this parameter is blank, latest commit hash will be used to build</font>', name: 'tag', trim: false)])])
+
+            ansiColor('xterm') {
                 println (ANSI_BOLD + ANSI_GREEN + '''\
                         First run of the job. Parameters created. Stopping the current build.
                         Please trigger new build and provide parameters if required.
                         '''.stripIndent().replace("\n"," ") + ANSI_NORMAL)
             }
             return
-}
+      }
 
       stage('Checkout'){
          ansiColor('xterm'){
-           String ANSI_GREEN = "\u001B[32m"
-           String ANSI_NORMAL = "\u001B[0m"
-           String ANSI_BOLD = "\u001B[1m"
-           String ANSI_RED = "\u001B[31m"
            if(!env.hub_org){
              println (ANSI_BOLD + ANSI_RED + "Uh Oh! Please set a Jenkins environment variable named hub_org with value as registery/sunbidrded" + ANSI_NORMAL)
              error 'Please resolve the errors and rerun..'
