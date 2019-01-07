@@ -19,7 +19,9 @@ node('build-slave') {
              println (ANSI_BOLD + ANSI_GREEN + "Found environment variable named hub_org with value as: " + hub_org + ANSI_NORMAL)
          }
          cleanWs()
-         checkout scm
+//         checkout scm
+         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: "refs/heads/$params.tag"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[]]]
+         println params.tag
          commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
          branch_name = sh(script: 'git name-rev --name-only HEAD | rev | cut -d "/" -f1| rev', returnStdout: true).trim()
          echo "Git Hash: "+commit_hash
@@ -46,4 +48,3 @@ node('build-slave') {
     }
 
 }
-
