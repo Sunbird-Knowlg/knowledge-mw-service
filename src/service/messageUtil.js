@@ -277,7 +277,8 @@ exports.CONTENT = {
     FAILED_MESSAGE: 'Refreshing lock failed',
     NOT_FOUND_FAILED_MESSAGE: 'Resource is not locked',
     DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
-    UNAUTHORIZED: 'You are not authorized to refresh this resource'
+    UNAUTHORIZED: 'You are not authorized to refresh this resource',
+    INVALID_LOCK_KEY: 'Invalid lock key'
   },
 
   RETIRE_LOCK: {
