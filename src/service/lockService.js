@@ -232,6 +232,14 @@ function refreshLock(req, response) {
       })
     },
     function (CBW) {
+      if (data.request.lockId !== contentBody.contentdata.lockKey) {
+        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
+          'Lock key and request lock key does not match', data.request))
+        rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
+        rspObj.errMsg = contentMessage.REFRESH_LOCK.INVALID_LOCK_KEY
+        rspObj.responseCode = responseCode.CLIENT_ERROR
+        return response.status(422).send(respUtil.errorResponse(rspObj))
+      }
       dbModel.instance.lock.findOne({
         resourceId: data.request.resourceId,
         resourceType: data.request.resourceType
@@ -294,7 +302,7 @@ function refreshLock(req, response) {
             rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.REFRESH_LOCK.NOT_FOUND_FAILED_MESSAGE
             rspObj.responseCode = responseCode.CLIENT_ERROR
-            return response.status(400).send(respUtil.errorResponse(rspObj))
+            return response.status(422).send(respUtil.errorResponse(rspObj))
           }
         }
       })
