@@ -99,7 +99,7 @@ function prepareQRCodeRequestData(dialcodes, config, channel, publisher, content
               fileNameArray = _.compact(fileNameArray)
 
               let fileName = _.join(fileNameArray, '_')
-              fileName = fileName.replace(/ /g, "_")
+              fileName = fileName.split(' ').join('_')
               fileName = _.lowerCase(fileName)
               data['storage']['fileName'] = fileName
               cb(null, data)
