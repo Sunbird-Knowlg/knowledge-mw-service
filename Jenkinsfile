@@ -1,5 +1,3 @@
-package Build
-
 node('build-slave') {
     try {
         String ANSI_GREEN = "\u001B[32m"
@@ -62,7 +60,6 @@ node('build-slave') {
     }
     catch (err) {
         currentBuild.result = "FAILURE"
-        currentBuild.description = "${build_tag}"
         throw err
     }
 
