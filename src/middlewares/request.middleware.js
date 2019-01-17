@@ -37,7 +37,7 @@ var apiInterceptor = new ApiInterceptor(keyCloakConfig, cacheConfig)
  * @param {type} next
  * @returns {unresolved}
  */
-function createAndValidateRequestBody (req, res, next) {
+function createAndValidateRequestBody(req, res, next) {
   req.body.ts = new Date()
   req.body.url = req.url
   req.body.path = req.route.path
@@ -61,6 +61,11 @@ function createAndValidateRequestBody (req, res, next) {
   }
   req.headers.telemetryData = rspObj.telemetryData
 
+  if (req.get('accept-encoding') && req.get('accept-encoding').toLowerCase() === 'gzip') {
+    req.encodingType = 'gzip';
+  }
+  delete req.headers['accept-encoding'];
+
   var removedHeaders = ['host', 'origin', 'accept', 'referer', 'content-length', 'user-agent', 'accept-encoding',
     'accept-language', 'accept-charset', 'cookie', 'dnt', 'postman-token', 'cache-control', 'connection']
 
@@ -68,7 +73,7 @@ function createAndValidateRequestBody (req, res, next) {
     delete req.headers[e]
   })
 
-  var requestedData = {body: req.body, params: req.body.params, headers: req.headers}
+  var requestedData = { body: req.body, params: req.body.params, headers: req.headers }
   LOG.info(utilsService.getLoggerData(rspObj, 'INFO',
     filename, 'createAndValidateRequestBody', 'API request come', requestedData))
 
@@ -82,7 +87,7 @@ function createAndValidateRequestBody (req, res, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function validateToken (req, res, next) {
+function validateToken(req, res, next) {
   var token = req.headers['x-authenticated-user-token']
   var rspObj = req.rspObj
 
@@ -106,8 +111,8 @@ function validateToken (req, res, next) {
       delete req.headers['x-authenticated-userid']
       var url = req.path
       if (!url.includes('/content/v3/review') &&
-      !url.includes('/v1/content/review') &&
-      !url.includes('/v1/course/review')) {
+        !url.includes('/v1/content/review') &&
+        !url.includes('/v1/course/review')) {
         delete req.headers['x-authenticated-user-token']
       }
       req.rspObj.userId = tokenData.userId
@@ -126,7 +131,7 @@ function validateToken (req, res, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForCreatorUser (req, response, next) {
+function apiAccessForCreatorUser(req, response, next) {
   var userId = req.headers['x-authenticated-userid']
   var data = {}
   var rspObj = req.rspObj
@@ -159,7 +164,7 @@ function apiAccessForCreatorUser (req, response, next) {
       if (res.result.content.createdBy !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR',
           filename, 'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
-          {createBy: res.result.content.createdBy, userId: userId}))
+          { createBy: res.result.content.createdBy, userId: userId }))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
@@ -177,7 +182,7 @@ function apiAccessForCreatorUser (req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForReviewerUser (req, response, next) {
+function apiAccessForReviewerUser(req, response, next) {
   var userId = req.headers['x-authenticated-userid']
   var data = {}
   var rspObj = req.rspObj
@@ -227,7 +232,7 @@ function apiAccessForReviewerUser (req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function hierarchyUpdateApiAccess (req, response, next) {
+function hierarchyUpdateApiAccess(req, response, next) {
   var userId = req.headers['x-authenticated-userid']
   var data = req.body
   var rspObj = req.rspObj
@@ -270,7 +275,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
       if (res.result.content.createdBy !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
           'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
-          {createBy: res.result.content.createdBy, userId: userId}))
+          { createBy: res.result.content.createdBy, userId: userId }))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
@@ -288,7 +293,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function checkChannelID (req, res, next) {
+function checkChannelID(req, res, next) {
   var channelID = req.headers['x-channel-id']
   var rspObj = req.rspObj
 
