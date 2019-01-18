@@ -45,12 +45,22 @@ function prepareQRCodeRequestData(dialcodes, config, channel, publisher, content
   let tasks = {}
   let data = {}
   let dialCodesMap = []
-  for (let index = 0; index < dialcodes.length; index++) {
-    const element = dialcodes[index]
-    tasks[element] = function (callback) {
-      imageService.insertImg(element, channel, publisher, callback)
+  if (_.isArray(dialcodes)) {
+    for (let index = 0; index < dialcodes.length; index++) {
+      const element = dialcodes[index]
+      tasks[element] = function (callback) {
+        imageService.insertImg(element, channel, publisher, element, callback)
+      }
     }
+  } else {
+    _.forIn(dialcodes, function (index, dialcode) {
+      tasks[dialcode] = function (callback) {
+        var fileName = index + '_' + dialcode;
+        imageService.insertImg(dialcode, channel, publisher, fileName, callback)
+      }
+    })
   }
+
 
   async.parallelLimit(tasks, 100, function (err, results) {
     if (err) {
@@ -99,6 +109,8 @@ function prepareQRCodeRequestData(dialcodes, config, channel, publisher, content
               fileNameArray = _.compact(fileNameArray)
 
               let fileName = _.join(fileNameArray, '_')
+              fileName = _.lowerCase(fileName)
+              fileName = fileName.split(' ').join('_')
               data['storage']['fileName'] = fileName
               cb(null, data)
             }
@@ -839,7 +851,7 @@ function reserveDialCode(req, response) {
     }, function (res, CBW) {
       var requestObj = data && data.request && data.request.dialcodes ? data.request.dialcodes : {}
       if (requestObj.qrCodeSpec && !_.isEmpty(requestObj.qrCodeSpec) && res.result.reservedDialcodes &&
-        res.result.reservedDialcodes.length) {
+        !_.isEmpty(res.result.reservedDialcodes)) {
         var batchImageService = getBatchImageInstance(requestObj)
         var channel = _.clone(req.get('x-channel-id'))
         prepareQRCodeRequestData(res.result.reservedDialcodes, batchImageService.config, channel,
