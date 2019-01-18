@@ -250,7 +250,8 @@ function hierarchyUpdateApiAccess(req, response, next) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
-  var hierarchy = data.request.data.hierarchy
+  var hierarchy = !_.isEmpty(data.request.data.hierarchy)
+    ? data.request.data.hierarchy : data.request.data.nodesModified
   data.contentId = _.findKey(hierarchy, function (item) {
     if (item.root === true) return item
   })
