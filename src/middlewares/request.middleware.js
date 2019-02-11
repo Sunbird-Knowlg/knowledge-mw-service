@@ -44,7 +44,7 @@ function createAndValidateRequestBody (req, res, next) {
   req.body.path = req.route.path
   req.body.params = req.body.params ? req.body.params : {}
   req.body.params.msgid = req.headers['msgid'] || req.body.params.msgid || uuidV1()
-
+  req.id = req.body.params.msgid
   var rspObj = {
     apiId: utilsService.getAppIDForRESP(req.body.path),
     path: req.body.path,
