@@ -13,7 +13,7 @@ const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
 var logger = require('sb_logger_util_v2')
 // TODO below configuration should to be refactored in a seperate file
-const logFilePath = path.join(__dirname, 'logs/microservice.log')
+const logFilePath = path.join(__dirname, './logs/microservice.log')
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
 var contentProviderApiConfig = JSON.parse(fs.readFileSync(contentProviderConfigPath))
 const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/telemetryEventConfig.json')))
@@ -74,7 +74,7 @@ logger.init({
   logLevel
 })
 
-logger.debug({msg: 'logger initialized'})
+logger.debug({ msg: 'logger initialized' })
 
 var app = express()
 const isEkStepProxyRequest = function (req) {
