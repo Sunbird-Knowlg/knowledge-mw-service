@@ -3,6 +3,7 @@ var LOG = require('sb_logger_util')
 var utilsService = require('../service/utilsService')
 var path = require('path')
 var filename = path.basename(__filename)
+var logger = require('sb_logger_util_v2')
 
 function addMetaFilters (req, res, next) {
   // If the request body has filter by metaFilter data, continue with the same filter, do not alter the values
@@ -25,6 +26,8 @@ function addMetaFilters (req, res, next) {
     }
     LOG.info(utilsService.getLoggerData({}, 'INFO',
       filename, 'addMetaFilters', 'added content meta filter', req.body.request.filters))
+
+    logger.info({ msg: 'added content meta filter', metaFilters: req.body.request.filters }, req)
     next()
   } else {
     next()
@@ -35,6 +38,7 @@ function fetchFilterQuery (req, filterProperty) {
     if (err) {
       LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'fetchFilterQuery',
         'failed to get fetch filter query'))
+      logger.error({ msg: 'failed to get fetch filter query', err })
     } else {
       for (var key in searchJSON) {
         var searchValue = searchJSON[key]
