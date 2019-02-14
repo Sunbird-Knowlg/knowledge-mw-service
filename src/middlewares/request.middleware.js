@@ -3,6 +3,7 @@ var uuidV1 = require('uuid/v1')
 var respUtil = require('response_util')
 var messageUtil = require('../service/messageUtil')
 var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 var utilsService = require('../service/utilsService')
 var path = require('path')
 var contentProvider = require('sb_content_provider_util')
@@ -43,7 +44,7 @@ function createAndValidateRequestBody (req, res, next) {
   req.body.path = req.route.path
   req.body.params = req.body.params ? req.body.params : {}
   req.body.params.msgid = req.headers['msgid'] || req.body.params.msgid || uuidV1()
-
+  req.id = req.body.params.msgid
   var rspObj = {
     apiId: utilsService.getAppIDForRESP(req.body.path),
     path: req.body.path,
@@ -68,9 +69,11 @@ function createAndValidateRequestBody (req, res, next) {
     delete req.headers[e]
   })
 
-  var requestedData = {body: req.body, params: req.body.params, headers: req.headers}
+  var requestedData = { body: req.body, params: req.params, query: req.query, headers: req.headers }
   LOG.info(utilsService.getLoggerData(rspObj, 'INFO',
     filename, 'createAndValidateRequestBody', 'API request come', requestedData))
+
+  logger.info({ msg: 'API request come', requestData: requestedData }, req)
 
   req.rspObj = rspObj
   next()
@@ -85,29 +88,48 @@ function createAndValidateRequestBody (req, res, next) {
 function validateToken (req, res, next) {
   var token = req.headers['x-authenticated-user-token']
   var rspObj = req.rspObj
-
   if (!token) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'API failed due to missing token'))
     rspObj.errCode = reqMsg.TOKEN.MISSING_CODE
     rspObj.errMsg = reqMsg.TOKEN.MISSING_MESSAGE
     rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+
+    logger.error({
+      msg: 'API failed due to missing token',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      }
+    }, req)
+
     return res.status(401).send(respUtil.errorResponse(rspObj))
   }
 
   apiInterceptor.validateToken(token, function (err, tokenData) {
     if (err) {
+      logger.error({ msg: 'Invalid token', err }, req)
       LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'Invalid token', err))
       rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
       rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
       rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+      logger.error({
+        msg: 'Invalid token',
+        err: {
+          err,
+          errCode: rspObj.errCode,
+          errMsg: rspObj.errMsg,
+          responseCode: rspObj.responseCode
+        }
+      }, req)
       return res.status(401).send(respUtil.errorResponse(rspObj))
     } else {
       var payload = jwt.decode(tokenData.token)
       delete req.headers['x-authenticated-userid']
       var url = req.path
       if (!url.includes('/content/v3/review') &&
-      !url.includes('/v1/content/review') &&
-      !url.includes('/v1/course/review')) {
+        !url.includes('/v1/content/review') &&
+        !url.includes('/v1/course/review')) {
         delete req.headers['x-authenticated-user-token']
       }
       req.rspObj.userId = tokenData.userId
@@ -148,6 +170,16 @@ function apiAccessForCreatorUser (req, response, next) {
             rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            logger.error({
+              msg: 'Getting error from content provider',
+              err: {
+                err,
+                errCode: rspObj.errCode,
+                errMsg: rspObj.errMsg,
+                responseCode: rspObj.responseCode
+              },
+              res
+            }, req)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           } else {
@@ -159,10 +191,19 @@ function apiAccessForCreatorUser (req, response, next) {
       if (res.result.content.createdBy !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR',
           filename, 'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
-          {createBy: res.result.content.createdBy, userId: userId}))
+          { createBy: res.result.content.createdBy, userId: userId }))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+        logger.error({
+          msg: 'Content createdBy and userId not matched',
+          additionalInfo: { createdBy: res.result.content.createdBy, userId: userId },
+          err: {
+            errCode: rspObj.errCode,
+            errMsg: rspObj.errMsg,
+            responseCode: rspObj.responseCode
+          }
+        }, req)
         return response.status(401).send(respUtil.errorResponse(rspObj))
       } else {
         next()
@@ -199,6 +240,16 @@ function apiAccessForReviewerUser (req, response, next) {
             rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            logger.error({
+              msg: 'getting error from content provider',
+              err: {
+                err,
+                errCode: rspObj.errCode,
+                errMsg: rspObj.errMsg,
+                responseCode: rspObj.responseCode
+              },
+              res
+            }, req)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           } else {
@@ -242,6 +293,15 @@ function hierarchyUpdateApiAccess (req, response, next) {
     rspObj.errCode = contentMessage.HIERARCHY_UPDATE.MISSING_CODE
     rspObj.errMsg = contentMessage.HIERARCHY_UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to required params are missing',
+      additionalInfo: data.request,
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -256,9 +316,21 @@ function hierarchyUpdateApiAccess (req, response, next) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
             'apiAccessForCreatorUser', 'Getting error from content provider', 'err = ' + err + ', res = ' + res))
+
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Getting error from content provider',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            res
+          }, req)
+
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -270,10 +342,19 @@ function hierarchyUpdateApiAccess (req, response, next) {
       if (res.result.content.createdBy !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
           'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
-          {createBy: res.result.content.createdBy, userId: userId}))
+          { createBy: res.result.content.createdBy, userId: userId }))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+        logger.error({
+          msg: 'Content createdBy and userId not matched',
+          additionalInfo: { createBy: res.result.content.createdBy, userId: userId },
+          err: {
+            errCode: rspObj.errCode,
+            errMsg: rspObj.errMsg,
+            responseCode: rspObj.responseCode
+          }
+        }, req)
         return response.status(401).send(respUtil.errorResponse(rspObj))
       } else {
         next()
@@ -291,13 +372,20 @@ function hierarchyUpdateApiAccess (req, response, next) {
 function checkChannelID (req, res, next) {
   var channelID = req.headers['x-channel-id']
   var rspObj = req.rspObj
-
   if (!channelID) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'checkChannelID',
       'API failed due to missing channelID'))
     rspObj.errCode = reqMsg.PARAMS.MISSING_CHANNELID_CODE
     rspObj.errMsg = reqMsg.PARAMS.MISSING_CHANNELID_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'API failed due to missing channelID',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      }
+    }, req)
     return res.status(400).send(respUtil.errorResponse(rspObj))
   }
   next()
