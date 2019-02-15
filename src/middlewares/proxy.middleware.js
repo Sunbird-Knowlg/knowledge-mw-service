@@ -369,7 +369,7 @@ module.exports = function (app) {
         return proxyReqOpts
       },
       proxyReqPathResolver: function (req) {
-        return require('url').parse(configUtil.getConfig('TELEMETRY_BASE_URL') + '/v1/telemetry')
+        return require('url').parse(configUtil.getConfig('TELEMETRY_BASE_URL') + 'v1/telemetry')
           .path
       }
     })
