@@ -67,12 +67,13 @@ function createLock (req, response) {
     rspObj.errMsg = contentMessage.CREATE_LOCK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to required request is missing',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -85,6 +86,7 @@ function createLock (req, response) {
     logger.error({
       msg: 'create lock validation failed',
       err: {
+        err: result.error,
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
@@ -134,6 +136,7 @@ function createLock (req, response) {
           logger.error({
             msg: 'error while getting data from db',
             err: {
+              err: error,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -202,6 +205,7 @@ function createLock (req, response) {
               logger.error({
                 msg: 'error while saving lock data from db',
                 err: {
+                  err,
                   errCode: rspObj.errCode,
                   errMsg: rspObj.errMsg,
                   responseCode: rspObj.responseCode
@@ -283,12 +287,13 @@ function refreshLock (req, response) {
     rspObj.errMsg = contentMessage.REFRESH_LOCK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to required request are missing',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -301,6 +306,7 @@ function refreshLock (req, response) {
     logger.error({
       msg: 'required feilds missing',
       err: {
+        err: result.error,
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
@@ -348,6 +354,7 @@ function refreshLock (req, response) {
           logger.error({
             msg: 'error while getting data from db for refreshing lock',
             err: {
+              err: error,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -394,6 +401,7 @@ function refreshLock (req, response) {
                 logger.error({
                   msg: 'error while updating lock data from db',
                   err: {
+                    err,
                     errCode: rspObj.errCode,
                     errMsg: rspObj.errMsg,
                     responseCode: rspObj.responseCode
@@ -479,7 +487,8 @@ function retireLock (req, response) {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -492,6 +501,7 @@ function retireLock (req, response) {
     logger.error({
       msg: 'Error due to lock retire feilds are missing',
       err: {
+        err: result.error,
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
@@ -536,6 +546,7 @@ function retireLock (req, response) {
             logger.error({
               msg: 'error while getting data from db for retiring lock',
               err: {
+                err: error,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -566,6 +577,7 @@ function retireLock (req, response) {
                   logger.error({
                     msg: 'error while deleting lock data from db',
                     err: {
+                      err,
                       errCode: rspObj.errCode,
                       errMsg: rspObj.errMsg,
                       responseCode: rspObj.responseCode
@@ -642,6 +654,7 @@ function listLock (req, response) {
       logger.error({
         msg: 'error while fetching lock list data from db',
         err: {
+          err: error,
           errCode: rspObj.errCode,
           errMsg: rspObj.errMsg,
           responseCode: rspObj.responseCode
