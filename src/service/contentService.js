@@ -137,8 +137,7 @@ function search(defaultContentTypes, req, response, objectType) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -281,14 +280,13 @@ function createContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.CREATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while creating content',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -357,8 +355,7 @@ function updateContentAPI(req, response) {
         msg: 'Request to content provider to get the latest version key',
         additionalInfo: {
           contentId: data.contentId,
-          query: qs,
-          headers: req.headers
+          query: qs
         }
       }, req)
       contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function (err, res) {
@@ -367,14 +364,13 @@ function updateContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while getting content using jquery',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -402,14 +398,13 @@ function updateContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while updating content',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -488,8 +483,7 @@ function uploadContentAPI(req, response) {
           logger.info({
             msg: 'Request to content provider to upload the content',
             additionalInfo: {
-              contentId: data.contentId,
-              headers: req.headers
+              contentId: data.contentId
             }
           }, req)
 
@@ -500,14 +494,13 @@ function uploadContentAPI(req, response) {
               rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD.FAILED_MESSAGE
               rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
               logger.error({
-                msg: 'Getting error from content provider',
+                msg: 'Getting error from content provider while uploading content',
                 err: {
                   err,
                   errCode: rspObj.errCode,
                   errMsg: rspObj.errMsg,
                   responseCode: rspObj.responseCode
-                },
-                res
+                }
               }, req)
               var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
               rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -534,8 +527,7 @@ function uploadContentAPI(req, response) {
         logger.info({
           msg: 'Request to content provider to upload the content',
           additionalInfo: {
-            contentId: data.contentId,
-            headers: req.headers
+            contentId: data.contentId
           }
         }, req)
 
@@ -547,14 +539,13 @@ function uploadContentAPI(req, response) {
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
 
             logger.error({
-              msg: 'Getting error from content provider',
+              msg: 'Getting error from content provider while uploading content with file url',
               err: {
                 err,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              },
-              res
+              }
             }, req)
 
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
@@ -607,8 +598,7 @@ function reviewContentAPI(req, response) {
         msg: 'Request to content provider to review the content',
         additionalInfo: {
           req: ekStepReqData,
-          contentId: data.contentId,
-          headers: req.headers
+          contentId: data.contentId
         }
       }, req)
       contentProvider.reviewContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
@@ -618,14 +608,13 @@ function reviewContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REVIEW.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while reviewing content',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -688,7 +677,7 @@ function publishContentAPI(req, response) {
         additionalInfo: {
           contentId: data.contentId,
           reqData: ekStepReqData,
-          headers: req.headers
+
         }
       }, req)
 
@@ -699,14 +688,13 @@ function publishContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.PUBLISH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while publishing content',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -770,8 +758,7 @@ function getContentAPI(req, response) {
         msg: 'Request to content provider to get the content meta data',
         additionalInfo: {
           contentId: data.contentId,
-          qs: data.queryParams,
-          headers: req.headers
+          qs: data.queryParams
         }
       }, req)
       contentProvider.getContentUsingQuery(data.contentId, data.queryParams, req.headers, function (err, res) {
@@ -781,14 +768,13 @@ function getContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while getting content using jquery',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -834,8 +820,7 @@ function getMyContentAPI(req, response) {
       logger.info({
         msg: 'Request to content provider to get user content',
         additionalInfo: {
-          body: ekStepReqData,
-          headers: req.headers
+          body: ekStepReqData
         }
       }, req)
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
@@ -844,14 +829,13 @@ function getMyContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider during composite search',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -916,14 +900,13 @@ function retireContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while searching content',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -951,8 +934,7 @@ function retireContentAPI(req, response) {
         logger.info({
           msg: 'Request to content provider to retire content',
           additionalInfo: {
-            contentId: contentId,
-            headers: req.headers
+            contentId: contentId
           }
         }, req)
 
@@ -966,14 +948,13 @@ function retireContentAPI(req, response) {
             errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE
             respCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             logger.error({
-              msg: 'Getting error from content provider',
+              msg: 'Getting error from content provider while retiring content',
               err: {
                 err,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              },
-              res
+              }
             }, req)
             httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             failedContent.push({ contentId: contentId, errCode: errCode, errMsg: errMsg })
@@ -1043,8 +1024,7 @@ function rejectContentAPI(req, response) {
       logger.info({
         msg: 'Request to content provider to reject content',
         additionalInfo: {
-          contentId: data.contentId,
-          headers: req.headers
+          contentId: data.contentId
         }
       }, req)
       contentProvider.rejectContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
@@ -1053,14 +1033,13 @@ function rejectContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REJECT.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while rejecting content',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1179,8 +1158,7 @@ function acceptFlagContentAPI(req, response) {
         msg: 'Request to content provider to accept flag',
         additionalInfo: {
           contentId: data.contentId,
-          body: ekStepReqData,
-          headers: req.headers
+          body: ekStepReqData
         }
       }, req)
 
@@ -1190,14 +1168,13 @@ function acceptFlagContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.ACCEPT_FLAG.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while accepting flagcontent',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1257,8 +1234,7 @@ function rejectFlagContentAPI(req, response) {
         msg: 'Request to content provider to reject flag',
         additionalInfo: {
           contentId: data.contentId,
-          body: ekStepReqData,
-          headers: req.headers
+          body: ekStepReqData
         }
       }, req)
 
@@ -1268,14 +1244,13 @@ function rejectFlagContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REJECT_FLAG.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while rejecting flagcontent',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1336,8 +1311,7 @@ function uploadContentUrlAPI(req, response) {
         msg: 'Request to content provider get upload content url',
         additionalInfo: {
           contentId: data.contentId,
-          body: ekStepReqData,
-          headers: req.headers
+          body: ekStepReqData
         }
       }, req)
       contentProvider.uploadContentUrl(ekStepReqData, data.contentId, req.headers, function (err, res) {
@@ -1346,14 +1320,13 @@ function uploadContentUrlAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD_URL.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while uploading contenturl',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1414,8 +1387,7 @@ function unlistedPublishContentAPI(req, response) {
         msg: 'Request to content provider to unlisted published the content',
         additionalInfo: {
           contentId: data.contentId,
-          reqData: ekStepReqData,
-          headers: req.headers
+          reqData: ekStepReqData
         }
       }, req)
       contentProvider.unlistedPublishContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
@@ -1425,14 +1397,13 @@ function unlistedPublishContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UNLISTED_PUBLISH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider during unlisting published content',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1480,8 +1451,7 @@ function assignBadge(req, response) {
       msg: 'Request to content provider to  get the content meta data',
       additionalInfo: {
         contentId: data.contentId,
-        qs: data.queryParams,
-        headers: req.headers
+        qs: data.queryParams
       }
     }, req)
     contentProvider.getContent(data.contentId, req.headers, function (err, res) {
@@ -1490,14 +1460,13 @@ function assignBadge(req, response) {
         rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
         rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
         logger.error({
-          msg: 'Getting error from content provider',
+          msg: 'Getting error from content provider while getting content',
           err: {
             err,
             errCode: rspObj.errCode,
             errMsg: rspObj.errMsg,
             responseCode: rspObj.responseCode
-          },
-          res
+          }
         }, req)
         var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
         rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1540,14 +1509,13 @@ function assignBadge(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while updating system content',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1590,8 +1558,7 @@ function revokeBadge(req, response) {
       msg: 'Request to content provider to  get the content meta data',
       additionalInfo: {
         contentId: data.contentId,
-        qs: data.queryParams,
-        headers: req.headers
+        qs: data.queryParams
       }
     }, req)
 
@@ -1601,14 +1568,13 @@ function revokeBadge(req, response) {
         rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
         rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
         logger.error({
-          msg: 'Getting error from content provider',
+          msg: 'Getting error from content provider while getting content',
           err: {
             err,
             errCode: rspObj.errCode,
             errMsg: rspObj.errMsg,
             responseCode: rspObj.responseCode
-          },
-          res
+          }
         }, req)
         var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
         rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1649,14 +1615,13 @@ function revokeBadge(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider while updating system content',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1722,8 +1687,7 @@ function copyContentAPI(req, response) {
       logger.info({
         msg: 'Request to content provider to  to copy content',
         additionalInfo: {
-          body: ekStepReqData,
-          headers: req.headers
+          body: ekStepReqData
         }
       }, req)
       contentProvider.copyContent(ekStepReqData, data['contentId'], req.headers, function (err, res) {
@@ -1731,6 +1695,15 @@ function copyContentAPI(req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.COPY.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.COPY.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Getting error from content provider while copying content',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            }
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -1784,8 +1757,7 @@ function searchPluginsAPI(req, response, objectType) {
       logger.info({
         msg: 'Request to content provider to search the plugins',
         additionalInfo: {
-          body: requestData,
-          headers: req.headers
+          body: requestData
         }
       }, req)
       contentProvider.pluginsSearch(requestData, req.headers, function (err, res) {
@@ -1794,14 +1766,13 @@ function searchPluginsAPI(req, response, objectType) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH_PLUGINS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider during plugins search',
             err: {
               err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
