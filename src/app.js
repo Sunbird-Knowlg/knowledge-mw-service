@@ -86,7 +86,8 @@ logger.init({
 logger.debug({ msg: `logger initialized with LEVEL= ${logLevel}` })
 
 logger.debug({
-  msg: 'environment variables', env: {
+  msg: 'environment variables',
+  env: {
     port,
     defaultChannel,
     telemetryBaseUrl,
@@ -171,7 +172,7 @@ require('./middlewares/proxy.middleware')(app)
 
 function startServer() {
   this.server = http.createServer(app).listen(port, function () {
-    logger.debug({ msg: `server running at PORT ${port}` })
+    logger.info({ msg: `server running at PORT ${port}` })
     logger.debug({ msg: `server started at ${new Date()}` })
     if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
       logger.fatal({
