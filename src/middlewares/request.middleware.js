@@ -2,7 +2,6 @@ var async = require('async')
 var uuidV1 = require('uuid/v1')
 var respUtil = require('response_util')
 var messageUtil = require('../service/messageUtil')
-var LOG = require('sb_logger_util')
 var logger = require('sb_logger_util_v2')
 var utilsService = require('../service/utilsService')
 var path = require('path')
@@ -38,7 +37,8 @@ var apiInterceptor = new ApiInterceptor(keyCloakConfig, cacheConfig)
  * @param {type} next
  * @returns {unresolved}
  */
-function createAndValidateRequestBody (req, res, next) {
+function createAndValidateRequestBody(req, res, next) {
+  logger.debug({ msg: 'createAndValidateRequestBody() called' }, req)
   req.body.ts = new Date()
   req.body.url = req.url
   req.body.path = req.route.path
@@ -69,11 +69,9 @@ function createAndValidateRequestBody (req, res, next) {
     delete req.headers[e]
   })
 
-  var requestedData = { body: req.body, params: req.params, query: req.query, headers: req.headers }
-  LOG.info(utilsService.getLoggerData(rspObj, 'INFO',
-    filename, 'createAndValidateRequestBody', 'API request come', requestedData))
+  var requestedData = { body: req.body, params: req.params, query: req.query, headers: lodash.pick(req.headers, ['content-type', 'telemetryData']) }
 
-  logger.info({ msg: 'API request come', requestData: requestedData }, req)
+  logger.info({ msg: 'new request', requestData: requestedData }, req)
 
   req.rspObj = rspObj
   next()
@@ -85,11 +83,11 @@ function createAndValidateRequestBody (req, res, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function validateToken (req, res, next) {
+function validateToken(req, res, next) {
+  logger.debug({ msg: 'validateToken() called' }, req)
   var token = req.headers['x-authenticated-user-token']
   var rspObj = req.rspObj
   if (!token) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'API failed due to missing token'))
     rspObj.errCode = reqMsg.TOKEN.MISSING_CODE
     rspObj.errMsg = reqMsg.TOKEN.MISSING_MESSAGE
     rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
@@ -108,8 +106,6 @@ function validateToken (req, res, next) {
 
   apiInterceptor.validateToken(token, function (err, tokenData) {
     if (err) {
-      logger.error({ msg: 'Invalid token', err }, req)
-      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'Invalid token', err))
       rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
       rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
       rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
@@ -133,6 +129,7 @@ function validateToken (req, res, next) {
         delete req.headers['x-authenticated-user-token']
       }
       req.rspObj.userId = tokenData.userId
+      logger.info({ msg: ` x-authenticated-userid  :- ${tokenData.userId}` })
       rspObj.telemetryData.actor = utilsService.getTelemetryActorData(req)
       req.headers['x-authenticated-userid'] = tokenData.userId
       req.rspObj.userName = payload.name
@@ -148,7 +145,8 @@ function validateToken (req, res, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForCreatorUser (req, response, next) {
+function apiAccessForCreatorUser(req, response, next) {
+  logger.debug({ msg: 'apiAccessForCreatorUser() called' }, req)
   var userId = req.headers['x-authenticated-userid']
   var data = {}
   var rspObj = req.rspObj
@@ -165,8 +163,6 @@ function apiAccessForCreatorUser (req, response, next) {
       contentProvider.getContentUsingQuery(data.contentId, qs, req.headers,
         function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-              'apiAccessForCreatorUser', 'Getting error from content provider', 'err = ' + err + ', res = ' + res))
             rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -189,9 +185,6 @@ function apiAccessForCreatorUser (req, response, next) {
     },
     function (res) {
       if (res.result.content.createdBy !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
-        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR',
-          filename, 'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
-          { createBy: res.result.content.createdBy, userId: userId }))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
@@ -218,7 +211,8 @@ function apiAccessForCreatorUser (req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForReviewerUser (req, response, next) {
+function apiAccessForReviewerUser(req, response, next) {
+  logger.debug({ msg: 'apiAccessForReviewerUser() called' }, req)
   var userId = req.headers['x-authenticated-userid']
   var data = {}
   var rspObj = req.rspObj
@@ -235,8 +229,6 @@ function apiAccessForReviewerUser (req, response, next) {
       contentProvider.getContentUsingQuery(data.contentId, qs, req.headers,
         function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-              'apiAccessForReviewerUser', 'Getting error from content provider', 'err = ' + err + ', res = ' + res))
             rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -259,11 +251,17 @@ function apiAccessForReviewerUser (req, response, next) {
     },
     function (res) {
       if (res.result.content.createdBy === userId || lodash.includes(res.result.content.collaborators, userId)) {
-        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR',
-          filename, 'apiAccessForReviewerUser', 'Content createdBy and userId are matched'))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+        logger.error({
+          msg: 'Unauthorized access',
+          err: {
+            errCode: rspObj.errCode,
+            errMsg: rspObj.errMsg,
+            responseCode: rspObj.responseCode
+          }
+        }, req)
         return response.status(401).send(respUtil.errorResponse(rspObj))
       } else {
         next()
@@ -278,7 +276,8 @@ function apiAccessForReviewerUser (req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function hierarchyUpdateApiAccess (req, response, next) {
+function hierarchyUpdateApiAccess(req, response, next) {
+  logger.debug({ msg: 'hierarchyUpdateApiAccess() called' }, req)
   var userId = req.headers['x-authenticated-userid']
   var data = req.body
   var rspObj = req.rspObj
@@ -288,8 +287,6 @@ function hierarchyUpdateApiAccess (req, response, next) {
   var contentMessage = messageUtil.CONTENT
 
   if (!data.request || !data.request.data || !data.request.data.hierarchy) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'hierarchyUpdateApiAccess',
-      'Error due to required params are missing', data.request))
     rspObj.errCode = contentMessage.HIERARCHY_UPDATE.MISSING_CODE
     rspObj.errMsg = contentMessage.HIERARCHY_UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -314,9 +311,6 @@ function hierarchyUpdateApiAccess (req, response, next) {
     function (CBW) {
       contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-            'apiAccessForCreatorUser', 'Getting error from content provider', 'err = ' + err + ', res = ' + res))
-
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -340,9 +334,6 @@ function hierarchyUpdateApiAccess (req, response, next) {
     },
     function (res) {
       if (res.result.content.createdBy !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
-        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-          'apiAccessForCreatorUser', 'Content createdBy and userId not matched',
-          { createBy: res.result.content.createdBy, userId: userId }))
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
@@ -369,12 +360,11 @@ function hierarchyUpdateApiAccess (req, response, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function checkChannelID (req, res, next) {
+function checkChannelID(req, res, next) {
+  logger.debug({ msg: 'checkChannelID() called' }, req)
   var channelID = req.headers['x-channel-id']
   var rspObj = req.rspObj
   if (!channelID) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'checkChannelID',
-      'API failed due to missing channelID'))
     rspObj.errCode = reqMsg.PARAMS.MISSING_CHANNELID_CODE
     rspObj.errMsg = reqMsg.PARAMS.MISSING_CHANNELID_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
@@ -388,6 +378,7 @@ function checkChannelID (req, res, next) {
     }, req)
     return res.status(400).send(respUtil.errorResponse(rspObj))
   }
+  log.info({ msg: `channel id = ${channelID}` })
   next()
 }
 

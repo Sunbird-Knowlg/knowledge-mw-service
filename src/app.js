@@ -83,8 +83,30 @@ logger.init({
   logLevel
 })
 
-logger.debug({ msg: 'logger initialized' })
+logger.debug({ msg: `logger initialized with LEVEL= ${logLevel}` })
 
+logger.debug({
+  msg: 'environment variables', env: {
+    port,
+    defaultChannel,
+    telemetryBaseUrl,
+    globalEkstepProxyBaseUrl,
+    contentRepoBaseUrl,
+    learnerServiceLocalBaseUrl,
+    searchServiceBaseUrl,
+    dialRepoBaseUrl,
+    pluginRepoBaseUrl,
+    dataServiceBaseUrl,
+    languageServiceBaseUrl,
+    logLevel,
+    logFilePath,
+    producerId,
+    sunbirdPortalBaseUrl,
+    lockExpiryTime,
+    contentServiceLocalBaseUrl,
+    dialCodeImageTempFolder: process.env.dial_code_image_temp_folder
+  }
+})
 var app = express()
 const isEkStepProxyRequest = function (req) {
   let url = req.url
@@ -147,13 +169,11 @@ require('./routes/lockRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer () {
+function startServer() {
   this.server = http.createServer(app).listen(port, function () {
-    console.log('server running at PORT [%d]', port)
     logger.debug({ msg: `server running at PORT ${port}` })
+    logger.debug({ msg: `server started at ${new Date()}` })
     if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
-      console.error('please set environment variable sunbird_environment, sunbird_instance' +
-        'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
       logger.fatal({
         msg: `please set environment variable sunbird_environment, sunbird_instance' +
           'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird`})
@@ -162,7 +182,6 @@ function startServer () {
     contentMetaProvider.getMetaFilterConfig().then((configStr) => {
       configUtil.setConfig('META_FILTER_REQUEST_JSON', configStr)
     }).catch((err) => {
-      console.log('error in getting meta filters', err)
       logger.fatal({ msg: 'error in getting meta filters', err })
       process.exit(1)
     })
@@ -177,9 +196,7 @@ if (defaultChannel) {
     if (defaultHashTagId) {
       configUtil.setConfig('DEFAULT_CHANNEL', defaultHashTagId)
     }
-    console.log('Error fetching default channel', err)
     logger.error({ msg: 'Error fetching default channel', err })
-    console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
     logger.info({ msg: `DEFAULT_CHANNEL ${configUtil.getConfig('DEFAULT_CHANNEL')}` })
     startServer()
   })
@@ -189,7 +206,7 @@ if (defaultChannel) {
 
 // Close server, when we start for test cases
 exports.close = function () {
-  logger.debug({ msg: 'server stopped' })
+  logger.debug({ msg: `server stopped at ${new Date()}` })
   this.server.close()
 }
 
@@ -205,5 +222,5 @@ const telemetryConfig = {
   authtoken: configUtil.getConfig('CONTENT_REPO_AUTHORIZATION_TOKEN')
 }
 
-logger.debug({msg: 'initializing the telemetry service'})
+logger.debug({ msg: 'Telemetry is initialized.' })
 telemetry.init(telemetryConfig)
