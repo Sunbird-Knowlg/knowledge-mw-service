@@ -37,7 +37,7 @@ var apiInterceptor = new ApiInterceptor(keyCloakConfig, cacheConfig)
  * @param {type} next
  * @returns {unresolved}
  */
-function createAndValidateRequestBody (req, res, next) {
+function createAndValidateRequestBody(req, res, next) {
   logger.debug({ msg: 'createAndValidateRequestBody() called' }, req)
   req.body.ts = new Date()
   req.body.url = req.url
@@ -88,7 +88,7 @@ function createAndValidateRequestBody (req, res, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function validateToken (req, res, next) {
+function validateToken(req, res, next) {
   logger.debug({ msg: 'validateToken() called' }, req)
   var token = req.headers['x-authenticated-user-token']
   var rspObj = req.rspObj
@@ -150,7 +150,7 @@ function validateToken (req, res, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForCreatorUser (req, response, next) {
+function apiAccessForCreatorUser(req, response, next) {
   logger.debug({ msg: 'apiAccessForCreatorUser() called' }, req)
   var userId = req.headers['x-authenticated-userid']
   var data = {}
@@ -216,7 +216,7 @@ function apiAccessForCreatorUser (req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForReviewerUser (req, response, next) {
+function apiAccessForReviewerUser(req, response, next) {
   logger.debug({ msg: 'apiAccessForReviewerUser() called' }, req)
   var userId = req.headers['x-authenticated-userid']
   var data = {}
@@ -244,8 +244,7 @@ function apiAccessForReviewerUser (req, response, next) {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              },
-              res
+              }, additionalInfo: { qs }
             }, req)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -281,7 +280,7 @@ function apiAccessForReviewerUser (req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function hierarchyUpdateApiAccess (req, response, next) {
+function hierarchyUpdateApiAccess(req, response, next) {
   logger.debug({ msg: 'hierarchyUpdateApiAccess() called' }, req)
   var userId = req.headers['x-authenticated-userid']
   var data = req.body
@@ -326,8 +325,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            res
+            }, additionalInfo: { qs }
           }, req)
 
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
@@ -365,7 +363,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function checkChannelID (req, res, next) {
+function checkChannelID(req, res, next) {
   logger.debug({ msg: 'checkChannelID() called' }, req)
   var channelID = req.headers['x-channel-id']
   var rspObj = req.rspObj
