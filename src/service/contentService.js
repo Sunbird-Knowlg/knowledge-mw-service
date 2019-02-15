@@ -35,7 +35,7 @@ var reqMsg = messageUtils.REQUEST
  * This function helps to generate code for create course
  * @returns {String}
  */
-function getCode () {
+function getCode() {
   return contentMessage.PREFIX_CODE + randomString.generate(6)
 }
 
@@ -51,15 +51,15 @@ function getCode () {
  * This function return the contentType for create course
  * @returns {String}
  */
-function getContentTypeForContent () {
+function getContentTypeForContent() {
   return contentMessage.CONTENT_TYPE
 }
 
-function searchAPI (req, response) {
+function searchAPI(req, response) {
   return search(compositeMessage.CONTENT_TYPE, req, response)
 }
 
-function searchContentAPI (req, response) {
+function searchContentAPI(req, response) {
   return search(getContentTypeForContent(), req, response, ['Content'])
 }
 
@@ -71,7 +71,7 @@ function searchContentAPI (req, response) {
 //   }
 // }
 
-function search (defaultContentTypes, req, response, objectType) {
+function search(defaultContentTypes, req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -85,12 +85,12 @@ function search (defaultContentTypes, req, response, objectType) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
 
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to required request || request.filters are missing',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
@@ -131,7 +131,7 @@ function search (defaultContentTypes, req, response, objectType) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider',
+            msg: 'Getting error from content provider composite search',
             err: {
               err,
               errCode: rspObj.errCode,
@@ -147,7 +147,7 @@ function search (defaultContentTypes, req, response, objectType) {
           if (req.query.framework) {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
-                logger.error({ msg: `Framework API failed with framework - ${req.query.framework}`, err, res }, req)
+                logger.error({ msg: `Framework API failed with framework - ${req.query.framework}`, err }, req)
                 rspObj.result = res.result
                 return response.status(200).send(respUtil.successResponse(rspObj))
               } else {
@@ -169,9 +169,9 @@ function search (defaultContentTypes, req, response, objectType) {
     function (res) {
       rspObj.result = res.result
       logger.info({
-        msg: `Content searched successfully with ${rspObj.result.count}`,
+        msg: `Content searched successfully with ${lodash.get(rspObj.result, 'count')}`,
         additionalInfo: {
-          contentCount: rspObj.result.count
+          contentCount: lodash.get(rspObj.result, 'count')
         }
       }, req)
 
@@ -180,21 +180,21 @@ function search (defaultContentTypes, req, response, objectType) {
   ])
 }
 
-function getFrameworkDetails (req, CBW) {
+function getFrameworkDetails(req, CBW) {
   cacheManager.get(req.query.framework, function (err, data) {
     if (err || !data) {
       contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, result) {
         if (err || result.responseCode !== responseCode.SUCCESS) {
-          logger.error({ msg: `Fetching framework data failed ${req.query.framework}`, err }, req)
+          logger.error({ msg: `Fetching framework data failed ${lodash.get(req.query, 'framework')}`, err }, req)
           CBW(new Error('Fetching framework data failed'), null)
         } else {
-          logger.info({ msg: `Fetching framework data success ${req.query.framework}`, res: result }, req)
+          logger.info({ msg: `Fetching framework data success ${lodash.get(req.query, 'framework')}` }, req)
           cacheManager.set({ key: req.query.framework, value: result },
             function (err, data) {
               if (err) {
-                logger.error({ msg: `Setting framework cache data failed ${req.query.framework}`, err }, req)
+                logger.error({ msg: `Setting framework cache data failed ${lodash.get(req.query, 'framework')}`, err }, req)
               } else {
-                logger.info({ msg: `Setting framework cache data success ${req.query.framework}`, res: result }, req)
+                logger.info({ msg: `Setting framework cache data success ${lodash.get(req.query, 'framework')}` }, req)
               }
             })
           CBW(null, result)
@@ -206,7 +206,7 @@ function getFrameworkDetails (req, CBW) {
   })
 }
 
-function modifyFacetsData (searchData, frameworkData, language) {
+function modifyFacetsData(searchData, frameworkData, language) {
   lodash.forEach(searchData, (facets) => {
     lodash.forEach(frameworkData, (categories) => {
       if (categories.code === facets.name) {
@@ -226,11 +226,11 @@ function modifyFacetsData (searchData, frameworkData, language) {
   })
 }
 
-function parseTranslationData (data, language) {
+function parseTranslationData(data, language) {
   try {
     return lodash.get(JSON.parse(data), language) || null
   } catch (e) {
-    console.warn(e)
+    logger.warn({ msg: 'warning from parseTranslationData()', warningMessage: e })
     return null
   }
 }
@@ -241,7 +241,7 @@ function parseTranslationData (data, language) {
  * @param {type} response
  * @returns {object} return response object with htpp status
  */
-function createContentAPI (req, response) {
+function createContentAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -252,12 +252,12 @@ function createContentAPI (req, response) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
 
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing request || request.content',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -283,6 +283,7 @@ function createContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -313,7 +314,7 @@ function createContentAPI (req, response) {
  * @param {type} response
  * @returns {unresolved}
  */
-function updateContentAPI (req, response) {
+function updateContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
 
@@ -335,12 +336,12 @@ function updateContentAPI (req, response) {
     rspObj.errMsg = contentMessage.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing request || request.content',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -368,6 +369,7 @@ function updateContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -402,6 +404,7 @@ function updateContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -426,7 +429,7 @@ function updateContentAPI (req, response) {
   ])
 }
 
-function uploadContentAPI (req, response) {
+function uploadContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   data.queryParams = req.query
@@ -460,6 +463,7 @@ function uploadContentAPI (req, response) {
             files: files
           },
           err: {
+            err,
             errCode: rspObj.errCode,
             errMsg: rspObj.errMsg,
             responseCode: rspObj.responseCode
@@ -498,6 +502,7 @@ function uploadContentAPI (req, response) {
               logger.error({
                 msg: 'Getting error from content provider',
                 err: {
+                  err,
                   errCode: rspObj.errCode,
                   errMsg: rspObj.errMsg,
                   responseCode: rspObj.responseCode
@@ -544,6 +549,7 @@ function uploadContentAPI (req, response) {
             logger.error({
               msg: 'Getting error from content provider',
               err: {
+                err,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -570,7 +576,7 @@ function uploadContentAPI (req, response) {
   }
 }
 
-function reviewContentAPI (req, response) {
+function reviewContentAPI(req, response) {
   logger.info({ msg: 'Request for review came' }, req)
   var data = {
     body: req.body
@@ -614,6 +620,7 @@ function reviewContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -638,7 +645,7 @@ function reviewContentAPI (req, response) {
   ])
 }
 
-function publishContentAPI (req, response) {
+function publishContentAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   data.contentId = req.params.contentId
@@ -664,12 +671,12 @@ function publishContentAPI (req, response) {
     rspObj.errMsg = contentMessage.PUBLISH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing request || request.content || request.content.lastPublishedBy',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -694,6 +701,7 @@ function publishContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -721,7 +729,7 @@ function publishContentAPI (req, response) {
   ])
 }
 
-function getContentAPI (req, response) {
+function getContentAPI(req, response) {
   var data = {}
   data.body = req.body
   data.contentId = req.params.contentId
@@ -742,14 +750,14 @@ function getContentAPI (req, response) {
     rspObj.errMsg = contentMessage.GET.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to required content id is missing',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
       },
       additionalInfo: {
-        contentId: data.contentId
+        data
       }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
@@ -775,6 +783,7 @@ function getContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -800,7 +809,7 @@ function getContentAPI (req, response) {
   ])
 }
 
-function getMyContentAPI (req, response) {
+function getMyContentAPI(req, response) {
   var request = {
     'filters': {
       // "createdBy": req.userId
@@ -837,6 +846,7 @@ function getMyContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -856,7 +866,7 @@ function getMyContentAPI (req, response) {
       logger.info({
         msg: 'My Content searched successfully',
         additionalInfo: {
-          count: rspObj.result.count
+          count: lodash.get(rspObj.result, 'count')
         }
       }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
@@ -864,7 +874,7 @@ function getMyContentAPI (req, response) {
   ])
 }
 
-function retireContentAPI (req, response) {
+function retireContentAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   var failedContent = []
@@ -880,12 +890,12 @@ function retireContentAPI (req, response) {
     rspObj.errMsg = contentMessage.RETIRE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to required request ||  request.contentIds are missing',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -908,6 +918,7 @@ function retireContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -957,6 +968,7 @@ function retireContentAPI (req, response) {
             logger.error({
               msg: 'Getting error from content provider',
               err: {
+                err,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -989,7 +1001,7 @@ function retireContentAPI (req, response) {
   ])
 }
 
-function rejectContentAPI (req, response) {
+function rejectContentAPI(req, response) {
   var data = {
     body: req.body
   }
@@ -1012,12 +1024,12 @@ function rejectContentAPI (req, response) {
     rspObj.errMsg = contentMessage.REJECT.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to required content ID is missing',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -1043,6 +1055,7 @@ function rejectContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1066,7 +1079,7 @@ function rejectContentAPI (req, response) {
   ])
 }
 
-function flagContentAPI (req, response) {
+function flagContentAPI(req, response) {
   // var data = req.body
   // data.contentId = req.params.contentId
   // var rspObj = req.rspObj
@@ -1124,7 +1137,7 @@ function flagContentAPI (req, response) {
   return response.status(200).send(respUtil.successResponse({}))
 }
 
-function acceptFlagContentAPI (req, response) {
+function acceptFlagContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1146,15 +1159,12 @@ function acceptFlagContentAPI (req, response) {
     rspObj.errMsg = contentMessage.ACCEPT_FLAG.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing content ID ||  request body ',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      },
-      additionalInfo: {
-        contentId: data.contentId
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -1182,6 +1192,7 @@ function acceptFlagContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1205,7 +1216,7 @@ function acceptFlagContentAPI (req, response) {
   ])
 }
 
-function rejectFlagContentAPI (req, response) {
+function rejectFlagContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1226,15 +1237,12 @@ function rejectFlagContentAPI (req, response) {
     rspObj.errMsg = contentMessage.REJECT_FLAG.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing content ID || request ',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      },
-      additionalInfo: {
-        contentId: data.contentId
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -1262,6 +1270,7 @@ function rejectFlagContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1285,7 +1294,7 @@ function rejectFlagContentAPI (req, response) {
   ])
 }
 
-function uploadContentUrlAPI (req, response) {
+function uploadContentUrlAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1306,16 +1315,13 @@ function uploadContentUrlAPI (req, response) {
     rspObj.errMsg = contentMessage.UPLOAD_URL.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing contentId || request || request.content || request.content.fileName',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
       },
-      additionalInfo: {
-        contentId: data.contentId,
-        body: data
-      }
+      additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -1342,6 +1348,7 @@ function uploadContentUrlAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1366,7 +1373,7 @@ function uploadContentUrlAPI (req, response) {
   ])
 }
 
-function unlistedPublishContentAPI (req, response) {
+function unlistedPublishContentAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   data.contentId = req.params.contentId
@@ -1391,12 +1398,12 @@ function unlistedPublishContentAPI (req, response) {
     rspObj.errMsg = contentMessage.UNLISTED_PUBLISH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing request || request.content || request.content.lastPublishedBy',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -1420,6 +1427,7 @@ function unlistedPublishContentAPI (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1445,7 +1453,7 @@ function unlistedPublishContentAPI (req, response) {
   ])
 }
 
-function assignBadge (req, response) {
+function assignBadge(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1457,12 +1465,12 @@ function assignBadge (req, response) {
     rspObj.errMsg = contentMessage.ASSIGN_BADGE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing request || requst.content || request.content.badgeAssertion',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -1484,6 +1492,7 @@ function assignBadge (req, response) {
         logger.error({
           msg: 'Getting error from content provider',
           err: {
+            err,
             errCode: rspObj.errCode,
             errMsg: rspObj.errMsg,
             responseCode: rspObj.responseCode
@@ -1533,6 +1542,7 @@ function assignBadge (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1554,7 +1564,7 @@ function assignBadge (req, response) {
   }])
 }
 
-function revokeBadge (req, response) {
+function revokeBadge(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1566,12 +1576,12 @@ function revokeBadge (req, response) {
     rspObj.errMsg = contentMessage.REVOKE_BADGE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing request || request.content || request.content.badgeAssertion',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -1593,6 +1603,7 @@ function revokeBadge (req, response) {
         logger.error({
           msg: 'Getting error from content provider',
           err: {
+            err,
             errCode: rspObj.errCode,
             errMsg: rspObj.errMsg,
             responseCode: rspObj.responseCode
@@ -1640,6 +1651,7 @@ function revokeBadge (req, response) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1667,7 +1679,7 @@ function revokeBadge (req, response) {
  * @param {type} response
  * @returns {unresolved}
  */
-function copyContentAPI (req, response) {
+function copyContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1690,12 +1702,12 @@ function copyContentAPI (req, response) {
     rspObj.errMsg = contentMessage.COPY.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to required contentId  missing',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -1736,7 +1748,7 @@ function copyContentAPI (req, response) {
   ])
 }
 
-function searchPluginsAPI (req, response, objectType) {
+function searchPluginsAPI(req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -1749,12 +1761,12 @@ function searchPluginsAPI (req, response, objectType) {
     rspObj.errMsg = contentMessage.SEARCH_PLUGINS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to missing request || request.filters',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      }, additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -1784,6 +1796,7 @@ function searchPluginsAPI (req, response, objectType) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
+              err,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1801,13 +1814,13 @@ function searchPluginsAPI (req, response, objectType) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'Content searched successfully', additionalInfo: { count: rspObj.result.count } }, req)
+      logger.info({ msg: 'Content searched successfully', additionalInfo: { count: lodash.get(rspObj.result, 'count') } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function validateContentLock (req, response) {
+function validateContentLock(req, response) {
   var rspObj = req.rspObj
   var userId = req.get('x-authenticated-userid')
   logger.debug({ msg: 'contentService.validateContentLock() called', additionalInfo: { rspObj } }, req)
