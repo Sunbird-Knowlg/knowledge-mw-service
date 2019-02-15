@@ -23,7 +23,7 @@ var responseCode = messageUtils.RESPONSE_CODE
 var defaultLockExpiryTime = parseInt(configUtil.getConfig('LOCK_EXPIRY_TIME'))
 var contentProvider = require('sb_content_provider_util')
 
-function createLock (req, response) {
+function createLock(req, response) {
   var lockId = dbModel.uuid()
   var newDateObj = createExpiryTime()
   var data = req.body
@@ -114,8 +114,7 @@ function createLock (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            },
-            additionalInfo: { res }
+            }
           }, req)
           return response.status(412).send(respUtil.errorResponse(rspObj))
         }
@@ -259,7 +258,7 @@ function createLock (req, response) {
   ])
 }
 
-function refreshLock (req, response) {
+function refreshLock(req, response) {
   logger.debug({ msg: 'lockService.refreshLock() called' }, req)
   var lockId = ''
   var contentBody = ''
@@ -457,7 +456,7 @@ function refreshLock (req, response) {
   ])
 }
 
-function retireLock (req, response) {
+function retireLock(req, response) {
   logger.debug({ msg: 'lockService.retireLock() called' }, req)
   var data = req.body
   var rspObj = req.rspObj
@@ -605,14 +604,14 @@ function retireLock (req, response) {
 
     function () {
       logger.info({
-        msg: 'retire lock successful', additionalInfo: { resourceId: data.request.resourceId }
+        msg: 'retire lock successful', additionalInfo: { resourceId: lodash.get(data.request, 'resourceId') }
       }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function listLock (req, response) {
+function listLock(req, response) {
   logger.debug({ msg: 'lockService.listLock() called' }, req)
   var data = req.body
   var rspObj = req.rspObj
@@ -669,7 +668,7 @@ function listLock (req, response) {
   })
 }
 
-function validateCreateLockRequestBody (request) {
+function validateCreateLockRequestBody(request) {
   var body = lodash.pick(request, ['resourceId', 'resourceType', 'resourceInfo', 'createdBy', 'creatorInfo'])
   var schema = Joi.object().keys({
     resourceId: Joi.string().required(),
@@ -681,7 +680,7 @@ function validateCreateLockRequestBody (request) {
   return Joi.validate(body, schema)
 }
 
-function validateRefreshLockRequestBody (request) {
+function validateRefreshLockRequestBody(request) {
   var body = lodash.pick(request, ['lockId', 'resourceId', 'resourceType'])
   var schema = Joi.object().keys({
     lockId: Joi.string().required(),
@@ -691,7 +690,7 @@ function validateRefreshLockRequestBody (request) {
   return Joi.validate(body, schema)
 }
 
-function validateCommonRequestBody (request) {
+function validateCommonRequestBody(request) {
   var body = lodash.pick(request, ['resourceId', 'resourceType'])
   var schema = Joi.object().keys({
     resourceId: Joi.string().required(),
@@ -700,36 +699,36 @@ function validateCommonRequestBody (request) {
   return Joi.validate(body, schema)
 }
 
-function createExpiryTime () {
+function createExpiryTime() {
   var dateObj = new Date()
   dateObj.setTime(new Date().getTime() + (defaultLockExpiryTime * 1000))
   return dateObj
 }
 
-function checkResourceTypeValidation (req, CBW) {
+function checkResourceTypeValidation(req, CBW) {
   logger.debug({ msg: 'lockService.checkResourceTypeValidation() called' }, req)
   switch (lodash.lowerCase(req.body.request.resourceType)) {
-  case 'content':
-    var httpOptions = {
-      url: configUtil.getConfig('CONTENT_SERVICE_LOCAL_BASE_URL') + '/v1/content/getContentLockValidation',
-      headers: req.headers,
-      method: 'POST',
-      body: req.body,
-      json: true
-    }
-    request(httpOptions, function (err, httpResponse, body) {
-      if (err) {
-        logger.error({ msg: 'error in lock service in checkResourceTypeValidation', err })
-        CBW(false, err)
-      } else if (lodash.get(body, 'result.message')) {
-        CBW(body.result.validation, body.result)
-      } else {
-        CBW(false, body)
+    case 'content':
+      var httpOptions = {
+        url: configUtil.getConfig('CONTENT_SERVICE_LOCAL_BASE_URL') + '/v1/content/getContentLockValidation',
+        headers: req.headers,
+        method: 'POST',
+        body: req.body,
+        json: true
       }
-    })
-    break
-  default:
-    CBW(false, 'Resource type is not valid')
+      request(httpOptions, function (err, httpResponse, body) {
+        if (err) {
+          logger.error({ msg: 'error in lock service in checkResourceTypeValidation', err })
+          CBW(false, err)
+        } else if (lodash.get(body, 'result.message')) {
+          CBW(body.result.validation, body.result)
+        } else {
+          CBW(false, body)
+        }
+      })
+      break
+    default:
+      CBW(false, 'Resource type is not valid')
   }
 }
 
