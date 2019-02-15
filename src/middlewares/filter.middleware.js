@@ -4,7 +4,7 @@ var path = require('path')
 var filename = path.basename(__filename)
 var logger = require('sb_logger_util_v2')
 
-function addMetaFilters(req, res, next) {
+function addMetaFilters (req, res, next) {
   // If the request body has filter by metaFilter data, continue with the same filter, do not alter the values
   // else call the fetchFilterQuery() function to generate the search string for the meta filters
   if (req && req.body && req.body.request && req.body.request.filters) {
@@ -29,7 +29,7 @@ function addMetaFilters(req, res, next) {
     next()
   }
 }
-function fetchFilterQuery(req, filterProperty) {
+function fetchFilterQuery (req, filterProperty) {
   filterService.getMetadataFilterQuery(function (err, searchJSON) {
     if (err) {
       logger.error({ msg: 'failed to get fetch filter query', err })
