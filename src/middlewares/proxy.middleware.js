@@ -183,6 +183,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/vocabulary/v3/term/suggest',
+    requestMiddleware.validateToken,
     proxy(searchServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -268,11 +269,13 @@ module.exports = function (app) {
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
       lockService.listLock
     )
 
   app.use(
     '/action/dialcode/*',
+    requestMiddleware.validateToken,
     proxy(dialRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -291,6 +294,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/composite/*',
+    requestMiddleware.validateToken,
     proxy(searchServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -307,6 +311,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/language/v3/list',
+    requestMiddleware.validateToken,
     proxy(contentRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -323,6 +328,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/language/*',
+    requestMiddleware.validateToken,
     proxy(languageServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -339,6 +345,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/*',
+    requestMiddleware.validateToken,
     proxy(contentRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
