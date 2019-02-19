@@ -23,7 +23,7 @@ var responseCode = messageUtils.RESPONSE_CODE
 var defaultLockExpiryTime = parseInt(configUtil.getConfig('LOCK_EXPIRY_TIME'))
 var contentProvider = require('sb_content_provider_util')
 
-function createLock(req, response) {
+function createLock (req, response) {
   var lockId = dbModel.uuid()
   var newDateObj = createExpiryTime()
   var data = req.body
@@ -84,7 +84,7 @@ function createLock(req, response) {
     rspObj.errMsg = result.error.details[0].message
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'create lock validation failed',
+      msg: 'create lock request body validation failed',
       err: {
         err: result.error,
         errCode: rspObj.errCode,
@@ -139,6 +139,10 @@ function createLock(req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
+            },
+            additionalInfo: {
+              resourceId: data.request.resourceId,
+              resourceType: data.request.resourceType
             }
           }, req)
           return response.status(500).send(respUtil.errorResponse(rspObj))
@@ -208,7 +212,8 @@ function createLock(req, response) {
                   errCode: rspObj.errCode,
                   errMsg: rspObj.errMsg,
                   responseCode: rspObj.responseCode
-                }
+                },
+                additionalInfo: { lockObject }
               }, req)
               return response.status(500).send(respUtil.errorResponse(rspObj))
             } else {
@@ -230,7 +235,7 @@ function createLock(req, response) {
       }
       contentProvider.updateContent(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          logger.error({ msg: 'Updating content failed with lock key', err }, req)
+          logger.error({ msg: 'Updating content failed with lock key', err, additionalInfo: { resourceId: data.request.resourceId } }, req)
           // Sending success CBW as content is already locked in db and ignoring content update error
           CBW(null, res)
         } else {
@@ -258,7 +263,7 @@ function createLock(req, response) {
   ])
 }
 
-function refreshLock(req, response) {
+function refreshLock (req, response) {
   logger.debug({ msg: 'lockService.refreshLock() called' }, req)
   var lockId = ''
   var contentBody = ''
@@ -303,7 +308,7 @@ function refreshLock(req, response) {
     rspObj.errMsg = result.error.details[0].message
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'required feilds missing',
+      msg: 'Error while validating refresh lock request body',
       err: {
         err: result.error,
         errCode: rspObj.errCode,
@@ -357,6 +362,10 @@ function refreshLock(req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
+            },
+            additionalInfo: {
+              resourceId: data.request.resourceId,
+              resourceType: data.request.resourceType
             }
           }, req)
           return response.status(500).send(respUtil.errorResponse(rspObj))
@@ -367,7 +376,7 @@ function refreshLock(req, response) {
             rspObj.errMsg = contentMessage.REFRESH_LOCK.UNAUTHORIZED
             rspObj.responseCode = responseCode.CLIENT_ERROR
             logger.error({
-              msg: 'error while comparing refresh requested by and created userIds',
+              msg: 'Unauthorized to refresh this lock',
               err: {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
@@ -404,6 +413,18 @@ function refreshLock(req, response) {
                     errCode: rspObj.errCode,
                     errMsg: rspObj.errMsg,
                     responseCode: rspObj.responseCode
+                  },
+                  additionalInfo: {
+                    resourceInfo: { resourceId: data.request.resourceId, resourceType: data.request.resourceType },
+                    lockObject: {
+                      lockId: result.lockId,
+                      resourceInfo: result.resourceInfo,
+                      createdBy: result.createdBy,
+                      creatorInfo: result.creatorInfo,
+                      deviceId: result.deviceId,
+                      createdOn: result.createdOn,
+                      expiresAt: newDateObj
+                    }
                   }
                 }, req)
                 return response.status(500).send(respUtil.errorResponse(rspObj))
@@ -456,7 +477,7 @@ function refreshLock(req, response) {
   ])
 }
 
-function retireLock(req, response) {
+function retireLock (req, response) {
   logger.debug({ msg: 'lockService.retireLock() called' }, req)
   var data = req.body
   var rspObj = req.rspObj
@@ -481,7 +502,7 @@ function retireLock(req, response) {
     rspObj.errMsg = contentMessage.RETIRE_LOCK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to required params are missing',
+      msg: 'Error due to required request body are missing',
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
@@ -498,7 +519,7 @@ function retireLock(req, response) {
     rspObj.errMsg = result.error.details[0].message
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
-      msg: 'Error due to lock retire feilds are missing',
+      msg: 'Error due to lock retire fields are missing',
       err: {
         err: result.error,
         errCode: rspObj.errCode,
@@ -580,7 +601,8 @@ function retireLock(req, response) {
                       errCode: rspObj.errCode,
                       errMsg: rspObj.errMsg,
                       responseCode: rspObj.responseCode
-                    }
+                    },
+                    additionalInfo: { resourceId: data.request.resourceId }
                   }, req)
                   return response.status(500).send(respUtil.errorResponse(rspObj))
                 } else CBW()
@@ -611,7 +633,7 @@ function retireLock(req, response) {
   ])
 }
 
-function listLock(req, response) {
+function listLock (req, response) {
   logger.debug({ msg: 'lockService.listLock() called' }, req)
   var data = req.body
   var rspObj = req.rspObj
@@ -668,7 +690,7 @@ function listLock(req, response) {
   })
 }
 
-function validateCreateLockRequestBody(request) {
+function validateCreateLockRequestBody (request) {
   var body = lodash.pick(request, ['resourceId', 'resourceType', 'resourceInfo', 'createdBy', 'creatorInfo'])
   var schema = Joi.object().keys({
     resourceId: Joi.string().required(),
@@ -680,7 +702,7 @@ function validateCreateLockRequestBody(request) {
   return Joi.validate(body, schema)
 }
 
-function validateRefreshLockRequestBody(request) {
+function validateRefreshLockRequestBody (request) {
   var body = lodash.pick(request, ['lockId', 'resourceId', 'resourceType'])
   var schema = Joi.object().keys({
     lockId: Joi.string().required(),
@@ -690,7 +712,7 @@ function validateRefreshLockRequestBody(request) {
   return Joi.validate(body, schema)
 }
 
-function validateCommonRequestBody(request) {
+function validateCommonRequestBody (request) {
   var body = lodash.pick(request, ['resourceId', 'resourceType'])
   var schema = Joi.object().keys({
     resourceId: Joi.string().required(),
@@ -699,36 +721,36 @@ function validateCommonRequestBody(request) {
   return Joi.validate(body, schema)
 }
 
-function createExpiryTime() {
+function createExpiryTime () {
   var dateObj = new Date()
   dateObj.setTime(new Date().getTime() + (defaultLockExpiryTime * 1000))
   return dateObj
 }
 
-function checkResourceTypeValidation(req, CBW) {
+function checkResourceTypeValidation (req, CBW) {
   logger.debug({ msg: 'lockService.checkResourceTypeValidation() called' }, req)
   switch (lodash.lowerCase(req.body.request.resourceType)) {
-    case 'content':
-      var httpOptions = {
-        url: configUtil.getConfig('CONTENT_SERVICE_LOCAL_BASE_URL') + '/v1/content/getContentLockValidation',
-        headers: req.headers,
-        method: 'POST',
-        body: req.body,
-        json: true
+  case 'content':
+    var httpOptions = {
+      url: configUtil.getConfig('CONTENT_SERVICE_LOCAL_BASE_URL') + '/v1/content/getContentLockValidation',
+      headers: req.headers,
+      method: 'POST',
+      body: req.body,
+      json: true
+    }
+    request(httpOptions, function (err, httpResponse, body) {
+      if (err) {
+        logger.error({ msg: 'error in lock service in checkResourceTypeValidation', err })
+        CBW(false, err)
+      } else if (lodash.get(body, 'result.message')) {
+        CBW(body.result.validation, body.result)
+      } else {
+        CBW(false, body)
       }
-      request(httpOptions, function (err, httpResponse, body) {
-        if (err) {
-          logger.error({ msg: 'error in lock service in checkResourceTypeValidation', err })
-          CBW(false, err)
-        } else if (lodash.get(body, 'result.message')) {
-          CBW(body.result.validation, body.result)
-        } else {
-          CBW(false, body)
-        }
-      })
-      break
-    default:
-      CBW(false, 'Resource type is not valid')
+    })
+    break
+  default:
+    CBW(false, 'Resource type is not valid')
   }
 }
 
