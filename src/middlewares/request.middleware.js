@@ -150,6 +150,7 @@ function validateUserToken (req, res, next) {
       rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
       return res.status(401).send(respUtil.errorResponse(rspObj))
     } else {
+      delete req.headers['x-authenticated-user-token']
       next()
     }
   })
