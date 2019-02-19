@@ -21,7 +21,7 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {object} req
  * @param {object} response
  */
-function submitDataSetRequest (req, response) {
+function submitDataSetRequest(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -32,6 +32,7 @@ function submitDataSetRequest (req, response) {
       contentProvider.submitDataSetRequest(data, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({ msg: 'Getting error from content provider while submitting dataset request', err }, req)
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, dataSetMessages.SUBMIT)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -52,7 +53,7 @@ function submitDataSetRequest (req, response) {
  * @param {object} req
  * @param {object} response
  */
-function getListOfDataSetRequest (req, response) {
+function getListOfDataSetRequest(req, response) {
   var query = req.query
   var rspObj = req.rspObj
   var clientKey = req.params.clientKey
@@ -71,6 +72,7 @@ function getListOfDataSetRequest (req, response) {
       contentProvider.getListOfDataSetRequest(query, clientKey, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({ msg: 'Getting error from content provider while getting list of dataset', err }, req)
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, dataSetMessages.LIST)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -91,7 +93,7 @@ function getListOfDataSetRequest (req, response) {
  * @param {object} req
  * @param {object} response
  */
-function getDataSetDetailRequest (req, response) {
+function getDataSetDetailRequest(req, response) {
   var rspObj = req.rspObj
   var clientKey = req.params.clientKey
   var requestId = req.params.requestId
@@ -109,6 +111,7 @@ function getDataSetDetailRequest (req, response) {
       contentProvider.getDataSetDetailRequest(clientKey, requestId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({ msg: 'Getting error from content provider while getting detail of dataset', err }, req)
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, dataSetMessages.READ)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -129,7 +132,7 @@ function getDataSetDetailRequest (req, response) {
  * @param {object} req
  * @param {object} response
  */
-function getChannelDataSetRequest (req, response) {
+function getChannelDataSetRequest(req, response) {
   var query = req.query
   var rspObj = req.rspObj
   var dataSetId = req.params.dataSetId
@@ -149,6 +152,7 @@ function getChannelDataSetRequest (req, response) {
       contentProvider.getChannelDataSetRequest(query, dataSetId, channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({ msg: 'Getting error from content provider to get channel dataset', err }, req)
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, dataSetMessages.CHANNEL)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {

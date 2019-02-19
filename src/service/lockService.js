@@ -235,6 +235,7 @@ function createLock (req, response) {
       }
       contentProvider.updateContent(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          rspObj.result = res && res.result ? res.result : {}
           logger.error({ msg: 'Updating content failed with lock key', err, additionalInfo: { resourceId: data.request.resourceId } }, req)
           // Sending success CBW as content is already locked in db and ignoring content update error
           CBW(null, res)

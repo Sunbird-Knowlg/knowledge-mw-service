@@ -141,6 +141,7 @@ function search (defaultContentTypes, req, response, objectType) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -291,6 +292,7 @@ function createContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -376,6 +378,7 @@ function updateContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -410,6 +413,7 @@ function updateContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -506,6 +510,7 @@ function uploadContentAPI (req, response) {
                 }
               }, req)
               var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+              rspObj.result = res && res.result ? res.result : {}
               rspObj = utilsService.getErrorResponse(rspObj, res)
               return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
             } else {
@@ -552,6 +557,7 @@ function uploadContentAPI (req, response) {
             }, req)
 
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+            rspObj.result = res && res.result ? res.result : {}
             rspObj = utilsService.getErrorResponse(rspObj, res)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           } else {
@@ -620,6 +626,7 @@ function reviewContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -701,6 +708,7 @@ function publishContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -781,6 +789,7 @@ function getContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -842,6 +851,7 @@ function getMyContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -914,6 +924,7 @@ function retireContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -962,6 +973,7 @@ function retireContentAPI (req, response) {
               }
             }, req)
             httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+            rspObj.result = res && res.result ? res.result : {}
             failedContent.push({ contentId: contentId, errCode: errCode, errMsg: errMsg })
           }
           CBE(null, null)
@@ -1048,6 +1060,7 @@ function rejectContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -1184,6 +1197,7 @@ function acceptFlagContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -1261,6 +1275,7 @@ function rejectFlagContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -1337,6 +1352,7 @@ function uploadContentUrlAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -1415,6 +1431,7 @@ function unlistedPublishContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -1479,6 +1496,7 @@ function assignBadge (req, response) {
           }
         }, req)
         var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+        rspObj.result = res && res.result ? res.result : {}
         rspObj = utilsService.getErrorResponse(rspObj, res)
         return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
       } else {
@@ -1528,6 +1546,7 @@ function assignBadge (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -1588,6 +1607,7 @@ function revokeBadge (req, response) {
           }
         }, req)
         var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+        rspObj.result = res && res.result ? res.result : {}
         rspObj = utilsService.getErrorResponse(rspObj, res)
         return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
       } else {
@@ -1635,6 +1655,7 @@ function revokeBadge (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -1717,6 +1738,7 @@ function copyContentAPI (req, response) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -1788,6 +1810,7 @@ function searchPluginsAPI (req, response, objectType) {
             }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
