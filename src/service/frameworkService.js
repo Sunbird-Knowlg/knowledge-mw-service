@@ -9,8 +9,7 @@ var path = require('path')
 var _ = require('lodash')
 var respUtil = require('response_util')
 var ekStepUtil = require('sb_content_provider_util')
-var LOG = require('sb_logger_util')
-
+var logger = require('sb_logger_util_v2')
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 
@@ -23,7 +22,8 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {Object} response
  */
 
-function getFrameworkById (req, response) {
+function getFrameworkById(req, response) {
+  logger.debug({ msg: 'frameworkService.getFrameworkById() called' }, req)
   var data = {}
   var rspObj = req.rspObj
   data.body = req.body
@@ -41,28 +41,21 @@ function getFrameworkById (req, response) {
   }
 
   if (!data.frameworkId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-      'Error due to required params are missing', {
-        frameworkId: data.frameworkId
-      }))
-
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({ msg: 'Error due to required framework Id is missing', additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Request to ekstep for get course meta data', {
-          frameworkId: data.frameworkId
-        }))
+      logger.info({ msg: 'Request to fetch framework', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       ekStepUtil.getFrameworkById(data.frameworkId, queryString, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({ msg: 'Getting error from ekstep while fetching framework by id ', additionalInfo: { frameworkId: data.frameworkId, queryString }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -73,20 +66,18 @@ function getFrameworkById (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworklList (req, response) {
+function frameworklList(req, response) {
+  logger.debug({ msg: 'frameworkService.frameworklList() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({ msg: 'Error due to required request body is missing', additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -97,17 +88,13 @@ function frameworklList (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Request to ekstep for search object type', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'request to get framework List' }, req)
       ekStepUtil.frameworklList(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({ msg: 'Getting error from ekstep while fetching frameworkList', additionalInfo: { ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -117,21 +104,20 @@ function frameworklList (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
+      logger.debug({ msg: 'framework List', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworkCreate (req, response) {
+function frameworkCreate(req, response) {
+  logger.debug({ msg: 'frameworkService.frameworkCreate() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({ msg: 'Error due to required request body is missing', additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -142,17 +128,13 @@ function frameworkCreate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Request to ekstep for search object type', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'request for new framework creation' }, req)
       ekStepUtil.frameworkCreate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({ msg: 'Getting error from ekstep while framework creation', additionalInfo: { ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -162,15 +144,15 @@ function frameworkCreate (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
+      logger.debug({ msg: 'framework created', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworkUpdate (req, response) {
+function frameworkUpdate(req, response) {
+  logger.debug({ msg: 'frameworkService.frameworkUpdate() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
   data.frameworkId = req.params.frameworkId
@@ -179,9 +161,8 @@ function frameworkUpdate (req, response) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.frameworkId, 'framework', '', {})
   }
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({ msg: 'Error due to required request body is missing', additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -192,18 +173,13 @@ function frameworkUpdate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Request to ekstep for search object type', {
-          body: data,
-          headers: req.headers,
-          frameworkId: data.frameworkId
-        }))
+      logger.info({ msg: 'request to update framework ', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       ekStepUtil.frameworkUpdate(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({ msg: 'Getting error from ekstep while framework update', additionalInfo: { frameworkId: data.frameworkId, ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -213,15 +189,15 @@ function frameworkUpdate (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
+      logger.debug({ msg: 'framework updated', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworkCopy (req, response) {
+function frameworkCopy(req, response) {
+  logger.debug({ msg: 'frameworkService.frameworkCopy() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
   data.frameworkId = req.params.frameworkId
@@ -230,9 +206,8 @@ function frameworkCopy (req, response) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.frameworkId, 'framework', '', {})
   }
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({ msg: 'Error due to required request body is missing', additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -243,18 +218,13 @@ function frameworkCopy (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Request to ekstep for search object type', {
-          body: data,
-          headers: req.headers,
-          frameworkId: data.frameworkId
-        }))
+      logger.info({ msg: 'request to copy framework', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       ekStepUtil.frameworkCopy(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({ msg: 'Getting error from ekstep while framework copy', additionalInfo: { frameworkId: data.frameworkId, ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -264,15 +234,15 @@ function frameworkCopy (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
+      logger.debug({ msg: 'framework copied', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworkPublish (req, response) {
+function frameworkPublish(req, response) {
+  logger.debug({ msg: 'frameworkService.frameworkPublish() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
   data.frameworkId = req.params.frameworkId
@@ -281,9 +251,8 @@ function frameworkPublish (req, response) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.frameworkId, 'framework', '', {})
   }
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({ msg: 'Error due to required request body is missing', additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -294,18 +263,13 @@ function frameworkPublish (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Request to ekstep for search object type', {
-          body: data,
-          headers: req.headers,
-          frameworkId: data.frameworkId
-        }))
+      logger.info({ msg: 'request to publish framework', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       ekStepUtil.frameworkPublish(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkServiceAPI',
-            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({ msg: 'Getting error from ekstep while framework publish', additionalInfo: { ekStepReqData, frameworkId: data.frameworkId }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -315,9 +279,8 @@ function frameworkPublish (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkServiceAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
+      logger.debug({ msg: 'framework published', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
