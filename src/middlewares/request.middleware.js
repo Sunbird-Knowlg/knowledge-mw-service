@@ -37,6 +37,7 @@ var apiInterceptor = new ApiInterceptor(keyCloakConfig, cacheConfig)
  * @param {type} next
  * @returns {unresolved}
  */
+
 function createAndValidateRequestBody(req, res, next) {
   logger.debug({ msg: 'createAndValidateRequestBody() called' }, req)
   req.body.ts = new Date()
@@ -65,7 +66,7 @@ function createAndValidateRequestBody(req, res, next) {
   // if (req.get('accept-encoding') && req.get('accept-encoding').toLowerCase() === 'gzip') {
   //   req.encodingType = 'gzip';
   // }
-  delete req.headers['accept-encoding'];
+  delete req.headers['accept-encoding']
 
   var removedHeaders = ['host', 'origin', 'accept', 'referer', 'content-length', 'user-agent', 'accept-encoding',
     'accept-language', 'accept-charset', 'cookie', 'dnt', 'postman-token', 'cache-control', 'connection']
@@ -93,6 +94,7 @@ function createAndValidateRequestBody(req, res, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
+
 function validateToken(req, res, next) {
   logger.debug({ msg: 'validateToken() called' }, req)
   var token = req.headers['x-authenticated-user-token']
@@ -148,6 +150,37 @@ function validateToken(req, res, next) {
     }
   })
 }
+/**
+ * [validateUserToken - to validate x-authenticated-user-token]
+ * @param  {[type]}   req
+ * @param  {[type]}   res
+ * @param  {Function} next
+ */
+function validateUserToken (req, res, next) {
+  var token = req.headers['x-authenticated-user-token']
+  var rspObj = req.rspObj || {}
+
+  if (!token) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'API failed due to missing token'))
+    rspObj.errCode = reqMsg.TOKEN.MISSING_CODE
+    rspObj.errMsg = reqMsg.TOKEN.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+    return res.status(401).send(respUtil.errorResponse(rspObj))
+  }
+
+  apiInterceptor.validateToken(token, function (err, tokenData) {
+    if (err) {
+      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'validateToken', 'Invalid token', err))
+      rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
+      rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
+      rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+      return res.status(401).send(respUtil.errorResponse(rspObj))
+    } else {
+      delete req.headers['x-authenticated-user-token']
+      next()
+    }
+  })
+}
 
 /**
  * [apiAccessForCreatorUser - Check api access for creator user]
@@ -155,6 +188,7 @@ function validateToken(req, res, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
+
 function apiAccessForCreatorUser(req, response, next) {
   logger.debug({ msg: 'apiAccessForCreatorUser() called' }, req)
   var userId = req.headers['x-authenticated-userid']
@@ -285,6 +319,7 @@ function apiAccessForReviewerUser(req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
+
 function hierarchyUpdateApiAccess(req, response, next) {
   logger.debug({ msg: 'hierarchyUpdateApiAccess() called' }, req)
   var userId = req.headers['x-authenticated-userid']
@@ -369,6 +404,7 @@ function hierarchyUpdateApiAccess(req, response, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
+
 function checkChannelID(req, res, next) {
   logger.debug({ msg: 'checkChannelID() called' }, req)
   var channelID = req.headers['x-channel-id']
@@ -398,3 +434,4 @@ module.exports.apiAccessForReviewerUser = apiAccessForReviewerUser
 module.exports.apiAccessForCreatorUser = apiAccessForCreatorUser
 module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess
 module.exports.checkChannelID = checkChannelID
+module.exports.validateUserToken = validateUserToken

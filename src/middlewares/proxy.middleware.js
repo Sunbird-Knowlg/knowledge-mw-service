@@ -104,8 +104,8 @@ module.exports = function (app) {
   app
     .route(
       '/action' +
-        configUtil.getConfig('ACCEPT_FLAG_CONTENT_URI') +
-        '/:contentId'
+      configUtil.getConfig('ACCEPT_FLAG_CONTENT_URI') +
+      '/:contentId'
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -117,8 +117,8 @@ module.exports = function (app) {
   app
     .route(
       '/action' +
-        configUtil.getConfig('REJECT_FLAG_CONTENT_URI') +
-        '/:contentId'
+      configUtil.getConfig('REJECT_FLAG_CONTENT_URI') +
+      '/:contentId'
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -171,8 +171,8 @@ module.exports = function (app) {
   app
     .route(
       '/action' +
-        configUtil.getConfig('UNLISTED_PUBLISH_CONTENT_URI') +
-        '/:contentId'
+      configUtil.getConfig('UNLISTED_PUBLISH_CONTENT_URI') +
+      '/:contentId'
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -208,7 +208,8 @@ module.exports = function (app) {
     )
 
   app.route('/action/dialcode/v1/process/status/:processId')
-    .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.getProcessIdStatusAPI)
+    .get(requestMiddleware.createAndValidateRequestBody,
+      dialCodeService.getProcessIdStatusAPI)
 
   app
     .route(
@@ -354,13 +355,13 @@ module.exports = function (app) {
 
   app.use(
     '/v1/telemetry',
-    proxy(contentRepoBaseUrl, {
+    proxy(configUtil.getConfig('TELEMETRY_BASE_URL'), {
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
         proxyReqOpts.headers['Authorization'] = contentRepoApiKey
         return proxyReqOpts
       },
       proxyReqPathResolver: function (req) {
-        return require('url').parse(contentRepoBaseUrl + '/data/v3/telemetry')
+        return require('url').parse(configUtil.getConfig('TELEMETRY_BASE_URL') + 'v1/telemetry')
           .path
       }
     })
