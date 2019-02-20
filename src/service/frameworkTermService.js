@@ -59,7 +59,6 @@ function getFrameworkTerm (req, response) {
             'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -107,7 +106,6 @@ function frameworkTermSearch (req, response) {
             'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -155,7 +153,6 @@ function frameworkTermCreate (req, response) {
             'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -210,7 +207,6 @@ function frameworkTermUpdate (req, response) {
             'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {

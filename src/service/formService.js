@@ -21,7 +21,7 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {object} req
  * @param {object} response
  */
-function getForm(req, response) {
+function getForm (req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -43,7 +43,7 @@ function getForm(req, response) {
           headers: req.headers
         }))
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
-        '.' + data.request.action.toLowerCase()
+       '.' + data.request.action.toLowerCase()
       var requestData = {
         'request': {
           'rootOrgId': data.request.rootOrgId || '*',
@@ -54,7 +54,6 @@ function getForm(req, response) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getForm',
             'Got error from learner service', res))
-          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.READ)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -90,15 +89,15 @@ function getForm(req, response) {
  * @param {object} req
  * @param {object} response
  */
-function updateForm(req, response) {
+function updateForm (req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
   if (!data.request ||
-    !data.request.type ||
-    !data.request.subType ||
-    !data.request.action ||
-    !data.request.data) {
+     !data.request.type ||
+     !data.request.subType ||
+     !data.request.action ||
+     !data.request.data) {
     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
       'Error due to required params are missing', data.request))
     rspObj.errCode = formMessages.UPDATE.MISSING_CODE
@@ -115,7 +114,7 @@ function updateForm(req, response) {
           headers: req.headers
         }))
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
-        '.' + data.request.action.toLowerCase()
+       '.' + data.request.action.toLowerCase()
       var requestData = {
         'request': {
           'rootOrgId': data.request.rootOrgId || '*',
@@ -126,7 +125,6 @@ function updateForm(req, response) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
             'Got error from learner service', res))
-          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.READ)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -136,7 +134,7 @@ function updateForm(req, response) {
     },
     function (responseData, CBW) {
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
-        '.' + data.request.action.toLowerCase()
+       '.' + data.request.action.toLowerCase()
       var requestData = {
         'request': {
           'rootOrgId': data.request.rootOrgId || '*',
@@ -173,7 +171,6 @@ function updateForm(req, response) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
             'Got error from learner service', res))
-          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.UPDATE)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -195,7 +192,7 @@ function updateForm(req, response) {
  * @param {object} req
  * @param {object} response
  */
-function createForm(req, response) {
+function createForm (req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -216,7 +213,7 @@ function createForm(req, response) {
 
     function (CBW) {
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
-        '.' + data.request.action.toLowerCase()
+       '.' + data.request.action.toLowerCase()
       var requestData = {
         'request': {
           'rootOrgId': data.request.rootOrgId || '*',
@@ -241,7 +238,6 @@ function createForm(req, response) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createForm',
             'Got error from learner service', res))
-          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.CREATE)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {

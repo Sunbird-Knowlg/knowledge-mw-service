@@ -7,7 +7,7 @@
     "lint": "eslint --ignore-path .eslintignore .",
     "validate": "npm ls",
     "precommit": "lint-staged",
-    "preinstall": "npm install ./libs/sb-config-util && npm install ./libs/sb-http-util && npm install ./libs/sb_content_provider_util && npm install ./libs/sb_logger_util && npm install ./libs/sb_logger_util_v2 && npm install ./libs/sb_req_validator_util && npm install ./libs/response_util && npm install ./libs/sb_api_interceptor && npm install ./libs/sb_cache_manager && npm install ./libs/sb_telemetry_util"
+    "preinstall": "npm install ./libs/sb-config-util && npm install ./libs/sb-http-util && npm install ./libs/sb_content_provider_util && npm install ./libs/sb_logger_util && npm install ./libs/sb_req_validator_util && npm install ./libs/response_util && npm install ./libs/sb_api_interceptor && npm install ./libs/sb_cache_manager && npm install ./libs/sb_telemetry_util"
   },
   "lint-staged": {
     "*.js": "eslint"
@@ -44,7 +44,6 @@
     "sb_cache_manager": "file:libs/sb_cache_manager",
     "sb_content_provider_util": "file:libs/sb_content_provider_util",
     "sb_logger_util": "file:libs/sb_logger_util",
-    "sb_logger_util_v2": "file:libs/sb_logger_util_v2",
     "sb_req_validator_util": "file:libs/sb_req_validator_util",
     "sb_telemetry_util": "file:libs/sb_telemetry_util",
     "underscore": "^1.8.3",
