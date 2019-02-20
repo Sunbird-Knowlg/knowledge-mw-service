@@ -43,7 +43,6 @@ const searchServiceApiKey = process.env.sunbird_search_service_api_key
 const dialRepoApiKey = process.env.sunbird_dial_repo_api_key
 const pluginRepoApiKey = process.env.sunbird_plugin_repo_api_key
 const dataServiceApiKey = process.env.sunbird_data_service_api_key
-const enableLogging = process.env.sunbird_content_service_enable_logging || 'false'
 const logLevel = process.env.sunbird_content_service_log_level || 'error'
 const languageServiceApiKey = process.env.sunbird_language_service_api_key
 
@@ -67,7 +66,6 @@ configUtil.setConfig('SEARCH_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + searchSer
 configUtil.setConfig('DIAL_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + dialRepoApiKey)
 configUtil.setConfig('PLUGIN_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + pluginRepoApiKey)
 configUtil.setConfig('DATA_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + dataServiceApiKey)
-configUtil.setConfig('ENABLE_LOGGING', enableLogging)
 configUtil.setConfig('LANGUAGE_SERVICE_BASE_URL', languageServiceBaseUrl)
 configUtil.setConfig('LANGUAGE_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + languageServiceApiKey)
 configUtil.setConfig('SUNBIRD_PORTAL_BASE_URL', sunbirdPortalBaseUrl)
@@ -79,7 +77,6 @@ process.env.dial_code_image_temp_folder = 'temp'
 
 logger.init({
   path: logFilePath,
-  enableLogger: enableLogging,
   logLevel
 })
 
@@ -170,7 +167,7 @@ require('./routes/lockRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer () {
+function startServer() {
   this.server = http.createServer(app).listen(port, function () {
     logger.info({ msg: `server running at PORT ${port}` })
     logger.debug({ msg: `server started at ${new Date()}` })
