@@ -1,6 +1,6 @@
 {
   "name": "content-service",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "description": "This service used to perform CRUD operations on content",
   "main": "app.js",
   "scripts": {
@@ -47,6 +47,7 @@
     "sb_logger_util_v2": "file:libs/sb_logger_util_v2",
     "sb_req_validator_util": "file:libs/sb_req_validator_util",
     "sb_telemetry_util": "file:libs/sb_telemetry_util",
+    "string-to-stream": "1.1.1",
     "underscore": "^1.8.3",
     "url-metadata": "^2.1.7",
     "uuid": "^3.0.1",

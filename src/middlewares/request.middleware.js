@@ -61,6 +61,11 @@ function createAndValidateRequestBody(req, res, next) {
     actor: utilsService.getTelemetryActorData(req)
   }
   req.headers.telemetryData = rspObj.telemetryData
+  // commenting for removing the gzip for search api
+  // if (req.get('accept-encoding') && req.get('accept-encoding').toLowerCase() === 'gzip') {
+  //   req.encodingType = 'gzip';
+  // }
+  delete req.headers['accept-encoding'];
 
   var removedHeaders = ['host', 'origin', 'accept', 'referer', 'content-length', 'user-agent', 'accept-encoding',
     'accept-language', 'accept-charset', 'cookie', 'dnt', 'postman-token', 'cache-control', 'connection']
@@ -306,7 +311,8 @@ function hierarchyUpdateApiAccess(req, response, next) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
-  var hierarchy = data.request.data.hierarchy
+  var hierarchy = !_.isEmpty(data.request.data.hierarchy)
+    ? data.request.data.hierarchy : data.request.data.nodesModified
   data.contentId = _.findKey(hierarchy, function (item) {
     if (item.root === true) return item
   })

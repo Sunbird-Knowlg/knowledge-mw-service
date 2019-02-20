@@ -15,6 +15,10 @@ var logger = require('sb_logger_util_v2')
 var validatorUtil = require('sb_req_validator_util')
 var _ = require('underscore')
 var lodash = require('lodash')
+var str = require('string-to-stream')
+var zlib = require('zlib');
+
+
 
 var contentModel = require('../models/contentModel').CONTENT
 var messageUtils = require('./messageUtil')
@@ -35,7 +39,7 @@ var reqMsg = messageUtils.REQUEST
  * This function helps to generate code for create course
  * @returns {String}
  */
-function getCode () {
+function getCode() {
   return contentMessage.PREFIX_CODE + randomString.generate(6)
 }
 
@@ -51,15 +55,15 @@ function getCode () {
  * This function return the contentType for create course
  * @returns {String}
  */
-function getContentTypeForContent () {
+function getContentTypeForContent() {
   return contentMessage.CONTENT_TYPE
 }
 
-function searchAPI (req, response) {
+function searchAPI(req, response) {
   return search(compositeMessage.CONTENT_TYPE, req, response)
 }
 
-function searchContentAPI (req, response) {
+function searchContentAPI(req, response) {
   return search(getContentTypeForContent(), req, response, ['Content'])
 }
 
@@ -71,7 +75,17 @@ function searchContentAPI (req, response) {
 //   }
 // }
 
-function search (defaultContentTypes, req, response, objectType) {
+function sendSearchResponse(req, response, data, statueCode) {
+  response.status(statueCode)
+  if (req.encodingType === 'gzip') {
+    response.set('Content-Encoding', 'gzip');
+    return str(JSON.stringify(data)).pipe(zlib.createGzip()).pipe(response)
+  } else {
+    return response.send(JSON.stringify(data))
+  }
+}
+
+function search(defaultContentTypes, req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -83,6 +97,7 @@ function search (defaultContentTypes, req, response, objectType) {
     rspObj.errCode = contentMessage.SEARCH.MISSING_CODE
     rspObj.errMsg = contentMessage.SEARCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+<<<<<<< HEAD
 
     logger.error({
       msg: 'Error due to required request || request.filters are missing',
@@ -95,6 +110,9 @@ function search (defaultContentTypes, req, response, objectType) {
     }, req)
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
+=======
+    return sendSearchResponse(req, response, respUtil.errorResponse(rspObj), 400)
+>>>>>>> 6618ec7f371b5715605a2d056e942bb0433a5f7c
   }
 
   if (!data.request.filters) {
@@ -144,14 +162,19 @@ function search (defaultContentTypes, req, response, objectType) {
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
-          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+          return sendSearchResponse(req, response, respUtil.errorResponse(rspObj), httpStatus)
         } else {
           if (req.query.framework) {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
+<<<<<<< HEAD
                 logger.error({ msg: `Framework API failed with framework - ${req.query.framework}`, err }, req)
+=======
+                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'Framework API failed',
+                  'Framework API failed with framework - ' + req.query.framework, { 'err': err, 'res': res }))
+>>>>>>> 6618ec7f371b5715605a2d056e942bb0433a5f7c
                 rspObj.result = res.result
-                return response.status(200).send(respUtil.successResponse(rspObj))
+                return sendSearchResponse(req, response, respUtil.successResponse(rspObj), 200);
               } else {
                 var language = req.query.lang ? req.query.lang : 'en'
                 if (lodash.get(res, 'result.facets') &&
@@ -170,6 +193,7 @@ function search (defaultContentTypes, req, response, objectType) {
 
     function (res) {
       rspObj.result = res.result
+<<<<<<< HEAD
       logger.info({
         msg: `Content searched successfully with ${lodash.get(rspObj.result, 'count')}`,
         additionalInfo: {
@@ -178,11 +202,18 @@ function search (defaultContentTypes, req, response, objectType) {
       }, req)
 
       return response.status(200).send(respUtil.successResponse(rspObj))
+=======
+      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchContentAPI',
+        'Content searched successfully, We got ' + rspObj.result.count + ' results', {
+          contentCount: rspObj.result.count
+        }))
+      return sendSearchResponse(req, response, respUtil.successResponse(rspObj), 200)
+>>>>>>> 6618ec7f371b5715605a2d056e942bb0433a5f7c
     }
   ])
 }
 
-function getFrameworkDetails (req, CBW) {
+function getFrameworkDetails(req, CBW) {
   cacheManager.get(req.query.framework, function (err, data) {
     if (err || !data) {
       contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, result) {
@@ -208,7 +239,7 @@ function getFrameworkDetails (req, CBW) {
   })
 }
 
-function modifyFacetsData (searchData, frameworkData, language) {
+function modifyFacetsData(searchData, frameworkData, language) {
   lodash.forEach(searchData, (facets) => {
     lodash.forEach(frameworkData, (categories) => {
       if (categories.code === facets.name) {
@@ -228,7 +259,7 @@ function modifyFacetsData (searchData, frameworkData, language) {
   })
 }
 
-function parseTranslationData (data, language) {
+function parseTranslationData(data, language) {
   try {
     return lodash.get(JSON.parse(data), language) || null
   } catch (e) {
@@ -243,7 +274,7 @@ function parseTranslationData (data, language) {
  * @param {type} response
  * @returns {object} return response object with htpp status
  */
-function createContentAPI (req, response) {
+function createContentAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -318,7 +349,7 @@ function createContentAPI (req, response) {
  * @param {type} response
  * @returns {unresolved}
  */
-function updateContentAPI (req, response) {
+function updateContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
 
@@ -435,7 +466,7 @@ function updateContentAPI (req, response) {
   ])
 }
 
-function uploadContentAPI (req, response) {
+function uploadContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   data.queryParams = req.query
@@ -582,8 +613,14 @@ function uploadContentAPI (req, response) {
   }
 }
 
+<<<<<<< HEAD
 function reviewContentAPI (req, response) {
   logger.info({ msg: 'Request for review came' }, req)
+=======
+function reviewContentAPI(req, response) {
+  LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'reviewContentAPI call came',
+    'Request for review came', null))
+>>>>>>> 6618ec7f371b5715605a2d056e942bb0433a5f7c
   var data = {
     body: req.body
   }
@@ -651,7 +688,7 @@ function reviewContentAPI (req, response) {
   ])
 }
 
-function publishContentAPI (req, response) {
+function publishContentAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   data.contentId = req.params.contentId
@@ -737,7 +774,7 @@ function publishContentAPI (req, response) {
   ])
 }
 
-function getContentAPI (req, response) {
+function getContentAPI(req, response) {
   var data = {}
   data.body = req.body
   data.contentId = req.params.contentId
@@ -817,7 +854,7 @@ function getContentAPI (req, response) {
   ])
 }
 
-function getMyContentAPI (req, response) {
+function getMyContentAPI(req, response) {
   var request = {
     'filters': {
       // "createdBy": req.userId
@@ -882,7 +919,7 @@ function getMyContentAPI (req, response) {
   ])
 }
 
-function retireContentAPI (req, response) {
+function retireContentAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   var failedContent = []
@@ -1011,7 +1048,7 @@ function retireContentAPI (req, response) {
   ])
 }
 
-function rejectContentAPI (req, response) {
+function rejectContentAPI(req, response) {
   var data = {
     body: req.body
   }
@@ -1090,7 +1127,7 @@ function rejectContentAPI (req, response) {
   ])
 }
 
-function flagContentAPI (req, response) {
+function flagContentAPI(req, response) {
   // var data = req.body
   // data.contentId = req.params.contentId
   // var rspObj = req.rspObj
@@ -1148,7 +1185,7 @@ function flagContentAPI (req, response) {
   return response.status(200).send(respUtil.successResponse({}))
 }
 
-function acceptFlagContentAPI (req, response) {
+function acceptFlagContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1228,7 +1265,7 @@ function acceptFlagContentAPI (req, response) {
   ])
 }
 
-function rejectFlagContentAPI (req, response) {
+function rejectFlagContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1307,7 +1344,7 @@ function rejectFlagContentAPI (req, response) {
   ])
 }
 
-function uploadContentUrlAPI (req, response) {
+function uploadContentUrlAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1386,7 +1423,7 @@ function uploadContentUrlAPI (req, response) {
   ])
 }
 
-function unlistedPublishContentAPI (req, response) {
+function unlistedPublishContentAPI(req, response) {
   var data = req.body
   var rspObj = req.rspObj
   data.contentId = req.params.contentId
@@ -1467,7 +1504,7 @@ function unlistedPublishContentAPI (req, response) {
   ])
 }
 
-function assignBadge (req, response) {
+function assignBadge(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1581,7 +1618,7 @@ function assignBadge (req, response) {
   }])
 }
 
-function revokeBadge (req, response) {
+function revokeBadge(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1699,7 +1736,7 @@ function revokeBadge (req, response) {
  * @param {type} response
  * @returns {unresolved}
  */
-function copyContentAPI (req, response) {
+function copyContentAPI(req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -1779,7 +1816,7 @@ function copyContentAPI (req, response) {
   ])
 }
 
-function searchPluginsAPI (req, response, objectType) {
+function searchPluginsAPI(req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -1852,7 +1889,7 @@ function searchPluginsAPI (req, response, objectType) {
   ])
 }
 
-function validateContentLock (req, response) {
+function validateContentLock(req, response) {
   var rspObj = req.rspObj
   var userId = req.get('x-authenticated-userid')
   logger.debug({ msg: 'contentService.validateContentLock() called', additionalInfo: { rspObj } }, req)
