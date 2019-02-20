@@ -65,7 +65,7 @@ function createAndValidateRequestBody(req, res, next) {
   // if (req.get('accept-encoding') && req.get('accept-encoding').toLowerCase() === 'gzip') {
   //   req.encodingType = 'gzip';
   // }
-  delete req.headers['accept-encoding'];
+  delete req.headers['accept-encoding']
 
   var removedHeaders = ['host', 'origin', 'accept', 'referer', 'content-length', 'user-agent', 'accept-encoding',
     'accept-language', 'accept-charset', 'cookie', 'dnt', 'postman-token', 'cache-control', 'connection']
@@ -144,6 +144,52 @@ function validateToken(req, res, next) {
       req.headers['x-authenticated-userid'] = tokenData.userId
       req.rspObj.userName = payload.name
       req.rspObj = rspObj
+      next()
+    }
+  })
+}
+/**
+ * [validateUserToken - to validate x-authenticated-user-token]
+ * @param  {[type]}   req
+ * @param  {[type]}   res
+ * @param  {Function} next
+ */
+function validateUserToken(req, res, next) {
+  var token = req.headers['x-authenticated-user-token']
+  var rspObj = req.rspObj || {}
+
+  if (!token) {
+    rspObj.errCode = reqMsg.TOKEN.MISSING_CODE
+    rspObj.errMsg = reqMsg.TOKEN.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+    logger.error({
+      msg: 'x-authenticated-user-token not present',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      }
+    }, req)
+    return res.status(401).send(respUtil.errorResponse(rspObj))
+  }
+
+  apiInterceptor.validateToken(token, function (err, tokenData) {
+    if (err) {
+      rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
+      rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
+      rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+      logger.error({
+        msg: 'Invalid token',
+        err: {
+          err,
+          errCode: rspObj.errCode,
+          errMsg: rspObj.errMsg,
+          responseCode: rspObj.responseCode
+        }, additionalInfo: { token }
+      }, req)
+      return res.status(401).send(respUtil.errorResponse(rspObj))
+    } else {
+      delete req.headers['x-authenticated-user-token']
       next()
     }
   })
@@ -398,3 +444,4 @@ module.exports.apiAccessForReviewerUser = apiAccessForReviewerUser
 module.exports.apiAccessForCreatorUser = apiAccessForCreatorUser
 module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess
 module.exports.checkChannelID = checkChannelID
+module.exports.validateUserToken = validateUserToken

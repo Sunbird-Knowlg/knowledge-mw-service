@@ -97,7 +97,6 @@ function search(defaultContentTypes, req, response, objectType) {
     rspObj.errCode = contentMessage.SEARCH.MISSING_CODE
     rspObj.errMsg = contentMessage.SEARCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-<<<<<<< HEAD
 
     logger.error({
       msg: 'Error due to required request || request.filters are missing',
@@ -110,9 +109,6 @@ function search(defaultContentTypes, req, response, objectType) {
     }, req)
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
-=======
-    return sendSearchResponse(req, response, respUtil.errorResponse(rspObj), 400)
->>>>>>> 6618ec7f371b5715605a2d056e942bb0433a5f7c
   }
 
   if (!data.request.filters) {
@@ -167,12 +163,7 @@ function search(defaultContentTypes, req, response, objectType) {
           if (req.query.framework) {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
-<<<<<<< HEAD
                 logger.error({ msg: `Framework API failed with framework - ${req.query.framework}`, err }, req)
-=======
-                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'Framework API failed',
-                  'Framework API failed with framework - ' + req.query.framework, { 'err': err, 'res': res }))
->>>>>>> 6618ec7f371b5715605a2d056e942bb0433a5f7c
                 rspObj.result = res.result
                 return sendSearchResponse(req, response, respUtil.successResponse(rspObj), 200);
               } else {
@@ -193,7 +184,6 @@ function search(defaultContentTypes, req, response, objectType) {
 
     function (res) {
       rspObj.result = res.result
-<<<<<<< HEAD
       logger.info({
         msg: `Content searched successfully with ${lodash.get(rspObj.result, 'count')}`,
         additionalInfo: {
@@ -202,13 +192,6 @@ function search(defaultContentTypes, req, response, objectType) {
       }, req)
 
       return response.status(200).send(respUtil.successResponse(rspObj))
-=======
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchContentAPI',
-        'Content searched successfully, We got ' + rspObj.result.count + ' results', {
-          contentCount: rspObj.result.count
-        }))
-      return sendSearchResponse(req, response, respUtil.successResponse(rspObj), 200)
->>>>>>> 6618ec7f371b5715605a2d056e942bb0433a5f7c
     }
   ])
 }
@@ -613,14 +596,8 @@ function uploadContentAPI(req, response) {
   }
 }
 
-<<<<<<< HEAD
-function reviewContentAPI (req, response) {
-  logger.info({ msg: 'Request for review came' }, req)
-=======
 function reviewContentAPI(req, response) {
-  LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'reviewContentAPI call came',
-    'Request for review came', null))
->>>>>>> 6618ec7f371b5715605a2d056e942bb0433a5f7c
+  logger.info({ msg: 'Request for review came' }, req)
   var data = {
     body: req.body
   }
