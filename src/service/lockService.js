@@ -57,7 +57,8 @@ function createLock (req, response) {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { userId: req.get('x-authenticated-userid'), createdBy: data.request.createdBy }
     }, req)
     return response.status(403).send(respUtil.errorResponse(rspObj))
   }
@@ -90,7 +91,8 @@ function createLock (req, response) {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { requestObj: data.request }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -159,11 +161,12 @@ function createLock (req, response) {
             rspObj.errCode = contentMessage.CREATE_LOCK.SELF_LOCKED_CODE
             rspObj.errMsg = contentMessage.CREATE_LOCK.SAME_USER_ERR_MSG
             logger.error({
-              msg: 'Resource already locked by user',
+              msg: 'Error due to self lock , Resource already locked by user ',
               err: {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg
-              }
+              },
+              additionalInfo: { userId: req.get('x-authenticated-userid'), createdBy: result.createdBy }
             }, req)
             var statusCode = 400
           } else {
@@ -236,7 +239,7 @@ function createLock (req, response) {
       contentProvider.updateContent(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.result = res && res.result ? res.result : {}
-          logger.error({ msg: 'Updating content failed with lock key', err, additionalInfo: { resourceId: data.request.resourceId } }, req)
+          logger.error({ msg: 'Updating content failed with lock key', err, additionalInfo: { resourceId: data.request.resourceId, ekStepReqData } }, req)
           // Sending success CBW as content is already locked in db and ignoring content update error
           CBW(null, res)
         } else {
@@ -315,7 +318,8 @@ function refreshLock (req, response) {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { requestObj: data.request }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -453,7 +457,8 @@ function refreshLock (req, response) {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              }
+              },
+              additionalInfo: { contentLockKey: contentBody.contentdata.lockKey, requestLockKey: data.request.lockId, resourceInfo: requestBody.request.resourceInfo }
             }, req)
             return response.status(400).send(respUtil.errorResponse(rspObj))
           }
@@ -526,7 +531,8 @@ function retireLock (req, response) {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { requestObj: data.request }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -571,7 +577,8 @@ function retireLock (req, response) {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              }
+              },
+              additionalInfo: { resourceId: data.request.resourceId, resourceType: data.request.resourceType }
             }, req)
             return response.status(500).send(respUtil.errorResponse(rspObj))
           } else if (result) {
@@ -585,6 +592,10 @@ function retireLock (req, response) {
                   errCode: rspObj.errCode,
                   errMsg: rspObj.errMsg,
                   responseCode: rspObj.responseCode
+                },
+                additionalInfo: {
+                  createdBy: lodash.get(result, 'createdBy'),
+                  requestedBy: req.get('x-authenticated-userid')
                 }
               }, req)
               return response.status(403).send(respUtil.errorResponse(rspObj))
@@ -603,7 +614,7 @@ function retireLock (req, response) {
                       errMsg: rspObj.errMsg,
                       responseCode: rspObj.responseCode
                     },
-                    additionalInfo: { resourceId: data.request.resourceId }
+                    additionalInfo: { resourceId: data.request.resourceId, resourceType: data.request.resourceType }
                   }, req)
                   return response.status(500).send(respUtil.errorResponse(rspObj))
                 } else CBW()
@@ -618,7 +629,8 @@ function retireLock (req, response) {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              }
+              },
+              additionalInfo: { resourceId: data.request.resourceId, resourceType: data.request.resourceType }
             }, req)
             return response.status(400).send(respUtil.errorResponse(rspObj))
           }
@@ -680,12 +692,14 @@ function listLock (req, response) {
           errCode: rspObj.errCode,
           errMsg: rspObj.errMsg,
           responseCode: rspObj.responseCode
-        }
+        },
+        additionalInfo: { query }
       }, req)
       return response.status(500).send(respUtil.errorResponse(rspObj))
     } else {
       rspObj.result.count = result.length
       rspObj.result.data = result
+      logger.info({ msg: 'list locks API result ', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   })
@@ -741,7 +755,7 @@ function checkResourceTypeValidation (req, CBW) {
     }
     request(httpOptions, function (err, httpResponse, body) {
       if (err) {
-        logger.error({ msg: 'error in lock service in checkResourceTypeValidation', err })
+        logger.error({ msg: 'error in lock service in checkResourceTypeValidation', additionalInfo: { httpOpt: lodash.omit(httpOptions, 'headers') }, err })
         CBW(false, err)
       } else if (lodash.get(body, 'result.message')) {
         CBW(body.result.validation, body.result)

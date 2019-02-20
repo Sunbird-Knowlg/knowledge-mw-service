@@ -31,7 +31,7 @@ function submitDataSetRequest(req, response) {
       logger.info({ msg: 'Request to content provider to submit data exhaust' }, req)
       contentProvider.submitDataSetRequest(data, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          logger.error({ msg: 'Getting error from content provider while submitting dataset request', err }, req)
+          logger.error({ msg: 'Getting error from content provider while submitting dataset request', additionalInfo: { data }, err }, req)
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, dataSetMessages.SUBMIT)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
@@ -71,7 +71,7 @@ function getListOfDataSetRequest(req, response) {
 
       contentProvider.getListOfDataSetRequest(query, clientKey, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          logger.error({ msg: 'Getting error from content provider while getting list of dataset', err }, req)
+          logger.error({ msg: 'Getting error from content provider while getting list of dataset', additionalInfo: { query }, err }, req)
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, dataSetMessages.LIST)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
@@ -151,7 +151,7 @@ function getChannelDataSetRequest(req, response) {
       }, req)
       contentProvider.getChannelDataSetRequest(query, dataSetId, channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          logger.error({ msg: 'Getting error from content provider to get channel dataset', err }, req)
+          logger.error({ msg: 'Getting error from content provider to get channel dataset', additionalInfo: { query }, err }, req)
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, dataSetMessages.CHANNEL)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))

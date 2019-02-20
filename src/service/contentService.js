@@ -138,7 +138,8 @@ function search (defaultContentTypes, req, response, objectType) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -289,7 +290,8 @@ function createContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -303,7 +305,7 @@ function createContentAPI (req, response) {
     function (res) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.info({ msg: 'Sending response back to user', res: rspObj.result }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
 
@@ -375,7 +377,8 @@ function updateContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, qs }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -410,7 +413,8 @@ function updateContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { ekStepReqData, contentId: data.contentId }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -507,7 +511,8 @@ function uploadContentAPI (req, response) {
                   errCode: rspObj.errCode,
                   errMsg: rspObj.errMsg,
                   responseCode: rspObj.responseCode
-                }
+                },
+                additionalInfo: { formData, contentId: data.contentId }
               }, req)
               var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
               rspObj.result = res && res.result ? res.result : {}
@@ -553,7 +558,8 @@ function uploadContentAPI (req, response) {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              }
+              },
+              additionalInfo: { contentId: data.contentId, queryString }
             }, req)
 
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
@@ -623,7 +629,8 @@ function reviewContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -705,7 +712,8 @@ function publishContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -786,7 +794,8 @@ function getContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, queryParams: data.queryParams }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -848,7 +857,8 @@ function getMyContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -921,7 +931,8 @@ function retireContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -970,7 +981,8 @@ function retireContentAPI (req, response) {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              }
+              },
+              additionalInfo: { contentId }
             }, req)
             httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj.result = res && res.result ? res.result : {}
@@ -1057,7 +1069,8 @@ function rejectContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -1194,7 +1207,8 @@ function acceptFlagContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -1272,7 +1286,8 @@ function rejectFlagContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -1349,7 +1364,8 @@ function uploadContentUrlAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -1428,7 +1444,8 @@ function unlistedPublishContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -1493,7 +1510,8 @@ function assignBadge (req, response) {
             errCode: rspObj.errCode,
             errMsg: rspObj.errMsg,
             responseCode: rspObj.responseCode
-          }
+          },
+          additionalInfo: { contentId: data.contentId }
         }, req)
         var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
         rspObj.result = res && res.result ? res.result : {}
@@ -1521,6 +1539,7 @@ function assignBadge (req, response) {
       rspObj.result.content = rspObj.result.content || {}
       rspObj.result.content.message = 'badge already exist'
       rspObj.responseCode = 'CONFLICT'
+      logger.error({ msg: 'badge already exists', additionalInfo: { result: rspObj.result } }, req)
       return response.status(409).send(respUtil.successResponse(rspObj))
     } else {
       badges.push(newBadge)
@@ -1543,7 +1562,8 @@ function assignBadge (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, requestBody }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -1604,7 +1624,8 @@ function revokeBadge (req, response) {
             errCode: rspObj.errCode,
             errMsg: rspObj.errMsg,
             responseCode: rspObj.responseCode
-          }
+          },
+          additionalInfo: { contentId: data.contentId }
         }, req)
         var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
         rspObj.result = res && res.result ? res.result : {}
@@ -1631,6 +1652,7 @@ function revokeBadge (req, response) {
       rspObj.result = rspObj.result || {}
       rspObj.result.content = rspObj.result.content || {}
       rspObj.result.content.message = 'badge not exist'
+      logger.error({ msg: 'batch does not exists ', additionalInfo: { result: rspObj.result } }, req)
       return response.status(404).send(respUtil.successResponse(rspObj))
     } else {
       var requestBody = {
@@ -1652,7 +1674,8 @@ function revokeBadge (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: data.contentId, requestBody }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -1735,7 +1758,8 @@ function copyContentAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { ekStepReqData, contentId: data['contentId'] }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -1807,7 +1831,8 @@ function searchPluginsAPI (req, response, objectType) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { requestData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -1857,7 +1882,7 @@ function validateContentLock (req, response) {
         rspObj.result.validation = false
         rspObj.result.message = 'You are not authorized'
         logger.error({
-          msg: 'You are not authorized', err: { errMsg: rspObj.result.message }
+          msg: 'You are not authorized', additionalInfo: { userId, createdBy: res.result.content.createdBy }, err: { errMsg: rspObj.result.message }
         }, req)
         return response.status(200).send(respUtil.successResponse(rspObj))
       } else {

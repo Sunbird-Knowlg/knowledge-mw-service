@@ -22,7 +22,7 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {Object} response
  */
 
-function getFrameworkById(req, response) {
+function getFrameworkById (req, response) {
   logger.debug({ msg: 'frameworkService.getFrameworkById() called' }, req)
   var data = {}
   var rspObj = req.rspObj
@@ -53,7 +53,7 @@ function getFrameworkById(req, response) {
       ekStepUtil.getFrameworkById(data.frameworkId, queryString, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while fetching framework by id ', err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while fetching framework by id ', additionalInfo: { frameworkId: data.frameworkId, queryString }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -72,7 +72,7 @@ function getFrameworkById(req, response) {
   ])
 }
 
-function frameworklList(req, response) {
+function frameworklList (req, response) {
   logger.debug({ msg: 'frameworkService.frameworklList() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -93,7 +93,7 @@ function frameworklList(req, response) {
       ekStepUtil.frameworklList(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while fetching frameworkList', err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while fetching frameworkList', additionalInfo: { ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -112,7 +112,7 @@ function frameworklList(req, response) {
   ])
 }
 
-function frameworkCreate(req, response) {
+function frameworkCreate (req, response) {
   logger.debug({ msg: 'frameworkService.frameworkCreate() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -133,7 +133,7 @@ function frameworkCreate(req, response) {
       ekStepUtil.frameworkCreate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while framework creation', err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while framework creation', additionalInfo: { ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -152,7 +152,7 @@ function frameworkCreate(req, response) {
   ])
 }
 
-function frameworkUpdate(req, response) {
+function frameworkUpdate (req, response) {
   logger.debug({ msg: 'frameworkService.frameworkUpdate() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -178,7 +178,7 @@ function frameworkUpdate(req, response) {
       ekStepUtil.frameworkUpdate(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while framework update', err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while framework update', additionalInfo: { frameworkId: data.frameworkId, ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -197,7 +197,7 @@ function frameworkUpdate(req, response) {
   ])
 }
 
-function frameworkCopy(req, response) {
+function frameworkCopy (req, response) {
   logger.debug({ msg: 'frameworkService.frameworkCopy() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -223,7 +223,7 @@ function frameworkCopy(req, response) {
       ekStepUtil.frameworkCopy(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while framework copy', err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while framework copy', additionalInfo: { frameworkId: data.frameworkId, ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -242,7 +242,7 @@ function frameworkCopy(req, response) {
   ])
 }
 
-function frameworkPublish(req, response) {
+function frameworkPublish (req, response) {
   logger.debug({ msg: 'frameworkService.frameworkPublish() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -268,7 +268,7 @@ function frameworkPublish(req, response) {
       ekStepUtil.frameworkPublish(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while framework publish', err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while framework publish', additionalInfo: { ekStepReqData, frameworkId: data.frameworkId }, err: { err, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)

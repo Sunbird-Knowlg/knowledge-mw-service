@@ -77,7 +77,7 @@ function updateCollaborators (req, response) {
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
             },
-            additionalInfo: { data }
+            additionalInfo: { contentId: data.contentId, qs }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -96,7 +96,8 @@ function updateCollaborators (req, response) {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              }
+              },
+              additionalInfo: { contentId: data.contentId, qs }
             }, req)
 
             httpStatus = res.result.content.status === 'Retired'
@@ -140,7 +141,7 @@ function updateCollaborators (req, response) {
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
             },
-            additionalInfo: { data }
+            additionalInfo: { contentId: data.contentId, ekStepReqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -208,7 +209,7 @@ function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
         logger.info({ msg: 'request to send mail', additionalInfo: { body: lsEmailData } }, req)
         contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            logger.error({ msg: 'Sending email failed', err }, req)
+            logger.error({ msg: 'Sending email failed', additionalInfo: { emailData: lsEmailData }, err }, req)
             CBW(new Error('Sending email failed'), null)
           } else {
             CBW(null, res)

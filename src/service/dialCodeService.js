@@ -99,7 +99,7 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
             }
           })
       } else {
-        logger.warn({ msg: 'contentId not present' })
+        logger.warn({ msg: 'contentId not present', additionalInfo: { data } })
         cb(null, data)
       }
     }
@@ -168,7 +168,7 @@ function generateDialCodeAPI (req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GENERATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Error while generating dialcode',
+            msg: 'Error while generating dial code',
             err: {
               err,
               errCode: rspObj.errCode,
@@ -198,7 +198,8 @@ function generateDialCodeAPI (req, response) {
               err: {
                 error,
                 responseCode: res.responseCode
-              }
+              },
+              additionalInfo: { dialCodes: res.result.dialcodes, publisher: requestObj.publisher, channel }
             }, req)
             return response.status(207).send(respUtil.successResponse(res))
           } else {
@@ -211,7 +212,8 @@ function generateDialCodeAPI (req, response) {
                     err: {
                       err,
                       responseCode: res.responseCode
-                    }
+                    },
+                    additionalInfo: { data, channel, requestObj, publisher: requestObj.publisher }
                   }, req)
                   return response.status(207).send(respUtil.successResponse(res))
                 } else {
@@ -231,10 +233,11 @@ function generateDialCodeAPI (req, response) {
       if (requestedCount > configUtil.getConfig('DIALCODE_GENERATE_MAX_COUNT')) {
         rspObj.responseCode = responseCode.PARTIAL_SUCCESS
         logger.error({
-          msg: 'Requsted count is more than Max limit of DIAL code generation',
+          msg: 'Requested count is more than Max limit of DIAL code generation',
           err: {
             responseCode: rspObj.responseCode
-          }
+          },
+          additionalInfo: { requestedCount, dialCodeGenerateMaxCount: configUtil.getConfig('DIALCODE_GENERATE_MAX_COUNT') }
         }, req)
         return response.status(207).send(respUtil.successResponse(rspObj))
       }
@@ -298,7 +301,8 @@ function dialCodeListAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { reqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -321,7 +325,8 @@ function dialCodeListAPI (req, response) {
               err: {
                 err: error,
                 responseCode: res.responseCode
-              }
+              },
+              additionalInfo: { channel, dialcodes, publisher: requestObj.publisher }
             }, req)
             return response.status(207).send(respUtil.successResponse(res))
           } else {
@@ -330,7 +335,7 @@ function dialCodeListAPI (req, response) {
                 if (err) {
                   res.responseCode = responseCode.PARTIAL_SUCCESS
                   logger.error({
-                    msg: 'Error while creating image bacth request',
+                    msg: 'Error while creating image batch request',
                     err: {
                       err,
                       responseCode: res.responseCode
@@ -409,7 +414,7 @@ function updateDialCodeAPI (req, response) {
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
             },
-            additionalInfo: { dialCodeId: data.dialCodeId }
+            additionalInfo: { dialCodeId: data.dialCodeId, reqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -454,7 +459,8 @@ function getDialCodeAPI (req, response) {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -482,7 +488,8 @@ function getDialCodeAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { dialCodeId: data.dialCodeId }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -539,7 +546,8 @@ function contentLinkDialCodeAPI (req, response) {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -564,7 +572,8 @@ function contentLinkDialCodeAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { reqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -609,7 +618,8 @@ function getProcessIdStatusAPI (req, response) {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -645,7 +655,8 @@ function searchDialCodeAPI (req, response) {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
         responseCode: rspObj.responseCode
-      }
+      },
+      additionalInfo: { data }
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -671,7 +682,8 @@ function searchDialCodeAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { reqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -743,7 +755,7 @@ function publishDialCodeAPI (req, response) {
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
             },
-            additionalInfo: { dialCodeId: data.dialCodeId }
+            additionalInfo: { dialCodeId: data.dialCodeId, reqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -809,7 +821,8 @@ function createPublisherAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { reqData }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -881,7 +894,8 @@ function updatePublisherAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { reqData, publisherId: data.publisherId }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -944,7 +958,8 @@ function getPublisherAPI (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { publisherId: data.publisherId }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -982,7 +997,8 @@ function reserveDialCode (req, response) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }
+            },
+            additionalInfo: { contentId: req.params.contentId, data }
           }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           if (res && res.result) rspObj.result = res.result
@@ -1006,7 +1022,8 @@ function reserveDialCode (req, response) {
                 err: {
                   err: error,
                   responseCode: res.responseCode
-                }
+                },
+                additionalInfo: { reservedDialCode: res.result.reservedDialcodes }
               }, req)
               return response.status(207).send(respUtil.successResponse(res))
             } else {
@@ -1019,7 +1036,8 @@ function reserveDialCode (req, response) {
                       err: {
                         err,
                         responseCode: res.responseCode
-                      }
+                      },
+                      additionalInfo: { data, channel, publisher: requestObj.publisher }
                     }, req)
                     return response.status(207).send(respUtil.successResponse(res))
                   } else {
@@ -1056,7 +1074,7 @@ function reserveDialCode (req, response) {
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
               },
-              additionalInfo: { contentId: req.params.contentId }
+              additionalInfo: { contentId: req.params.contentId, ekStepReqData }
             }, req)
             var httpStatus = updateResponse && updateResponse.statusCode >= 100 && updateResponse.statusCode < 600 ? updateResponse.statusCode : 500
             rspObj.result = res && res.result ? res.result : {}
@@ -1101,7 +1119,7 @@ function releaseDialCode (req, response) {
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
             },
-            additionalInfo: { contentId: req.params.contentId }
+            additionalInfo: { contentId: req.params.contentId, data }
           }, req)
           rspObj.result = res && res.result ? res.result : {}
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
