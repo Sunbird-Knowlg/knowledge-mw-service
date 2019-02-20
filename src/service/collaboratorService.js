@@ -91,7 +91,7 @@ function updateCollaborators (req, response) {
               ? responseCode.RESOURCE_NOT_FOUND : contentMessage.COLLABORATORS.FORBIDDEN
 
             logger.error({
-              msg: 'Cannot update collaborators because content is in Draft state',
+              msg: 'Cannot update collaborators because content is not in Draft state',
               err: {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
