@@ -22,7 +22,7 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {Object} response
  */
 
-function getFrameworkById (req, response) {
+function getFrameworkById(req, response) {
   logger.debug({ msg: 'frameworkService.getFrameworkById() called' }, req)
   var data = {}
   var rspObj = req.rspObj
@@ -66,13 +66,12 @@ function getFrameworkById (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'framework details', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworklList (req, response) {
+function frameworklList(req, response) {
   logger.debug({ msg: 'frameworkService.frameworklList() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -106,13 +105,13 @@ function frameworklList (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'framework List', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'framework List', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworkCreate (req, response) {
+function frameworkCreate(req, response) {
   logger.debug({ msg: 'frameworkService.frameworkCreate() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -146,13 +145,13 @@ function frameworkCreate (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'framework created', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'framework created', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworkUpdate (req, response) {
+function frameworkUpdate(req, response) {
   logger.debug({ msg: 'frameworkService.frameworkUpdate() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -191,13 +190,13 @@ function frameworkUpdate (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'framework updated', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'framework updated', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworkCopy (req, response) {
+function frameworkCopy(req, response) {
   logger.debug({ msg: 'frameworkService.frameworkCopy() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -236,13 +235,13 @@ function frameworkCopy (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'framework copied', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'framework copied', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
 }
 
-function frameworkPublish (req, response) {
+function frameworkPublish(req, response) {
   logger.debug({ msg: 'frameworkService.frameworkPublish() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -281,7 +280,7 @@ function frameworkPublish (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'framework published', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'framework published', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])

@@ -43,7 +43,7 @@ const searchServiceApiKey = process.env.sunbird_search_service_api_key
 const dialRepoApiKey = process.env.sunbird_dial_repo_api_key
 const pluginRepoApiKey = process.env.sunbird_plugin_repo_api_key
 const dataServiceApiKey = process.env.sunbird_data_service_api_key
-const logLevel = process.env.sunbird_content_service_log_level || 'error'
+const logLevel = process.env.sunbird_content_service_log_level || 'info'
 const languageServiceApiKey = process.env.sunbird_language_service_api_key
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
