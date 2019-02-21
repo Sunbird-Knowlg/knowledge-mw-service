@@ -183,6 +183,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/vocabulary/v3/term/suggest',
+    requestMiddleware.validateUserToken,
     proxy(searchServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -196,8 +197,22 @@ module.exports = function (app) {
       }
     })
   )
+  app.use('/action/composite/v3/search',
+    proxy(searchServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = searchServiceApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/composite/', '')
+        return require('url').parse(searchServiceBaseUrl + originalUrl).path
+      }
+    })
+  )
   app.use(
-    ['/action/composite/v3/search', '/action/framework/v3/read/*', '/action/content/v1/read/*'],
+    ['/action/framework/v3/read/*', '/action/content/v1/read/*'],
     proxy(contentRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
