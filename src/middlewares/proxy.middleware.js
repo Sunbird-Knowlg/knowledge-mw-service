@@ -196,7 +196,21 @@ module.exports = function (app) {
       }
     })
   )
-
+  app.use(
+    ['/action/composite/v3/search', '/action/framework/v3/read/*', '/action/content/v1/read/*'],
+    proxy(contentRepoBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/', '')
+        return require('url').parse(contentRepoBaseUrl + originalUrl).path
+      }
+    })
+  )
   app
     .route(
       '/action/dialcode/v1/reserve/:contentId'
@@ -268,11 +282,13 @@ module.exports = function (app) {
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateUserToken,
       lockService.listLock
     )
 
   app.use(
     '/action/dialcode/*',
+    requestMiddleware.validateUserToken,
     proxy(dialRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -291,6 +307,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/composite/*',
+    requestMiddleware.validateUserToken,
     proxy(searchServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -307,6 +324,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/language/v3/list',
+    requestMiddleware.validateUserToken,
     proxy(contentRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -323,6 +341,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/language/*',
+    requestMiddleware.validateUserToken,
     proxy(languageServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -333,21 +352,6 @@ module.exports = function (app) {
         var originalUrl = req.originalUrl
         originalUrl = originalUrl.replace('action/language/', '')
         return require('url').parse(languageServiceBaseUrl + originalUrl).path
-      }
-    })
-  )
-  app.use(
-    ['/action/composite/v3/search', '/action/framework/v3/read/*', '/action/content/v1/read/*'],
-    proxy(contentRepoBaseUrl, {
-      limit: reqDataLimitOfContentUpload,
-      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
-        return proxyReqOpts
-      },
-      proxyReqPathResolver: function (req) {
-        var originalUrl = req.originalUrl
-        originalUrl = originalUrl.replace('action/', '')
-        return require('url').parse(contentRepoBaseUrl + originalUrl).path
       }
     })
   )
