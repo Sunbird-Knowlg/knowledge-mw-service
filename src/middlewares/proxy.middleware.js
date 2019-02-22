@@ -133,7 +133,6 @@ module.exports = function (app) {
     )
     .patch(
       requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser
     )
 
@@ -154,7 +153,6 @@ module.exports = function (app) {
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser
     )
 
@@ -164,7 +162,6 @@ module.exports = function (app) {
     )
     .patch(
       requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
       requestMiddleware.hierarchyUpdateApiAccess
     )
 
