@@ -4,14 +4,12 @@ var respUtil = require('response_util')
 var messageUtil = require('../service/messageUtil')
 var logger = require('sb_logger_util_v2')
 var utilsService = require('../service/utilsService')
-var path = require('path')
 var contentProvider = require('sb_content_provider_util')
 var ApiInterceptor = require('sb_api_interceptor')
 var _ = require('underscore')
 var reqMsg = messageUtil.REQUEST
 var responseCode = messageUtil.RESPONSE_CODE
 var apiVersions = messageUtil.API_VERSION
-var filename = path.basename(__filename)
 var jwt = require('jsonwebtoken')
 var lodash = require('lodash')
 
@@ -37,13 +35,13 @@ var apiInterceptor = new ApiInterceptor(keyCloakConfig, cacheConfig)
  * @param {type} next
  * @returns {unresolved}
  */
-function createAndValidateRequestBody(req, res, next) {
+function createAndValidateRequestBody (req, res, next) {
   logger.debug({ msg: 'createAndValidateRequestBody() called' }, req)
   req.body.ts = new Date()
   req.body.url = req.url
   req.body.path = req.route.path
   req.body.params = req.body.params ? req.body.params : {}
-  req.body.params.msgid = req.headers['msgid'] || req.body.params.msgid || uuidV1()
+  req.body.params.msgid = req.get('msgid') || req.body.params.msgid || uuidV1()
   req.id = req.body.params.msgid
   var rspObj = {
     apiId: utilsService.getAppIDForRESP(req.body.path),
@@ -93,9 +91,9 @@ function createAndValidateRequestBody(req, res, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function validateToken(req, res, next) {
+function validateToken (req, res, next) {
   logger.debug({ msg: 'validateToken() called' }, req)
-  var token = req.headers['x-authenticated-user-token']
+  var token = req.get('x-authenticated-user-token')
   var rspObj = req.rspObj
   if (!token) {
     rspObj.errCode = reqMsg.TOKEN.MISSING_CODE
@@ -154,8 +152,8 @@ function validateToken(req, res, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function validateUserToken(req, res, next) {
-  var token = req.headers['x-authenticated-user-token']
+function validateUserToken (req, res, next) {
+  var token = req.get('x-authenticated-user-token')
   var rspObj = req.rspObj || {}
 
   if (!token) {
@@ -185,7 +183,8 @@ function validateUserToken(req, res, next) {
           errCode: rspObj.errCode,
           errMsg: rspObj.errMsg,
           responseCode: rspObj.responseCode
-        }, additionalInfo: { token }
+        },
+        additionalInfo: { token }
       }, req)
       return res.status(401).send(respUtil.errorResponse(rspObj))
     } else {
@@ -201,9 +200,9 @@ function validateUserToken(req, res, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForCreatorUser(req, response, next) {
+function apiAccessForCreatorUser (req, response, next) {
   logger.debug({ msg: 'apiAccessForCreatorUser() called' }, req)
-  var userId = req.headers['x-authenticated-userid']
+  var userId = req.get('x-authenticated-userid')
   var data = {}
   var rspObj = req.rspObj
   var qs = {
@@ -267,9 +266,9 @@ function apiAccessForCreatorUser(req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForReviewerUser(req, response, next) {
+function apiAccessForReviewerUser (req, response, next) {
   logger.debug({ msg: 'apiAccessForReviewerUser() called' }, req)
-  var userId = req.headers['x-authenticated-userid']
+  var userId = req.get('x-authenticated-userid')
   var data = {}
   var rspObj = req.rspObj
   var qs = {
@@ -295,7 +294,8 @@ function apiAccessForReviewerUser(req, response, next) {
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
-              }, additionalInfo: { qs }
+              },
+              additionalInfo: { qs }
             }, req)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -331,9 +331,9 @@ function apiAccessForReviewerUser(req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function hierarchyUpdateApiAccess(req, response, next) {
+function hierarchyUpdateApiAccess (req, response, next) {
   logger.debug({ msg: 'hierarchyUpdateApiAccess() called' }, req)
-  var userId = req.headers['x-authenticated-userid']
+  var userId = req.get('x-authenticated-userid')
   var data = req.body
   var rspObj = req.rspObj
   var qs = {
@@ -377,7 +377,8 @@ function hierarchyUpdateApiAccess(req, response, next) {
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
-            }, additionalInfo: { qs }
+            },
+            additionalInfo: { qs }
           }, req)
 
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
@@ -415,9 +416,9 @@ function hierarchyUpdateApiAccess(req, response, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function checkChannelID(req, res, next) {
+function checkChannelID (req, res, next) {
   logger.debug({ msg: 'checkChannelID() called' }, req)
-  var channelID = req.headers['x-channel-id']
+  var channelID = req.get('x-channel-id')
   var rspObj = req.rspObj
   if (!channelID) {
     rspObj.errCode = reqMsg.PARAMS.MISSING_CHANNELID_CODE
