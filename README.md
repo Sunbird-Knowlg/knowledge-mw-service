@@ -2,7 +2,7 @@
 
 This is the repository for content management micro-service.
 
-The code in this repository is licensed under MIT unless otherwise noted. Please see the [LICENSE](https://github.com/project-sunbird/sunbird-content-seContentrvice/blob/master/LICENSE) file for details.
+The code in this repository is licensed under MIT unless otherwise noted. Please see the [LICENSE](https://github.com/project-sunbird/sunbird-content-service/blob/master/LICENSE) file for details.
 
 ## Pre Requirements
 1. Node
