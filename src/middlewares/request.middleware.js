@@ -78,7 +78,7 @@ function createAndValidateRequestBody(req, res, next) {
     body: req.body,
     params: req.params,
     query: req.query,
-    headers: lodash.omit(req.headers, ['Authorization', 'x-authenticated-user-token'])
+    headers: lodash.omit(req.headers, ['Authorization', 'x-authenticated-user-token', 'authorization'])
   }
 
   logger.info({ msg: 'new request', requestData: requestedData }, req)

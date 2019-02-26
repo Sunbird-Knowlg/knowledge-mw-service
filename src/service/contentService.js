@@ -385,7 +385,7 @@ function updateContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider while getting content using jquery',
+            msg: 'Getting error from content provider while getting content using query',
             err: {
               err,
               errCode: rspObj.errCode,
@@ -802,7 +802,7 @@ function getContentAPI(req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider while getting content using jquery',
+            msg: 'Getting error from content provider while getting content using query',
             err: {
               err,
               errCode: rspObj.errCode,
