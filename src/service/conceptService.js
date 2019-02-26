@@ -22,7 +22,7 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {Object} req
  * @param {Object} response
  */
-function getDomainsAPI (req, response) {
+function getDomainsAPI(req, response) {
   var data = {}
   var rspObj = req.rspObj
   data.body = req.body
@@ -42,6 +42,7 @@ function getDomainsAPI (req, response) {
           rspObj.errMsg = domainMessage.GET_DOMAINS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -63,7 +64,7 @@ function getDomainsAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function getDomainByIDAPI (req, response) {
+function getDomainByIDAPI(req, response) {
   var data = {}
   var rspObj = req.rspObj
 
@@ -94,6 +95,7 @@ function getDomainByIDAPI (req, response) {
           rspObj.errMsg = domainMessage.GET_DOMAIN_BY_ID.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -116,7 +118,7 @@ function getDomainByIDAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function getObjectTypesAPI (req, response) {
+function getObjectTypesAPI(req, response) {
   var data = {}
   var rspObj = req.rspObj
   data.domainId = req.params.domainId
@@ -147,6 +149,7 @@ function getObjectTypesAPI (req, response) {
           rspObj.errMsg = domainMessage.GET_OBJECTS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -168,7 +171,7 @@ function getObjectTypesAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function getObjectTypeByIDAPI (req, response) {
+function getObjectTypeByIDAPI(req, response) {
   var data = {}
   var rspObj = req.rspObj
 
@@ -201,6 +204,7 @@ function getObjectTypeByIDAPI (req, response) {
           rspObj.errMsg = domainMessage.GET_OBJECT_BY_ID.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -223,7 +227,7 @@ function getObjectTypeByIDAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function getConceptByIdAPI (req, response) {
+function getConceptByIdAPI(req, response) {
   var data = {}
   var rspObj = req.rspObj
   data.conceptId = req.params.conceptId
@@ -253,6 +257,7 @@ function getConceptByIdAPI (req, response) {
           rspObj.errMsg = domainMessage.GET_CONCEPT_BY_ID.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -275,7 +280,7 @@ function getConceptByIdAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function searchObjectTypeAPI (req, response) {
+function searchObjectTypeAPI(req, response) {
   var rspObj = req.rspObj
   var data = req.body
   data.domainId = req.params.domainId
@@ -311,6 +316,7 @@ function searchObjectTypeAPI (req, response) {
             rspObj.errMsg = domainMessage.SEARCH_OBJECT_TYPE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+            rspObj.result = res && res.result ? res.result : {}
             rspObj = utilsService.getErrorResponse(rspObj, res)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           } else {
@@ -333,7 +339,7 @@ function searchObjectTypeAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function createObjectTypeAPI (req, response) {
+function createObjectTypeAPI(req, response) {
   var rspObj = req.rspObj
 
   var data = req.body
@@ -369,6 +375,7 @@ function createObjectTypeAPI (req, response) {
           rspObj.errMsg = domainMessage.CREATE_OBJECT_TYPE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -391,7 +398,7 @@ function createObjectTypeAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function updateObjectTypeAPI (req, response) {
+function updateObjectTypeAPI(req, response) {
   var rspObj = req.rspObj
   var data = req.body
   data.domainId = req.params.domainId
@@ -428,6 +435,7 @@ function updateObjectTypeAPI (req, response) {
             rspObj.errMsg = domainMessage.UPDATE_OBJECT_TYPE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+            rspObj.result = res && res.result ? res.result : {}
             rspObj = utilsService.getErrorResponse(rspObj, res)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           } else {
@@ -450,7 +458,7 @@ function updateObjectTypeAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function retireObjectTypeAPI (req, response) {
+function retireObjectTypeAPI(req, response) {
   var rspObj = req.rspObj
   var data = req.body
   data.domainId = req.params.domainId
@@ -485,6 +493,7 @@ function retireObjectTypeAPI (req, response) {
             rspObj.errMsg = domainMessage.RETIRE_OBJECT_TYPE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+            rspObj.result = res && res.result ? res.result : {}
             rspObj = utilsService.getErrorResponse(rspObj, res)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
           } else {
@@ -507,7 +516,7 @@ function retireObjectTypeAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function listTermsAPI (req, response) {
+function listTermsAPI(req, response) {
   var rspObj = req.rspObj
   async.waterfall([
     function (CBW) {
@@ -538,7 +547,7 @@ function listTermsAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function listResourceBundlesAPI (req, response) {
+function listResourceBundlesAPI(req, response) {
   var rspObj = req.rspObj
   async.waterfall([
     function (CBW) {
@@ -569,7 +578,7 @@ function listResourceBundlesAPI (req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function listOrdinalsAPI (req, response) {
+function listOrdinalsAPI(req, response) {
   var rspObj = req.rspObj
   async.waterfall([
     function (CBW) {

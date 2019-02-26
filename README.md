@@ -15,7 +15,7 @@ The code in this repository is licensed under MIT unless otherwise noted. Please
 * sunbird_dial_repo_api_key : API key for the dial URL
 * sunbird_plugin_repo_api_key: API key for the plugin URL 
 * sunbird_data_service_api_key: API key for the data service URL
-* sunbird_content_service_enable_logging : API key for the content service login
+* sunbird_content_service_log_level : sets the log level e.g debug , info etc.
 * sunbird_language_service_api_key: API key for the language service 
 * sunbird_default_channel: Default channel. e.g. sunbird (string)  
 * sunbird_content_plugin_base_url: Content plugin base url. e.g.: https://qa.ekstep.in or https://community.ekstep.in
