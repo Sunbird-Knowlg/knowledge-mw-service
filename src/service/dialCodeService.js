@@ -274,7 +274,7 @@ function dialCodeListAPI (req, response) {
     logger.info({ msg: 'request to get list of dialcodes', additionalInfo: { data: data.request.search } }, req)
   }
 
-  if (!data.request || !data.request.search || !data.request.search.publisher) {
+  if (!data.request || !data.request.search) {
     rspObj.errCode = dialCodeMessage.LIST.MISSING_CODE
     rspObj.errMsg = dialCodeMessage.LIST.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR

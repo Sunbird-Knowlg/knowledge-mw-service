@@ -353,11 +353,17 @@ function refreshLock (req, response) {
     },
     function (CBW) {
       if (data.request.lockId !== contentBody.contentdata.lockKey) {
-        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'refreshLockAPI',
-          'Lock key and request lock key does not match', data.request))
         rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
         rspObj.errMsg = contentMessage.REFRESH_LOCK.INVALID_LOCK_KEY
         rspObj.responseCode = responseCode.CLIENT_ERROR
+        logger.error({
+          msg: 'Lock key and request lock key does not match',
+          err: {
+            errCode: rspObj.errCode,
+            errMsg: rspObj.errMsg,
+            responseCode: rspObj.responseCode
+          }
+        }, req)
         return response.status(422).send(respUtil.errorResponse(rspObj))
       }
       dbModel.instance.lock.findOne({
