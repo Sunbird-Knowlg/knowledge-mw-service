@@ -11,6 +11,6 @@ module.exports = function (app) {
   app.route('/health')
     .get(requestMiddleware.createAndValidateRequestBody, healthService.checkHealth)
 
-  app.route('/content-service/health')
+  app.route('/service/health')
     .get(requestMiddleware.createAndValidateRequestBody, healthService.checkContentServiceHealth)
 }

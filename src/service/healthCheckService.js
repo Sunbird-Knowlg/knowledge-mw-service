@@ -30,7 +30,6 @@ function getHealthCheckObj (name, healthy, err, errMsg) {
 
 // Function help to get health check response
 function getHealthCheckResp (rsp, healthy, checksArrayObj) {
-  delete rsp.responseCode
   rsp.result = {}
   rsp.result.name = messageUtils.SERVICE.NAME
   rsp.result.version = messageUtils.API_VERSION.V1
@@ -121,7 +120,8 @@ function checkHealth (req, response) {
  */
 function checkContentServiceHealth (req, response) {
   var rspObj = req.rspObj
-  return response.status(200).send(respUtil.successResponse(rspObj))
+  var rsp = respUtil.successResponse(rspObj)
+  return response.status(200).send(getHealthCheckResp(rsp, true))
 }
 
 module.exports.checkHealth = checkHealth
