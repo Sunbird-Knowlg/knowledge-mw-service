@@ -558,7 +558,9 @@ exports.DIALCODE = {
     NOTFOUND_CODE: 'ERR_PROCESS_ID_NOT_FOUND',
     NOTFOUND_MESSAGE: 'Requested process id not found',
     INPROGRESS_MESSAGE: 'in-process',
-    COMPLETED: 'completed'
+    COMPLETED: 'completed',
+    FAILED_UPDATE_MESSAGE: 'Unable to update process info',
+    FAILED_KAFKA_MESSAGE: 'Kafka failed'
   },
 
   SEARCH: {

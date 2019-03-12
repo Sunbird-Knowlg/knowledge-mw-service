@@ -14,6 +14,7 @@ var Telemetry = require('sb_telemetry_util')
 var telemetry = new Telemetry()
 var batchModelProperties = ['processid', 'dialcodes', 'config', 'status', 'channel', 'publisher']
 var KafkaService = require('./../../helpers/qrCodeKafkaProducer.js') 
+var utilsService = require('../utilsService')
 
 const defaultConfig = {
   "errorCorrectionLevel": "H",
@@ -104,6 +105,86 @@ BatchImageService.prototype.getStatus = function (rspObj, processId) {
           rspObj.result.status = dialCodeMessage.PROCESS.COMPLETED
           rspObj.result.url = batch.url
           resolve({ code: 200, data: respUtil.successResponse(rspObj) })
+        }
+      }
+    })
+  })
+}
+
+BatchImageService.prototype.updateProcessId = function (rspObj, processId, force) {
+  return new Promise(function (resolve, reject) {
+    try {
+      var processUUId = dbModel.uuidFromString(processId)
+    } catch (e) {
+      console.log('err', e)
+      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateProcessId',
+        'Process id not found', e))
+      rspObj.errCode = dialCodeMessage.PROCESS.NOTFOUND_CODE
+      rspObj.errMsg = dialCodeMessage.PROCESS.NOTFOUND_MESSAGE
+      rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
+      reject(new Error(JSON.stringify({ code: 404, data: respUtil.errorResponse(rspObj) })))
+    }
+    // Finding process details from DB
+    dbModel.instance.dialcode_batch.findOne({ processid: processUUId }, function (err, batch) {
+      if (err) {
+        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
+          'updateProcessId', 'DB error while fetching process details', err))
+        rspObj.errCode = dialCodeMessage.PROCESS.FAILED_CODE
+        rspObj.errMsg = dialCodeMessage.PROCESS.FAILED_MESSAGE
+        rspObj.responseCode = responseCode.SERVER_ERROR
+        reject(new Error(JSON.stringify({ code: 500, data: respUtil.errorResponse(rspObj) })))
+      } else if (!batch) {
+        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
+          'updateProcessId', 'Process details not found in DB', err))
+        rspObj.errCode = dialCodeMessage.PROCESS.NOTFOUND_CODE
+        rspObj.errMsg = dialCodeMessage.PROCESS.NOTFOUND_MESSAGE
+        rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
+        reject(new Error(JSON.stringify({ code: 404, data: respUtil.errorResponse(rspObj) })))
+      } else {
+        // If force is sent true in query param or batch status is 3
+        if (force === 'true' || batch.status === 3) {
+          LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename,
+            'updateProcessId', 'Process updation initiated', batch))
+          batch.status = 0
+          // Updating process status to 0
+          dbModel.instance.dialcode_batch.update(
+            { processid: processUUId },
+            { status: batch.status }, function (err) {
+              if (err) {
+                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
+                  'updateProcessId', 'Updating process details failed in DB', err))
+                rspObj.errCode = dialCodeMessage.PROCESS.FAILED_CODE
+                rspObj.errMsg = dialCodeMessage.PROCESS.FAILED_UPDATE_MESSAGE
+                rspObj.responseCode = responseCode.SERVER_ERROR
+                reject(new Error(JSON.stringify({ code: 500, data: respUtil.errorResponse(rspObj) })))
+              } else {
+                // Sending record to kafka
+                KafkaService.sendRecord(batch, function (err, res) {
+                  if (err) {
+                    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
+                      'updateProcessId', 'Kafka send record failed', err))
+                    rspObj.errCode = dialCodeMessage.PROCESS.FAILED_CODE
+                    rspObj.errMsg = dialCodeMessage.PROCESS.FAILED_KAFKA_MESSAGE
+                    rspObj.responseCode = responseCode.SERVER_ERROR
+                    reject(new Error(JSON.stringify({ code: 500, data: respUtil.errorResponse(rspObj) })))
+                  } else {
+                    LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename,
+                      'updateProcessId', 'Kafka send record successful', batch))
+                    rspObj.result.status = dialCodeMessage.PROCESS.INPROGRESS_MESSAGE
+                    resolve({ code: 200, data: respUtil.successResponse(rspObj) })
+                  }
+                })
+              }
+            })
+        } else {
+          if (batch.status !== 2) {
+            rspObj.result.status = dialCodeMessage.PROCESS.INPROGRESS_MESSAGE
+            resolve({ code: 500, data: respUtil.errorResponse(rspObj) })
+          } else {
+            rspObj.result.status = dialCodeMessage.PROCESS.COMPLETED
+            rspObj.result.url = batch.url
+            resolve({ code: 500, data: respUtil.errorResponse(rspObj) })
+          }
         }
       }
     })
