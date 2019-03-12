@@ -111,4 +111,15 @@ function checkHealth (req, response) {
   })
 }
 
+/**
+ * This function helps to check health for content service and returns 200 on success
+ * @param {Object} req
+ * @param {Object} response
+ */
+function checkContentServiceHealth (req, response) {
+  var rspObj = req.rspObj
+  return response.status(200).send(respUtil.successResponse(rspObj))
+}
+
 module.exports.checkHealth = checkHealth
+module.exports.checkContentServiceHealth = checkContentServiceHealth
