@@ -49,6 +49,7 @@ const languageServiceApiKey = process.env.sunbird_language_service_api_key
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 const sunbirdPortalBaseUrl = process.env.sunbird_portal_base_url || 'https://staging.open-sunbird.org'
 const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
+const contentServiceHealthStatus = true
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://content-service:5000'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
@@ -70,6 +71,7 @@ configUtil.setConfig('LANGUAGE_SERVICE_BASE_URL', languageServiceBaseUrl)
 configUtil.setConfig('LANGUAGE_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + languageServiceApiKey)
 configUtil.setConfig('SUNBIRD_PORTAL_BASE_URL', sunbirdPortalBaseUrl)
 configUtil.setConfig('LOCK_EXPIRY_TIME', lockExpiryTime)
+configUtil.setConfig('CONTENT_SERVICE_HEALTH_STATUS', contentServiceHealthStatus)
 configUtil.setConfig('CONTENT_SERVICE_LOCAL_BASE_URL', contentServiceLocalBaseUrl)
 
 process.env.sunbird_cassandra_urls = process.env.sunbird_cassandra_urls || '127.0.0.1'
@@ -101,6 +103,7 @@ logger.debug({
     producerId,
     sunbirdPortalBaseUrl,
     lockExpiryTime,
+    contentServiceHealthStatus,
     contentServiceLocalBaseUrl,
     dialCodeImageTempFolder: process.env.dial_code_image_temp_folder
   }

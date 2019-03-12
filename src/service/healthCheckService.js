@@ -9,6 +9,7 @@ var contentProvider = require('sb_content_provider_util')
 var respUtil = require('response_util')
 var path = require('path')
 var LOG = require('sb_logger_util')
+var configUtil = require('sb-config-util')
 
 var messageUtils = require('./messageUtil')
 var utilsService = require('./utilsService')
@@ -102,10 +103,12 @@ function checkHealth (req, response) {
     if (isEkStepHealthy && isLSHealthy && isDbConnected) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'checkHealth',
         'Content service is healthy'))
+      configUtil.setConfig('CONTENT_SERVICE_HEALTH_STATUS', true)
       return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj))
     } else {
       LOG.error(utilsService.getLoggerData(rspObj, 'INFO', filename, 'checkHealth',
         'Content service is not healthy', { rsp: checksArrayObj }))
+      configUtil.setConfig('CONTENT_SERVICE_HEALTH_STATUS', false)
       return response.status(200).send(getHealthCheckResp(rsp, false, checksArrayObj))
     }
   })
