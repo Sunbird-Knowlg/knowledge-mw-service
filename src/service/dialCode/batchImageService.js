@@ -116,7 +116,6 @@ BatchImageService.prototype.restartProcess = function (rspObj, processId, force)
     try {
       var processUUId = dbModel.uuidFromString(processId)
     } catch (e) {
-      console.log('err', e)
       LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'restartProcess',
         'Process id not found', e))
       rspObj.errCode = dialCodeMessage.PROCESS.NOT_FOUND_CODE
