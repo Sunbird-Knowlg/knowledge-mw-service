@@ -141,8 +141,8 @@ BatchImageService.prototype.updateProcessId = function (rspObj, processId, force
         rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
         reject(new Error(JSON.stringify({ code: 404, data: respUtil.errorResponse(rspObj) })))
       } else {
-        // If force is sent true in query param or batch status is 3
-        if (force === 'true' || batch.status === 3) {
+        // If force is sent true in query param or batch status is 2 or 3
+        if (force === 'true' || batch.status === 2 || batch.status === 3) {
           LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename,
             'updateProcessId', 'Process updation initiated', batch))
           batch.status = 0
@@ -177,14 +177,8 @@ BatchImageService.prototype.updateProcessId = function (rspObj, processId, force
               }
             })
         } else {
-          if (batch.status !== 2) {
-            rspObj.result.status = dialCodeMessage.PROCESS.INPROGRESS_MESSAGE
-            resolve({ code: 500, data: respUtil.errorResponse(rspObj) })
-          } else {
-            rspObj.result.status = dialCodeMessage.PROCESS.COMPLETED
-            rspObj.result.url = batch.url
-            resolve({ code: 500, data: respUtil.errorResponse(rspObj) })
-          }
+          rspObj.result.status = dialCodeMessage.PROCESS.INPROGRESS_MESSAGE
+          resolve({ code: 500, data: respUtil.errorResponse(rspObj) })
         }
       }
     })
