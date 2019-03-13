@@ -62,5 +62,5 @@ module.exports = function (app) {
       dialCodeService.releaseDialCode)
 
   app.route(BASE_URL + '/process/retry/:processId')
-    .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.updateProcessIdStatus)
+    .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.retryProcess)
 }

@@ -952,18 +952,18 @@ function releaseDialCode(req, response) {
  * @param {type} response
  * @returns {object} return response object with http status
  */
-function updateProcessIdStatus (req, response) {
+function retryProcess (req, response) {
   var data = {}
   data.body = req.body
   data.processId = req.params.processId
   var rspObj = req.rspObj
   // Adding objectData in telemetryData object
   if (rspObj.telemetryData) {
-    rspObj.telemetryData.object = utilsService.getObjectData(data.processId, 'updateProcessIdStatus', '', {})
+    rspObj.telemetryData.object = utilsService.getObjectData(data.processId, 'retryProcess', '', {})
   }
 
   if (!data.processId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateProcessIdStatus',
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retryProcess',
       'Error due to required params are missing', {
         processId: data.processId
       }))
@@ -973,7 +973,7 @@ function updateProcessIdStatus (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   var batchImageService = new BatchImageService()
-  batchImageService.updateProcessId(rspObj, req.params.processId, req.query.force).then(process => {
+  batchImageService.restartProcess(rspObj, req.params.processId, req.query.force).then(process => {
     return response.status(process.code).send(process.data)
   })
     .catch(err => {
@@ -996,4 +996,4 @@ module.exports.getPublisherAPI = getPublisherAPI
 module.exports.updatePublisherAPI = updatePublisherAPI
 module.exports.reserveDialCode = reserveDialCode
 module.exports.releaseDialCode = releaseDialCode
-module.exports.updateProcessIdStatus = updateProcessIdStatus
+module.exports.retryProcess = retryProcess

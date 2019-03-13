@@ -81,8 +81,8 @@ BatchImageService.prototype.getStatus = function (rspObj, processId) {
       var processUUId = dbModel.uuidFromString(processId)
     } catch (e) {
       console.log('err', e)
-      rspObj.errCode = dialCodeMessage.PROCESS.NOTFOUND_CODE
-      rspObj.errMsg = dialCodeMessage.PROCESS.NOTFOUND_MESSAGE
+      rspObj.errCode = dialCodeMessage.PROCESS.NOT_FOUND_CODE
+      rspObj.errMsg = dialCodeMessage.PROCESS.NOT_FOUND_MESSAGE
       rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
       reject(new Error(JSON.stringify({ code: 404, data: respUtil.errorResponse(rspObj) })))
     }
@@ -93,8 +93,8 @@ BatchImageService.prototype.getStatus = function (rspObj, processId) {
         rspObj.responseCode = responseCode.SERVER_ERROR
         reject(new Error(JSON.stringify({ code: 500, data: respUtil.errorResponse(rspObj) })))
       } else if (!batch) {
-        rspObj.errCode = dialCodeMessage.PROCESS.NOTFOUND_CODE
-        rspObj.errMsg = dialCodeMessage.PROCESS.NOTFOUND_MESSAGE
+        rspObj.errCode = dialCodeMessage.PROCESS.NOT_FOUND_CODE
+        rspObj.errMsg = dialCodeMessage.PROCESS.NOT_FOUND_MESSAGE
         rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
         reject(new Error(JSON.stringify({ code: 404, data: respUtil.errorResponse(rspObj) })))
       } else {
@@ -111,16 +111,16 @@ BatchImageService.prototype.getStatus = function (rspObj, processId) {
   })
 }
 
-BatchImageService.prototype.updateProcessId = function (rspObj, processId, force) {
+BatchImageService.prototype.restartProcess = function (rspObj, processId, force) {
   return new Promise(function (resolve, reject) {
     try {
       var processUUId = dbModel.uuidFromString(processId)
     } catch (e) {
       console.log('err', e)
-      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateProcessId',
+      LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'restartProcess',
         'Process id not found', e))
-      rspObj.errCode = dialCodeMessage.PROCESS.NOTFOUND_CODE
-      rspObj.errMsg = dialCodeMessage.PROCESS.NOTFOUND_MESSAGE
+      rspObj.errCode = dialCodeMessage.PROCESS.NOT_FOUND_CODE
+      rspObj.errMsg = dialCodeMessage.PROCESS.NOT_FOUND_MESSAGE
       rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
       reject(new Error(JSON.stringify({ code: 404, data: respUtil.errorResponse(rspObj) })))
     }
@@ -128,23 +128,23 @@ BatchImageService.prototype.updateProcessId = function (rspObj, processId, force
     dbModel.instance.dialcode_batch.findOne({ processid: processUUId }, function (err, batch) {
       if (err) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-          'updateProcessId', 'DB error while fetching process details', err))
+          'restartProcess', 'DB error while fetching process details', err))
         rspObj.errCode = dialCodeMessage.PROCESS.FAILED_CODE
         rspObj.errMsg = dialCodeMessage.PROCESS.FAILED_MESSAGE
         rspObj.responseCode = responseCode.SERVER_ERROR
         reject(new Error(JSON.stringify({ code: 500, data: respUtil.errorResponse(rspObj) })))
       } else if (!batch) {
         LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-          'updateProcessId', 'Process details not found in DB', err))
-        rspObj.errCode = dialCodeMessage.PROCESS.NOTFOUND_CODE
-        rspObj.errMsg = dialCodeMessage.PROCESS.NOTFOUND_MESSAGE
+          'restartProcess', 'Process details not found in DB', err))
+        rspObj.errCode = dialCodeMessage.PROCESS.NOT_FOUND_CODE
+        rspObj.errMsg = dialCodeMessage.PROCESS.NOT_FOUND_MESSAGE
         rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
         reject(new Error(JSON.stringify({ code: 404, data: respUtil.errorResponse(rspObj) })))
       } else {
         // If force is sent true in query param or batch status is 2 or 3
         if (force === 'true' || batch.status === 2 || batch.status === 3) {
           LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename,
-            'updateProcessId', 'Process updation initiated', batch))
+            'restartProcess', 'Process updation initiated', batch))
           batch.status = 0
           // Updating process status to 0
           dbModel.instance.dialcode_batch.update(
@@ -152,7 +152,7 @@ BatchImageService.prototype.updateProcessId = function (rspObj, processId, force
             { status: batch.status }, function (err) {
               if (err) {
                 LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-                  'updateProcessId', 'Updating process details failed in DB', err))
+                  'restartProcess', 'Updating process details failed in DB', err))
                 rspObj.errCode = dialCodeMessage.PROCESS.FAILED_CODE
                 rspObj.errMsg = dialCodeMessage.PROCESS.FAILED_UPDATE_MESSAGE
                 rspObj.responseCode = responseCode.SERVER_ERROR
@@ -162,14 +162,14 @@ BatchImageService.prototype.updateProcessId = function (rspObj, processId, force
                 KafkaService.sendRecord(batch, function (err, res) {
                   if (err) {
                     LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-                      'updateProcessId', 'Kafka send record failed', err))
+                      'restartProcess', 'Kafka send record failed', err))
                     rspObj.errCode = dialCodeMessage.PROCESS.FAILED_CODE
                     rspObj.errMsg = dialCodeMessage.PROCESS.FAILED_KAFKA_MESSAGE
                     rspObj.responseCode = responseCode.SERVER_ERROR
                     reject(new Error(JSON.stringify({ code: 500, data: respUtil.errorResponse(rspObj) })))
                   } else {
                     LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename,
-                      'updateProcessId', 'Kafka send record successful', batch))
+                      'restartProcess', 'Kafka send record successful', batch))
                     rspObj.result.status = dialCodeMessage.PROCESS.INPROGRESS_MESSAGE
                     resolve({ code: 200, data: respUtil.successResponse(rspObj) })
                   }
