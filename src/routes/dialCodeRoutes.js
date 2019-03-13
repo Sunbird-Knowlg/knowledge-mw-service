@@ -60,4 +60,7 @@ module.exports = function (app) {
   app.route(BASE_URL + '/release/:contentId')
     .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       dialCodeService.releaseDialCode)
+
+  app.route(BASE_URL + '/process/retry/:processId')
+    .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.retryProcess)
 }

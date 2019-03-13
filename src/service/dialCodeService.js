@@ -946,6 +946,42 @@ function releaseDialCode(req, response) {
   ])
 }
 
+/**
+ * This function helps to update the status of the given process
+ * @param {type} req
+ * @param {type} response
+ * @returns {object} return response object with http status
+ */
+function retryProcess (req, response) {
+  var data = {}
+  data.body = req.body
+  data.processId = req.params.processId
+  var rspObj = req.rspObj
+  // Adding objectData in telemetryData object
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.processId, 'retryProcess', '', {})
+  }
+
+  if (!data.processId) {
+    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retryProcess',
+      'Error due to required params are missing', {
+        processId: data.processId
+      }))
+    rspObj.errCode = dialCodeMessage.PROCESS.MISSING_CODE
+    rspObj.errMsg = dialCodeMessage.PROCESS.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+  var batchImageService = new BatchImageService()
+  batchImageService.restartProcess(rspObj, req.params.processId, req.query.force).then(process => {
+    return response.status(process.code).send(process.data)
+  })
+    .catch(err => {
+      var error = JSON.parse(err.message)
+      return response.status(error.code).send(error.data)
+    })
+}
+
 module.exports.generateDialCodeAPI = generateDialCodeAPI
 module.exports.dialCodeListAPI = dialCodeListAPI
 module.exports.updateDialCodeAPI = updateDialCodeAPI
@@ -960,3 +996,4 @@ module.exports.getPublisherAPI = getPublisherAPI
 module.exports.updatePublisherAPI = updatePublisherAPI
 module.exports.reserveDialCode = reserveDialCode
 module.exports.releaseDialCode = releaseDialCode
+module.exports.retryProcess = retryProcess
