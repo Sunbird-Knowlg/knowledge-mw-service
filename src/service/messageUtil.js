@@ -560,7 +560,7 @@ exports.DIALCODE = {
     INPROGRESS_MESSAGE: 'in-process',
     COMPLETED: 'completed',
     FAILED_UPDATE_MESSAGE: 'Unable to update process info',
-    FAILED_KAFKA_MESSAGE: 'Kafka failed'
+    FAILED_KAFKA_MESSAGE: 'Unable to send message to Kafka'
   },
 
   SEARCH: {
