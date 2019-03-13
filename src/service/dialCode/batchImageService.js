@@ -146,10 +146,11 @@ BatchImageService.prototype.restartProcess = function (rspObj, processId, force)
           LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename,
             'restartProcess', 'Process updation initiated', batch))
           batch.status = 0
+          batch.url = null
           // Updating process status to 0
           dbModel.instance.dialcode_batch.update(
             { processid: processUUId },
-            { status: batch.status }, function (err) {
+            { status: batch.status, url: batch.url }, function (err) {
               if (err) {
                 LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
                   'restartProcess', 'Updating process details failed in DB', err))
