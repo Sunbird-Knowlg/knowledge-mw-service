@@ -9,6 +9,7 @@ var contentProvider = require('sb_content_provider_util')
 var respUtil = require('response_util')
 var path = require('path')
 var LOG = require('sb_logger_util')
+var configUtil = require('sb-config-util')
 
 var messageUtils = require('./messageUtil')
 var utilsService = require('./utilsService')
@@ -29,7 +30,6 @@ function getHealthCheckObj (name, healthy, err, errMsg) {
 
 // Function help to get health check response
 function getHealthCheckResp (rsp, healthy, checksArrayObj) {
-  delete rsp.responseCode
   rsp.result = {}
   rsp.result.name = messageUtils.SERVICE.NAME
   rsp.result.version = messageUtils.API_VERSION.V1
@@ -54,10 +54,12 @@ function checkHealth (req, response) {
       cassandraUtils.checkCassandraDBHealth(function (err, res) {
         if (err || res === false) {
           isDbConnected = false
+          configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.CASSANDRA_DB.NAME, isDbConnected,
             hcMessages.CASSANDRA_DB.FAILED_CODE, hcMessages.CASSANDRA_DB.FAILED_MESSAGE))
         } else {
           isDbConnected = true
+          configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'true')
           checksArrayObj.push(getHealthCheckObj(hcMessages.CASSANDRA_DB.NAME, isDbConnected, '', ''))
         }
         CB()
@@ -67,13 +69,16 @@ function checkHealth (req, response) {
       contentProvider.ekStepHealthCheck(function (err, res) {
         if (err) {
           isEkStepHealthy = false
+          configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.EK_STEP.NAME, isEkStepHealthy,
             hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE))
         } else if (res && res.result && res.result.healthy) {
           isEkStepHealthy = true
+          configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'true')
           checksArrayObj.push(getHealthCheckObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, '', ''))
         } else {
           isEkStepHealthy = false
+          configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.EK_STEP.NAME, isEkStepHealthy,
             hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE))
         }
@@ -84,13 +89,16 @@ function checkHealth (req, response) {
       contentProvider.learnerServiceHealthCheck(function (err, res) {
         if (err) {
           isLSHealthy = false
+          configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.LEARNER_SERVICE.NAME,
             isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE))
         } else if (res && res.result && res.result.response && res.result.response.healthy) {
           isLSHealthy = true
+          configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, '', ''))
         } else {
           isLSHealthy = false
+          configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.LEARNER_SERVICE.NAME,
             isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE))
         }
@@ -111,4 +119,16 @@ function checkHealth (req, response) {
   })
 }
 
+/**
+ * This function helps to check health for content service and returns 200 on success
+ * @param {Object} req
+ * @param {Object} response
+ */
+function checkContentServiceHealth (req, response) {
+  var rspObj = req.rspObj
+  var rsp = respUtil.successResponse(rspObj)
+  return response.status(200).send(getHealthCheckResp(rsp, true))
+}
+
 module.exports.checkHealth = checkHealth
+module.exports.checkContentServiceHealth = checkContentServiceHealth
