@@ -50,9 +50,6 @@ const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_i
 const sunbirdPortalBaseUrl = process.env.sunbird_portal_base_url || 'https://staging.open-sunbird.org'
 const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
 const contentServiceHealthCheckEnable = process.env.sunbird_health_check_enable || 'true'
-const learnerServiceHealthStatus = 'true'
-const cassandraDbHealthStatus = 'true'
-const ekstepHealthStatus = 'true'
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://content-service:5000'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
@@ -75,9 +72,9 @@ configUtil.setConfig('LANGUAGE_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + languag
 configUtil.setConfig('SUNBIRD_PORTAL_BASE_URL', sunbirdPortalBaseUrl)
 configUtil.setConfig('LOCK_EXPIRY_TIME', lockExpiryTime)
 configUtil.setConfig('CONTENT_SERVICE_HEALTH_CHECK_ENABLE', contentServiceHealthCheckEnable)
-configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', learnerServiceHealthStatus)
-configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', cassandraDbHealthStatus)
-configUtil.setConfig('EKSTEP_HEALTH_STATUS', ekstepHealthStatus)
+configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'true')
+configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'true')
+configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'true')
 configUtil.setConfig('CONTENT_SERVICE_LOCAL_BASE_URL', contentServiceLocalBaseUrl)
 
 process.env.sunbird_cassandra_urls = process.env.sunbird_cassandra_urls || '127.0.0.1'
@@ -110,9 +107,6 @@ logger.debug({
     sunbirdPortalBaseUrl,
     lockExpiryTime,
     contentServiceHealthCheckEnable,
-    learnerServiceHealthStatus,
-    cassandraDbHealthStatus,
-    ekstepHealthStatus,
     contentServiceLocalBaseUrl,
     dialCodeImageTempFolder: process.env.dial_code_image_temp_folder
   }
