@@ -54,10 +54,12 @@ function checkHealth (req, response) {
       cassandraUtils.checkCassandraDBHealth(function (err, res) {
         if (err || res === false) {
           isDbConnected = false
+          configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.CASSANDRA_DB.NAME, isDbConnected,
             hcMessages.CASSANDRA_DB.FAILED_CODE, hcMessages.CASSANDRA_DB.FAILED_MESSAGE))
         } else {
           isDbConnected = true
+          configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'true')
           checksArrayObj.push(getHealthCheckObj(hcMessages.CASSANDRA_DB.NAME, isDbConnected, '', ''))
         }
         CB()
@@ -67,13 +69,16 @@ function checkHealth (req, response) {
       contentProvider.ekStepHealthCheck(function (err, res) {
         if (err) {
           isEkStepHealthy = false
+          configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.EK_STEP.NAME, isEkStepHealthy,
             hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE))
         } else if (res && res.result && res.result.healthy) {
           isEkStepHealthy = true
+          configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'true')
           checksArrayObj.push(getHealthCheckObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, '', ''))
         } else {
           isEkStepHealthy = false
+          configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.EK_STEP.NAME, isEkStepHealthy,
             hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE))
         }
@@ -84,13 +89,16 @@ function checkHealth (req, response) {
       contentProvider.learnerServiceHealthCheck(function (err, res) {
         if (err) {
           isLSHealthy = false
+          configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.LEARNER_SERVICE.NAME,
             isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE))
         } else if (res && res.result && res.result.response && res.result.response.healthy) {
           isLSHealthy = true
+          configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, '', ''))
         } else {
           isLSHealthy = false
+          configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.LEARNER_SERVICE.NAME,
             isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE))
         }
@@ -102,12 +110,10 @@ function checkHealth (req, response) {
     if (isEkStepHealthy && isLSHealthy && isDbConnected) {
       LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'checkHealth',
         'Content service is healthy'))
-      configUtil.setConfig('CONTENT_SERVICE_HEALTH_STATUS', true)
       return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj))
     } else {
       LOG.error(utilsService.getLoggerData(rspObj, 'INFO', filename, 'checkHealth',
         'Content service is not healthy', { rsp: checksArrayObj }))
-      configUtil.setConfig('CONTENT_SERVICE_HEALTH_STATUS', false)
       return response.status(200).send(getHealthCheckResp(rsp, false, checksArrayObj))
     }
   })
