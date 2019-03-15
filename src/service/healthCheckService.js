@@ -133,7 +133,7 @@ function checkContentServiceHealth (req, response) {
 }
 
 /**
- * This function helps to check health of all dependency services in content service and returns 503 error if any service is down
+ * This function helps to check health of all dependency services in content service and returns 503 error if any service is down. This is controlled by a global variable
  * @param {Array} dependancyServices
  */
 function checkDependantServiceHealth (dependancyServices) {
