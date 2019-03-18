@@ -7,72 +7,92 @@
 var contentService = require('../service/contentService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var filterMiddleware = require('../middlewares/filter.middleware')
+var healthService = require('../service/healthCheckService')
 
 var BASE_URL = '/v1/content'
+var dependentServiceHealth = ['EKSTEP']
 
 module.exports = function (app) {
   app.route(BASE_URL + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       contentService.searchContentAPI)
 
   app.route(BASE_URL + '/create')
-    .post(requestMiddleware.createAndValidateRequestBody, contentService.createContentAPI)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, contentService.createContentAPI)
 
   app.route(BASE_URL + '/update/:contentId')
-    .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, contentService.updateContentAPI)
 
   app.route(BASE_URL + '/upload/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, contentService.uploadContentAPI)
 
   app.route(BASE_URL + '/review/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, contentService.reviewContentAPI)
 
   app.route(BASE_URL + '/publish/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForReviewerUser, contentService.publishContentAPI)
 
   app.route(BASE_URL + '/retire')
-    .delete(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .delete(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       contentService.retireContentAPI)
 
   app.route(BASE_URL + '/reject/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForReviewerUser, contentService.rejectContentAPI)
 
   app.route(BASE_URL + '/read/:contentId')
-    .get(requestMiddleware.createAndValidateRequestBody, contentService.getContentAPI)
+    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, contentService.getContentAPI)
 
   app.route(BASE_URL + '/read/mycontent/:createdBy')
-    .get(requestMiddleware.createAndValidateRequestBody, contentService.getMyContentAPI)
+    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, contentService.getMyContentAPI)
 
   app.route(BASE_URL + '/flag/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, contentService.flagContentAPI)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, contentService.flagContentAPI)
 
   app.route(BASE_URL + '/flag/accept/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForReviewerUser, contentService.acceptFlagContentAPI)
 
   app.route(BASE_URL + '/flag/reject/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForReviewerUser, contentService.rejectFlagContentAPI)
 
   app.route(BASE_URL + '/upload/url/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, contentService.uploadContentUrlAPI)
 
   app.route(BASE_URL + '/badge/assign/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, contentService.assignBadgeAPI)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, contentService.assignBadgeAPI)
 
   app.route(BASE_URL + '/badge/revoke/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, contentService.revokeBadgeAPI)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, contentService.revokeBadgeAPI)
 
   app.route(BASE_URL + '/copy/:contentId')
-    .post(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       contentService.copyContentAPI)
 
   app.route(BASE_URL + '/getContentLockValidation')
-    .post(requestMiddleware.createAndValidateRequestBody, contentService.validateContentLock)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, contentService.validateContentLock)
 }

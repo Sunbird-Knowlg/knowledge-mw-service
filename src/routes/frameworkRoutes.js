@@ -7,25 +7,34 @@
 var frameworkService = require('../service/frameworkService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var filterMiddleware = require('../middlewares/filter.middleware')
+var healthService = require('../service/healthCheckService')
 
 var baseUrl = '/v1/framework'
+var dependentServiceHealth = ['EKSTEP']
 
 module.exports = function (app) {
   app.route(baseUrl + '/read/:frameworkId')
-    .get(requestMiddleware.createAndValidateRequestBody, frameworkService.getFrameworkById)
+    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, frameworkService.getFrameworkById)
 
   app.route(baseUrl + '/list')
-    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       frameworkService.frameworklList)
 
   app.route(baseUrl + '/create')
-    .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkCreate)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkCreate)
 
   app.route(baseUrl + '/update/:frameworkId')
-    .patch(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkUpdate)
+    .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkUpdate)
 
   app.route(baseUrl + '/copy/:frameworkId')
-    .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkCopy)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkCopy)
+
   app.route(baseUrl + '/publish/:frameworkId')
-    .post(requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkPublish)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, frameworkService.frameworkPublish)
 }
