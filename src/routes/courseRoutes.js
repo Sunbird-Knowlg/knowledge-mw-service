@@ -7,36 +7,46 @@
 var courseService = require('../service/courseService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var filterMiddleware = require('../middlewares/filter.middleware')
+var healthService = require('../service/healthCheckService')
 
 var BASE_URL = '/v1/course'
+var dependentServiceHealth = ['EKSTEP']
 
 module.exports = function (app) {
   app.route(BASE_URL + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       courseService.searchCourseAPI)
 
   app.route(BASE_URL + '/create')
-    .post(requestMiddleware.createAndValidateRequestBody, courseService.createCourseAPI)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, courseService.createCourseAPI)
 
   app.route(BASE_URL + '/update/:courseId')
-    .patch(requestMiddleware.createAndValidateRequestBody, courseService.updateCourseAPI)
+    .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, courseService.updateCourseAPI)
 
   app.route(BASE_URL + '/review/:courseId')
-    .post(requestMiddleware.createAndValidateRequestBody, courseService.reviewCourseAPI)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, courseService.reviewCourseAPI)
 
   app.route(BASE_URL + '/publish/:courseId')
     .get(requestMiddleware.createAndValidateRequestBody, courseService.publishCourseAPI)
 
   app.route(BASE_URL + '/read/:courseId')
-    .get(requestMiddleware.createAndValidateRequestBody, courseService.getCourseAPI)
+    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, courseService.getCourseAPI)
 
   app.route(BASE_URL + '/read/mycourse/:createdBy')
-    .get(requestMiddleware.createAndValidateRequestBody, courseService.getMyCourseAPI)
+    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, courseService.getMyCourseAPI)
 
   app.route(BASE_URL + '/hierarchy/:courseId')
-    .get(requestMiddleware.createAndValidateRequestBody, courseService.getCourseHierarchyAPI)
+    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, courseService.getCourseHierarchyAPI)
 
   app.route(BASE_URL + '/hierarchy/update')
-    .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.hierarchyUpdateApiAccess, courseService.updateCourseHierarchyAPI)
 }

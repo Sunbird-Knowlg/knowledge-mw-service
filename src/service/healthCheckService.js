@@ -19,6 +19,7 @@ var filename = path.basename(__filename)
 var hcMessages = messageUtils.HEALTH_CHECK
 var uuidV1 = require('uuid/v1')
 var dateFormat = require('dateformat')
+var checksArrayObj = []
 
 // Function return to get health check object
 function getHealthCheckObj (name, healthy, err, errMsg) {
@@ -47,7 +48,7 @@ function getHealthCheckResp (rsp, healthy, checksArrayObj) {
  */
 function checkHealth (req, response) {
   var rspObj = req.rspObj
-  var checksArrayObj = []
+  checksArrayObj = []
   var isEkStepHealthy
   var isLSHealthy
   var isDbConnected
@@ -166,7 +167,7 @@ function checkDependantServiceHealth (dependancyServices) {
             'errmsg': 'Service is unavailable'
           },
           'responseCode': 'SERVICE_UNAVAILABLE',
-          'result': {}
+          'result': { check: checksArrayObj }
         })
         res.end()
       } else {

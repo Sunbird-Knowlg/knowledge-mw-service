@@ -7,20 +7,26 @@
 var frameworkTermService = require('../service/frameworkTermService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var filterMiddleware = require('../middlewares/filter.middleware')
+var healthService = require('../service/healthCheckService')
 
 var baseUrl = '/v1/framework/term'
+var dependentServiceHealth = ['EKSTEP']
 
 module.exports = function (app) {
   app.route(baseUrl + '/read/:categoryID')
-    .get(requestMiddleware.createAndValidateRequestBody, frameworkTermService.getFrameworkTerm)
+    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, frameworkTermService.getFrameworkTerm)
 
   app.route(baseUrl + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       frameworkTermService.frameworkTermSearch)
 
   app.route(baseUrl + '/create')
-    .post(requestMiddleware.createAndValidateRequestBody, frameworkTermService.frameworkTermCreate)
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, frameworkTermService.frameworkTermCreate)
 
   app.route(baseUrl + '/update/:categoryID')
-    .patch(requestMiddleware.createAndValidateRequestBody, frameworkTermService.frameworkTermUpdate)
+    .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, frameworkTermService.frameworkTermUpdate)
 }

@@ -6,11 +6,14 @@
 
 var collaboratorService = require('../service/collaboratorService')
 var requestMiddleware = require('../middlewares/request.middleware')
+var healthService = require('../service/healthCheckService')
 
 var BASE_URL = '/v1/content'
+var dependentServiceHealth = ['EKSTEP']
 
 module.exports = function (app) {
   app.route(BASE_URL + '/collaborator/update/:contentId')
-    .patch(requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
+    .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, collaboratorService.updateCollaborators)
 }

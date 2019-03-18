@@ -7,22 +7,28 @@
 var frameworkCategoryInstanceService = require('../service/frameworkCategoryInstanceService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var filterMiddleware = require('../middlewares/filter.middleware')
+var healthService = require('../service/healthCheckService')
 
 var baseUrl = '/v1/framework/category'
+var dependentServiceHealth = ['EKSTEP']
 
 module.exports = function (app) {
   app.route(baseUrl + '/read/:categoryID')
-    .get(requestMiddleware.createAndValidateRequestBody, frameworkCategoryInstanceService.getFrameworkCategoryInstance)
+    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, frameworkCategoryInstanceService.getFrameworkCategoryInstance)
 
   app.route(baseUrl + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       frameworkCategoryInstanceService.frameworkCategoryInstanceSearch)
 
   app.route(baseUrl + '/create')
-    .post(requestMiddleware.createAndValidateRequestBody,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody,
       frameworkCategoryInstanceService.frameworkCategoryInstanceCreate)
 
   app.route(baseUrl + '/update/:categoryID')
-    .patch(requestMiddleware.createAndValidateRequestBody,
+    .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody,
       frameworkCategoryInstanceService.frameworkCategoryInstanceUpdate)
 }
