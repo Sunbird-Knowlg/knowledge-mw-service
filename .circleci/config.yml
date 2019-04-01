@@ -7,7 +7,9 @@ jobs:
       - checkout
       - run: apk add zip git
       - run: apk add python make g++
-      - run: git submodule update --init --recursive src/libs
+      #- run: git submodule update --init --recursive src/libs
+      - run: git submodule update --init
+      - run: git submodule update --init --recursive --remote
       - run: mkdir -p opt/content && cp -r src/* opt/content/
       #- restore_cache:
           #key: dependency-cache-{{ checksum "package.json" }}
