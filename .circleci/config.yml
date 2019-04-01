@@ -9,8 +9,8 @@ jobs:
       - run: apk add python make g++
       - run: git submodule update --init --recursive src/libs
       - run: mkdir -p opt/content && cp -r src/* opt/content/
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+      #- restore_cache:
+          #key: dependency-cache-{{ checksum "package.json" }}
       - run: cd opt/content/ && npm install --unsafe-perm
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
