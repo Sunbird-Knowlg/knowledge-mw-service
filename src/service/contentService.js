@@ -160,7 +160,7 @@ function search(defaultContentTypes, req, response, objectType) {
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return sendSearchResponse(req, response, respUtil.errorResponse(rspObj), httpStatus)
         } else {
-          if (req.query.framework) {
+          if (req.query.framework && req.query.framework !== 'null') {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
                 logger.error({ msg: `Framework API failed with framework - ${req.query.framework}`, err }, req)
