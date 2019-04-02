@@ -127,7 +127,7 @@ function searchCourseAPI (req, response) {
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
-          if (req.query.framework) {
+          if (req.query.framework && req.query.framework !== 'null') {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
                 LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'Framework API failed',
