@@ -139,7 +139,8 @@ function validateToken (req, res, next) {
       req.rspObj.userId = tokenData.userId
       logger.info({ msg: ` x-authenticated-userid  :- ${tokenData.userId}` })
       rspObj.telemetryData.actor = utilsService.getTelemetryActorData(req)
-      req.headers['x-authenticated-userid'] = tokenData.userId
+      var userId = tokenData.userId.split(':')
+      req.headers['x-authenticated-userid'] = userId[userId.length - 1]
       req.rspObj.userName = payload.name
       req.rspObj = rspObj
       next()
