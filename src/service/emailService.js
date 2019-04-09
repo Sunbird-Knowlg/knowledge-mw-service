@@ -116,7 +116,7 @@ function acceptFlagContentEmail (req, callback) {
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
 
-  if (data.contentId) {
+  if (!data.contentId) {
     callback(new Error('Content id is missing'), null)
   }
   async.waterfall([
@@ -174,7 +174,7 @@ function rejectFlagContentEmail (req, callback) {
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
 
-  if (data.contentId) {
+  if (!data.contentId) {
     callback(new Error('Content id is missing'), null)
   }
   async.waterfall([
@@ -734,7 +734,7 @@ function unlistedPublishContentEmail (req, callback) {
   var rspObj = req.rspObj
   var baseUrl = data.request && data.request.content && data.request.content.baseUrl ? data.request.content.baseUrl : ''
 
-  if (data.contentId) {
+  if (!data.contentId) {
     callback(new Error('Content id missing'), null)
   }
   async.waterfall([
