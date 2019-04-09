@@ -154,7 +154,6 @@ function gzipCompression (req, res, next) {
   return function (req, res, next) {
     if (configUtil.getConfig('ENABLE_GZIP') === 'true') {
       var comMidleware = compression()
-      console.log('comMidleware', comMidleware)
       comMidleware(req, res, next)
     } else {
       next()
