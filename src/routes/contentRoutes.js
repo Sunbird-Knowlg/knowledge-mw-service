@@ -15,6 +15,7 @@ var dependentServiceHealth = ['EKSTEP']
 module.exports = function (app) {
   app.route(BASE_URL + '/search')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       contentService.searchContentAPI)
 
