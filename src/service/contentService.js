@@ -67,24 +67,6 @@ function searchContentAPI(req, response) {
   return search(getContentTypeForContent(), req, response, ['Content'])
 }
 
-// This function used for performance log
-// function logs (isPLogs, startTime, rspObj, level, file, method, message, data, stacktrace) {
-//   if (isPLogs) {
-//     LOG.info(utilsService.getPerfLoggerData(rspObj, 'INFO', file, method,
-//       'Time taken in ms', {timeInMs: Date.now() - csApiStart}))
-//   }
-// }
-
-function sendSearchResponse(req, response, data, statueCode) {
-  response.status(statueCode)
-  if (req.encodingType === 'gzip') {
-    response.set('Content-Encoding', 'gzip');
-    return str(JSON.stringify(data)).pipe(zlib.createGzip()).pipe(response)
-  } else {
-    return response.send(JSON.stringify(data))
-  }
-}
-
 function search(defaultContentTypes, req, response, objectType) {
   var data = req.body
   var rspObj = req.rspObj
@@ -158,14 +140,14 @@ function search(defaultContentTypes, req, response, objectType) {
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
-          return sendSearchResponse(req, response, respUtil.errorResponse(rspObj), httpStatus)
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
           if (req.query.framework && req.query.framework !== 'null') {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
                 logger.error({ msg: `Framework API failed with framework - ${req.query.framework}`, err }, req)
                 rspObj.result = res.result
-                return sendSearchResponse(req, response, respUtil.successResponse(rspObj), 200);
+                return response.status(200).send(respUtil.successResponse(rspObj))
               } else {
                 var language = req.query.lang ? req.query.lang : 'en'
                 if (lodash.get(res, 'result.facets') &&

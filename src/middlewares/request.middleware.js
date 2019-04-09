@@ -61,11 +61,6 @@ function createAndValidateRequestBody (req, res, next) {
     actor: utilsService.getTelemetryActorData(req)
   }
   req.headers.telemetryData = rspObj.telemetryData
-  // commenting for removing the gzip for search api
-  // if (req.get('accept-encoding') && req.get('accept-encoding').toLowerCase() === 'gzip') {
-  //   req.encodingType = 'gzip';
-  // }
-  // delete req.headers['accept-encoding']
 
   var removedHeaders = ['host', 'origin', 'accept', 'referer', 'content-length', 'user-agent',
     'accept-language', 'accept-charset', 'cookie', 'dnt', 'postman-token', 'cache-control', 'connection']
