@@ -81,6 +81,15 @@ module.exports = function (app) {
 
   app
     .route(
+      '/action' + configUtil.getConfig('GET_CONTENT_URI') + '/:contentId'
+    )
+    .get(
+      requestMiddleware.createAndValidateRequestBody,
+      contentService.getContentAPI
+    )
+
+  app
+    .route(
       '/action' + configUtil.getConfig('PUBLISH_CONTENT_URI') + '/:contentId'
     )
     .post(
