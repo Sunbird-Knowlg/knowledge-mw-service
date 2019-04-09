@@ -823,6 +823,53 @@ function getContentAPI(req, response) {
     function (res, CBW) {
       orgHelper.includeOrgDetails(req, res, CBW)
     },
+    function (resp, CBW) {
+      if (lodash.get(resp, 'result.content.assets')) {
+        var ekStepReqData = {
+          request: {
+            filters: {
+              identifier: resp.result.content.assets,
+              status: 'Live'
+            },
+            fields: ['streamingUrl', 'artifactUrl']
+          }
+        }
+        logger.info({
+          msg: 'Request to content provider to search for assets',
+          additionalInfo: {
+            body: ekStepReqData
+          }
+        }, req)
+        contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
+          if (err || res.responseCode !== responseCode.SUCCESS) {
+            rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET_MY.FAILED_CODE
+            rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE
+            rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            logger.error({
+              msg: 'Getting error from content provider during composite search for assets',
+              err: {
+                err,
+                errCode: rspObj.errCode,
+                errMsg: rspObj.errMsg,
+                responseCode: rspObj.responseCode
+              },
+              additionalInfo: { ekStepReqData }
+            }, req)
+            var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+            rspObj.result = res && res.result ? res.result : {}
+            rspObj = utilsService.getErrorResponse(rspObj, res)
+            return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+          } else {
+            if (lodash.get(res, 'result.content')) {
+              resp.result.content.assetsMap = res.result.content
+            }
+            CBW(null, resp)
+          }
+        })
+      } else {
+        CBW(null, resp)
+      }
+    },
     function (res) {
       rspObj.result = res.result
       logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
