@@ -8,6 +8,7 @@ var contentService = require('../service/contentService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var filterMiddleware = require('../middlewares/filter.middleware')
 var healthService = require('../service/healthCheckService')
+var compression = require('compression')
 
 var BASE_URL = '/v1/content'
 var dependentServiceHealth = ['EKSTEP']
@@ -15,6 +16,7 @@ var dependentServiceHealth = ['EKSTEP']
 module.exports = function (app) {
   app.route(BASE_URL + '/search')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       contentService.searchContentAPI)
 

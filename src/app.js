@@ -51,6 +51,7 @@ const sunbirdPortalBaseUrl = process.env.sunbird_portal_base_url || 'https://sta
 const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
 const isHealthCheckEnabled = process.env.sunbird_health_check_enable || 'true'
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://content-service:5000'
+const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('CONTENT_REPO_BASE_URL', contentRepoBaseUrl)
@@ -76,6 +77,7 @@ configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'true')
 configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'true')
 configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'true')
 configUtil.setConfig('CONTENT_SERVICE_LOCAL_BASE_URL', contentServiceLocalBaseUrl)
+configUtil.setConfig('ENABLE_GZIP', sunbirdGzipEnable)
 
 process.env.sunbird_cassandra_urls = process.env.sunbird_cassandra_urls || '127.0.0.1'
 process.env.dial_code_image_temp_folder = 'temp'

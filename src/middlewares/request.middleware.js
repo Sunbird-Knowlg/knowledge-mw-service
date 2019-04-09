@@ -12,6 +12,8 @@ var responseCode = messageUtil.RESPONSE_CODE
 var apiVersions = messageUtil.API_VERSION
 var jwt = require('jsonwebtoken')
 var lodash = require('lodash')
+var configUtil = require('sb-config-util')
+var compression = require('compression')
 
 var keyCloakConfig = {
   'authServerUrl': process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : 'https://staging.open-sunbird.org/auth',
@@ -63,9 +65,9 @@ function createAndValidateRequestBody (req, res, next) {
   // if (req.get('accept-encoding') && req.get('accept-encoding').toLowerCase() === 'gzip') {
   //   req.encodingType = 'gzip';
   // }
-  delete req.headers['accept-encoding']
+  // delete req.headers['accept-encoding']
 
-  var removedHeaders = ['host', 'origin', 'accept', 'referer', 'content-length', 'user-agent', 'accept-encoding',
+  var removedHeaders = ['host', 'origin', 'accept', 'referer', 'content-length', 'user-agent',
     'accept-language', 'accept-charset', 'cookie', 'dnt', 'postman-token', 'cache-control', 'connection']
 
   removedHeaders.forEach(function (e) {
@@ -146,6 +148,18 @@ function validateToken (req, res, next) {
       next()
     }
   })
+}
+
+function gzipCompression (req, res, next) {
+  return function (req, res, next) {
+    if (configUtil.getConfig('ENABLE_GZIP') === 'true') {
+      var comMidleware = compression()
+      console.log('comMidleware', comMidleware)
+      comMidleware(req, res, next)
+    } else {
+      next()
+    }
+  }
 }
 /**
  * [validateUserToken - to validate x-authenticated-user-token]
@@ -447,3 +461,4 @@ module.exports.apiAccessForCreatorUser = apiAccessForCreatorUser
 module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess
 module.exports.checkChannelID = checkChannelID
 module.exports.validateUserToken = validateUserToken
+module.exports.gzipCompression = gzipCompression
