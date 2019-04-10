@@ -15,10 +15,6 @@ var logger = require('sb_logger_util_v2')
 var validatorUtil = require('sb_req_validator_util')
 var _ = require('underscore')
 var lodash = require('lodash')
-var str = require('string-to-stream')
-var zlib = require('zlib');
-
-
 
 var contentModel = require('../models/contentModel').CONTENT
 var messageUtils = require('./messageUtil')
