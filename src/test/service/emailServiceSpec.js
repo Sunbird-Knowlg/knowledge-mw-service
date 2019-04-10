@@ -5,7 +5,7 @@ var sinon = require('sinon');
 var contentProvider = require('sb_content_provider_util');
 var emailServiceTestData = require('../fixtures/services/emailServiceTestData').emailServiceTestData;
 
-var mockedGetContent,
+var mockedGetContent, mockedUserSearch,
     req = emailServiceTestData.REQUEST,
     mockedSendEmail,
     mockedGetForm,
@@ -733,5 +733,90 @@ describe('Email service.rejectContentEmail', function () {
         });
     });
 
+});
+
+describe('Email service.reviewContentEmail', function () {
+
+    before(function () {
+        mockedGetContent = sinon.stub(contentProvider, "getContent").returns(mockFunction);
+        mockedSendEmail = sinon.stub(contentProvider, "sendEmail").returns(mockFunction);
+        mockedGetForm = sinon.stub(contentProvider, "getForm").returns(mockFunction);
+        mockedUserSearch = sinon.stub(contentProvider, "userSearch").returns(mockFunction);
+    });
+    after(function () {
+        mockedGetContent.restore();
+        mockedSendEmail.restore();
+        mockedGetForm.restore();
+    });
+
+    it('should return error as content ID is not present', function (done) {
+        var request = JSON.parse(JSON.stringify(emailServiceTestData.REQUEST));
+        request.params.contentId = null;
+        emailService.reviewContentEmail(request, function (err, res) {
+            expect(res).to.equal(null);
+            expect(err.message).to.equal('Content id is missing');
+            done()
+        })
+    });
+
+    it('should thorw error as user information not fetched', function (done) {
+        mockedUserSearch.yields("error", null);
+        emailService.reviewContentEmail(emailServiceTestData.REQUEST, function (err, res) {
+            expect(res).to.equal(null);
+            expect(err.message).to.equal('Sending email failed');
+            done()
+        })
+    });
+
+    it('should throw error as response code not matched for fetching user information', function (done) {
+        mockedUserSearch.yields(null, emailServiceTestData.ErrorResponse);
+        emailService.reviewContentEmail(emailServiceTestData.REQUEST, function (err, res) {
+            expect(res).to.equal(null);
+            expect(err.message).to.equal('Sending email failed');
+            done()
+        })
+    });
+
+    it('should throw error as content ID is not matched for fetching content', function (done) {
+        mockedUserSearch.yields(null, emailServiceTestData.SuccessResponse);
+        mockedGetContent.yields("error", null);
+        emailService.reviewContentEmail(emailServiceTestData.REQUEST, function (err, res) {
+            expect(res).to.equal(null);
+            expect(err.message).to.equal('Sending email failed');
+            done()
+        })
+    });
+
+    it('should throw error as success code is not matched for fetching content', function (done) {
+        mockedUserSearch.yields(null, emailServiceTestData.SuccessResponse);
+        mockedGetContent.yields(null, emailServiceTestData.ErrorResponse);
+        emailService.reviewContentEmail(emailServiceTestData.REQUEST, function (err, res) {
+            expect(res).to.equal(null);
+            expect(err.message).to.equal('Sending email failed');
+            done()
+        })
+    });
+
+    it('should return error as for not fetched', function (done) {
+        mockedUserSearch.yields(null, emailServiceTestData.SuccessResponse);
+        mockedGetContent.yields(null, emailServiceTestData.SuccessResponse);
+        mockedGetForm.yields(null, {});
+        emailService.reviewContentEmail(req, function (err, res) {
+            expect(res).to.equal(null);
+            expect(err.message).to.equal('Sending email failed');
+            done()
+        })
+    });
+
+    it('should return error as success code is not matched for fetching template', function (done) {
+        mockedUserSearch.yields(null, emailServiceTestData.SuccessResponse);
+        mockedGetContent.yields(null, emailServiceTestData.SuccessResponse);
+        mockedGetForm.yields(null, {});
+        emailService.reviewContentEmail(req, function (err, res) {
+            expect(res).to.equal(null);
+            expect(err.message).to.equal('Sending email failed');
+            done()
+        })
+    });
 });
 
