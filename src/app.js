@@ -51,7 +51,7 @@ const sunbirdPortalBaseUrl = process.env.sunbird_portal_base_url || 'https://sta
 const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
 const isHealthCheckEnabled = process.env.sunbird_health_check_enable || 'true'
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://content-service:5000'
-const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'false'
+const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('CONTENT_REPO_BASE_URL', contentRepoBaseUrl)
