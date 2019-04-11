@@ -53,7 +53,7 @@ function fetchUrlMeta (req, response) {
           responseCode: rspObj.responseCode
         },
         additionalInfo: {url: data.url}
-      })
+      }, req)
       return response.status(500).send(respUtil.errorResponse(rspObj))
     })
 }
