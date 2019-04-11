@@ -3,7 +3,7 @@ var path = require('path')
 var contentProvider = require('sb_content_provider_util')
 var utilsService = require('./utilsService')
 var filename = path.basename(__filename)
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 var messageUtils = require('./messageUtil')
 var emailMessage = messageUtils.EMAIL
 var responseCode = messageUtils.RESPONSE_CODE
@@ -28,7 +28,7 @@ var reviewerQueryLimit = 200
  * @param {string} orgName
  * @param {string} fromEmail
  */
-function getEmailData (name, subject, body, actionUrl, actionName, emailArray,
+function getEmailData(name, subject, body, actionUrl, actionName, emailArray,
   recipientUserIds, emailTemplateType, imageUrl, orgName, fromEmail) {
   var request = {
     name: name,
@@ -51,18 +51,24 @@ function getEmailData (name, subject, body, actionUrl, actionName, emailArray,
  * @param {object} req
  * @param {function} callback
  */
-function createFlagContentEmail (req, callback) {
+function createFlagContentEmail(req, callback) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
 
   if (!data.contentId) {
+    logger.error({ msg: 'content Id is missing', additionalInfo: { data } }, req)
     return callback(new Error('Required content id is missing'), null)
   }
   async.waterfall([
     function (CBW) {
       contentProvider.getContent(data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          logger.error({
+            msg: 'Error from content provider while fetching content',
+            err,
+            additionalInfo: { data }
+          }, req)
           callback(new Error('Invalid content id'), null)
         } else {
           data.request.contentData = res.result.content
@@ -83,14 +89,13 @@ function createFlagContentEmail (req, callback) {
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createFlagContentEmail',
-        'Request to Leaner service to send email', {
-          body: lsEmailData
-        }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createFlagContentEmail',
-            'Sending email failed', res))
+          logger.error({
+            msg: 'Error while sending email',
+            err,
+            additionalInfo: { emailData: lsEmailData }
+          }, req)
           callback(new Error('Sending email failed'), null)
         } else {
           CBW(null, res)
@@ -99,8 +104,6 @@ function createFlagContentEmail (req, callback) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createFlagContentEmail',
-        'Email sent successfully', rspObj))
       callback(null, true)
     }
   ])
@@ -111,18 +114,23 @@ function createFlagContentEmail (req, callback) {
  * @param {object} req
  * @param {function} callback
  */
-function acceptFlagContentEmail (req, callback) {
+function acceptFlagContentEmail(req, callback) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
 
   if (!data.contentId) {
+    logger.error({ msg: 'content Id is missing', additionalInfo: { data } }, req)
     callback(new Error('Content id is missing'), null)
   }
   async.waterfall([
     function (CBW) {
       contentProvider.getContent(data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          logger.error({
+            msg: 'Error from content provider while fetching content',
+            additionalInfo: { data }
+          }, req)
           callback(new Error('Invalid content id'), null)
         } else {
           data.request.contentData = res.result.content
@@ -141,14 +149,13 @@ function acceptFlagContentEmail (req, callback) {
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'acceptFlagContentEmail',
-        'Request to Leaner service to send email', {
-          body: lsEmailData
-        }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'acceptFlagContentEmail',
-            'Sending email failed', res))
+          logger.error({
+            msg: 'Error from content provider while sending email',
+            err,
+            additionalInfo: { emailData: lsEmailData }
+          }, req)
           callback(new Error('Sending email failed'), null)
         } else {
           CBW(null, res)
@@ -157,8 +164,6 @@ function acceptFlagContentEmail (req, callback) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'acceptFlagContentEmail',
-        'Email sent successfully', rspObj))
       callback(null, true)
     }
   ])
@@ -169,18 +174,24 @@ function acceptFlagContentEmail (req, callback) {
  * @param {object} req
  * @param {function} callback
  */
-function rejectFlagContentEmail (req, callback) {
+function rejectFlagContentEmail(req, callback) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
 
   if (!data.contentId) {
+    logger.error({ msg: 'content Id is missing', additionalInfo: { data } }, req)
     callback(new Error('Content id is missing'), null)
   }
   async.waterfall([
     function (CBW) {
       contentProvider.getContent(data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          logger.error({
+            msg: 'Error from content provider while fetching content',
+            err,
+            additionalInfo: { data }
+          }, req)
           callback(new Error('Invalid content id'), null)
         } else {
           data.request.contentData = res.result.content
@@ -199,14 +210,13 @@ function rejectFlagContentEmail (req, callback) {
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'rejectFlagContentEmail',
-        'Request to Leaner service to send email', {
-          body: lsEmailData
-        }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'rejectFlagContentEmail',
-            'Sending email failed', res))
+          logger.error({
+            msg: 'Error from content provider while sending email',
+            err,
+            additionalInfo: { emailData: lsEmailData }
+          }, req)
           callback(new Error('Sending email failed'), null)
         } else {
           CBW(null, res)
@@ -215,8 +225,6 @@ function rejectFlagContentEmail (req, callback) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'rejectFlagContentEmail',
-        'Email sent successfully', rspObj))
       callback(null, true)
     }
   ])
@@ -226,16 +234,17 @@ function rejectFlagContentEmail (req, callback) {
  * Below function is used to fetch content details using content id
  * @param {object} req
  */
-function getContentDetails (req) {
+function getContentDetails(req) {
   return function (callback) {
     contentProvider.getContent(req.params.contentId, req.headers, function (err, result) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
-        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Call content read API',
-          'Getting content details failed', err))
+        logger.error({
+          msg: 'Error from content provider while fetching content',
+          err,
+          additionalInfo: { contentId: req.params.contentId }
+        }, req)
         callback(new Error('Invalid content id'), null)
       } else {
-        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'Call content read API',
-          'Getting content details success', result))
         callback(null, result)
       }
     })
@@ -246,16 +255,17 @@ function getContentDetails (req) {
  * Below function is used to fetch email template using Form API
  * @param {object} formRequest
  */
-function getTemplateConfig (formRequest) {
+function getTemplateConfig(formRequest) {
   return function (callback) {
     contentProvider.getForm(formRequest, {}, function (err, result) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
-        LOG.error(utilsService.getLoggerData(formRequest, 'ERROR', filename, 'Call Form API failed',
-          'Getting template failed', err))
+        logger.error({
+          msg: 'Error from content provider while fetching form',
+          err,
+          additionalInfo: { formRequest }
+        })
         callback(new Error('Form API failed'), null)
       } else {
-        LOG.info(utilsService.getLoggerData(formRequest, 'INFO', filename, 'Call Form API success',
-          'Getting template success', result))
         callback(null, result)
       }
     })
@@ -266,7 +276,7 @@ function getTemplateConfig (formRequest) {
  * Below function is used to fetch user details
  * @param {object} formRequest
  */
-function getUserDetails (req) {
+function getUserDetails(req) {
   return function (callback) {
     var data = {
       'request': {
@@ -277,12 +287,13 @@ function getUserDetails (req) {
     }
     contentProvider.userSearch(data, req.headers, function (err, result) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
-        LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserDetails failed',
-          'getUserDetails failed', err))
+        logger.error({
+          msg: 'Error from content provider while fetching user Details',
+          err,
+          additionalInfo: { data }
+        }, req)
         callback(new Error('User Search failed'), null)
       } else {
-        LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserDetails success',
-          'getUserDetails success', result))
         callback(null, result)
       }
     })
@@ -294,7 +305,7 @@ function getUserDetails (req) {
  * content creator after the content is published
  * @param {object} content
  */
-function getPublishedContentUrl (content) {
+function getPublishedContentUrl(content) {
   var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL')
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     if (content.contentType !== 'Course') {
@@ -313,11 +324,11 @@ function getPublishedContentUrl (content) {
  * after the content is rejected
  * @param {object} content
  */
-function getDraftContentUrl (content) {
+function getDraftContentUrl(content) {
   var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/workspace/content/edit'
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     return baseUrl + '/collection/' + content.identifier + '/' + content.contentType +
-    '/draft/' + content.framework + '/Draft'
+      '/draft/' + content.framework + '/Draft'
   } else if (content.mimeType === 'application/vnd.ekstep.ecml-archive') {
     return baseUrl + '/content/' + content.identifier + '/draft/' + content.framework + '/Draft'
   } else {
@@ -329,11 +340,11 @@ function getDraftContentUrl (content) {
  * Below function is used construct content link which will be sent to reviewers
  * @param {object} content
  */
-function getReviewContentUrl (content) {
+function getReviewContentUrl(content) {
   var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/workspace/content'
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     return baseUrl + '/edit/collection/' + content.identifier + '/' + content.contentType +
-    '/upForReview/' + content.framework
+      '/upForReview/' + content.framework
   } else if (content.mimeType === 'application/vnd.ekstep.ecml-archive') {
     return baseUrl + '/upForReview/content/' + content.identifier
   } else {
@@ -347,10 +358,9 @@ function getReviewContentUrl (content) {
  * @param {function} action
  * @param {function} callback
  */
-function sendContentEmail (req, action, callback) {
+function sendContentEmail(req, action, callback) {
   if (!req.params.contentId) {
-    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
-      'Content id is missing', null))
+    logger.error({ msg: 'content Id is missing', additionalInfo: { contentId: req.params.contentId } }, req)
     callback(new Error('Content id is missing'), null)
   }
   var formRequest = {
@@ -368,6 +378,10 @@ function sendContentEmail (req, action, callback) {
         templateConfig: getTemplateConfig(formRequest)
       }, function (err, results) {
         if (err) {
+          logger.error({
+            msg: 'getContentDetails or getTemplateConfig failed',
+            additionalInfo: { formRequest, contentId: req.params.contentId }
+          }, req)
           callback(err, null)
         } else {
           callback(null, results)
@@ -376,7 +390,7 @@ function sendContentEmail (req, action, callback) {
     },
     function (data, callback) {
       if (lodash.get(data.contentDetails, 'result.content') &&
-      lodash.get(data.templateConfig, 'result.form.data.fields[0]')) {
+        lodash.get(data.templateConfig, 'result.form.data.fields[0]')) {
         var cData = data.contentDetails.result.content
         var eData = data.templateConfig.result.form.data.fields[0]
         var subject = eData.subject
@@ -408,10 +422,11 @@ function sendContentEmail (req, action, callback) {
 
         contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
-              'Sending email failed', err))
-            LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, action,
-              'Sent email successfully', res))
+            logger.error({
+              msg: 'Error from content provider while sending email',
+              err,
+              additionalInfo: { emailData: lsEmailData }
+            }, req)
             callback(new Error('Sending email failed!'), null)
           } else {
             callback(null, data)
@@ -423,8 +438,7 @@ function sendContentEmail (req, action, callback) {
     }
   ], function (err, data) {
     if (err) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, action,
-        'Sending email failed', err))
+      logger.error({ msg: 'Error while sending email', err }, req)
       callback(new Error('Sending email failed'), null)
     } else {
       callback(null, true)
@@ -437,7 +451,7 @@ function sendContentEmail (req, action, callback) {
  * @param {object} req
  * @param {function} callback
  */
-function publishedContentEmail (req, callback) {
+function publishedContentEmail(req, callback) {
   sendContentEmail(req, 'publish', callback)
 }
 
@@ -446,10 +460,9 @@ function publishedContentEmail (req, callback) {
  * @param {object} req
  * @param {function} callback
  */
-function reviewContentEmail (req, callback) {
+function reviewContentEmail(req, callback) {
   if (!req.params.contentId) {
-    LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
-      'Content id is missing', null))
+    logger.error({ msg: 'content Id is missing' }, req)
     callback(new Error('Content id is missing'), null)
   }
   var formRequest = {
@@ -468,22 +481,21 @@ function reviewContentEmail (req, callback) {
         templateConfig: getTemplateConfig(formRequest)
       }, function (err, results) {
         if (err) {
-          LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'get 3 parallel details error',
-            'get 3 parallel details failed', err))
+          logger.error({
+            msg: 'getUserDetails or getContentDetails or getTemplateConfig failed',
+            err,
+            additionalInfo: { contentId: req.params.contentId, formRequest }
+          }, req)
           callback(err, null)
         } else {
-          LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'get 3 parallel details success',
-            'get 3 parallel details success', results))
           callback(null, results)
         }
       })
     },
     function (data, callback) {
-      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'get all data',
-        'get all data', data))
       if (lodash.get(data.contentDetails, 'result.content') &&
-      lodash.get(data.templateConfig, 'result.form.data.fields[0]') &&
-      lodash.get(data.userDetails, 'result.response.content[0].rootOrgId')) {
+        lodash.get(data.templateConfig, 'result.form.data.fields[0]') &&
+        lodash.get(data.userDetails, 'result.response.content[0].rootOrgId')) {
         var cData = data.contentDetails.result.content
         var eData = data.templateConfig.result.form.data.fields[0]
         var subject = eData.subject
@@ -504,45 +516,39 @@ function reviewContentEmail (req, callback) {
         getReviwerUserIds(req, data.userDetails.result.response.content[0],
           data.contentDetails.result.content.contentType, function (err, userIds) {
             if (err) {
-              LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'userIds error',
-                'userIds failed', err))
+              logger.error({ msg: 'All reviewers data not found', err }, req)
               callback(new Error('All reviewers data not found'), null)
             } else {
-              LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'userIds success',
-                'userIds success', userIds))
               // Fetching email request body for sending email
               var lsEmailData = {
                 request: getEmailData(null, subject, body, null, null, null,
                   userIds, data.templateConfig.result.form.data.templateName,
                   eData.logo, eData.orgName, eData.fromEmail)
               }
-              LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'lsEmailData success',
-                'lsEmailData success', lsEmailData))
               contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
                 if (err || res.responseCode !== responseCode.SUCCESS) {
-                  LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
-                    'Sending email failed', err))
+                  logger.error({
+                    msg: 'Error from content provider while sending email',
+                    err,
+                    additionalInfo: { emailData: lsEmailData }
+                  }, req)
                   callback(new Error('Sending email failed!'), null)
                 } else {
-                  LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'sendForReview',
-                    'Sent email successfully', res))
                   callback(null, data)
                 }
               })
             }
           })
       } else {
+        logger.error({ msg: 'Required data missing for sending mail' }, req)
         callback(new Error('All data not found for sending email'), null)
       }
     }
   ], function (err, data) {
     if (err) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'sendForReview',
-        'Sending email failed', err))
+      logger.error({ msg: 'Error while sending email', err }, req)
       callback(new Error('Sending email failed'), null)
     } else {
-      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'final sendEmail success',
-        'final sendEmail success', data))
       callback(null, true)
     }
   })
@@ -554,7 +560,7 @@ function reviewContentEmail (req, callback) {
  * @param {object} data
  * @param {function} callback
  */
-function getReviwerUserIds (req, userdata, contentType, callback) {
+function getReviwerUserIds(req, userdata, contentType, callback) {
   var reviewerRoles = contentType === 'TextBook' ? ['BOOK_REVIEWER'] : ['CONTENT_REVIEWER', 'CONTENT_REVIEW']
   var creatorRoles = contentType === 'TextBook' ? ['BOOK_CREATOR'] : ['CONTENT_CREATOR',
     'CONTENT_CREATION', 'CONTENT_REVIEWER', 'CONTENT_REVIEW']
@@ -598,12 +604,9 @@ function getReviwerUserIds (req, userdata, contentType, callback) {
     subOrgReviewers: getUserIds(req, subOrgReviewerRequest, fetchSubOrgReviewers)
   }, function (err, results) {
     if (err) {
-      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getReviwerUserIds error',
-        'getReviwerUserIds failed', err))
+      logger.error({ msg: 'getReviwerUserIds failed' }, req)
       callback(err, null)
     } else {
-      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getReviwerUserIds success',
-        'getReviwerUserIds success', results))
       var rootOrgReviewersId = lodash.map(results.rootOrgReviewers, 'id')
       var subOrgReviewersId = lodash.map(results.subOrgReviewers, 'id')
       var allReviewerIds = lodash.union(rootOrgReviewersId, subOrgReviewersId)
@@ -618,20 +621,17 @@ function getReviwerUserIds (req, userdata, contentType, callback) {
  * @param {object} body
  * @param {boolean} fetchDetailsFlag
  */
-function getUserIds (req, body, fetchDetailsFlag) {
+function getUserIds(req, body, fetchDetailsFlag) {
   if (fetchDetailsFlag) {
     return function (CBW) {
       async.waterfall([
         function (callback) {
           contentProvider.userSearch(body, req.headers, function (err, result) {
             if (err || result.responseCode !== responseCode.SUCCESS) {
-              LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds 1st 200 error',
-                'getUserIds 1st 200 failed', err))
+              logger.error({ msg: 'Error from content Provider due to user Search', err }, req)
               callback(new Error('User Search failed'), null)
             } else {
-              LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds 1st 200 success',
-                'getUserIds 1st 200 success', result))
-              callback(null, {count: result.result.response.count, content: result.result.response.content})
+              callback(null, { count: result.result.response.count, content: result.result.response.content })
             }
           })
         },
@@ -648,12 +648,9 @@ function getUserIds (req, body, fetchDetailsFlag) {
                 return function (cb) {
                   contentProvider.userSearch(request, req.headers, function (err, result) {
                     if (err || result.responseCode !== responseCode.SUCCESS) {
-                      LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds recursive error',
-                        'getUserIds recursive failed', err))
+                      logger.error({ msg: 'User search failed in content Provider', additionalInfo: { request } }, req)
                       cb(new Error('User Search failed'), null)
                     } else {
-                      LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds recursive success',
-                        'getUserIds recursive success', result))
                       cb(null, result.result.response.content)
                     }
                   })
@@ -665,12 +662,9 @@ function getUserIds (req, body, fetchDetailsFlag) {
             }
             async.parallel(parallelFunctions, function (err, data) {
               if (err) {
-                LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds parallel error',
-                  'getUserIds parallel failed', err))
+                logger.error({ msg: 'fetch userIds failed', err, additionalInfo: { reqBody } }, req)
                 callback(new Error('User Search failed'), null)
               } else {
-                LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds parallel success',
-                  'getUserIds parallel success', data))
                 lodash.forEach(data, function (userData) {
                   userDetails = userDetails.concat(userData)
                 })
@@ -681,12 +675,9 @@ function getUserIds (req, body, fetchDetailsFlag) {
         }
       ], function (err, data) {
         if (err) {
-          LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'getUserIds final error',
-            'getUserIds final failed', err))
+          logger.error({ msg: 'Get user Data failed', err }, req)
           CBW(new Error('Get user data failed'), null)
         } else {
-          LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'getUserIds final success',
-            'getUserIds final success', data))
           CBW(null, data)
         }
       })
@@ -703,7 +694,7 @@ function getUserIds (req, body, fetchDetailsFlag) {
  * @param {object} req
  * @param {function} callback
  */
-function rejectContentEmail (req, callback) {
+function rejectContentEmail(req, callback) {
   sendContentEmail(req, 'requestForChanges', callback)
 }
 
@@ -728,19 +719,25 @@ var getUnlistedShareUrl = function (cData, baseUri) {
  * @param {object} req
  * @param {function} callback
  */
-function unlistedPublishContentEmail (req, callback) {
+function unlistedPublishContentEmail(req, callback) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
   var baseUrl = data.request && data.request.content && data.request.content.baseUrl ? data.request.content.baseUrl : ''
 
   if (!data.contentId) {
+    logger.error({ msg: 'content id is missing', additionalInfo: { data } }, req)
     callback(new Error('Content id missing'), null)
   }
   async.waterfall([
     function (CBW) {
       contentProvider.getContent(data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          logger.error({
+            msg: 'Error from content provider while fetching content',
+            err,
+            additionalInfo: { contentId: data.contentId }
+          }, req)
           callback(new Error('Invalid content id'), null)
         } else {
           data.request.contentData = res.result.content
@@ -760,14 +757,13 @@ function unlistedPublishContentEmail (req, callback) {
       var lsEmailData = {
         request: getEmailData(null, subject, body, null, null, null, [cData.createdBy], eData.TEMPLATE)
       }
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'unlistedPublishContentEmail',
-        'Request to Leaner service to send email', {
-          body: lsEmailData
-        }))
       contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'unlistedPublishContentEmail',
-            'Sending email failed', res))
+          logger.error({
+            msg: 'Error from content provider while sending email',
+            err,
+            additionalInfo: { emailData: lsEmailData }
+          }, req)
           callback(new Error('Sending email failed'), null)
         } else {
           CBW(null, res)
@@ -776,8 +772,6 @@ function unlistedPublishContentEmail (req, callback) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'unlistedPublishContentEmail',
-        'Email sent successfully', rspObj))
       callback(null, true)
     }
   ])
