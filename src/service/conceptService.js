@@ -8,8 +8,7 @@ var async = require('async')
 var path = require('path')
 var respUtil = require('response_util')
 var contentProvider = require('sb_content_provider_util')
-var LOG = require('sb_logger_util')
-
+var logger = require('sb_logger_util_v2')
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 
@@ -23,6 +22,7 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {Object} response
  */
 function getDomainsAPI(req, response) {
+  logger.debug({ msg: 'conceptService.getDomainAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
   data.body = req.body
@@ -30,17 +30,21 @@ function getDomainsAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDomainsAPI',
-        'Request to content provider for get all domains', {
-          headers: req.headers
-        }))
+      logger.info({ msg: 'Request to content provider to get all domains', additionalInfo: { data } }, req)
       contentProvider.getDomains(req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDomainsAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = domainMessage.GET_DOMAINS.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_DOMAINS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error while getting domains from content provider',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            }
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -53,7 +57,6 @@ function getDomainsAPI(req, response) {
 
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDomainsAPI', 'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -65,35 +68,46 @@ function getDomainsAPI(req, response) {
  * @param {Object} response
  */
 function getDomainByIDAPI(req, response) {
+  logger.debug({ msg: 'conceptService.getDomainByIDAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
 
   data.domainId = req.params.domainId
 
   if (!data.domainId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDomainByIDAPI',
-      'Error due to required params are missing', data))
     rspObj.errCode = domainMessage.GET_DOMAIN_BY_ID.MISSING_CODE
     rspObj.errMsg = domainMessage.GET_DOMAIN_BY_ID.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing domainId',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDomainByIDAPI',
-        'Request to content provider for get domain by id', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'Request to content provider to get domain by Id', additionalInfo: { data } }, req)
       contentProvider.getDomainById(data.domainId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getDomainByIDAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = domainMessage.GET_DOMAIN_BY_ID.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_DOMAIN_BY_ID.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error while getting domain By Id from content provider',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            }
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -106,8 +120,6 @@ function getDomainByIDAPI(req, response) {
 
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getDomainByIDAPI',
-        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -119,35 +131,46 @@ function getDomainByIDAPI(req, response) {
  * @param {Object} response
  */
 function getObjectTypesAPI(req, response) {
+  logger.debug({ msg: 'conceptService.getObjectTypesAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
   data.domainId = req.params.domainId
   data.objectType = req.params.objectType
 
   if (!data.domainId || !data.objectType) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getObjectTypesAPI',
-      'Error due to required params are missing', data))
     rspObj.errCode = domainMessage.GET_OBJECTS.MISSING_CODE
     rspObj.errMsg = domainMessage.GET_OBJECTS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing domainId or objectType',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getObjectTypesAPI',
-        'Request to content provider for get object type', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'Request to content provider to get Object Types ', additionalInfo: { data } }, req)
       contentProvider.getObjects(data.domainId, data.objectType, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename,
-            'getObjectTypesAPI', 'Getting error from content provider', res))
           rspObj.errCode = domainMessage.GET_OBJECTS.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_OBJECTS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error while getting Object Types from content provider',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            }
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -159,8 +182,6 @@ function getObjectTypesAPI(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getObjectTypesAPI',
-        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -172,6 +193,7 @@ function getObjectTypesAPI(req, response) {
  * @param {Object} response
  */
 function getObjectTypeByIDAPI(req, response) {
+  logger.debug({ msg: 'conceptService.getObjectTypeByIDAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
 
@@ -180,29 +202,39 @@ function getObjectTypeByIDAPI(req, response) {
   data.objectId = req.params.objectId
 
   if (!data.domainId || !data.objectType || !data.objectId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getObjectTypeByIDAPI',
-      'Error due to required params are missing', data))
     rspObj.errCode = domainMessage.GET_OBJECT_BY_ID.MISSING_CODE
     rspObj.errMsg = domainMessage.GET_OBJECT_BY_ID.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing domainId or objectType or objectId',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getObjectTypeByIDAPI',
-        'Request to content provider for get object type using id', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'Request to content provider to get Object Types by Id', additionalInfo: { data } }, req)
       contentProvider.getObjectById(data.domainId, data.objectType, data.objectId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getObjectTypeByIDAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = domainMessage.GET_OBJECT_BY_ID.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_OBJECT_BY_ID.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error while getting Object Types by Id from content provider',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            }
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -215,8 +247,6 @@ function getObjectTypeByIDAPI(req, response) {
 
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getObjectTypeByIDAPI',
-        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -228,34 +258,45 @@ function getObjectTypeByIDAPI(req, response) {
  * @param {Object} response
  */
 function getConceptByIdAPI(req, response) {
+  logger.debug({ msg: 'conceptService.getConceptByIdAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
   data.conceptId = req.params.conceptId
 
   if (!data.conceptId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getConceptByIdAPI',
-      'Error due to required params are missing', data))
     rspObj.errCode = domainMessage.GET_OBJECTS.MISSING_CODE
     rspObj.errMsg = domainMessage.GET_OBJECTS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing conceptID',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getConceptByIdAPI',
-        'Request to content provider for get concept', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'Request to content provider to get concept', additionalInfo: { data } }, req)
       contentProvider.getConceptById(data.conceptId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getConceptByIdAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = domainMessage.GET_CONCEPT_BY_ID.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_CONCEPT_BY_ID.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error while getting concept from content provider',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            }
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -268,8 +309,6 @@ function getConceptByIdAPI(req, response) {
 
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getConceptByIdAPI',
-        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -281,17 +320,25 @@ function getConceptByIdAPI(req, response) {
  * @param {Object} response
  */
 function searchObjectTypeAPI(req, response) {
+  logger.debug({ msg: 'conceptService.searchObjectTypeAPI() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
   data.domainId = req.params.domainId
   data.objectType = req.params.objectType
 
   if (!data.domainId || !data.objectType || !data.request || !data.request.search) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchObjectTypeAPI',
-      'Error due to required params are missing', data))
     rspObj.errCode = domainMessage.SEARCH_OBJECT_TYPE.MISSING_CODE
     rspObj.errMsg = domainMessage.SEARCH_OBJECT_TYPE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing domainId or objectType or request or search property in request',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -302,19 +349,22 @@ function searchObjectTypeAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchObjectTypeAPI',
-        'Request to content provider for search object type', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'Request to content provider to search Object Types ', additionalInfo: { data } }, req)
       contentProvider.searchObjectsType(ekStepReqData, data.domainId,
         data.objectType, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchObjectTypeAPI',
-              'Getting error from content provider', res))
             rspObj.errCode = domainMessage.SEARCH_OBJECT_TYPE.FAILED_CODE
             rspObj.errMsg = domainMessage.SEARCH_OBJECT_TYPE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            logger.error({
+              msg: 'Error while searching objectTypes from content provider',
+              err: {
+                err,
+                errCode: rspObj.errCode,
+                errMsg: rspObj.errMsg,
+                responseCode: rspObj.responseCode
+              }
+            }, req)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj.result = res && res.result ? res.result : {}
             rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -326,8 +376,6 @@ function searchObjectTypeAPI(req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchObjectTypeAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -341,17 +389,24 @@ function searchObjectTypeAPI(req, response) {
  */
 function createObjectTypeAPI(req, response) {
   var rspObj = req.rspObj
-
+  logger.debug({ msg: 'conceptService.createObjectTypeAPI() called' }, req)
   var data = req.body
   data.domainId = req.params.domainId
   data.objectType = req.params.objectType
 
   if (!data.domainId || !data.objectType || !data.request || !data.request.object) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createObjectTypeAPI',
-      'Error due to required params are missing', data))
     rspObj.errCode = domainMessage.CREATE_OBJECT_TYPE.MISSING_CODE
     rspObj.errMsg = domainMessage.CREATE_OBJECT_TYPE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing domainId or objectType or request or object property in request',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -362,18 +417,21 @@ function createObjectTypeAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createObjectTypeAPI',
-        'Request to content provider for create object type', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'Request to content provider to create Object Type ', additionalInfo: { data } }, req)
       contentProvider.createObjectType(ekStepReqData, data.domainId, data.objectType, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createObjectTypeAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = domainMessage.CREATE_OBJECT_TYPE.FAILED_CODE
           rspObj.errMsg = domainMessage.CREATE_OBJECT_TYPE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider while creating objectTypes ',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            }
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -385,8 +443,6 @@ function createObjectTypeAPI(req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createObjectTypeAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -399,6 +455,7 @@ function createObjectTypeAPI(req, response) {
  * @param {Object} response
  */
 function updateObjectTypeAPI(req, response) {
+  logger.debug({ msg: 'conceptService.updateObjectTypeAPI() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
   data.domainId = req.params.domainId
@@ -406,11 +463,18 @@ function updateObjectTypeAPI(req, response) {
   data.objectId = req.params.objectId
 
   if (!data.domainId || !data.objectType || !data.objectId || !data.request || !data.request.object) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateObjectTypeAPI',
-      'Error due to required params are missing', data))
     rspObj.errCode = domainMessage.UPDATE_OBJECT_TYPE.MISSING_CODE
     rspObj.errMsg = domainMessage.UPDATE_OBJECT_TYPE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing domainId or objectType or ObjectId or request or object property in request',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -421,19 +485,22 @@ function updateObjectTypeAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateObjectTypeAPI',
-        'Request to content provider for update object type', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'Request to content provider to update Object Type ', additionalInfo: { data } }, req)
       contentProvider.updateObjectType(ekStepReqData, data.domainId,
         data.objectType, data.objectId, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateObjectTypeAPI',
-              'Getting error from content provider', res))
             rspObj.errCode = domainMessage.UPDATE_OBJECT_TYPE.FAILED_CODE
             rspObj.errMsg = domainMessage.UPDATE_OBJECT_TYPE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            logger.error({
+              msg: 'Error from content provider while updating objectTypes ',
+              err: {
+                err,
+                errCode: rspObj.errCode,
+                errMsg: rspObj.errMsg,
+                responseCode: rspObj.responseCode
+              }
+            }, req)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj.result = res && res.result ? res.result : {}
             rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -445,8 +512,6 @@ function updateObjectTypeAPI(req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateObjectTypeAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -459,6 +524,7 @@ function updateObjectTypeAPI(req, response) {
  * @param {Object} response
  */
 function retireObjectTypeAPI(req, response) {
+  logger.debug({ msg: 'conceptService.retireObjectTypeAPI() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
   data.domainId = req.params.domainId
@@ -466,11 +532,18 @@ function retireObjectTypeAPI(req, response) {
   data.objectId = req.params.objectId
 
   if (!data.domainId || !data.objectType || !data.objectId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retireObjectTypeAPI',
-      'Error due to required params are missing', data))
     rspObj.errCode = domainMessage.RETIRE_OBJECT_TYPE.MISSING_CODE
     rspObj.errMsg = domainMessage.RETIRE_OBJECT_TYPE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing domainId or objectType or ObjectId',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -479,19 +552,22 @@ function retireObjectTypeAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'retireObjectTypeAPI',
-        'Request to content provider for retire object type', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.info({ msg: 'Request to content provider to retire Object Type ', additionalInfo: { data } }, req)
       contentProvider.retireObjectType(ekStepReqData, data.domainId,
         data.objectType, data.objectId, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'retireObjectTypeAPI',
-              'Getting error from content provider', res))
             rspObj.errCode = domainMessage.RETIRE_OBJECT_TYPE.FAILED_CODE
             rspObj.errMsg = domainMessage.RETIRE_OBJECT_TYPE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            logger.error({
+              msg: 'Error from content provider while retiring objectTypes ',
+              err: {
+                err,
+                errCode: rspObj.errCode,
+                errMsg: rspObj.errMsg,
+                responseCode: rspObj.responseCode
+              }
+            }, req)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj.result = res && res.result ? res.result : {}
             rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -503,8 +579,6 @@ function retireObjectTypeAPI(req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'retireObjectTypeAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -517,16 +591,13 @@ function retireObjectTypeAPI(req, response) {
  * @param {Object} response
  */
 function listTermsAPI(req, response) {
+  logger.debug({ msg: 'conceptService.listTermsAPI() called' }, req)
   var rspObj = req.rspObj
   async.waterfall([
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'listTermsAPI',
-        'Request to content provider for terms list', {
-          headers: req.headers
-        }))
       contentProvider.listTerms(req.headers, function (err, res) {
         if (err) {
-          console.log(err)
+          logger.error({msg: 'Error from content provider while listing Terms'}, req)
         }
         CBW(null, res)
       })
@@ -534,8 +605,6 @@ function listTermsAPI(req, response) {
     function (res) {
       rspObj.result = res.result
       var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'listTermsAPI',
-        'Sending response back to user'))
       rspObj = utilsService.getErrorResponse(rspObj, res)
       return response.status(httpStatus).send(respUtil.successResponse(rspObj))
     }
@@ -548,16 +617,13 @@ function listTermsAPI(req, response) {
  * @param {Object} response
  */
 function listResourceBundlesAPI(req, response) {
+  logger.debug({ msg: 'conceptService.listResourceBundlesAPI() called' }, req)
   var rspObj = req.rspObj
   async.waterfall([
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'listResourceBundlesAPI',
-        'Request to content provider for terms list', {
-          headers: req.headers
-        }))
       contentProvider.listResourceBundles(req.headers, function (err, res) {
         if (err) {
-          console.log(err)
+          logger.error({msg: 'Error from content provider while listing resourceBundles'}, req)
         }
         CBW(null, res)
       })
@@ -565,8 +631,6 @@ function listResourceBundlesAPI(req, response) {
     function (res) {
       rspObj.result = res.result
       var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'listResourceBundlesAPI',
-        'Sending response back to user'))
       rspObj = utilsService.getErrorResponse(rspObj, res)
       return response.status(httpStatus).send(respUtil.successResponse(rspObj))
     }
@@ -579,16 +643,13 @@ function listResourceBundlesAPI(req, response) {
  * @param {Object} response
  */
 function listOrdinalsAPI(req, response) {
+  logger.debug({ msg: 'conceptService.listOrdinalsAPI() called' }, req)
   var rspObj = req.rspObj
   async.waterfall([
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'listOrdinalsAPI',
-        'Request to content provider for terms list', {
-          headers: req.headers
-        }))
       contentProvider.listOrdinals(req.headers, function (err, res) {
         if (err) {
-          console.log(err)
+          logger.error({msg: 'Error from content provider while listing ordinals'}, req)
         }
         CBW(null, res)
       })
@@ -596,8 +657,6 @@ function listOrdinalsAPI(req, response) {
     function (res) {
       rspObj.result = res.result
       var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'listOrdinalsAPI',
-        'Sending response back to user'))
       rspObj = utilsService.getErrorResponse(rspObj, res)
       return response.status(httpStatus).send(respUtil.successResponse(rspObj))
     }
