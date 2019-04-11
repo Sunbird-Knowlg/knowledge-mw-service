@@ -10,7 +10,7 @@ var path = require('path')
 var contentProvider = require('sb_content_provider_util')
 var respUtil = require('response_util')
 var validatorUtil = require('sb_req_validator_util')
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 var _ = require('underscore')
 var lodash = require('lodash')
 
@@ -97,11 +97,18 @@ function searchCourseAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.filters) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchCourseAPI',
-      'Error due to required params are missing', data.request))
     rspObj.errCode = courseMessage.SEARCH.MISSING_CODE
     rspObj.errMsg = courseMessage.SEARCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request body or filters',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -113,15 +120,21 @@ function searchCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchCourseAPI',
-        'Request to content provider to search the course', ekStepReqData))
+      logger.info({ msg: 'Request to content provider for course composite search', additionalInfo: { data } }, req)
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'searchCourseAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.SEARCH.FAILED_CODE
           rspObj.errMsg = courseMessage.SEARCH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider during composite search',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            }
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -130,8 +143,7 @@ function searchCourseAPI (req, response) {
           if (req.query.framework && req.query.framework !== 'null') {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
-                LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'Framework API failed',
-                  'Framework API failed with framework - ' + req.query.framework, {'err': err, 'res': res}))
+                logger.error({msg: 'Error while fetching framework details', additionalInfo: {framework: req.query.framework}}, req)
                 rspObj.result = res.result
                 return response.status(200).send(respUtil.successResponse(rspObj))
               } else {
@@ -155,10 +167,7 @@ function searchCourseAPI (req, response) {
         rspObj.result = transformResBody(res.result, 'content', 'course')
         rspObj.result.count = res.result.count
       }
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'searchCourseAPI',
-        'Course searched successfully, We got ' + rspObj.result.count + ' results', {
-          courseCount: rspObj.result.count
-        }))
+      logger.info({msg: `${rspObj.result.count} - course search results found`}, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -169,21 +178,15 @@ function getFrameworkDetails (req, CBW) {
     if (err || !data) {
       contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, result) {
         if (err || result.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'framework API failed',
-            'Fetching framework data failed' + req.query.framework, err))
+          logger.error({msg: 'Error while fetching framework details', err, additionalInfo: {framework: req.query.framework}}, req)
           CBW(new Error('Fetching framework data failed'), null)
         } else {
-          LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename, 'framework API success',
-            'Fetching framework data success - ' + req.query.framework, result))
           cacheManager.set({ key: req.query.framework, value: result },
             function (err, data) {
               if (err) {
-                LOG.error(utilsService.getLoggerData(req.rspObj, 'ERROR', filename, 'Setting framework cache failed',
-                  'Setting framework cache data failed' + req.query.framework, err))
+                logger.error({msg: 'Error while caching framework details', err, additionalInfo: {framework: req.query.framework}}, req)
               } else {
-                LOG.info(utilsService.getLoggerData(req.rspObj, 'INFO', filename,
-                  'Setting framework cache data success',
-                  'Setting framework cache data success - ' + req.query.framework, result))
+                logger.info({msg: 'Caching framework details successful', additionalInfo: {framework: req.query.framework}}, req)
               }
             })
           CBW(null, result)
@@ -219,7 +222,7 @@ function parseTranslationData (data, language) {
   try {
     return lodash.get(JSON.parse(data), language) || null
   } catch (e) {
-    console.warn(e)
+    logger.warn({msg: 'Error while parsing translation data ', err: e})
     return null
   }
 }
@@ -236,11 +239,18 @@ function createCourseAPI (req, response) {
 
   if (!data.request || !data.request.course || !validatorUtil.validate(data.request.course, courseModel.CREATE)) {
     // prepare
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createCourseAPI',
-      'Error due to required params are missing', data.request))
     rspObj.errCode = courseMessage.CREATE.MISSING_CODE
     rspObj.errMsg = courseMessage.CREATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request body or course ',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -254,15 +264,21 @@ function createCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createCourseAPI',
-        'Request to content provider to create the course', ekStepReqData))
+      logger.info({ msg: 'Request to content provider for creating course', additionalInfo: { data } }, req)
       contentProvider.createContent(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createCourseAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.CREATE.MISSING_CODE
           rspObj.errMsg = courseMessage.CREATE.MISSING_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider during content creation',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            }
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -279,8 +295,6 @@ function createCourseAPI (req, response) {
       if (rspObj.telemetryData) {
         rspObj.telemetryData.object = utilsService.getObjectData(rspObj.result.course_id, 'course', '', {})
       }
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createCourseAPI',
-        'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
 
@@ -304,11 +318,18 @@ function updateCourseAPI (req, response) {
   }
 
   if (!data.request || !data.request.course || !validatorUtil.validate(data.request.course, courseModel.UPDATE)) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateCourseAPI',
-      'Error due to required params are missing', data.request))
     rspObj.errCode = courseMessage.UPDATE.MISSING_CODE
     rspObj.errMsg = courseMessage.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request body or course details ',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -322,18 +343,22 @@ function updateCourseAPI (req, response) {
       var qs = {
         mode: 'edit'
       }
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCourseAPI',
-        'Request to content provider to get latest version key', {
-          courseId: data.courseId,
-          query: qs
-        }))
+      logger.info({ msg: 'Request to content provider for updating course', additionalInfo: { data } }, req)
       contentProvider.getContentUsingQuery(data.courseId, qs, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateCourseAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.UPDATE.FAILED_CODE
           rspObj.errMsg = courseMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider while fetching content using query',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {courseId: data.courseId, qs}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -346,15 +371,21 @@ function updateCourseAPI (req, response) {
     },
     function (CBW) {
       var ekStepReqData = transformReqBody(data.request, 'course', 'content')
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCourseAPI',
-        'Request to content provider to update the course', ekStepReqData))
       contentProvider.updateContent(ekStepReqData, data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateCourseAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.UPDATE.FAILED_CODE
           rspObj.errMsg = courseMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider while updating content',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {courseId: data.courseId, ekStepReqData}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -368,8 +399,6 @@ function updateCourseAPI (req, response) {
     function (res) {
       rspObj.result.course_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCourseAPI',
-        'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -399,19 +428,22 @@ function reviewCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'reviewCourseAPI',
-        'Request to content provider to review the course', {
-          req: ekStepReqData,
-          courseId: data.courseId
-        }))
-
+      logger.info({ msg: 'Request to content provider to review course', additionalInfo: { data } }, req)
       contentProvider.reviewContent(ekStepReqData, data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'reviewCourseAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.REVIEW.FAILED_CODE
           rspObj.errMsg = courseMessage.REVIEW.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider while reviewing content',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -425,8 +457,6 @@ function reviewCourseAPI (req, response) {
     function (res) {
       rspObj.result.course_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'reviewCourseAPI',
-        'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -449,11 +479,18 @@ function publishCourseAPI (req, response) {
   }
 
   if (!data.request || !data.request.course || !data.request.course.lastPublishedBy) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'publishCourseAPI',
-      'Error due to required params are missing', data.request))
     rspObj.errCode = courseMessage.PUBLISH.MISSING_CODE
     rspObj.errMsg = courseMessage.PUBLISH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request body or course or lastPublishedBy property in course',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   var ekStepReqData = transformReqBody(data.request, 'course', 'content')
@@ -461,18 +498,22 @@ function publishCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishCourseAPI',
-        'Request to content provider to publish the course', {
-          courseId: data.courseId,
-          reqData: ekStepReqData
-        }))
+      logger.info({ msg: 'Request to content provider to publish course', additionalInfo: { data } }, req)
       contentProvider.publishContent(ekStepReqData, data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'publishCourseAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.PUBLISH.FAILED_CODE
           rspObj.errMsg = courseMessage.PUBLISH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider while publishing course',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -487,8 +528,6 @@ function publishCourseAPI (req, response) {
       rspObj.result.course_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
       rspObj.result.publishStatus = res.result.publishStatus.replace('Content Id', 'Course Id')
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'publishCourseAPI',
-        'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -512,30 +551,40 @@ function getCourseAPI (req, response) {
   }
 
   if (!data.courseId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getCourseAPI',
-      'Error due to required params are missing', {
-        courseId: data.courseId
-      }))
     rspObj.errCode = courseMessage.GET.FAILED_CODE
     rspObj.errMsg = courseMessage.GET.FAILED_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing courseId',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseAPI',
-        'Request to content provider to get course meta data', {
-          courseId: data.courseId
-        }))
+      logger.info({ msg: 'Request to content provider to get Course Details', additionalInfo: { data } }, req)
       contentProvider.getContent(data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getCourseAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.GET.FAILED_CODE
           rspObj.errMsg = courseMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider while fetching course',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -550,8 +599,6 @@ function getCourseAPI (req, response) {
     },
     function (res) {
       rspObj.result = transformResBody(res.result, 'content', 'course')
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseAPI',
-        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -581,15 +628,22 @@ function getMyCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getMyCourseAPI',
-        'Request to content provider to get user course', ekStepReqData))
+      logger.info({ msg: 'Request to content provider to get Course Details', additionalInfo: { data: request } }, req)
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getMyCourseAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.GET_MY.FAILED_CODE
           rspObj.errMsg = courseMessage.GET_MY.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider during composite search',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data: request}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -606,10 +660,7 @@ function getMyCourseAPI (req, response) {
         rspObj.result = transformResBody(res.result, 'content', 'course')
         rspObj.result.count = res.result.count
       }
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getMyCourseAPI',
-        'My Course searched successfully, We got ' + rspObj.result.count + ' results', {
-          courseCount: rspObj.result.count
-        }))
+      logger.info({msg: `${rspObj.result.count} - my course search results count`}, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -633,30 +684,40 @@ function getCourseHierarchyAPI (req, response) {
   }
 
   if (!data.courseId) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getCourseHierarchyAPI',
-      'Error due to required params are missing', {
-        courseId: data.courseId
-      }))
     rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE
     rspObj.errMsg = courseMessage.HIERARCHY.FAILED_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing courseId',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseHierarchyAPI',
-        'Request to content provider to get course hierarchy', {
-          courseId: data.courseId
-        }))
+      logger.info({ msg: 'Request to content provider to get content Hierarchy', additionalInfo: { data } }, req)
       contentProvider.contentHierarchy(data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getCourseHierarchyAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE
           rspObj.errMsg = courseMessage.HIERARCHY.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider while getting content hierarchy',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {courseId: data.courseId}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -671,8 +732,6 @@ function getCourseHierarchyAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getCourseHierarchyAPI',
-        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -689,11 +748,18 @@ function updateCourseHierarchyAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.data || !data.request.data.hierarchy) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateCourseHierarchyAPI',
-      'Error due to required params are missing', data.request))
     rspObj.errCode = courseMessage.HIERARCHY_UPDATE.MISSING_CODE
     rspObj.errMsg = courseMessage.HIERARCHY_UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request or request.data or data hierarchy info',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   var hierarchy = data.request.data.hierarchy
@@ -709,15 +775,22 @@ function updateCourseHierarchyAPI (req, response) {
   async.waterfall([
     function (CBW) {
       var ekStepReqData = {request: data.request}
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCourseHierarchyAPI',
-        'Request to content provider to update the course hierarchy', ekStepReqData))
+      logger.info({ msg: 'Request to content provider to update content Hierarchy', additionalInfo: { data } }, req)
       contentProvider.contentHierarchyUpdate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateCourseHierarchyAPI',
-            'Getting error from content provider', res))
           rspObj.errCode = courseMessage.HIERARCHY_UPDATE.FAILED_CODE
           rspObj.errMsg = courseMessage.HIERARCHY_UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider while updating content hierarchy',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {courseId: data.courseId}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -729,8 +802,6 @@ function updateCourseHierarchyAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateCourseHierarchyAPI',
-        'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
