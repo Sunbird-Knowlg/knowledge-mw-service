@@ -129,6 +129,7 @@ function acceptFlagContentEmail(req, callback) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error from content provider while fetching content',
+            err,
             additionalInfo: { data }
           }, req)
           callback(new Error('Invalid content id'), null)
@@ -604,7 +605,7 @@ function getReviwerUserIds(req, userdata, contentType, callback) {
     subOrgReviewers: getUserIds(req, subOrgReviewerRequest, fetchSubOrgReviewers)
   }, function (err, results) {
     if (err) {
-      logger.error({ msg: 'getReviwerUserIds failed' }, req)
+      logger.error({ msg: 'getReviwerUserIds failed', err }, req)
       callback(err, null)
     } else {
       var rootOrgReviewersId = lodash.map(results.rootOrgReviewers, 'id')
@@ -648,7 +649,7 @@ function getUserIds(req, body, fetchDetailsFlag) {
                 return function (cb) {
                   contentProvider.userSearch(request, req.headers, function (err, result) {
                     if (err || result.responseCode !== responseCode.SUCCESS) {
-                      logger.error({ msg: 'User search failed in content Provider', additionalInfo: { request } }, req)
+                      logger.error({ msg: 'User search failed in content Provider', err, additionalInfo: { request } }, req)
                       cb(new Error('User Search failed'), null)
                     } else {
                       cb(null, result.result.response.content)
