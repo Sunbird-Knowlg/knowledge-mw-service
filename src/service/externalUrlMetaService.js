@@ -9,7 +9,7 @@ var filename = path.basename(__filename)
 var responseCode = messageUtils.RESPONSE_CODE
 var respUtil = require('response_util')
 var utilsService = require('../service/utilsService')
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 
 function fetchUrlMetaAPI (req, response) {
   return fetchUrlMeta(req, response)
@@ -22,6 +22,15 @@ function fetchUrlMeta (req, response) {
     rspObj.errCode = extUrlMessage.FETCH.MISSING_CODE
     rspObj.errMsg = extUrlMessage.FETCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing url property in request',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: {data}
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -29,14 +38,22 @@ function fetchUrlMeta (req, response) {
   urlMetadata(data.url).then(
     function (metadata) {
       rspObj.result = metadata
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'fetchUrlMetaAPI',
-        'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     },
     function (error) {
       rspObj.errCode = error.code || extUrlMessage.FETCH.FAILED_CODE
       rspObj.errMsg = extUrlMessage.FETCH.FAILED_MESSAGE
       rspObj.responseCode = responseCode.INTERNAL_SERVER_ERROR
+      logger.error({
+        msg: 'Error while fetching meta data of the link',
+        err: {
+          error,
+          errCode: rspObj.errCode,
+          errMsg: rspObj.errMsg,
+          responseCode: rspObj.responseCode
+        },
+        additionalInfo: {url: data.url}
+      }, req)
       return response.status(500).send(respUtil.errorResponse(rspObj))
     })
 }
