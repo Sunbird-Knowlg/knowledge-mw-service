@@ -1,5 +1,5 @@
 var _ = require('lodash')
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 var dbModel = require('./../../utils/cassandraUtil').getConnections('dialcodes')
 
 function ImageService(config) {
@@ -29,11 +29,14 @@ ImageService.prototype.insertImg = function (dialcode, channel, publisher, fileN
   })
   image.save(function (error) {
     if (error) {
-      LOG.error({
-        'Unable to insert data to images table : ': error,
-        dialcode,
-        channel,
-        publisher
+      logger.error({
+        msg: 'Unable to insert data to image table',
+        error,
+        additionalInfo: {
+          dialcode,
+          channel,
+          publisher
+        }
       })
       callback(error, null)
     } else {
@@ -56,11 +59,14 @@ ImageService.prototype.getImgFromDB = function (dialcode, channel, publisher, ca
     { allow_filtering: true },
     function (error, images) {
       if (error) {
-        LOG.error({
-          'Unable to query dial code images before creating one : ': error,
-          dialcode,
-          channel,
-          publisher
+        logger.error({
+          msg: 'Unable to query dial code images before creating one',
+          error,
+          additionalInfo: {
+            dialcode: dialcode,
+            channel: channel,
+            publisher: publisher
+          }
         })
       }
       callback(error, images)
