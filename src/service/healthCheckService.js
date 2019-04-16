@@ -8,7 +8,7 @@ var async = require('async')
 var contentProvider = require('sb_content_provider_util')
 var respUtil = require('response_util')
 var path = require('path')
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 var configUtil = require('sb-config-util')
 
 var messageUtils = require('./messageUtil')
@@ -57,11 +57,13 @@ function checkHealth (req, response) {
       cassandraUtils.checkCassandraDBHealth(function (err, res) {
         if (err || res === false) {
           isDbConnected = false
+          logger.error({msg: 'CASSANDRA_DB_HEALTH_STATUS is False', err}, req)
           configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.CASSANDRA_DB.NAME, isDbConnected,
             hcMessages.CASSANDRA_DB.FAILED_CODE, hcMessages.CASSANDRA_DB.FAILED_MESSAGE))
         } else {
           isDbConnected = true
+          logger.info({msg: 'CASSANDRA_DB_HEALTH_STATUS is True'}, req)
           configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'true')
           checksArrayObj.push(getHealthCheckObj(hcMessages.CASSANDRA_DB.NAME, isDbConnected, '', ''))
         }
@@ -72,15 +74,18 @@ function checkHealth (req, response) {
       contentProvider.ekStepHealthCheck(function (err, res) {
         if (err) {
           isEkStepHealthy = false
+          logger.error({msg: 'EKSTEP_HEALTH_STATUS is False', err}, req)
           configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.EK_STEP.NAME, isEkStepHealthy,
             hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE))
         } else if (res && res.result && res.result.healthy) {
           isEkStepHealthy = true
+          logger.info({msg: 'EKSTEP_HEALTH_STATUS is True'}, req)
           configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'true')
           checksArrayObj.push(getHealthCheckObj(hcMessages.EK_STEP.NAME, isEkStepHealthy, '', ''))
         } else {
           isEkStepHealthy = false
+          logger.error({msg: 'EKSTEP_HEALTH_STATUS is False'}, req)
           configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.EK_STEP.NAME, isEkStepHealthy,
             hcMessages.EK_STEP.FAILED_CODE, hcMessages.EK_STEP.FAILED_MESSAGE))
@@ -92,15 +97,18 @@ function checkHealth (req, response) {
       contentProvider.learnerServiceHealthCheck(function (err, res) {
         if (err) {
           isLSHealthy = false
+          logger.error({msg: 'LEARNER_SERVICE_HEALTH_STATUS is False', err}, req)
           configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.LEARNER_SERVICE.NAME,
             isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE))
         } else if (res && res.result && res.result.response && res.result.response.healthy) {
           isLSHealthy = true
-          configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'false')
+          logger.info({msg: 'LEARNER_SERVICE_HEALTH_STATUS is True'}, req)
+          configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'true')
           checksArrayObj.push(getHealthCheckObj(hcMessages.LEARNER_SERVICE.NAME, isLSHealthy, '', ''))
         } else {
           isLSHealthy = false
+          logger.error({msg: 'LEARNER_SERVICE_HEALTH_STATUS is False'}, req)
           configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.LEARNER_SERVICE.NAME,
             isLSHealthy, hcMessages.LEARNER_SERVICE.FAILED_CODE, hcMessages.LEARNER_SERVICE.FAILED_MESSAGE))
@@ -111,12 +119,10 @@ function checkHealth (req, response) {
   ], function () {
     var rsp = respUtil.successResponse(rspObj)
     if (isEkStepHealthy && isLSHealthy && isDbConnected) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'checkHealth',
-        'Content service is healthy'))
+      logger.info({msg: 'Content Service is Healthy', additionalInfo: {healthStatus: checksArrayObj}}, req)
       return response.status(200).send(getHealthCheckResp(rsp, true, checksArrayObj))
     } else {
-      LOG.error(utilsService.getLoggerData(rspObj, 'INFO', filename, 'checkHealth',
-        'Content service is not healthy', { rsp: checksArrayObj }))
+      logger.error({msg: 'Content Service is not healthy', additionalInfo: {healthStatus: checksArrayObj}}, req)
       return response.status(200).send(getHealthCheckResp(rsp, false, checksArrayObj))
     }
   })
