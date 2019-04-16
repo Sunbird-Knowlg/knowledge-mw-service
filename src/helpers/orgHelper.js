@@ -1,7 +1,7 @@
 var path = require('path')
 var filename = path.basename(__filename)
 var utilsService = require('../service/utilsService')
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 const contentProvider = require('sb_content_provider_util')
 var _ = require('lodash')
 var CacheManager = require('sb_cache_manager')
@@ -14,16 +14,25 @@ var async = require('async')
  * @param requestObj  js object which contains the search request with filters,offset,limit,query etc
  * @param cb callback after success or error
  */
-function getRootOrgs (requestObj, cb, noExitOnError) {
-  LOG.info(utilsService.getLoggerData({}, 'INFO',
-    filename, 'getRootOrgs', 'getRootOrgs called', requestObj))
+function getRootOrgs(requestObj, cb, noExitOnError) {
+  logger.info({ msg: 'getRootOrgs() called', additionalInfo: { requestObj } })
   contentProvider.getAllRootOrgs(requestObj, (err, res) => {
     if (!err) {
       return cb(err, res)
     } else {
-      LOG.error(utilsService.getLoggerData({}, 'ERROR',
-        filename, 'getRootOrgs', 'error in getting root orgs.', err))
-      if (!noExitOnError) process.exit(1)
+      logger.error({
+        msg: 'Error from content provider while getting all root orgs details',
+        err,
+        additionalInfo: { requestObj }
+      })
+      if (!noExitOnError) {
+        logger.fatal({
+          msg: 'Exiting due to error from content provider while getting all root orgs details',
+          err,
+          additionalInfo: { requestObj, noExitOnError }
+        })
+        process.exit(1)
+      }
     }
   })
 }
@@ -34,7 +43,7 @@ function getRootOrgs (requestObj, cb, noExitOnError) {
    inputdata is array of contents that needs org data
  * @param CBW callback after success or error
  */
-function getRootOrgsFromCache (orgfetchquery, tryfromcache, inputdata, cb) {
+function getRootOrgsFromCache(orgfetchquery, tryfromcache, inputdata, cb) {
   async.waterfall([
     function (CBW) {
       if (tryfromcache) {
@@ -45,8 +54,7 @@ function getRootOrgsFromCache (orgfetchquery, tryfromcache, inputdata, cb) {
             return cb(null, cachedata)
           } else {
             if (err) {
-              LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'getRootOrgsFromCache',
-                'Feching Org details from cache failed.', err))
+              logger.error({ msg: 'getRootOrgsFromCache failed', err })
             }
             CBW()
           }
@@ -58,6 +66,7 @@ function getRootOrgsFromCache (orgfetchquery, tryfromcache, inputdata, cb) {
     function (CBW) {
       getRootOrgs(orgfetchquery, function (err, res) {
         if (err) {
+          logger.error({ msg: 'Error while fetching rootOrgs', err, additionalInfo: { orgfetchquery } })
           return cb(err)
         } else {
           if (_.get(res, 'result.response') && _.get(res.result, 'response.content')) {
@@ -73,14 +82,12 @@ function getRootOrgsFromCache (orgfetchquery, tryfromcache, inputdata, cb) {
   ])
 }
 
-function insertDataToCache (cacheinputdata) {
+function insertDataToCache(cacheinputdata) {
   cacheManager.mset({ data: cacheinputdata, ttl: configData.orgCacheExpiryTime }, function (err, data) {
     if (err) {
-      LOG.error(utilsService.getLoggerData({}, 'ERROR', filename, 'Setting allRootOrgs cache failed',
-        'Setting allRootOrgs cache data failed', err))
+      logger.error({ msg: 'Caching allRootOrgs data failed', err, additionalInfo: { data: cacheinputdata } })
     } else {
-      LOG.info(utilsService.getLoggerData({}, 'INFO', filename,
-        'Setting allRootOrgs cache data success'))
+      logger.info({ msg: 'Caching allRootOrgs data successful', additionalInfo: { data: cacheinputdata } })
     }
   })
 }
@@ -90,7 +97,7 @@ function insertDataToCache (cacheinputdata) {
  * @param inputdata is array of objects, it might be content or course
  * @param cb callback after success or error
  */
-function populateOrgDetailsByHasTag (contents, inputfields, cb) {
+function populateOrgDetailsByHasTag(contents, inputfields, cb) {
   var orgDetails = []
   var orgFetchQuery = {
     'request': {
@@ -106,6 +113,11 @@ function populateOrgDetailsByHasTag (contents, inputfields, cb) {
           orgDetails = orgdata
           return CBW()
         } else {
+          logger.error({
+            msg: 'Error while getting rootOrgs from cache memory',
+            err,
+            additionalInfo: { orgFetchQuery, tryFromCache, contents }
+          })
           return cb(null, contents)
         }
       })
@@ -125,6 +137,11 @@ function populateOrgDetailsByHasTag (contents, inputfields, cb) {
             orgDetails = _.concat(orgDetails, orgdata)
             return CBW()
           } else {
+            logger.error({
+              msg: 'Error while getting rootOrgs from cache memory',
+              err,
+              additionalInfo: { orgFetchQuery, tryFromCache, contents }
+            })
             return cb(null, contents)
           }
         })
@@ -151,7 +168,7 @@ function populateOrgDetailsByHasTag (contents, inputfields, cb) {
  * @param inputdata is req object and res object
  * @param cb there will be no error callback , always returns success
  */
-function includeOrgDetails (req, res, cb) {
+function includeOrgDetails(req, res, cb) {
   if (_.get(req, 'query.orgdetails') && _.get(res, 'result.content')) {
     var inputfields = req.query.orgdetails.split(',')
     var fieldsToPopulate = configData.orgfieldsAllowedToSend.filter(eachfield => inputfields.includes(eachfield))
@@ -175,7 +192,7 @@ function includeOrgDetails (req, res, cb) {
 }
 
 // prepares the set data for inserting in cache
-function prepareCacheDataToInsert (data) {
+function prepareCacheDataToInsert(data) {
   var cacheKeyValuePairs = []
   _.forEach(data, function (eachdata) {
     if (eachdata.hashTagId) {
@@ -188,7 +205,7 @@ function prepareCacheDataToInsert (data) {
 }
 
 // prepares the get data for fetching from cache
-function getKeyNames (data) {
+function getKeyNames(data) {
   var keyNames = []
   _.forEach(data, function (eachdata) {
     if (eachdata.channel) {
