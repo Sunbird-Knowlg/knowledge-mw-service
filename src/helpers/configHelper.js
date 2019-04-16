@@ -1,7 +1,7 @@
 var path = require('path')
 var filename = path.basename(__filename)
 var utilsService = require('../service/utilsService')
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 var async = require('async')
 var _ = require('lodash')
 var orgDataHelper = require('./orgHelper')
@@ -11,7 +11,7 @@ var orgDataHelper = require('./orgHelper')
  * data asynchronously and return back a promise
  * @returns promise
  */
-function getAllChannelsFromAPI () {
+function getAllChannelsFromAPI() {
   return new Promise(function (resolve, reject) {
     var limit = 200
     var offset = 0
@@ -23,10 +23,10 @@ function getAllChannelsFromAPI () {
         'limit': limit
       }
     }
-    LOG.info(utilsService.getLoggerData({}, 'INFO',
-      filename, 'getAllChannelsFromAPI', 'fetching all channels req', channelReqObj))
+    logger.info({ msg: 'Request to get all channels from getAllChannelsFrom API', additionalInfo: { channelReqObj } })
     orgDataHelper.getRootOrgs(channelReqObj, function (err, res) {
       if (err) {
+        logger.error({ msg: 'Error while getting root Org info', err, additionalInfo: { channelReqObj } })
         reject(err)
       }
       const orgCount = res.result.response.count
@@ -41,8 +41,7 @@ function getAllChannelsFromAPI () {
         }
         async.map(channelReqArr, orgDataHelper.getRootOrgs, function (err, mappedResArr) {
           if (err) {
-            LOG.error(utilsService.getLoggerData({}, 'ERROR',
-              filename, 'getFilterConfig', 'getAllChannelsFromAPI callback', err))
+            logger.error({msg: 'Error from getAllChannelsFrom API', err})
           }
           /**
            * extract hashTagId which represents the channelID from each response
@@ -52,13 +51,11 @@ function getAllChannelsFromAPI () {
             allChannels.push(_.map(item.result.response.content, 'hashTagId'))
           })
           allChannels = _.without(_.flatten(allChannels), null)
-          LOG.info(utilsService.getLoggerData({}, 'INFO',
-            filename, 'getAllChannelsFromAPI', 'all channels arr', allChannels))
+          logger.info({ msg: 'All channels info from getAllChannelsFrom API', additionalInfo: { allChannels } })
           resolve(allChannels)
         })
       } else {
-        LOG.info(utilsService.getLoggerData({}, 'INFO',
-          filename, 'getAllChannelsFromAPI', 'all channels arr', allChannels))
+        logger.info({ msg: 'All channels info from getAllChannelsFrom API', additionalInfo: { allChannels } })
         resolve(allChannels)
       }
     })
