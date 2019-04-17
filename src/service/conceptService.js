@@ -597,8 +597,7 @@ function listTermsAPI(req, response) {
     function (CBW) {
       contentProvider.listTerms(req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          logger.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'listTermsAPI',
-              'Getting error from content provider', res));
+          logger.error({msg: 'Error from content provider while listing Terms'}, req)
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
           rspObj.result = res && res.result ? res.result : {};
@@ -629,8 +628,7 @@ function listResourceBundlesAPI(req, response) {
     function (CBW) {
       contentProvider.listResourceBundles(req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          logger.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'listResourceBundlesAPI',
-              'Getting error from content provider', res));
+          logger.error({msg: 'Error from content provider while listing resourceBundles'}, req)
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
           rspObj.result = res && res.result ? res.result : {};
@@ -661,8 +659,7 @@ function listOrdinalsAPI(req, response) {
     function (CBW) {
       contentProvider.listOrdinals(req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          logger.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'listResourceBundlesAPI',
-              'Getting error from content provider', res));
+          logger.error({msg: 'Error from content provider while listing ordinals'}, req)
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
           rspObj.result = res && res.result ? res.result : {};
