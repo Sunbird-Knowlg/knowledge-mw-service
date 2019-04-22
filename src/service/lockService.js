@@ -682,7 +682,7 @@ function listLock (req, response) {
 
   // Adding objectData in telemetry
   if (rspObj.telemetryData) {
-    rspObj.telemetryData.object = utilsService.getObjectData(data, 'ListLockAPI', '', {})
+    rspObj.telemetryData.object = utilsService.getObjectData('', 'ListLockAPI', '', {})
   }
 
   var query = {}
