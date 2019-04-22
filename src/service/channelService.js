@@ -203,7 +203,6 @@ function ChannelUpdate (req, response) {
   logger.debug({ msg: 'channelService.ChannelUpdate() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
-  data.channelId = req.params.channelId
   // Adding telemetry object data
   if (rspObj.telemetryData) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.channelId, 'channel', '', {})
@@ -217,6 +216,7 @@ function ChannelUpdate (req, response) {
     }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
+  data.channelId = req.params.channelId;
 
   var ekStepReqData = {
     request: data.request
