@@ -279,6 +279,7 @@ function getTemplateConfig(formRequest) {
  */
 function getUserDetails(req) {
   return function (callback) {
+    delete req.headers['accept-encoding']
     var data = {
       'request': {
         'filters': {
@@ -290,7 +291,7 @@ function getUserDetails(req) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
         logger.error({
           msg: 'Error from content provider while fetching user Details',
-          err,
+          err: err || result,
           additionalInfo: { data }
         }, req)
         callback(new Error('User Search failed'), null)
