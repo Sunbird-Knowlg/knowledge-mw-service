@@ -291,7 +291,7 @@ function getUserDetails(req) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
         logger.error({
           msg: 'Error from content provider while fetching user Details',
-          err: 'err = ' + err + ', result = ' + result,
+          err: err || result,
           additionalInfo: { data }
         }, req)
         callback(new Error('User Search failed'), null)
