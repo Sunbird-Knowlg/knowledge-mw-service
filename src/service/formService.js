@@ -57,7 +57,7 @@ function getForm (req, response) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error from content provider while fetching form data from learner service',
-            err,
+            err: err || res,
             additionalInfo: { requestData }
           }, req)
           rspObj.result = res && res.result ? res.result : {}

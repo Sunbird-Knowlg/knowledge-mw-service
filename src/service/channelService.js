@@ -48,7 +48,7 @@ function getChannelValuesById (req, response) {
       ekStepUtil.getChannelValuesById(data.channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while fetching channel by id ', additionalInfo: { channelId: data.channelId }, err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while fetching channel by id ', additionalInfo: { channelId: data.channelId }, err: { err: err || res, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -92,7 +92,7 @@ function ChannelList (req, response) {
       ekStepUtil.ChannelList(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while fetching channel List', additionalInfo: { ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while fetching channel List', additionalInfo: { ekStepReqData }, err: { err: err || res, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -136,7 +136,7 @@ function ChannelSearch (req, response) {
       ekStepUtil.ChannelSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while searching channel', additionalInfo: { ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while searching channel', additionalInfo: { ekStepReqData }, err: { err: err || res, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -180,7 +180,7 @@ function ChannelCreate (req, response) {
       ekStepUtil.ChannelCreate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while creating channel', additionalInfo: { ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while creating channel', additionalInfo: { ekStepReqData }, err: { err: err || res, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -229,7 +229,7 @@ function ChannelUpdate (req, response) {
       ekStepUtil.ChannelUpdate(ekStepReqData, data.channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({ msg: 'Getting error from ekstep while updating channel', additionalInfo: { ekStepReqData }, err: { err, responseCode: rspObj.responseCode } }, req)
+          logger.error({ msg: 'Getting error from ekstep while updating channel', additionalInfo: { ekStepReqData }, err: { err: err || res, responseCode: rspObj.responseCode } }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)

@@ -53,7 +53,7 @@ function getFrameworkTerm (req, response) {
           logger.error({
             msg: 'Error while fetching framework terms from ekstep',
             err: {
-              err,
+              err: err || res,
               responseCode: rspObj.responseCode
             },
             additionalInfo: {data}
@@ -103,7 +103,7 @@ function frameworkTermSearch (req, response) {
           logger.error({
             msg: 'Error while searching framework terms from ekstep',
             err: {
-              err,
+              err: err || res,
               responseCode: rspObj.responseCode
             },
             additionalInfo: {data}
@@ -153,7 +153,7 @@ function frameworkTermCreate (req, response) {
           logger.error({
             msg: 'Error while creating framework terms from ekstep',
             err: {
-              err,
+              err: err || res,
               responseCode: rspObj.responseCode
             },
             additionalInfo: {data}
@@ -209,7 +209,7 @@ function frameworkTermUpdate (req, response) {
           logger.error({
             msg: 'Error while updating framework terms from ekstep',
             err: {
-              err,
+              err: err || res,
               responseCode: rspObj.responseCode
             },
             additionalInfo: {data}

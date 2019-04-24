@@ -233,7 +233,7 @@ function apiAccessForCreatorUser (req, response, next) {
             logger.error({
               msg: 'Getting error from content provider',
               err: {
-                err,
+                err: err || res,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -299,7 +299,7 @@ function apiAccessForReviewerUser (req, response, next) {
             logger.error({
               msg: 'getting error from content provider',
               err: {
-                err,
+                err: err || res,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -382,7 +382,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
           logger.error({
             msg: 'Getting error from content provider',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode

@@ -72,7 +72,7 @@ function updateCollaborators (req, response) {
           logger.error({
             msg: 'Getting error from content provider while fetching content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -136,7 +136,7 @@ function updateCollaborators (req, response) {
           logger.error({
             msg: 'Getting error from content provider while updating content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -209,7 +209,7 @@ function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
         logger.info({ msg: 'request to send mail', additionalInfo: { body: lsEmailData } }, req)
         contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            logger.error({ msg: 'Sending email failed', additionalInfo: { emailData: lsEmailData }, err }, req)
+            logger.error({ msg: 'Sending email failed', additionalInfo: { emailData: lsEmailData }, err: err || res }, req)
             CBW(new Error('Sending email failed'), null)
           } else {
             CBW(null, res)

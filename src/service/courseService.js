@@ -129,7 +129,7 @@ function searchCourseAPI (req, response) {
           logger.error({
             msg: 'Error from content provider during composite search',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -143,7 +143,7 @@ function searchCourseAPI (req, response) {
           if (req.query.framework && req.query.framework !== 'null') {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
-                logger.error({msg: 'Error while fetching framework details', additionalInfo: {framework: req.query.framework}}, req)
+                logger.error({msg: 'Error while fetching framework details', err: err || res, additionalInfo: {framework: req.query.framework}}, req)
                 rspObj.result = res.result
                 return response.status(200).send(respUtil.successResponse(rspObj))
               } else {
@@ -178,7 +178,7 @@ function getFrameworkDetails (req, CBW) {
     if (err || !data) {
       contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, result) {
         if (err || result.responseCode !== responseCode.SUCCESS) {
-          logger.error({msg: 'Error while fetching framework details', err, additionalInfo: {framework: req.query.framework}}, req)
+          logger.error({msg: 'Error while fetching framework details', err: err || result, additionalInfo: {framework: req.query.framework}}, req)
           CBW(new Error('Fetching framework data failed'), null)
         } else {
           cacheManager.set({ key: req.query.framework, value: result },
@@ -273,7 +273,7 @@ function createCourseAPI (req, response) {
           logger.error({
             msg: 'Error from content provider during content creation',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -352,7 +352,7 @@ function updateCourseAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while fetching content using query',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -379,7 +379,7 @@ function updateCourseAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while updating content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -437,7 +437,7 @@ function reviewCourseAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while reviewing content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -507,7 +507,7 @@ function publishCourseAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while publishing course',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -578,7 +578,7 @@ function getCourseAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while fetching course',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -637,7 +637,7 @@ function getMyCourseAPI (req, response) {
           logger.error({
             msg: 'Error from content provider during composite search',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -711,7 +711,7 @@ function getCourseHierarchyAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while getting content hierarchy',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -784,7 +784,7 @@ function updateCourseHierarchyAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while updating content hierarchy',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode

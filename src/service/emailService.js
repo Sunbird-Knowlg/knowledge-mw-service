@@ -66,7 +66,7 @@ function createFlagContentEmail(req, callback) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error from content provider while fetching content',
-            err,
+            err: err || res,
             additionalInfo: { data }
           }, req)
           callback(new Error('Invalid content id'), null)
@@ -93,7 +93,7 @@ function createFlagContentEmail(req, callback) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error while sending email',
-            err,
+            err: err || res,
             additionalInfo: { emailData: lsEmailData }
           }, req)
           callback(new Error('Sending email failed'), null)
@@ -129,7 +129,7 @@ function acceptFlagContentEmail(req, callback) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error from content provider while fetching content',
-            err,
+            err: err || res,
             additionalInfo: { data }
           }, req)
           callback(new Error('Invalid content id'), null)
@@ -154,7 +154,7 @@ function acceptFlagContentEmail(req, callback) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error from content provider while sending email',
-            err,
+            err: err || res,
             additionalInfo: { emailData: lsEmailData }
           }, req)
           callback(new Error('Sending email failed'), null)
@@ -190,7 +190,7 @@ function rejectFlagContentEmail(req, callback) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error from content provider while fetching content',
-            err,
+            err: err || res,
             additionalInfo: { data }
           }, req)
           callback(new Error('Invalid content id'), null)
@@ -215,7 +215,7 @@ function rejectFlagContentEmail(req, callback) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error from content provider while sending email',
-            err,
+            err: err || res,
             additionalInfo: { emailData: lsEmailData }
           }, req)
           callback(new Error('Sending email failed'), null)
@@ -241,7 +241,7 @@ function getContentDetails(req) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
         logger.error({
           msg: 'Error from content provider while fetching content',
-          err,
+          err: err || result,
           additionalInfo: { contentId: req.params.contentId }
         }, req)
         callback(new Error('Invalid content id'), null)
@@ -262,7 +262,7 @@ function getTemplateConfig(formRequest) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
         logger.error({
           msg: 'Error from content provider while fetching form',
-          err,
+          err: err || result,
           additionalInfo: { formRequest }
         })
         callback(new Error('Form API failed'), null)
@@ -630,7 +630,7 @@ function getUserIds(req, body, fetchDetailsFlag) {
         function (callback) {
           contentProvider.userSearch(body, req.headers, function (err, result) {
             if (err || result.responseCode !== responseCode.SUCCESS) {
-              logger.error({ msg: 'Error from content Provider due to user Search', err }, req)
+              logger.error({ msg: 'Error from content Provider due to user Search', err: err || result }, req)
               callback(new Error('User Search failed'), null)
             } else {
               callback(null, { count: result.result.response.count, content: result.result.response.content })
@@ -650,7 +650,7 @@ function getUserIds(req, body, fetchDetailsFlag) {
                 return function (cb) {
                   contentProvider.userSearch(request, req.headers, function (err, result) {
                     if (err || result.responseCode !== responseCode.SUCCESS) {
-                      logger.error({ msg: 'User search failed in content Provider', err, additionalInfo: { request } }, req)
+                      logger.error({ msg: 'User search failed in content Provider', err: err || result, additionalInfo: { request } }, req)
                       cb(new Error('User Search failed'), null)
                     } else {
                       cb(null, result.result.response.content)
@@ -737,7 +737,7 @@ function unlistedPublishContentEmail(req, callback) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error from content provider while fetching content',
-            err,
+            err: err || res,
             additionalInfo: { contentId: data.contentId }
           }, req)
           callback(new Error('Invalid content id'), null)
@@ -763,7 +763,7 @@ function unlistedPublishContentEmail(req, callback) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({
             msg: 'Error from content provider while sending email',
-            err,
+            err: err || res,
             additionalInfo: { emailData: lsEmailData }
           }, req)
           callback(new Error('Sending email failed'), null)

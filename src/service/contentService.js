@@ -126,7 +126,7 @@ function search(defaultContentTypes, req, response, objectType) {
           logger.error({
             msg: 'Getting error from content provider composite search',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -141,7 +141,7 @@ function search(defaultContentTypes, req, response, objectType) {
           if (req.query.framework && req.query.framework !== 'null') {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
-                logger.error({ msg: `Framework API failed with framework - ${req.query.framework}`, err }, req)
+                logger.error({ msg: `Framework API failed with framework - ${req.query.framework}`, err: err || res }, req)
                 rspObj.result = res.result
                 return response.status(200).send(respUtil.successResponse(rspObj))
               } else {
@@ -179,7 +179,7 @@ function getFrameworkDetails(req, CBW) {
     if (err || !data) {
       contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, result) {
         if (err || result.responseCode !== responseCode.SUCCESS) {
-          logger.error({ msg: `Fetching framework data failed ${lodash.get(req.query, 'framework')}`, err }, req)
+          logger.error({ msg: `Fetching framework data failed ${lodash.get(req.query, 'framework')}`, err: err || result }, req)
           CBW(new Error('Fetching framework data failed'), null)
         } else {
           logger.info({ msg: `Fetching framework data success ${lodash.get(req.query, 'framework')}` }, req)
@@ -278,7 +278,7 @@ function createContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while creating content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -365,7 +365,7 @@ function updateContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while getting content using jquery',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -401,7 +401,7 @@ function updateContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while updating content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -499,7 +499,7 @@ function uploadContentAPI(req, response) {
               logger.error({
                 msg: 'Getting error from content provider while uploading content',
                 err: {
-                  err,
+                  err: err || res,
                   errCode: rspObj.errCode,
                   errMsg: rspObj.errMsg,
                   responseCode: rspObj.responseCode
@@ -546,7 +546,7 @@ function uploadContentAPI(req, response) {
             logger.error({
               msg: 'Getting error from content provider while uploading content with file url',
               err: {
-                err,
+                err: err || res,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -617,7 +617,7 @@ function reviewContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while reviewing content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -700,7 +700,7 @@ function publishContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while publishing content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -782,7 +782,7 @@ function getContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while getting content using jquery',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -826,7 +826,7 @@ function getContentAPI(req, response) {
             logger.error({
               msg: 'Getting error from content provider during composite search for assets',
               err: {
-                err,
+                err: err || res,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -892,7 +892,7 @@ function getMyContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider during composite search',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -966,7 +966,7 @@ function retireContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while searching content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1016,7 +1016,7 @@ function retireContentAPI(req, response) {
             logger.error({
               msg: 'Getting error from content provider while retiring content',
               err: {
-                err,
+                err: err || res,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -1104,7 +1104,7 @@ function rejectContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while rejecting content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1242,7 +1242,7 @@ function acceptFlagContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while accepting flag content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1321,7 +1321,7 @@ function rejectFlagContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while rejecting flag Content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1399,7 +1399,7 @@ function uploadContentUrlAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while uploading content Url',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1479,7 +1479,7 @@ function unlistedPublishContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while fetching unlisted published content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1545,7 +1545,7 @@ function assignBadge(req, response) {
         logger.error({
           msg: 'Getting error from content provider while getting content',
           err: {
-            err,
+            err: err || res,
             errCode: rspObj.errCode,
             errMsg: rspObj.errMsg,
             responseCode: rspObj.responseCode
@@ -1597,7 +1597,7 @@ function assignBadge(req, response) {
           logger.error({
             msg: 'Getting error from content provider while updating system content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1659,7 +1659,7 @@ function revokeBadge(req, response) {
         logger.error({
           msg: 'Getting error from content provider while getting content',
           err: {
-            err,
+            err: err || res,
             errCode: rspObj.errCode,
             errMsg: rspObj.errMsg,
             responseCode: rspObj.responseCode
@@ -1709,7 +1709,7 @@ function revokeBadge(req, response) {
           logger.error({
             msg: 'Getting error from content provider while updating system content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1793,7 +1793,7 @@ function copyContentAPI(req, response) {
           logger.error({
             msg: 'Getting error from content provider while copying content',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1866,7 +1866,7 @@ function searchPluginsAPI(req, response, objectType) {
           logger.error({
             msg: 'Getting error from content provider during plugins search',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode

@@ -57,7 +57,7 @@ function checkHealth (req, response) {
       cassandraUtils.checkCassandraDBHealth(function (err, res) {
         if (err || res === false) {
           isDbConnected = false
-          logger.error({msg: 'CASSANDRA_DB_HEALTH_STATUS is False', err}, req)
+          logger.error({msg: 'CASSANDRA_DB_HEALTH_STATUS is False', err: err || res}, req)
           configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'false')
           checksArrayObj.push(getHealthCheckObj(hcMessages.CASSANDRA_DB.NAME, isDbConnected,
             hcMessages.CASSANDRA_DB.FAILED_CODE, hcMessages.CASSANDRA_DB.FAILED_MESSAGE))

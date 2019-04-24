@@ -39,7 +39,7 @@ function getDomainsAPI(req, response) {
           logger.error({
             msg: 'Error while getting domains from content provider',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -102,7 +102,7 @@ function getDomainByIDAPI(req, response) {
           logger.error({
             msg: 'Error while getting domain By Id from content provider',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -165,7 +165,7 @@ function getObjectTypesAPI(req, response) {
           logger.error({
             msg: 'Error while getting Object Types from content provider',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -229,7 +229,7 @@ function getObjectTypeByIDAPI(req, response) {
           logger.error({
             msg: 'Error while getting Object Types by Id from content provider',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -291,7 +291,7 @@ function getConceptByIdAPI(req, response) {
           logger.error({
             msg: 'Error while getting concept from content provider',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -359,7 +359,7 @@ function searchObjectTypeAPI(req, response) {
             logger.error({
               msg: 'Error while searching objectTypes from content provider',
               err: {
-                err,
+                err: err || res,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -426,7 +426,7 @@ function createObjectTypeAPI(req, response) {
           logger.error({
             msg: 'Error from content provider while creating objectTypes ',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -495,7 +495,7 @@ function updateObjectTypeAPI(req, response) {
             logger.error({
               msg: 'Error from content provider while updating objectTypes ',
               err: {
-                err,
+                err: err || res,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -562,7 +562,7 @@ function retireObjectTypeAPI(req, response) {
             logger.error({
               msg: 'Error from content provider while retiring objectTypes ',
               err: {
-                err,
+                err: err || res,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -597,7 +597,7 @@ function listTermsAPI(req, response) {
     function (CBW) {
       contentProvider.listTerms(req.headers, function (err, res) {
         if (err) {
-          logger.error({msg: 'Error from content provider while listing Terms'}, req)
+          logger.error({msg: 'Error from content provider while listing Terms', err}, req)
         }
         CBW(null, res)
       })
@@ -623,7 +623,7 @@ function listResourceBundlesAPI(req, response) {
     function (CBW) {
       contentProvider.listResourceBundles(req.headers, function (err, res) {
         if (err) {
-          logger.error({msg: 'Error from content provider while listing resourceBundles'}, req)
+          logger.error({msg: 'Error from content provider while listing resourceBundles', err}, req)
         }
         CBW(null, res)
       })
@@ -649,7 +649,7 @@ function listOrdinalsAPI(req, response) {
     function (CBW) {
       contentProvider.listOrdinals(req.headers, function (err, res) {
         if (err) {
-          logger.error({msg: 'Error from content provider while listing ordinals'}, req)
+          logger.error({msg: 'Error from content provider while listing ordinals', err}, req)
         }
         CBW(null, res)
       })

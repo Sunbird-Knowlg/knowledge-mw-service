@@ -91,7 +91,7 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
         contentProvider.getContentUsingQuery(contentId, qs, {},
           function (err, res) {
             if (err || res.responseCode !== responseCode.SUCCESS) {
-              logger.error({ msg: 'Error while getting content', err, additionalInfo: { contentId, qs } })
+              logger.error({ msg: 'Error while getting content', err: err || res, additionalInfo: { contentId, qs } })
               cb(null, data)
             } else {
               let medium = _.get(res, 'result.content.medium')
@@ -182,7 +182,7 @@ function generateDialCodeAPI (req, response) {
           logger.error({
             msg: 'Error while generating dial code',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -309,7 +309,7 @@ function dialCodeListAPI (req, response) {
           logger.error({
             msg: 'Error while fetching dial code list',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -421,7 +421,7 @@ function updateDialCodeAPI (req, response) {
           logger.error({
             msg: 'Error from content Provider while updating the dial code',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -496,7 +496,7 @@ function getDialCodeAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while fetching dialcode',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -580,7 +580,7 @@ function contentLinkDialCodeAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while linking content with dialCode',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -690,7 +690,7 @@ function searchDialCodeAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while searching for a dial code',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -762,7 +762,7 @@ function publishDialCodeAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while publishing dial code',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -829,7 +829,7 @@ function createPublisherAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while creating a publisher',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -902,7 +902,7 @@ function updatePublisherAPI (req, response) {
           logger.error({
             msg: 'Error from content provider while updating publisher',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -966,7 +966,7 @@ function getPublisherAPI (req, response) {
           logger.error({
             msg: 'Error from content provider fetching publisher details',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1005,7 +1005,7 @@ function reserveDialCode (req, response) {
           logger.error({
             msg: 'Error from content provider fetching while reserving dialCode',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode
@@ -1081,7 +1081,7 @@ function reserveDialCode (req, response) {
             logger.error({
               msg: 'Error from content provider fetching while updating content',
               err: {
-                err,
+                err: err || res,
                 errCode: rspObj.errCode,
                 errMsg: rspObj.errMsg,
                 responseCode: rspObj.responseCode
@@ -1126,7 +1126,7 @@ function releaseDialCode (req, response) {
           logger.error({
             msg: 'Error from content provider fetching while releasing dial code',
             err: {
-              err,
+              err: err || res,
               errCode: rspObj.errCode,
               errMsg: rspObj.errMsg,
               responseCode: rspObj.responseCode

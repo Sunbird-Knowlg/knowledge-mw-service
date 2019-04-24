@@ -51,7 +51,7 @@ function getFrameworkCategoryInstance (req, response) {
           logger.error({
             msg: 'Error while fetching framework category instance from ekstep',
             err: {
-              err,
+              err: err || res,
               responseCode: rspObj.responseCode
             },
             additionalInfo: {data}
@@ -101,7 +101,7 @@ function frameworkCategoryInstanceSearch (req, response) {
           logger.error({
             msg: 'Error while searching framework category instance from ekstep',
             err: {
-              err,
+              err: err || res,
               responseCode: rspObj.responseCode
             },
             additionalInfo: {data}
@@ -150,7 +150,7 @@ function frameworkCategoryInstanceCreate (req, response) {
           logger.error({
             msg: 'Error while creating framework category instance from ekstep',
             err: {
-              err,
+              err: err || res,
               responseCode: rspObj.responseCode
             },
             additionalInfo: {data}
@@ -204,7 +204,7 @@ function frameworkCategoryInstanceUpdate (req, response) {
             logger.error({
               msg: 'Error while updating framework category instance from ekstep',
               err: {
-                err,
+                err: err || res,
                 responseCode: rspObj.responseCode
               },
               additionalInfo: {data}
