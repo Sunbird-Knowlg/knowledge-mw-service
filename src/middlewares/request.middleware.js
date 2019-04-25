@@ -52,7 +52,8 @@ function createAndValidateRequestBody (req, res, next) {
     msgid: req.body.params.msgid,
     result: {},
     startTime: new Date(),
-    method: req.originalMethod
+    method: req.originalMethod,
+    did: req.get('x-device-id')
   }
 
   rspObj.telemetryData = {
