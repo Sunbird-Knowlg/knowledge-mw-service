@@ -39,6 +39,7 @@ function getLoggerData (rspObj, level, file, method, message, data, stacktrace) 
   }
   var dataObj = {
     'eid': 'BE_LOG',
+    'did': rspObj.did,
     'ets': Date.now(),
     'ver': '1.0',
     'mid': rspObj.msgid,
