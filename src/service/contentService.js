@@ -420,7 +420,7 @@ function updateContentAPI(req, response) {
 
     function (res) {
       rspObj.result.content_id = res.result.node_id
-      rspObj.result.versionKey = res.result.versionKey
+      rspObj.result.versionKey = res.result.content.versionKey
       logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }

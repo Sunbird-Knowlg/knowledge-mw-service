@@ -1,3 +1,4 @@
+/*
 var request = require('request');
 var host = "http://localhost:5000";
 var base_url = host + "/v1/dialcode";
@@ -341,3 +342,4 @@ describe("Dialcode", function () {
     });
     
 });
+*/

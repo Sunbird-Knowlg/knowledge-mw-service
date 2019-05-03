@@ -596,8 +596,14 @@ function listTermsAPI(req, response) {
   async.waterfall([
     function (CBW) {
       contentProvider.listTerms(req.headers, function (err, res) {
-        if (err) {
-          logger.error({msg: 'Error from content provider while listing Terms'}, req)
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          logger.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'listTermsAPI',
+              'Getting error from content provider', res));
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+          rspObj.result = res && res.result ? res.result : {};
+          rspObj = utilsService.getErrorResponse(rspObj, res);
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         }
         CBW(null, res)
       })
@@ -622,8 +628,14 @@ function listResourceBundlesAPI(req, response) {
   async.waterfall([
     function (CBW) {
       contentProvider.listResourceBundles(req.headers, function (err, res) {
-        if (err) {
-          logger.error({msg: 'Error from content provider while listing resourceBundles'}, req)
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          logger.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'listResourceBundlesAPI',
+              'Getting error from content provider', res));
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+          rspObj.result = res && res.result ? res.result : {};
+          rspObj = utilsService.getErrorResponse(rspObj, res);
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         }
         CBW(null, res)
       })
@@ -648,8 +660,14 @@ function listOrdinalsAPI(req, response) {
   async.waterfall([
     function (CBW) {
       contentProvider.listOrdinals(req.headers, function (err, res) {
-        if (err) {
-          logger.error({msg: 'Error from content provider while listing ordinals'}, req)
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          logger.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'listResourceBundlesAPI',
+              'Getting error from content provider', res));
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR;
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500;
+          rspObj.result = res && res.result ? res.result : {};
+          rspObj = utilsService.getErrorResponse(rspObj, res);
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         }
         CBW(null, res)
       })

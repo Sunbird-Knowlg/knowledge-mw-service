@@ -23,6 +23,7 @@ exports.emailServiceTestData = {
         get: function () {
             return 'mock Channel ID'
         },
+        headers: {}
     },
     "ErrorResponse": {
         "responseCode": "RESOURCE_NOT_FOUND"
