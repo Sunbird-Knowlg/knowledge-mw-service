@@ -61,8 +61,7 @@ module.exports = function (app) {
       requestMiddleware.apiAccessForReviewerUser, contentService.rejectContentAPI)
 
   app.route(BASE_URL + '/read/:contentId')
-    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
+    .get(requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, contentService.getContentAPI)
 
   app.route(BASE_URL + '/read/mycontent/:createdBy')
