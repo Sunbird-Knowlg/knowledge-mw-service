@@ -3,7 +3,7 @@ var bodyParser = require('body-parser')
 var methodOverride = require('method-override')
 var http = require('http')
 var path = require('path')
-var cp = require('child_process')
+// var cp = require('child_process')
 var TelemetryUtil = require('sb_telemetry_util')
 var telemetry = new TelemetryUtil()
 var fs = require('fs')
@@ -149,11 +149,6 @@ app.use(function (req, res, next) {
   } else {
     next()
   };
-})
-
-app.use(function (req, res, next) {
-  res.setHeader('Connection', 'close')
-  next()
 })
 
 require('./routes/healthCheckRoutes')(app)
