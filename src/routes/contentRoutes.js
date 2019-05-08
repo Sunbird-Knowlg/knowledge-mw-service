@@ -64,6 +64,10 @@ module.exports = function (app) {
     .get(requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, contentService.getContentAPI)
 
+  app.route(BASE_URL + '/read2/:contentId')
+    .get(requestMiddleware.gzipCompression(),
+      requestMiddleware.createAndValidateRequestBody, contentService.getContentAPI2)
+
   app.route(BASE_URL + '/read/mycontent/:createdBy')
     .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
       requestMiddleware.gzipCompression(),

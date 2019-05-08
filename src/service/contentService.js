@@ -856,6 +856,47 @@ function getContentAPI(req, response) {
   ])
 }
 
+function getContentAPI2(req, response) {
+  var data = {}
+  data.body = req.body
+  data.contentId = req.params.contentId
+  data.queryParams = req.query
+  var rspObj = req.rspObj
+
+  if (!data.contentId) {
+    rspObj.errCode = contentMessage.GET.MISSING_CODE
+    rspObj.errMsg = contentMessage.GET.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+
+  async.waterfall([
+
+    function (CBW) {
+      contentProvider.getContentUsingQuery(data.contentId, data.queryParams, req.headers, function (err, res) {
+        // After check response, we perform other operation
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
+          rspObj = utilsService.getErrorResponse(rspObj, res)
+          logger.error({ err: err || res })
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
+}
+
 function getMyContentAPI(req, response) {
   var request = {
     'filters': {
@@ -1943,6 +1984,7 @@ module.exports.uploadContentAPI = uploadContentAPI
 module.exports.reviewContentAPI = reviewContentAPI
 module.exports.publishContentAPI = publishContentAPI
 module.exports.getContentAPI = getContentAPI
+module.exports.getContentAPI2 = getContentAPI2
 module.exports.getMyContentAPI = getMyContentAPI
 module.exports.retireContentAPI = retireContentAPI
 module.exports.rejectContentAPI = rejectContentAPI
