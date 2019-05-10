@@ -151,10 +151,10 @@ app.use(function (req, res, next) {
   };
 })
 
-app.use(function (req, res, next) {
-  res.setHeader('Connection', 'close')
-  next()
-})
+// app.use(function (req, res, next) {
+//   res.setHeader('Connection', 'close')
+//   next()
+// })
 
 require('./routes/healthCheckRoutes')(app)
 require('./routes/courseRoutes')(app)
