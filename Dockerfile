@@ -1,12 +1,8 @@
-FROM node:6-alpine
+FROM node:8.16.0
 MAINTAINER "Manojvv" "manojv@ilimi.in"
-RUN apk update \
-    && apk add unzip \
-    && apk add curl \
-    && adduser -u 1001 -h /home/sunbird/ -D sunbird \
-    && apk add --update ca-certificates  \
-    && apk add --update ca-certificates openssl
-RUN apk add imagemagick
+RUN sed -i '/jessie-updates/d' /etc/apt/sources.list
+RUN apt update && apt install -y unzip curl ca-certificates openssl imagemagick \
+    && useradd -u 1001 -md /home/sunbird sunbird
 USER sunbird
 ENV  GRAPH_HOME "/home/sunbird/ImageMagick-6.9.3"
 ENV  PATH "$GRAPH_HOME/bin:$PATH"
