@@ -850,7 +850,7 @@ function getContentAPI(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      //logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
