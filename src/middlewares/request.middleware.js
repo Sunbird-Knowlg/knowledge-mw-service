@@ -12,8 +12,8 @@ var responseCode = messageUtil.RESPONSE_CODE
 var apiVersions = messageUtil.API_VERSION
 var jwt = require('jsonwebtoken')
 var lodash = require('lodash')
-var configUtil = require('sb-config-util')
-var compression = require('compression')
+// var configUtil = require('sb-config-util')
+// var compression = require('compression')
 
 var keyCloakConfig = {
   'authServerUrl': process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : 'https://staging.open-sunbird.org/auth',
@@ -146,16 +146,16 @@ function validateToken (req, res, next) {
   })
 }
 
-function gzipCompression (req, res, next) {
-  return function (req, res, next) {
-    if (configUtil.getConfig('ENABLE_GZIP') === 'true') {
-      var comMidleware = compression()
-      comMidleware(req, res, next)
-    } else {
-      next()
-    }
-  }
-}
+// function gzipCompression (req, res, next) {
+//   return function (req, res, next) {
+//     if (configUtil.getConfig('ENABLE_GZIP') === 'true') {
+//       var comMidleware = compression()
+//       comMidleware(req, res, next)
+//     } else {
+//       next()
+//     }
+//   }
+// }
 /**
  * [validateUserToken - to validate x-authenticated-user-token]
  * @param  {[type]}   req
@@ -456,4 +456,3 @@ module.exports.apiAccessForCreatorUser = apiAccessForCreatorUser
 module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess
 module.exports.checkChannelID = checkChannelID
 module.exports.validateUserToken = validateUserToken
-module.exports.gzipCompression = gzipCompression

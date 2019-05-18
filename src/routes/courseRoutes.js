@@ -15,48 +15,39 @@ var dependentServiceHealth = ['EKSTEP']
 module.exports = function (app) {
   app.route(BASE_URL + '/search')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       courseService.searchCourseAPI)
 
   app.route(BASE_URL + '/create')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, courseService.createCourseAPI)
 
   app.route(BASE_URL + '/update/:courseId')
     .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, courseService.updateCourseAPI)
 
   app.route(BASE_URL + '/review/:courseId')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, courseService.reviewCourseAPI)
 
   app.route(BASE_URL + '/publish/:courseId')
     .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, courseService.publishCourseAPI)
 
   app.route(BASE_URL + '/read/:courseId')
     .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, courseService.getCourseAPI)
 
   app.route(BASE_URL + '/read/mycourse/:createdBy')
     .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, courseService.getMyCourseAPI)
 
   app.route(BASE_URL + '/hierarchy/:courseId')
     .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, courseService.getCourseHierarchyAPI)
 
   app.route(BASE_URL + '/hierarchy/update')
     .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
-      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.hierarchyUpdateApiAccess, courseService.updateCourseHierarchyAPI)
 }
