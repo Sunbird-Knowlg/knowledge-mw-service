@@ -44,7 +44,7 @@ function getChannelValuesById (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to get channel details by id ', additionalInfo: { channelId: _.get(data, 'channelId') } }, req)
+      logger.debug({ msg: 'Request to get channel details by id ', additionalInfo: { channelId: _.get(data, 'channelId') } }, req)
       ekStepUtil.getChannelValuesById(data.channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -61,7 +61,7 @@ function getChannelValuesById (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'channel details', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'channel details', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -88,7 +88,7 @@ function ChannelList (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to get channel List' }, req)
+      logger.debug({ msg: 'Request to get channel List' }, req)
       ekStepUtil.ChannelList(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -105,7 +105,7 @@ function ChannelList (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'channel List details', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'channel List details', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -132,7 +132,7 @@ function ChannelSearch (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to search channel', additionalInfo: { ekStepReqData } }, req)
+      logger.debug({ msg: 'Request to search channel', additionalInfo: { ekStepReqData } }, req)
       ekStepUtil.ChannelSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -149,7 +149,7 @@ function ChannelSearch (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'channel search result', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'channel search result', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -176,7 +176,7 @@ function ChannelCreate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to create channel', additionalInfo: { ekStepReqData } }, req)
+      logger.debug({ msg: 'Request to create channel', additionalInfo: { ekStepReqData } }, req)
       ekStepUtil.ChannelCreate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -193,7 +193,7 @@ function ChannelCreate (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'channel created', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'channel created', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -225,7 +225,7 @@ function ChannelUpdate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to update channel', additionalInfo: { channelId: _.get(data, 'channelId'), ekStepReqData } }, req)
+      logger.debug({ msg: 'Request to update channel', additionalInfo: { channelId: _.get(data, 'channelId'), ekStepReqData } }, req)
       ekStepUtil.ChannelUpdate(ekStepReqData, data.channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -242,7 +242,7 @@ function ChannelUpdate (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'channel updated', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'channel updated', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])

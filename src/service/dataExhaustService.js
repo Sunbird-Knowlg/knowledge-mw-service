@@ -28,7 +28,7 @@ function submitDataSetRequest(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to submit data exhaust' }, req)
+      logger.debug({ msg: 'Request to content provider to submit data exhaust' }, req)
       contentProvider.submitDataSetRequest(data, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           logger.error({ msg: 'Getting error from content provider while submitting dataset request', additionalInfo: { data }, err }, req)
@@ -42,7 +42,7 @@ function submitDataSetRequest(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'submitDataSetRequest API result', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'submitDataSetRequest API result', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -61,7 +61,7 @@ function getListOfDataSetRequest(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to get list of dataset',
         additionalInfo: {
           query: query,
@@ -82,7 +82,7 @@ function getListOfDataSetRequest(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'getListOfDataSetRequest API result', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'getListOfDataSetRequest API result', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -101,7 +101,7 @@ function getDataSetDetailRequest(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to get detail of dataset',
         additionalInfo: {
           clientKey: clientKey,
@@ -121,7 +121,7 @@ function getDataSetDetailRequest(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'getDataSetDetailRequest API result', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'getDataSetDetailRequest API result', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -141,7 +141,7 @@ function getChannelDataSetRequest(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to get channel dataset',
         additionalInfo: {
           query: query,
@@ -162,7 +162,7 @@ function getChannelDataSetRequest(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'getChannelDataSetRequest API result', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'getChannelDataSetRequest API result', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])

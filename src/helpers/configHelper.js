@@ -23,7 +23,7 @@ function getAllChannelsFromAPI() {
         'limit': limit
       }
     }
-    logger.info({ msg: 'Request to get all channels from getAllChannelsFrom API', additionalInfo: { channelReqObj } })
+    logger.debug({ msg: 'Request to get all channels from getAllChannelsFrom API', additionalInfo: { channelReqObj } })
     orgDataHelper.getRootOrgs(channelReqObj, function (err, res) {
       if (err) {
         logger.error({ msg: 'Error while getting root Org info', err, additionalInfo: { channelReqObj } })
@@ -51,11 +51,11 @@ function getAllChannelsFromAPI() {
             allChannels.push(_.map(item.result.response.content, 'hashTagId'))
           })
           allChannels = _.without(_.flatten(allChannels), null)
-          logger.info({ msg: 'All channels info from getAllChannelsFrom API', additionalInfo: { allChannels } })
+          logger.debug({ msg: 'All channels info from getAllChannelsFrom API', additionalInfo: { allChannels } })
           resolve(allChannels)
         })
       } else {
-        logger.info({ msg: 'All channels info from getAllChannelsFrom API', additionalInfo: { allChannels } })
+        logger.debug({ msg: 'All channels info from getAllChannelsFrom API', additionalInfo: { allChannels } })
         resolve(allChannels)
       }
     })

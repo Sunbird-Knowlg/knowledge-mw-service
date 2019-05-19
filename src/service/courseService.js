@@ -120,7 +120,7 @@ function searchCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider for course composite search', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider for course composite search', additionalInfo: { data } }, req)
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = courseMessage.SEARCH.FAILED_CODE
@@ -167,7 +167,7 @@ function searchCourseAPI (req, response) {
         rspObj.result = transformResBody(res.result, 'content', 'course')
         rspObj.result.count = res.result.count
       }
-      logger.info({msg: `${rspObj.result.count} - course search results found`}, req)
+      logger.debug({msg: `${rspObj.result.count} - course search results found`}, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -186,7 +186,7 @@ function getFrameworkDetails (req, CBW) {
               if (err) {
                 logger.error({msg: 'Error while caching framework details', err, additionalInfo: {framework: req.query.framework}}, req)
               } else {
-                logger.info({msg: 'Caching framework details successful', additionalInfo: {framework: req.query.framework}}, req)
+                logger.debug({msg: 'Caching framework details successful', additionalInfo: {framework: req.query.framework}}, req)
               }
             })
           CBW(null, result)
@@ -264,7 +264,7 @@ function createCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider for creating course', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider for creating course', additionalInfo: { data } }, req)
       contentProvider.createContent(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = courseMessage.CREATE.MISSING_CODE
@@ -343,7 +343,7 @@ function updateCourseAPI (req, response) {
       var qs = {
         mode: 'edit'
       }
-      logger.info({ msg: 'Request to content provider for updating course', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider for updating course', additionalInfo: { data } }, req)
       contentProvider.getContentUsingQuery(data.courseId, qs, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = courseMessage.UPDATE.FAILED_CODE
@@ -428,7 +428,7 @@ function reviewCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to review course', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to review course', additionalInfo: { data } }, req)
       contentProvider.reviewContent(ekStepReqData, data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = courseMessage.REVIEW.FAILED_CODE
@@ -498,7 +498,7 @@ function publishCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to publish course', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to publish course', additionalInfo: { data } }, req)
       contentProvider.publishContent(ekStepReqData, data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = courseMessage.PUBLISH.FAILED_CODE
@@ -569,7 +569,7 @@ function getCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to get Course Details', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to get Course Details', additionalInfo: { data } }, req)
       contentProvider.getContent(data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = courseMessage.GET.FAILED_CODE
@@ -628,7 +628,7 @@ function getMyCourseAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to get Course Details', additionalInfo: { data: request } }, req)
+      logger.debug({ msg: 'Request to content provider to get Course Details', additionalInfo: { data: request } }, req)
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = courseMessage.GET_MY.FAILED_CODE
@@ -660,7 +660,7 @@ function getMyCourseAPI (req, response) {
         rspObj.result = transformResBody(res.result, 'content', 'course')
         rspObj.result.count = res.result.count
       }
-      logger.info({msg: `${rspObj.result.count} - my course search results count`}, req)
+      logger.debug({msg: `${rspObj.result.count} - my course search results count`}, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -702,7 +702,7 @@ function getCourseHierarchyAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to get content Hierarchy', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to get content Hierarchy', additionalInfo: { data } }, req)
       contentProvider.contentHierarchy(data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE
@@ -775,7 +775,7 @@ function updateCourseHierarchyAPI (req, response) {
   async.waterfall([
     function (CBW) {
       var ekStepReqData = {request: data.request}
-      logger.info({ msg: 'Request to content provider to update content Hierarchy', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to update content Hierarchy', additionalInfo: { data } }, req)
       contentProvider.contentHierarchyUpdate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = courseMessage.HIERARCHY_UPDATE.FAILED_CODE

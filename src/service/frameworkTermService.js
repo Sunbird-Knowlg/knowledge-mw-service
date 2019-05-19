@@ -46,7 +46,7 @@ function getFrameworkTerm (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to get Framework Terms', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to get Framework Terms', additionalInfo: { data } }, req)
       ekStepUtil.getFrameworkTerm(data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -96,7 +96,7 @@ function frameworkTermSearch (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to search Framework Terms', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to search Framework Terms', additionalInfo: { data } }, req)
       ekStepUtil.frameworkTermSearch(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -146,7 +146,7 @@ function frameworkTermCreate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to create Framework Terms', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to create Framework Terms', additionalInfo: { data } }, req)
       ekStepUtil.frameworkTermCreate(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -202,7 +202,7 @@ function frameworkTermUpdate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to update Framework Terms', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to update Framework Terms', additionalInfo: { data } }, req)
       ekStepUtil.frameworkTermUpdate(ekStepReqData, data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR

@@ -44,7 +44,7 @@ function getFrameworkCategoryInstance (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to get Framework Category instance', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to get Framework Category instance', additionalInfo: { data } }, req)
       ekStepUtil.getFrameworkCategoryInstance(data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -94,7 +94,7 @@ function frameworkCategoryInstanceSearch (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to search Framework Category instance', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to search Framework Category instance', additionalInfo: { data } }, req)
       ekStepUtil.frameworkCategoryInstanceSearch(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -143,7 +143,7 @@ function frameworkCategoryInstanceCreate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to create Framework Category instance', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to create Framework Category instance', additionalInfo: { data } }, req)
       ekStepUtil.frameworkCategoryInstanceCreate(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -196,7 +196,7 @@ function frameworkCategoryInstanceUpdate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to update Framework Category instance', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to update Framework Category instance', additionalInfo: { data } }, req)
       ekStepUtil.frameworkCategoryInstanceUpdate(ekStepReqData, data.queryParams, data.category, req.headers,
         function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {

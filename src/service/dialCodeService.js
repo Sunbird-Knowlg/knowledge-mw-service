@@ -167,7 +167,7 @@ function generateDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to generate the dial code',
         additionalInfo: {
           body: reqData
@@ -241,7 +241,7 @@ function generateDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'generateDialCodeAPI Result', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'generateDialCodeAPI Result', additionalInfo: { result: rspObj.result } }, req)
       if (requestedCount > configUtil.getConfig('DIALCODE_GENERATE_MAX_COUNT')) {
         rspObj.responseCode = responseCode.PARTIAL_SUCCESS
         logger.error({
@@ -271,7 +271,7 @@ function dialCodeListAPI (req, response) {
     !_.isEmpty(data.request.search.qrCodeSpec))
   if (qrCodeFlag) {
     var requestObj = data.request.search
-    logger.info({ msg: 'request to get list of dialcodes', additionalInfo: { data: data.request.search } }, req)
+    logger.debug({ msg: 'request to get list of dialcodes', additionalInfo: { data: data.request.search } }, req)
   }
 
   if (!data.request || !data.request.search) {
@@ -367,7 +367,7 @@ function dialCodeListAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'dialCodeListAPI Results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'dialCodeListAPI Results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -412,7 +412,7 @@ function updateDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'request to update the dial code', additionalInfo: { body: reqData } }, req)
+      logger.debug({ msg: 'request to update the dial code', additionalInfo: { body: reqData } }, req)
       contentProvider.updateDialCode(reqData, data.dialCodeId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.UPDATE.FAILED_CODE
@@ -439,7 +439,7 @@ function updateDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'updateDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'updateDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -480,7 +480,7 @@ function getDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to get dialcode meta data',
         additionalInfo: {
           dialCodeId: data.dialCodeId,
@@ -514,7 +514,7 @@ function getDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'getDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'getDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -571,7 +571,7 @@ function contentLinkDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to link the content', additionalInfo: { body: reqData } }, req)
+      logger.debug({ msg: 'Request to link the content', additionalInfo: { body: reqData } }, req)
       contentProvider.contentLinkDialCode(reqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.CONTENT_LINK.FAILED_CODE
@@ -598,7 +598,7 @@ function contentLinkDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'contentLinkDialCodeAPI result', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'contentLinkDialCodeAPI result', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -637,7 +637,7 @@ function getProcessIdStatusAPI (req, response) {
   }
   var batchImageService = new BatchImageService()
   batchImageService.getStatus(rspObj, req.params.processId).then(process => {
-    logger.info({ msg: 'getProcessIdStatusAPI results', additionalInfo: { processID: req.params.processId, data: process.data } }, req)
+    logger.debug({ msg: 'getProcessIdStatusAPI results', additionalInfo: { processID: req.params.processId, data: process.data } }, req)
     return response.status(process.code).send(process.data)
   })
     .catch(err => {
@@ -681,7 +681,7 @@ function searchDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'request to search dialCode', additionalInfo: { body: reqData } }, req)
+      logger.debug({ msg: 'request to search dialCode', additionalInfo: { body: reqData } }, req)
       contentProvider.searchDialCode(reqData, req.headers, function (err, res) {
         if (err || _.indexOf([responseCode.SUCCESS, responseCode.PARTIAL_SUCCESS], res.responseCode) === -1) {
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.SEARCH.FAILED_CODE
@@ -708,7 +708,7 @@ function searchDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'searchDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'searchDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -753,7 +753,7 @@ function publishDialCodeAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to publish the dial code', additionalInfo: { body: reqData } }, req)
+      logger.debug({ msg: 'Request to publish the dial code', additionalInfo: { body: reqData } }, req)
       contentProvider.publishDialCode(reqData, data.dialCodeId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.PUBLISH.FAILED_CODE
@@ -780,7 +780,7 @@ function publishDialCodeAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'publishDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'publishDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -820,7 +820,7 @@ function createPublisherAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to create a publisher ', additionalInfo: { body: reqData } }, req)
+      logger.debug({ msg: 'Request to create a publisher ', additionalInfo: { body: reqData } }, req)
       contentProvider.createPublisher(reqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.CREATE_PUBLISHER.FAILED_CODE
@@ -852,7 +852,7 @@ function createPublisherAPI (req, response) {
         rspObj.telemetryData.object = utilsService.getObjectData(data.dialCodeId, 'dialcode', '', {})
       }
 
-      logger.info({ msg: 'createPublisherAPi result', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'createPublisherAPi result', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -893,7 +893,7 @@ function updatePublisherAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'request to update the publisher', additionalInfo: { body: reqData } }, req)
+      logger.debug({ msg: 'request to update the publisher', additionalInfo: { body: reqData } }, req)
       contentProvider.updatePublisher(reqData, data.publisherId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.UPDATE_PUBLISHER.FAILED_CODE
@@ -920,7 +920,7 @@ function updatePublisherAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'updatePublisherAPI results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'updatePublisherAPI results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -956,7 +956,7 @@ function getPublisherAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to get publisher meta data', additionalInfo: { publisherId: data.publisherId } }, req)
+      logger.debug({ msg: 'Request to get publisher meta data', additionalInfo: { publisherId: data.publisherId } }, req)
       contentProvider.getPublisher(data.publisherId, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
@@ -984,7 +984,7 @@ function getPublisherAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'getPublisherAPI results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'getPublisherAPI results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -1105,7 +1105,7 @@ function reserveDialCode (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'reserveDialCode results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'reserveDialCode results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -1143,7 +1143,7 @@ function releaseDialCode (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'releaseDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'releaseDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])

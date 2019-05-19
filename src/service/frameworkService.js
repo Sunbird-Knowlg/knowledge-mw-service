@@ -49,7 +49,7 @@ function getFrameworkById(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to fetch framework', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
+      logger.debug({ msg: 'Request to fetch framework', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       ekStepUtil.getFrameworkById(data.frameworkId, queryString, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -88,7 +88,7 @@ function frameworklList(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'request to get framework List' }, req)
+      logger.debug({ msg: 'request to get framework List' }, req)
       ekStepUtil.frameworklList(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -128,7 +128,7 @@ function frameworkCreate(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'request for new framework creation' }, req)
+      logger.debug({ msg: 'request for new framework creation' }, req)
       ekStepUtil.frameworkCreate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -173,7 +173,7 @@ function frameworkUpdate(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'request to update framework ', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
+      logger.debug({ msg: 'request to update framework ', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       ekStepUtil.frameworkUpdate(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -218,7 +218,7 @@ function frameworkCopy(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'request to copy framework', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
+      logger.debug({ msg: 'request to copy framework', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       ekStepUtil.frameworkCopy(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
@@ -263,7 +263,7 @@ function frameworkPublish(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'request to publish framework', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
+      logger.debug({ msg: 'request to publish framework', additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       ekStepUtil.frameworkPublish(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR

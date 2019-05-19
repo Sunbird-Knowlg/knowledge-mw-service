@@ -15,7 +15,7 @@ var async = require('async')
  * @param cb callback after success or error
  */
 function getRootOrgs(requestObj, cb, noExitOnError) {
-  logger.info({ msg: 'getRootOrgs() called', additionalInfo: { requestObj } })
+  logger.debug({ msg: 'getRootOrgs() called', additionalInfo: { requestObj } })
   contentProvider.getAllRootOrgs(requestObj, (err, res) => {
     if (!err) {
       return cb(err, res)
@@ -87,7 +87,7 @@ function insertDataToCache(cacheinputdata) {
     if (err) {
       logger.error({ msg: 'Caching allRootOrgs data failed', err, additionalInfo: { data: cacheinputdata } })
     } else {
-      logger.info({ msg: 'Caching allRootOrgs data successful', additionalInfo: { data: cacheinputdata } })
+      logger.debug({ msg: 'Caching allRootOrgs data successful', additionalInfo: { data: cacheinputdata } })
     }
   })
 }

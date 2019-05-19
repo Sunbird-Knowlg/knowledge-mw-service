@@ -44,7 +44,7 @@ function getForm (req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to get Form data', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to get Form data', additionalInfo: { data } }, req)
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
         '.' + data.request.action.toLowerCase()
       var requestData = {
@@ -119,7 +119,7 @@ function updateForm (req, response) {
 
   async.waterfall([
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to update Form data', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to update Form data', additionalInfo: { data } }, req)
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
         '.' + data.request.action.toLowerCase()
       var requestData = {
@@ -250,7 +250,7 @@ function createForm (req, response) {
       var frameworkKey = data.request.framework || 'default'
       requestData.request.tenantPreference[0].data[frameworkKey] = data.request.data
       requestData.request.tenantPreference[0].data = JSON.stringify(requestData.request.tenantPreference[0].data)
-      logger.info({ msg: 'Request to content provider to create form', additionalInfo: { requestData } }, req)
+      logger.debug({ msg: 'Request to content provider to create form', additionalInfo: { requestData } }, req)
       contentProvider.learnerServiceCreateForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.result = res && res.result ? res.result : {}
