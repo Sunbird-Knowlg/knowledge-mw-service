@@ -14,6 +14,7 @@ var dependentServiceHealth = ['EKSTEP']
 module.exports = function (app) {
   app.route(BASE_URL + '/collaborator/update/:contentId')
     .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser, collaboratorService.updateCollaborators)
 }

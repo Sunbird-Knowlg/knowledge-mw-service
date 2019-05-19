@@ -12,12 +12,12 @@ var BASE_URL = '/v1/data/form'
 
 module.exports = function (app) {
   app.route(BASE_URL + '/read')
-    .post(requestMiddleware.createAndValidateRequestBody,
+    .post(requestMiddleware.gzipCompression(), requestMiddleware.createAndValidateRequestBody,
       formService.getFormRequest)
   app.route(BASE_URL + '/update')
-    .post(requestMiddleware.createAndValidateRequestBody,
+    .post(requestMiddleware.gzipCompression(), requestMiddleware.createAndValidateRequestBody,
       formService.updateFormRequest)
   app.route(BASE_URL + '/create')
-    .post(requestMiddleware.createAndValidateRequestBody,
+    .post(requestMiddleware.gzipCompression(), requestMiddleware.createAndValidateRequestBody,
       formService.createFormRequest)
 }

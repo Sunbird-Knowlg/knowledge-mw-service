@@ -84,6 +84,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('GET_CONTENT_URI') + '/:contentId'
     )
     .get(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       contentService.getContentAPI
     )
@@ -93,6 +94,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('PUBLISH_CONTENT_URI') + '/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForReviewerUser,
@@ -104,6 +106,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('REJECT_CONTENT_URI') + '/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForReviewerUser,
@@ -141,6 +144,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('UPDATE_CONTENT_URI') + '/:contentId'
     )
     .patch(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.apiAccessForCreatorUser
     )
@@ -150,6 +154,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('REVIEW_CONTENT_URI') + '/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser,
@@ -161,6 +166,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('CONTENT_UPLOAD_URL_URI') + '/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.apiAccessForCreatorUser
     )
@@ -170,6 +176,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('CONTENT_HIERARCHY_UPDATE_URI') + '/'
     )
     .patch(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.hierarchyUpdateApiAccess
     )
@@ -238,13 +245,14 @@ module.exports = function (app) {
       '/action/dialcode/v1/reserve/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       dialCodeService.reserveDialCode
     )
 
   app.route('/action/dialcode/v1/process/status/:processId')
-    .get(requestMiddleware.createAndValidateRequestBody,
+    .get(requestMiddleware.gzipCompression(), requestMiddleware.createAndValidateRequestBody,
       dialCodeService.getProcessIdStatusAPI)
 
   app
@@ -252,6 +260,7 @@ module.exports = function (app) {
       '/action/dialcode/v1/release/:contentId'
     )
     .patch(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       dialCodeService.releaseDialCode
@@ -262,6 +271,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('UPDATE_COLLABORATOR') + '/:contentId'
     )
     .patch(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser,

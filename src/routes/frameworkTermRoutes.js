@@ -15,18 +15,22 @@ var dependentServiceHealth = ['EKSTEP']
 module.exports = function (app) {
   app.route(baseUrl + '/read/:categoryID')
     .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, frameworkTermService.getFrameworkTerm)
 
   app.route(baseUrl + '/search')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       frameworkTermService.frameworkTermSearch)
 
   app.route(baseUrl + '/create')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, frameworkTermService.frameworkTermCreate)
 
   app.route(baseUrl + '/update/:categoryID')
     .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, frameworkTermService.frameworkTermUpdate)
 }
