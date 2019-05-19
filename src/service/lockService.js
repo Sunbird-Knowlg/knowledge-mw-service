@@ -713,7 +713,7 @@ function listLock (req, response) {
     } else {
       rspObj.result.count = result.length
       rspObj.result.data = result
-      logger.info({ msg: 'list locks API result ', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'list locks API result ', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   })

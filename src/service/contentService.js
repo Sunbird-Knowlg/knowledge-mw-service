@@ -111,7 +111,7 @@ function search(defaultContentTypes, req, response, objectType) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to search the content',
         additionalInfo: {
           body: ekStepReqData
@@ -162,7 +162,7 @@ function search(defaultContentTypes, req, response, objectType) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({
+      logger.debug({
         msg: `Content searched successfully with ${lodash.get(rspObj.result, 'count')}`,
         additionalInfo: {
           contentCount: lodash.get(rspObj.result, 'count')
@@ -182,13 +182,13 @@ function getFrameworkDetails(req, CBW) {
           logger.error({ msg: `Fetching framework data failed ${lodash.get(req.query, 'framework')}`, err }, req)
           CBW(new Error('Fetching framework data failed'), null)
         } else {
-          logger.info({ msg: `Fetching framework data success ${lodash.get(req.query, 'framework')}` }, req)
+          logger.debug({ msg: `Fetching framework data success ${lodash.get(req.query, 'framework')}` }, req)
           cacheManager.set({ key: req.query.framework, value: result },
             function (err, data) {
               if (err) {
                 logger.error({ msg: `Setting framework cache data failed ${lodash.get(req.query, 'framework')}`, err }, req)
               } else {
-                logger.info({ msg: `Setting framework cache data success ${lodash.get(req.query, 'framework')}` }, req)
+                logger.debug({ msg: `Setting framework cache data success ${lodash.get(req.query, 'framework')}` }, req)
               }
             })
           CBW(null, result)
@@ -266,7 +266,7 @@ function createContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to create content',
         additionalInfo: { body: ekStepReqData }
       }, req)
@@ -297,7 +297,7 @@ function createContentAPI(req, response) {
     function (res) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      logger.info({ msg: 'Sending response back to user', res: rspObj.result }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj.result }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
 
@@ -350,7 +350,7 @@ function updateContentAPI(req, response) {
         mode: 'edit',
         fields: 'versionKey'
       }
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to get the latest version key',
         additionalInfo: {
           contentId: data.contentId,
@@ -387,7 +387,7 @@ function updateContentAPI(req, response) {
         request: data.request
       }
 
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to update the content',
         additionalInfo: {
           body: ekStepReqData
@@ -421,7 +421,7 @@ function updateContentAPI(req, response) {
     function (res) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -483,7 +483,7 @@ function uploadContentAPI(req, response) {
       async.waterfall([
 
         function (CBW) {
-          logger.info({
+          logger.debug({
             msg: 'Request to content provider to upload the content',
             additionalInfo: {
               contentId: data.contentId
@@ -517,7 +517,7 @@ function uploadContentAPI(req, response) {
         },
         function (res) {
           rspObj.result = res.result
-          logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+          logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
           var modifyRsp = respUtil.successResponse(rspObj)
           modifyRsp.success = true
           return response.status(200).send(modifyRsp)
@@ -529,7 +529,7 @@ function uploadContentAPI(req, response) {
     async.waterfall([
 
       function (CBW) {
-        logger.info({
+        logger.debug({
           msg: 'Request to content provider to upload the content',
           additionalInfo: {
             contentId: data.contentId
@@ -565,7 +565,7 @@ function uploadContentAPI(req, response) {
       },
       function (res) {
         rspObj.result = res.result
-        logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+        logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
         var modifyRsp = respUtil.successResponse(rspObj)
         modifyRsp.success = true
         return response.status(200).send(modifyRsp)
@@ -575,7 +575,7 @@ function uploadContentAPI(req, response) {
 }
 
 function reviewContentAPI(req, response) {
-  logger.info({ msg: 'Request for review came' }, req)
+  logger.debug({ msg: 'Request for review came' }, req)
   var data = {
     body: req.body
   }
@@ -601,7 +601,7 @@ function reviewContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to review the content',
         additionalInfo: {
           req: ekStepReqData,
@@ -637,7 +637,7 @@ function reviewContentAPI(req, response) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
       emailService.reviewContentEmail(req, function () { })
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -682,7 +682,7 @@ function publishContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to publish the content',
         additionalInfo: {
           contentId: data.contentId,
@@ -722,7 +722,7 @@ function publishContentAPI(req, response) {
       rspObj.result.publishStatus = res.result.publishStatus
       emailService.publishedContentEmail(req, function () { })
 
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
 
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -766,7 +766,7 @@ function getContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to get the content meta data',
         additionalInfo: {
           contentId: data.contentId,
@@ -812,7 +812,7 @@ function getContentAPI(req, response) {
             fields: ['streamingUrl', 'artifactUrl']
           }
         }
-        logger.info({
+        logger.debug({
           msg: 'Request to content provider to search for assets',
           additionalInfo: {
             body: ekStepReqData
@@ -850,7 +850,7 @@ function getContentAPI(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      //logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -878,7 +878,7 @@ function getMyContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to get user content',
         additionalInfo: {
           body: ekStepReqData
@@ -910,7 +910,7 @@ function getMyContentAPI(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({
+      logger.debug({
         msg: 'My Content searched successfully',
         additionalInfo: {
           count: lodash.get(rspObj.result, 'count')
@@ -997,7 +997,7 @@ function retireContentAPI(req, response) {
 
     function (CBW) {
       async.each(data.request.contentIds, function (contentId, CBE) {
-        logger.info({
+        logger.debug({
           msg: 'Request to content provider to retire content',
           additionalInfo: {
             contentId: contentId
@@ -1043,7 +1043,7 @@ function retireContentAPI(req, response) {
     },
     function () {
       rspObj.result = failedContent
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
 
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -1090,7 +1090,7 @@ function rejectContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to reject content',
         additionalInfo: {
           contentId: data.contentId
@@ -1123,7 +1123,7 @@ function rejectContentAPI(req, response) {
     function (res) {
       rspObj.result = res.result
       emailService.rejectContentEmail(req, function () { })
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -1226,7 +1226,7 @@ function acceptFlagContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to accept flag',
         additionalInfo: {
           contentId: data.contentId,
@@ -1261,7 +1261,7 @@ function acceptFlagContentAPI(req, response) {
     function (res) {
       rspObj.result = res.result
       emailService.acceptFlagContentEmail(req, function () { })
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -1305,7 +1305,7 @@ function rejectFlagContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to reject flag',
         additionalInfo: {
           contentId: data.contentId,
@@ -1340,7 +1340,7 @@ function rejectFlagContentAPI(req, response) {
     function (res) {
       rspObj.result = res.result
       emailService.rejectFlagContentEmail(req, function () { })
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -1384,7 +1384,7 @@ function uploadContentUrlAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider get upload content url',
         additionalInfo: {
           contentId: data.contentId,
@@ -1417,7 +1417,7 @@ function uploadContentUrlAPI(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       var modifyRsp = respUtil.successResponse(rspObj)
       modifyRsp.success = true
       return response.status(200).send(modifyRsp)
@@ -1463,7 +1463,7 @@ function unlistedPublishContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to unlisted published content',
         additionalInfo: {
           contentId: data.contentId,
@@ -1500,7 +1500,7 @@ function unlistedPublishContentAPI(req, response) {
       rspObj.result.versionKey = res.result.versionKey
       rspObj.result.publishStatus = res.result.publishStatus
       emailService.unlistedPublishContentEmail(req, function () { })
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -1530,7 +1530,7 @@ function assignBadge(req, response) {
   }
 
   async.waterfall([function (CBW) {
-    logger.info({
+    logger.debug({
       msg: 'Request to content provider to  get the content meta data',
       additionalInfo: {
         contentId: data.contentId,
@@ -1615,7 +1615,7 @@ function assignBadge(req, response) {
     }
   }, function (res) {
     rspObj.result = res.result
-    logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+    logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
     return response.status(200).send(respUtil.successResponse(rspObj))
   }])
 }
@@ -1643,7 +1643,7 @@ function revokeBadge(req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   async.waterfall([function (CBW) {
-    logger.info({
+    logger.debug({
       msg: 'Request to content provider to  get the content meta data',
       additionalInfo: {
         contentId: data.contentId,
@@ -1727,7 +1727,7 @@ function revokeBadge(req, response) {
     }
   }, function (res) {
     rspObj.result = res.result
-    logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+    logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
     return response.status(200).send(respUtil.successResponse(rspObj))
   }])
 }
@@ -1779,7 +1779,7 @@ function copyContentAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to  to copy content',
         additionalInfo: {
           body: ekStepReqData
@@ -1811,7 +1811,7 @@ function copyContentAPI(req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'Sending response back to user', res: rspObj }, req)
+      logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
 
@@ -1852,7 +1852,7 @@ function searchPluginsAPI(req, response, objectType) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to search the plugins',
         additionalInfo: {
           body: requestData
@@ -1885,7 +1885,7 @@ function searchPluginsAPI(req, response, objectType) {
 
     function (res) {
       rspObj.result = res.result
-      logger.info({ msg: 'Content searched successfully', additionalInfo: { count: lodash.get(rspObj.result, 'count') } }, req)
+      logger.debug({ msg: 'Content searched successfully', additionalInfo: { count: lodash.get(rspObj.result, 'count') } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -1910,7 +1910,7 @@ function validateContentLock(req, response) {
       logger.error({ msg: 'Getting content details failed', err: { errMsg: rspObj.result.message }, res }, req)
       return response.status(500).send(respUtil.errorResponse(rspObj))
     } else {
-      logger.info({ msg: 'Getting content details success', res }, req)
+      logger.debug({ msg: 'Getting content details success', res }, req)
       if (res.result.content.status !== 'Draft' && req.body.request.apiName !== 'retireLock') {
         rspObj.result.validation = false
         rspObj.result.message = 'The operation cannot be completed as content is not in draft state'
@@ -1928,7 +1928,7 @@ function validateContentLock(req, response) {
         rspObj.result.validation = true
         rspObj.result.message = 'Content successfully validated'
         rspObj.result.contentdata = res.result.content
-        logger.info({ msg: 'Content successfully validated' }, req)
+        logger.debug({ msg: 'Content successfully validated' }, req)
         return response.status(200).send(respUtil.successResponse(rspObj))
       }
     }

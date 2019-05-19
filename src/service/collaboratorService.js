@@ -57,7 +57,7 @@ function updateCollaborators (req, response) {
         fields: 'versionKey, collaborators, contentType, name, mimeType, framework, status'
       }
 
-      logger.info({
+      logger.debug({
         msg: 'Request to update collaborators',
         additionalInfo: {
           contentId: data.contentId,
@@ -122,7 +122,7 @@ function updateCollaborators (req, response) {
       var ekStepReqData = {
         request: data.request
       }
-      logger.info({
+      logger.debug({
         msg: 'Request to content provider to update the content',
         additionalInfo: {
           body: ekStepReqData
@@ -156,7 +156,7 @@ function updateCollaborators (req, response) {
     function (res) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      logger.info({
+      logger.debug({
         msg: 'updateCollaborators API result',
         additionalInfo: {
           contentId: rspObj.result.content_id,
@@ -206,7 +206,7 @@ function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
           request: getEmailData(subject, body, collaboratorsArray, eData.TEMPLATE)
         }
 
-        logger.info({ msg: 'request to send mail', additionalInfo: { body: lsEmailData } }, req)
+        logger.debug({ msg: 'request to send mail', additionalInfo: { body: lsEmailData } }, req)
         contentProvider.sendEmail(lsEmailData, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             logger.error({ msg: 'Sending email failed', additionalInfo: { emailData: lsEmailData }, err }, req)
@@ -218,7 +218,7 @@ function notifyCollaborators (req, cData, collaboratorsArray, emailType) {
       },
 
       function (res) {
-        logger.info({ msg: 'Email sent successfully' }, req)
+        logger.debug({ msg: 'Email sent successfully' }, req)
         return (null, true)
       }
     ])

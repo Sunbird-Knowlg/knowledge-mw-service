@@ -30,7 +30,7 @@ function getDomainsAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to get all domains', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to get all domains', additionalInfo: { data } }, req)
       contentProvider.getDomains(req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = domainMessage.GET_DOMAINS.FAILED_CODE
@@ -93,7 +93,7 @@ function getDomainByIDAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to get domain by Id', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to get domain by Id', additionalInfo: { data } }, req)
       contentProvider.getDomainById(data.domainId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = domainMessage.GET_DOMAIN_BY_ID.FAILED_CODE
@@ -156,7 +156,7 @@ function getObjectTypesAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to get Object Types ', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to get Object Types ', additionalInfo: { data } }, req)
       contentProvider.getObjects(data.domainId, data.objectType, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = domainMessage.GET_OBJECTS.FAILED_CODE
@@ -220,7 +220,7 @@ function getObjectTypeByIDAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to get Object Types by Id', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to get Object Types by Id', additionalInfo: { data } }, req)
       contentProvider.getObjectById(data.domainId, data.objectType, data.objectId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = domainMessage.GET_OBJECT_BY_ID.FAILED_CODE
@@ -282,7 +282,7 @@ function getConceptByIdAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to get concept', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to get concept', additionalInfo: { data } }, req)
       contentProvider.getConceptById(data.conceptId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = domainMessage.GET_CONCEPT_BY_ID.FAILED_CODE
@@ -349,7 +349,7 @@ function searchObjectTypeAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to search Object Types ', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to search Object Types ', additionalInfo: { data } }, req)
       contentProvider.searchObjectsType(ekStepReqData, data.domainId,
         data.objectType, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
@@ -417,7 +417,7 @@ function createObjectTypeAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to create Object Type ', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to create Object Type ', additionalInfo: { data } }, req)
       contentProvider.createObjectType(ekStepReqData, data.domainId, data.objectType, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = domainMessage.CREATE_OBJECT_TYPE.FAILED_CODE
@@ -485,7 +485,7 @@ function updateObjectTypeAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to update Object Type ', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to update Object Type ', additionalInfo: { data } }, req)
       contentProvider.updateObjectType(ekStepReqData, data.domainId,
         data.objectType, data.objectId, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
@@ -552,7 +552,7 @@ function retireObjectTypeAPI(req, response) {
   async.waterfall([
 
     function (CBW) {
-      logger.info({ msg: 'Request to content provider to retire Object Type ', additionalInfo: { data } }, req)
+      logger.debug({ msg: 'Request to content provider to retire Object Type ', additionalInfo: { data } }, req)
       contentProvider.retireObjectType(ekStepReqData, data.domainId,
         data.objectType, data.objectId, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
