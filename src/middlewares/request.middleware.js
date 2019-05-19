@@ -77,7 +77,7 @@ function createAndValidateRequestBody (req, res, next) {
     headers: lodash.omit(req.headers, ['Authorization', 'x-authenticated-user-token'])
   }
 
-  logger.info({ msg: 'new request', requestData: requestedData }, req)
+  logger.debug({ msg: 'new request', requestData: requestedData }, req)
 
   req.rspObj = rspObj
   next()
@@ -135,7 +135,7 @@ function validateToken (req, res, next) {
         delete req.headers['x-authenticated-user-token']
       }
       req.rspObj.userId = tokenData.userId
-      logger.info({ msg: ` x-authenticated-userid  :- ${tokenData.userId}` })
+      logger.debug({ msg: ` x-authenticated-userid  :- ${tokenData.userId}` })
       rspObj.telemetryData.actor = utilsService.getTelemetryActorData(req)
       var userId = tokenData.userId.split(':')
       req.headers['x-authenticated-userid'] = userId[userId.length - 1]
@@ -444,7 +444,7 @@ function checkChannelID (req, res, next) {
     }, req)
     return res.status(400).send(respUtil.errorResponse(rspObj))
   }
-  logger.info({ msg: `channel id = ${channelID}` })
+  logger.debug({ msg: `channel id = ${channelID}` })
   next()
 }
 
