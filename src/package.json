@@ -40,6 +40,7 @@
     "node-cron": "1.2.1",
     "qrcode": "1.2.0",
     "randomstring": "^1.1.5",
+    "request": "2.87.0",
     "response_util": "file:libs/response_util",
     "sb-config-util": "file:libs/sb-config-util",
     "sb-http-util": "file:libs/sb-http-util",
