@@ -7,6 +7,7 @@
 const request = require('request');
 const async = require('async');
 const _ = require('underscore');
+var configUtil = require('sb-config-util');
 
 class PageService {
     constructor(pageConfig) {
@@ -33,7 +34,7 @@ class PageService {
         rspObj.result.name = name;
         sections.forEach(function(section) {
             sectionCalls.push(function(callback) {
-                var options = instance.getHttpOptions('https://dev.sunbirded.org/api/content/v1/search', instance.getSearchRequestBody(JSON.parse(section.searchQuery), filters), 'POST', {})
+                var options = instance.getHttpOptions(configUtil.getConfig('SEARCH_SERVICE_BASE_URL') + configUtil.getConfig('SEARCH_URI'), instance.getSearchRequestBody(JSON.parse(section.searchQuery), filters), 'POST', {})
                 instance.sendRequest(options, function(error, response, body) {
                     if(error) {
                         callback(error)
