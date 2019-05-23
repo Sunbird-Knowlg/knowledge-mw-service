@@ -249,7 +249,8 @@ function apiAccessForCreatorUser (req, response, next) {
         })
     },
     function (res) {
-      if (res.result.content.createdBy !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
+      let createdBy = res.result.content.createdBy.split(':')
+      if (createdBy[createdBy.length - 1] !== userId && !lodash.includes(res.result.content.collaborators, userId)) {
         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
