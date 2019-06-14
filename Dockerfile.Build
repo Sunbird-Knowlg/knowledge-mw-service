@@ -1,11 +1,9 @@
-FROM node:6-alpine
+FROM circleci/node:8.11.2-stretch
 MAINTAINER "Manojvv" "manojv@ilimi.in"
-RUN apk update \
-   && apk add zip \
-   && mkdir -p /opt/content
-RUN apk add python make g++
-ADD src /opt/content/
+USER root
+RUN mkdir -p /opt/content
+COPY src /opt/content/
 WORKDIR /opt/content/
 RUN npm install --unsafe-perm
 WORKDIR /opt
-CMD ["zip", "-r", "content_service.zip", "content"]
+CMD ["tar", "-cvf", "content_service.tar", "content"]
