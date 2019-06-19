@@ -1,22 +1,22 @@
-FROM node:6-alpine
+FROM circleci/node:8.11.2-stretch
 MAINTAINER "Manojvv" "manojv@ilimi.in"
-RUN apk update \
-    && apk add unzip \
-    && apk add curl \
-    && adduser -u 1001 -h /home/sunbird/ -D sunbird \
-    && apk add --update ca-certificates  \
-    && apk add --update ca-certificates openssl imagemagick \
-    && adduser -D sunbird
+USER root
+COPY src /opt/content/
+WORKDIR /opt/content/
+RUN npm install --unsafe-perm
+
+FROM node:8.11-slim
+MAINTAINER "Manojvv" "manojv@ilimi.in"
+RUN sed -i '/jessie-updates/d' /etc/apt/sources.list \
+    && apt update && apt install openssl imagemagick -y \
+    && apt-get clean \
+    && useradd -m sunbird
 USER sunbird
-ENV  GRAPH_HOME "/home/sunbird/ImageMagick-6.9.3"
-ENV  PATH "$GRAPH_HOME/bin:$PATH"
-RUN  wget -P /home/sunbird  https://www.imagemagick.org/download/binaries/ImageMagick-i386-pc-solaris2.11.tar.gz
-RUN tar -xvzf /home/sunbird/ImageMagick-i386-pc-solaris2.11.tar.gz -C /home/sunbird
-ENV  MAGICK_HOME "/home/sunbird/ImageMagick-6.9.3"
-ENV  PATH "$MAGICK_HOME/bin:$PATH"
-RUN mkdir -p /home/sunbird/mw
-WORKDIR /home/sunbird/mw
-COPY ./content_service.zip  /home/sunbird/mw/
-RUN unzip /home/sunbird/mw/content_service.zip
+ADD ImageMagick-i386-pc-solaris2.11.tar.gz /home/sunbird
+ENV GRAPH_HOME "/home/sunbird/ImageMagick-6.9.3"
+ENV PATH "$GRAPH_HOME/bin:$PATH"
+ENV MAGICK_HOME "/home/sunbird/ImageMagick-6.9.3"
+ENV PATH "$MAGICK_HOME/bin:$PATH"
+COPY --from=0 --chown=sunbird /opt/content /home/sunbird/mw/content
 WORKDIR /home/sunbird/mw/content/
 CMD ["node", "app.js", "&"]
