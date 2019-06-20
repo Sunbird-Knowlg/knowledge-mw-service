@@ -1,9 +1,0 @@
-FROM circleci/node:8.11.2-stretch
-MAINTAINER "Manojvv" "manojv@ilimi.in"
-USER root
-RUN mkdir -p /opt/content
-COPY src /opt/content/
-WORKDIR /opt/content/
-RUN npm install --unsafe-perm
-WORKDIR /opt
-CMD ["tar", "-cvf", "content_service.tar", "content"]
