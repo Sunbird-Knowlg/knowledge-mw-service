@@ -187,6 +187,7 @@ function startServer () {
       process.exit(1)
     })
   })
+  this.server.keepAliveTimeout = 60000 * 5;
 }
 
 // Create server
