@@ -6,17 +6,17 @@
 
 var QRCode = require('qrcode')
 var gm = require('gm').subClass({ imageMagick: true })
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 var path = require('path')
 var filename = path.basename(__filename)
 
-function qrCodeUtil () {}
+function qrCodeUtil() { }
 
-qrCodeUtil.prototype.mmToPixel = function mmToPixel (data) {
+qrCodeUtil.prototype.mmToPixel = function mmToPixel(data) {
   return Math.floor(data * 2.6)
 }
 
-qrCodeUtil.prototype.generate = function generateImage (filePath, text, color,
+qrCodeUtil.prototype.generate = function generateImage(filePath, text, color,
   bgColor, errorCorrectionLevel, margin, size, callback) {
   QRCode.toFile(filePath, text, { // dynamic - name should be dial code
     color: {
@@ -28,13 +28,20 @@ qrCodeUtil.prototype.generate = function generateImage (filePath, text, color,
     width: this.mmToPixel(size)
   }, function (err) {
     if (err) {
-      LOG.error({filename, 'qrcode generation error': err})
+      logger.error({
+        msg: 'QR code generation error',
+        err,
+        additionalInfo:
+        {
+          filePath, text, color, bgColor, errorCorrectionLevel, margin, size
+        }
+      })
     }
     callback(err, filePath)
   })
 }
 
-qrCodeUtil.prototype.addTextAndBorder = function addTextAndBorder (filePath, text, border, color, size, callback) {
+qrCodeUtil.prototype.addTextAndBorder = function addTextAndBorder(filePath, text, border, color, size, callback) {
   var tempgm = gm()
   if (text) {
     tempgm
@@ -48,19 +55,19 @@ qrCodeUtil.prototype.addTextAndBorder = function addTextAndBorder (filePath, tex
     .in(filePath)
     .write(filePath, function (err) {
       if (err) {
-        LOG.error({filename, 'Unable to add text or border : ': err})
+        logger.error({ msg: 'Unable to add text or border', err })
       }
       callback(err, filePath)
     })
 }
 
-qrCodeUtil.prototype.resize = function resize (filePath, width, height, callback) {
+qrCodeUtil.prototype.resize = function resize(filePath, width, height, callback) {
   gm()
     .in('-geometry', this.mmToPixel(width) + 'X' + this.mmToPixel(height) + '!')
     .in(filePath)
     .write(filePath, function (err) {
       if (err) {
-        LOG.error({filename, 'Unable to resize image : ': err})
+        logger.error({ msg: 'Unable to resize image', err })
       }
       callback(err, filePath)
     })

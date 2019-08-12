@@ -8,7 +8,7 @@ var async = require('async')
 var path = require('path')
 var respUtil = require('response_util')
 var contentProvider = require('sb_content_provider_util')
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 
@@ -26,24 +26,27 @@ function getForm (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.type || !data.request.subType || !data.request.action) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getForm',
-      'Error due to required params are missing', data.request))
     rspObj.errCode = formMessages.READ.MISSING_CODE
     rspObj.errMsg = formMessages.READ.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request or request type or request subtype or request action',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getForm',
-        'Request to learner service to read form data', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.debug({ msg: 'Request to content provider to get Form data', additionalInfo: { data } }, req)
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
-       '.' + data.request.action.toLowerCase()
+        '.' + data.request.action.toLowerCase()
       var requestData = {
         'request': {
           'rootOrgId': data.request.rootOrgId || '*',
@@ -52,8 +55,12 @@ function getForm (req, response) {
       }
       contentProvider.learnerServiceGetForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getForm',
-            'Got error from learner service', res))
+          logger.error({
+            msg: 'Error from content provider while fetching form data from learner service',
+            err,
+            additionalInfo: { requestData }
+          }, req)
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.READ)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -67,8 +74,7 @@ function getForm (req, response) {
             }
             responseData.result.form.data = formData[data.request.framework] || formData['default']
           } catch (error) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'getForm',
-              'error while parsing response data', res))
+            logger.error({ msg: 'Error while parsing response data', error }, req)
           }
 
           CBW(null, responseData)
@@ -77,8 +83,6 @@ function getForm (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'getForm',
-        'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -94,27 +98,30 @@ function updateForm (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request ||
-     !data.request.type ||
-     !data.request.subType ||
-     !data.request.action ||
-     !data.request.data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
-      'Error due to required params are missing', data.request))
+    !data.request.type ||
+    !data.request.subType ||
+    !data.request.action ||
+    !data.request.data) {
     rspObj.errCode = formMessages.UPDATE.MISSING_CODE
     rspObj.errMsg = formMessages.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request or request type or request subtype or request action or request data',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateForm',
-        'Request to learner service to read form data', {
-          body: data,
-          headers: req.headers
-        }))
+      logger.debug({ msg: 'Request to content provider to update Form data', additionalInfo: { data } }, req)
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
-       '.' + data.request.action.toLowerCase()
+        '.' + data.request.action.toLowerCase()
       var requestData = {
         'request': {
           'rootOrgId': data.request.rootOrgId || '*',
@@ -123,8 +130,12 @@ function updateForm (req, response) {
       }
       contentProvider.learnerServiceGetForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
-            'Got error from learner service', res))
+          logger.error({
+            msg: 'Error from content provider while fetching form data from learner service',
+            err,
+            additionalInfo: { requestData }
+          }, req)
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.READ)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -134,7 +145,7 @@ function updateForm (req, response) {
     },
     function (responseData, CBW) {
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
-       '.' + data.request.action.toLowerCase()
+        '.' + data.request.action.toLowerCase()
       var requestData = {
         'request': {
           'rootOrgId': data.request.rootOrgId || '*',
@@ -153,24 +164,30 @@ function updateForm (req, response) {
         var frameworkKey = data.request.framework || 'default'
         formData[frameworkKey] = data.request.data
       } catch (error) {
-        LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
-          'unable to parse data after read', responseData))
         rspObj.errCode = formMessages.UPDATE.FAILED_CODE
         rspObj.errMsg = formMessages.UPDATE.FAILED_MESSAGE
         rspObj.responseCode = responseCode.CLIENT_ERROR
+        logger.error({
+          msg: 'Error while parsing response data',
+          err: {
+            error,
+            errCode: rspObj.errCode,
+            errMsg: rspObj.errMsg,
+            responseCode: rspObj.responseCode
+          }
+        }, req)
         return response.status(400).send(respUtil.errorResponse(rspObj))
       }
 
       requestData.request.tenantPreference[0].data = JSON.stringify(formData)
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateForm',
-        'Request to learner service to update form data', {
-          body: requestData,
-          headers: req.headers
-        }))
       contentProvider.learnerServiceUpdateForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'updateForm',
-            'Got error from learner service', res))
+          logger.error({
+            msg: 'Error from content provider while updating form in learner service',
+            err,
+            additionalInfo: { requestData }
+          }, req)
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.UPDATE)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -180,8 +197,6 @@ function updateForm (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'updateForm',
-        'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -201,11 +216,18 @@ function createForm (req, response) {
     !data.request.subType ||
     !data.request.action ||
     !data.request.data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createForm',
-      'Error due to required params are missing', data.request))
     rspObj.errCode = formMessages.CREATE.MISSING_CODE
     rspObj.errMsg = formMessages.CREATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request or request type or request subtype or request action or request data',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -213,7 +235,7 @@ function createForm (req, response) {
 
     function (CBW) {
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
-       '.' + data.request.action.toLowerCase()
+        '.' + data.request.action.toLowerCase()
       var requestData = {
         'request': {
           'rootOrgId': data.request.rootOrgId || '*',
@@ -228,16 +250,15 @@ function createForm (req, response) {
       var frameworkKey = data.request.framework || 'default'
       requestData.request.tenantPreference[0].data[frameworkKey] = data.request.data
       requestData.request.tenantPreference[0].data = JSON.stringify(requestData.request.tenantPreference[0].data)
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createForm',
-        'Request to learner service to create form data', {
-          body: requestData,
-          headers: req.headers
-        }))
-
+      logger.debug({ msg: 'Request to content provider to create form', additionalInfo: { requestData } }, req)
       contentProvider.learnerServiceCreateForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'createForm',
-            'Got error from learner service', res))
+          rspObj.result = res && res.result ? res.result : {}
+          logger.error({
+            msg: 'Error from content provider while creating form in learner service',
+            err,
+            additionalInfo: { requestData }
+          }, req)
           rspObj = utilsService.getErrorResponse(rspObj, res, formMessages.CREATE)
           return response.status(utilsService.getHttpStatus(res)).send(respUtil.errorResponse(rspObj))
         } else {
@@ -247,8 +268,6 @@ function createForm (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'createForm',
-        'Sending response back to user', rspObj))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])

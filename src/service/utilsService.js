@@ -39,6 +39,7 @@ function getLoggerData (rspObj, level, file, method, message, data, stacktrace) 
   }
   var dataObj = {
     'eid': 'BE_LOG',
+    'did': rspObj.did,
     'ets': Date.now(),
     'ver': '1.0',
     'mid': rspObj.msgid,
@@ -158,7 +159,8 @@ function getTelemetryActorData (req) {
     actor.type = 'user'
   } else if (req && req['headers'] && req['headers'] && req['headers']['x-authenticated-user-token']) {
     var payload = jwt.decode(req['headers']['x-authenticated-user-token'])
-    actor.id = _.toString(payload['sub'])
+    var userId = payload['sub'].split(':')
+    actor.id = userId[userId.length - 1]
     actor.type = 'user'
   } else {
     actor.id = _.toString(req.headers['x-consumer-id'])

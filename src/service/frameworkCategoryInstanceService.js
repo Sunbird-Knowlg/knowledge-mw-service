@@ -8,8 +8,7 @@ var async = require('async')
 var path = require('path')
 var respUtil = require('response_util')
 var ekStepUtil = require('sb_content_provider_util')
-var LOG = require('sb_logger_util')
-
+var logger = require('sb_logger_util_v2')
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 
@@ -33,30 +32,32 @@ function getFrameworkCategoryInstance (req, response) {
   }
 
   if (!data.queryParams) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkCategoryInstanceServiceAPI',
-      'Error due to required params are missing', {
-        category: data.category,
-        qs: data.queryParams
-      }))
-
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request body or query Parameters or categoryId',
+      err: {responseCode: rspObj.responseCode},
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkCategoryInstanceServiceAPI',
-        'Request to ekstep for get course meta data', {
-          qs: data.queryParams,
-          category: data.category
-        }))
+      logger.debug({ msg: 'Request to get Framework Category instance', additionalInfo: { data } }, req)
       ekStepUtil.getFrameworkCategoryInstance(data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkCategoryInstanceServiceAPI',
-            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error while fetching framework category instance from ekstep',
+            err: {
+              err,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
@@ -67,8 +68,6 @@ function getFrameworkCategoryInstance (req, response) {
 
     function (res) {
       rspObj.result = res.result
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkCategoryInstanceServiceAPI',
-        'Sending response back to user'))
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -79,9 +78,12 @@ function frameworkCategoryInstanceSearch (req, response) {
   var data = req.body
   data.queryParams = req.query
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkCategoryInstanceServiceAPI',
-      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request body or query params',
+      err: {responseCode: rspObj.responseCode},
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -92,17 +94,18 @@ function frameworkCategoryInstanceSearch (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkCategoryInstanceServiceAPI',
-        'Request to ekstep for search object type', {
-          body: data,
-          headers: req.headers,
-          qs: data.queryParams
-        }))
+      logger.debug({ msg: 'Request to search Framework Category instance', additionalInfo: { data } }, req)
       ekStepUtil.frameworkCategoryInstanceSearch(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkCategoryInstanceServiceAPI',
-            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error while searching framework category instance from ekstep',
+            err: {
+              err,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -113,8 +116,6 @@ function frameworkCategoryInstanceSearch (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkCategoryInstanceServiceAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -126,9 +127,12 @@ function frameworkCategoryInstanceCreate (req, response) {
   var data = req.body
   data.queryParams = req.query
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkCategoryInstanceServiceAPI',
-      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request body or query params',
+      err: {responseCode: rspObj.responseCode},
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -139,17 +143,18 @@ function frameworkCategoryInstanceCreate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkCategoryInstanceServiceAPI',
-        'Request to ekstep for search object type', {
-          body: data,
-          headers: req.headers,
-          qs: data.queryParams
-        }))
+      logger.debug({ msg: 'Request to create Framework Category instance', additionalInfo: { data } }, req)
       ekStepUtil.frameworkCategoryInstanceCreate(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkCategoryInstanceServiceAPI',
-            'Getting error from ekstep', res))
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error while creating framework category instance from ekstep',
+            err: {
+              err,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -160,8 +165,6 @@ function frameworkCategoryInstanceCreate (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkCategoryInstanceServiceAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -177,9 +180,12 @@ function frameworkCategoryInstanceUpdate (req, response) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.category, 'category', '', {})
   }
   if (!data) {
-    LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkCategoryInstanceServiceAPI',
-      'Error due to required params are missing', data))
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing request body or query params or categoryId',
+      err: {responseCode: rspObj.responseCode},
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -190,19 +196,19 @@ function frameworkCategoryInstanceUpdate (req, response) {
   async.waterfall([
 
     function (CBW) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkCategoryInstanceServiceAPI',
-        'Request to ekstep for search object type', {
-          body: data,
-          headers: req.headers,
-          category: data.category,
-          qs: data.queryParams
-        }))
+      logger.debug({ msg: 'Request to update Framework Category instance', additionalInfo: { data } }, req)
       ekStepUtil.frameworkCategoryInstanceUpdate(ekStepReqData, data.queryParams, data.category, req.headers,
         function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            LOG.error(utilsService.getLoggerData(rspObj, 'ERROR', filename, 'frameworkCategoryInstanceServiceAPI',
-              'Getting error from ekstep', res))
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            logger.error({
+              msg: 'Error while updating framework category instance from ekstep',
+              err: {
+                err,
+                responseCode: rspObj.responseCode
+              },
+              additionalInfo: {data}
+            }, req)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj = utilsService.getErrorResponse(rspObj, res)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -213,8 +219,6 @@ function frameworkCategoryInstanceUpdate (req, response) {
     },
 
     function (res) {
-      LOG.info(utilsService.getLoggerData(rspObj, 'INFO', filename, 'frameworkCategoryInstanceServiceAPI',
-        'Sending response back to user'))
       rspObj.result = res.result
       return response.status(200).send(respUtil.successResponse(rspObj))
     }

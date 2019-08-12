@@ -7,11 +7,15 @@
 var contentService = require('../service/contentService')
 var requestMiddleware = require('../middlewares/request.middleware')
 var filterMiddleware = require('../middlewares/filter.middleware')
+var healthService = require('../service/healthCheckService')
 
 var BASE_URL_V1 = '/v1'
+var dependentServiceHealth = ['EKSTEP']
 
 module.exports = function (app) {
   app.route(BASE_URL_V1 + '/search')
-    .post(requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
+    .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.gzipCompression(),
+      requestMiddleware.createAndValidateRequestBody, filterMiddleware.addMetaFilters,
       contentService.searchAPI)
 }

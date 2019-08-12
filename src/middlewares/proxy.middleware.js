@@ -81,9 +81,20 @@ module.exports = function (app) {
 
   app
     .route(
+      '/action' + configUtil.getConfig('GET_CONTENT_URI') + '/:contentId'
+    )
+    .get(
+      requestMiddleware.gzipCompression(),
+      requestMiddleware.createAndValidateRequestBody,
+      contentService.getContentAPI
+    )
+
+  app
+    .route(
       '/action' + configUtil.getConfig('PUBLISH_CONTENT_URI') + '/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForReviewerUser,
@@ -95,6 +106,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('REJECT_CONTENT_URI') + '/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForReviewerUser,
@@ -104,8 +116,8 @@ module.exports = function (app) {
   app
     .route(
       '/action' +
-        configUtil.getConfig('ACCEPT_FLAG_CONTENT_URI') +
-        '/:contentId'
+      configUtil.getConfig('ACCEPT_FLAG_CONTENT_URI') +
+      '/:contentId'
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -117,8 +129,8 @@ module.exports = function (app) {
   app
     .route(
       '/action' +
-        configUtil.getConfig('REJECT_FLAG_CONTENT_URI') +
-        '/:contentId'
+      configUtil.getConfig('REJECT_FLAG_CONTENT_URI') +
+      '/:contentId'
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -132,8 +144,8 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('UPDATE_CONTENT_URI') + '/:contentId'
     )
     .patch(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser
     )
 
@@ -142,6 +154,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('REVIEW_CONTENT_URI') + '/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser,
@@ -153,8 +166,8 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('CONTENT_UPLOAD_URL_URI') + '/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser
     )
 
@@ -163,16 +176,16 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('CONTENT_HIERARCHY_UPDATE_URI') + '/'
     )
     .patch(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.validateToken,
       requestMiddleware.hierarchyUpdateApiAccess
     )
 
   app
     .route(
       '/action' +
-        configUtil.getConfig('UNLISTED_PUBLISH_CONTENT_URI') +
-        '/:contentId'
+      configUtil.getConfig('UNLISTED_PUBLISH_CONTENT_URI') +
+      '/:contentId'
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
@@ -183,6 +196,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/vocabulary/v3/term/suggest',
+    requestMiddleware.validateUserToken,
     proxy(searchServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -196,25 +210,57 @@ module.exports = function (app) {
       }
     })
   )
-
+  app.use('/action/composite/v3/search',
+    proxy(searchServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = searchServiceApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/composite/', '')
+        return require('url').parse(searchServiceBaseUrl + originalUrl).path
+      }
+    })
+  )
+  app.use(
+    ['/action/framework/v3/read/*', '/action/content/v3/read/*', '/action/content/v1/read/*',
+      '/action/content/v3/hierarchy/*'],
+    proxy(contentRepoBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/', '')
+        return require('url').parse(contentRepoBaseUrl + originalUrl).path
+      }
+    })
+  )
   app
     .route(
       '/action/dialcode/v1/reserve/:contentId'
     )
     .post(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       dialCodeService.reserveDialCode
     )
 
   app.route('/action/dialcode/v1/process/status/:processId')
-    .get(requestMiddleware.createAndValidateRequestBody, dialCodeService.getProcessIdStatusAPI)
+    .get(requestMiddleware.gzipCompression(), requestMiddleware.createAndValidateRequestBody,
+      dialCodeService.getProcessIdStatusAPI)
 
   app
     .route(
       '/action/dialcode/v1/release/:contentId'
     )
     .patch(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       dialCodeService.releaseDialCode
@@ -225,6 +271,7 @@ module.exports = function (app) {
       '/action' + configUtil.getConfig('UPDATE_COLLABORATOR') + '/:contentId'
     )
     .patch(
+      requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
       requestMiddleware.apiAccessForCreatorUser,
@@ -267,11 +314,13 @@ module.exports = function (app) {
     )
     .post(
       requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateUserToken,
       lockService.listLock
     )
 
   app.use(
     '/action/dialcode/*',
+    requestMiddleware.validateUserToken,
     proxy(dialRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -290,6 +339,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/composite/*',
+    requestMiddleware.validateUserToken,
     proxy(searchServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -306,6 +356,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/language/v3/list',
+    requestMiddleware.validateUserToken,
     proxy(contentRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -322,6 +373,7 @@ module.exports = function (app) {
 
   app.use(
     '/action/language/*',
+    requestMiddleware.validateUserToken,
     proxy(languageServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -335,9 +387,9 @@ module.exports = function (app) {
       }
     })
   )
-
   app.use(
     '/action/*',
+    requestMiddleware.validateUserToken,
     proxy(contentRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -354,13 +406,13 @@ module.exports = function (app) {
 
   app.use(
     '/v1/telemetry',
-    proxy(contentRepoBaseUrl, {
+    proxy(configUtil.getConfig('TELEMETRY_BASE_URL'), {
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
         proxyReqOpts.headers['Authorization'] = contentRepoApiKey
         return proxyReqOpts
       },
       proxyReqPathResolver: function (req) {
-        return require('url').parse(contentRepoBaseUrl + '/data/v3/telemetry')
+        return require('url').parse(configUtil.getConfig('TELEMETRY_BASE_URL') + 'v1/telemetry')
           .path
       }
     })

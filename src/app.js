@@ -3,17 +3,18 @@ var bodyParser = require('body-parser')
 var methodOverride = require('method-override')
 var http = require('http')
 var path = require('path')
-var cp = require('child_process')
+// var cp = require('child_process')
 var TelemetryUtil = require('sb_telemetry_util')
 var telemetry = new TelemetryUtil()
 var fs = require('fs')
 var configUtil = require('sb-config-util')
 var _ = require('lodash')
+var logger = require('sb_logger_util_v2')
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
 // TODO below configuration should to be refactored in a seperate file
-
+var logFilePath = path.join(__dirname, './logs/microservice.log')
 const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderApiConfig.json')
 var contentProviderApiConfig = JSON.parse(fs.readFileSync(contentProviderConfigPath))
 const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/telemetryEventConfig.json')))
@@ -42,13 +43,15 @@ const searchServiceApiKey = process.env.sunbird_search_service_api_key
 const dialRepoApiKey = process.env.sunbird_dial_repo_api_key
 const pluginRepoApiKey = process.env.sunbird_plugin_repo_api_key
 const dataServiceApiKey = process.env.sunbird_data_service_api_key
-const enableLogging = process.env.sunbird_content_service_enable_logging
+const logLevel = process.env.sunbird_content_service_log_level || 'info'
 const languageServiceApiKey = process.env.sunbird_language_service_api_key
 
 const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_instance + '.content-service'
 const sunbirdPortalBaseUrl = process.env.sunbird_portal_base_url || 'https://staging.open-sunbird.org'
 const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
+const isHealthCheckEnabled = process.env.sunbird_health_check_enable || 'true'
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://content-service:5000'
+const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('CONTENT_REPO_BASE_URL', contentRepoBaseUrl)
@@ -65,16 +68,51 @@ configUtil.setConfig('SEARCH_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + searchSer
 configUtil.setConfig('DIAL_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + dialRepoApiKey)
 configUtil.setConfig('PLUGIN_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + pluginRepoApiKey)
 configUtil.setConfig('DATA_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + dataServiceApiKey)
-configUtil.setConfig('ENABLE_LOGGING', enableLogging)
 configUtil.setConfig('LANGUAGE_SERVICE_BASE_URL', languageServiceBaseUrl)
 configUtil.setConfig('LANGUAGE_SERVICE_AUTHORIZATION_TOKEN', 'Bearer ' + languageServiceApiKey)
 configUtil.setConfig('SUNBIRD_PORTAL_BASE_URL', sunbirdPortalBaseUrl)
 configUtil.setConfig('LOCK_EXPIRY_TIME', lockExpiryTime)
+configUtil.setConfig('CONTENT_SERVICE_HEALTH_CHECK_ENABLED', isHealthCheckEnabled)
+configUtil.setConfig('LEARNER_SERVICE_HEALTH_STATUS', 'true')
+configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'true')
+configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'true')
 configUtil.setConfig('CONTENT_SERVICE_LOCAL_BASE_URL', contentServiceLocalBaseUrl)
+configUtil.setConfig('ENABLE_GZIP', sunbirdGzipEnable)
 
 process.env.sunbird_cassandra_urls = process.env.sunbird_cassandra_urls || '127.0.0.1'
 process.env.dial_code_image_temp_folder = 'temp'
 
+logger.init({
+  path: logFilePath,
+  logLevel
+})
+
+logger.debug({ msg: `logger initialized with LEVEL= ${logLevel}` })
+
+logger.debug({
+  msg: 'environment variables',
+  env: {
+    port,
+    defaultChannel,
+    telemetryBaseUrl,
+    globalEkstepProxyBaseUrl,
+    contentRepoBaseUrl,
+    learnerServiceLocalBaseUrl,
+    searchServiceBaseUrl,
+    dialRepoBaseUrl,
+    pluginRepoBaseUrl,
+    dataServiceBaseUrl,
+    languageServiceBaseUrl,
+    logLevel,
+    logFilePath,
+    producerId,
+    sunbirdPortalBaseUrl,
+    lockExpiryTime,
+    isHealthCheckEnabled,
+    contentServiceLocalBaseUrl,
+    dialCodeImageTempFolder: process.env.dial_code_image_temp_folder
+  }
+})
 var app = express()
 const isEkStepProxyRequest = function (req) {
   let url = req.url
@@ -113,11 +151,6 @@ app.use(function (req, res, next) {
   };
 })
 
-app.use(function (req, res, next) {
-  res.setHeader('Connection', 'close')
-  next()
-})
-
 require('./routes/healthCheckRoutes')(app)
 require('./routes/courseRoutes')(app)
 require('./routes/contentRoutes')(app)
@@ -139,16 +172,18 @@ require('./middlewares/proxy.middleware')(app)
 
 function startServer () {
   this.server = http.createServer(app).listen(port, function () {
-    console.log('server running at PORT [%d]', port)
+    logger.info({ msg: `server running at PORT ${port}` })
+    logger.debug({ msg: `server started at ${new Date()}` })
     if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
-      console.error('please set environment variable sunbird_environment, sunbird_instance' +
-        'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird')
+      logger.fatal({
+        msg: `please set environment variable sunbird_environment, sunbird_instance' +
+          'start service Eg: sunbird_environment = dev, sunbird_instance = sunbird`})
       process.exit(1)
     }
     contentMetaProvider.getMetaFilterConfig().then((configStr) => {
       configUtil.setConfig('META_FILTER_REQUEST_JSON', configStr)
     }).catch((err) => {
-      console.log('error in getting meta filters', err)
+      logger.fatal({ msg: 'error in getting meta filters', err })
       process.exit(1)
     })
   })
@@ -162,8 +197,8 @@ if (defaultChannel) {
     if (defaultHashTagId) {
       configUtil.setConfig('DEFAULT_CHANNEL', defaultHashTagId)
     }
-    console.log('Error fetching default channel', err)
-    console.log('DEFAULT_CHANNEL', configUtil.getConfig('DEFAULT_CHANNEL'))
+    logger.error({ msg: 'Error fetching default channel', err })
+    logger.info({ msg: `DEFAULT_CHANNEL ${configUtil.getConfig('DEFAULT_CHANNEL')}` })
     startServer()
   })
 } else {
@@ -172,6 +207,7 @@ if (defaultChannel) {
 
 // Close server, when we start for test cases
 exports.close = function () {
+  logger.debug({ msg: `server stopped at ${new Date()}` })
   this.server.close()
 }
 
@@ -187,4 +223,5 @@ const telemetryConfig = {
   authtoken: configUtil.getConfig('CONTENT_REPO_AUTHORIZATION_TOKEN')
 }
 
+logger.debug({ msg: 'Telemetry is initialized.' })
 telemetry.init(telemetryConfig)

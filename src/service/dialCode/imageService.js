@@ -1,38 +1,24 @@
-var async = require('async')
 var _ = require('lodash')
-var path = require('path')
-var fs = require('fs')
-var fse = require('fs-extra')
-var LOG = require('sb_logger_util')
-var uuid = require('uuid')
-var ColorUtil = require('./../../utils/colorUtil')
-var QRCodeUtil = require('./../../utils/qrCodeUtil')
-var qrCodeUtil = new QRCodeUtil()
+var logger = require('sb_logger_util_v2')
 var dbModel = require('./../../utils/cassandraUtil').getConnections('dialcodes')
-var colorConvert = new ColorUtil()
-var currentFile = path.basename(__filename)
-var errorCorrectionLevels = ['L', 'M', 'Q', 'H']
 
 function ImageService(config) {
-  this.config = config;
+  this.config = config
 }
 
 ImageService.prototype.getImage = function generateImage(dialcode, channel, publisher, cb) {
-
+  var self = this
   this.getImgFromDB(dialcode, channel, publisher, function (error, images) {
     var image = compareImageConfig(images, self.configToString())
     if (!error && image && image.url) {
       cb(null, { url: image.url, 'created': false })
     } else {
-      cb(error, null);
+      cb(error, null)
     }
   })
-
 }
 
-
-ImageService.prototype.insertImg = function (dialcode, channel, publisher, callback) {
-  var fileName = dialcode + '_' + uuid.v4();
+ImageService.prototype.insertImg = function (dialcode, channel, publisher, fileName, callback) {
   var image = new dbModel.instance.dialcode_images({
     dialcode: dialcode,
     config: this.configToString(),
@@ -43,11 +29,14 @@ ImageService.prototype.insertImg = function (dialcode, channel, publisher, callb
   })
   image.save(function (error) {
     if (error) {
-      LOG.error({
-        'Unable to insert data to images table : ': error,
-        dialcode,
-        channel,
-        publisher
+      logger.error({
+        msg: 'Unable to insert data to image table',
+        error,
+        additionalInfo: {
+          dialcode,
+          channel,
+          publisher
+        }
       })
       callback(error, null)
     } else {
@@ -57,7 +46,7 @@ ImageService.prototype.insertImg = function (dialcode, channel, publisher, callb
 }
 
 ImageService.prototype.getConfig = function () {
-  return this.config;
+  return this.config
 }
 
 ImageService.prototype.getImgFromDB = function (dialcode, channel, publisher, callback) {
@@ -70,17 +59,19 @@ ImageService.prototype.getImgFromDB = function (dialcode, channel, publisher, ca
     { allow_filtering: true },
     function (error, images) {
       if (error) {
-        LOG.error({
-          'Unable to query dial code images before creating one : ': error,
-          dialcode,
-          channel,
-          publisher
+        logger.error({
+          msg: 'Unable to query dial code images before creating one',
+          error,
+          additionalInfo: {
+            dialcode: dialcode,
+            channel: channel,
+            publisher: publisher
+          }
         })
       }
       callback(error, images)
     })
 }
-
 
 ImageService.prototype.configToString = function () {
   return _.mapValues(this.getConfig(), _.method('toString'))

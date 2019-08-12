@@ -5,8 +5,7 @@ RUN apk update \
     && apk add curl \
     && adduser -u 1001 -h /home/sunbird/ -D sunbird \
     && apk add --update ca-certificates  \
-    && apk add --update ca-certificates openssl
-RUN apk add imagemagick
+    && apk add --update ca-certificates openssl imagemagick
 USER sunbird
 ENV  GRAPH_HOME "/home/sunbird/ImageMagick-6.9.3"
 ENV  PATH "$GRAPH_HOME/bin:$PATH"

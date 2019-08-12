@@ -4,7 +4,7 @@ var colorConvert = new ColorUtil()
 var dbModel = require('./../../utils/cassandraUtil').getConnections('dialcodes')
 var messageUtils = require('./../messageUtil')
 var respUtil = require('response_util')
-var LOG = require('sb_logger_util')
+var logger = require('sb_logger_util_v2')
 var path = require('path')
 var filename = path.basename(__filename)
 var dialCodeMessage = messageUtils.DIALCODE
@@ -13,7 +13,7 @@ var errorCorrectionLevels = ['L', 'M', 'Q', 'H']
 var Telemetry = require('sb_telemetry_util')
 var telemetry = new Telemetry()
 var batchModelProperties = ['processid', 'dialcodes', 'config', 'status', 'channel', 'publisher']
-var KafkaService = require('./../../helpers/qrCodeKafkaProducer.js') 
+var KafkaService = require('./../../helpers/qrCodeKafkaProducer.js')
 
 const defaultConfig = {
   "errorCorrectionLevel": "H",
@@ -57,19 +57,20 @@ BatchImageService.prototype.createRequest = function (data, channel, publisher, 
 
   batch.save(function (error) {
     if (error) {
-      LOG.error({ filename, 'error while inserting record :': error })
+      logger.error({ msg: 'Error while inserting record', error })
       callback(error, null)
     } else {
       data.processId = processId;
-      KafkaService.sendRecord(data, function(err, res){
-        if(err){
+      KafkaService.sendRecord(data, function (err, res) {
+        if (err) {
+          logger.error({ msg: 'Error while sending record to kafka', err, additionalInfo: { data } })
           callback(err, null)
         } else {
           callback(null, processId)
         }
       })
       //TODO: Send to Kafka
-     
+
     }
   })
 }
@@ -83,6 +84,16 @@ BatchImageService.prototype.getStatus = function (rspObj, processId) {
       rspObj.errCode = dialCodeMessage.PROCESS.NOTFOUND_CODE
       rspObj.errMsg = dialCodeMessage.PROCESS.NOTFOUND_MESSAGE
       rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
+      logger.error({
+        msg: 'Requested process id not found',
+        err: {
+          error: e,
+          errCode: rspObj.errCode,
+          errMsg: rspObj.errMsg,
+          responseCode: rspObj.responseCode
+        },
+        additionalInfo: {processId}
+      })
       reject(new Error(JSON.stringify({ code: 404, data: respUtil.errorResponse(rspObj) })))
     }
     dbModel.instance.dialcode_batch.findOne({ processid: processUUId }, function (err, batch) {
@@ -90,11 +101,30 @@ BatchImageService.prototype.getStatus = function (rspObj, processId) {
         rspObj.errCode = dialCodeMessage.PROCESS.FAILED_CODE
         rspObj.errMsg = dialCodeMessage.PROCESS.FAILED_MESSAGE
         rspObj.responseCode = responseCode.SERVER_ERROR
+        logger.error({
+          msg: 'Unable to get the process info',
+          err: {
+            err,
+            errCode: rspObj.errCode,
+            errMsg: rspObj.errMsg,
+            responseCode: rspObj.responseCode
+          },
+          additionalInfo: {processId: processUUId}
+        })
         reject(new Error(JSON.stringify({ code: 500, data: respUtil.errorResponse(rspObj) })))
       } else if (!batch) {
         rspObj.errCode = dialCodeMessage.PROCESS.NOTFOUND_CODE
         rspObj.errMsg = dialCodeMessage.PROCESS.NOTFOUND_MESSAGE
         rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
+        logger.error({
+          msg: 'missing batch with given process id',
+          err: {
+            errCode: rspObj.errCode,
+            errMsg: rspObj.errMsg,
+            responseCode: rspObj.responseCode
+          },
+          additionalInfo: {processId: processUUId, batch}
+        })
         reject(new Error(JSON.stringify({ code: 404, data: respUtil.errorResponse(rspObj) })))
       } else {
         if (batch.status !== 2) {
