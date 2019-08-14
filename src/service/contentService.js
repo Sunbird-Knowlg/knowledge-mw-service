@@ -953,18 +953,18 @@ function retireContentAPI(req, response) {
     function (CBW) {
       var ekStepReqData = {
         request: {
-          search: {
+          filters: {
             identifier: data.request.contentIds
           }
         }
       }
-      contentProvider.searchContent(ekStepReqData, req.headers, function (err, res) {
+      contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
-            msg: 'Getting error from content provider while searching content',
+            msg: 'Getting error from content provider composite search',
             err: {
               err,
               errCode: rspObj.errCode,
