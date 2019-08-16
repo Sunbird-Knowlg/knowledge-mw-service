@@ -954,7 +954,8 @@ function retireContentAPI(req, response) {
       var ekStepReqData = {
         request: {
           filters: {
-            identifier: data.request.contentIds
+            identifier: data.request.contentIds,
+            status:[]
           }
         }
       }
