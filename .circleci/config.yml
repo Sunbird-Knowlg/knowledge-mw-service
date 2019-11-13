@@ -5,8 +5,8 @@ jobs:
       - image: circleci/node:6.17-browsers
     steps:
       - checkout
-      - run: apk add zip git
-      - run: apk add python make g++
+        #- run: apk add zip git
+        #      - run: apk add python make g++
       - run: git submodule update --init --recursive src/libs
       - run: mkdir -p opt/content && cp -r src/* opt/content/
       - restore_cache:
