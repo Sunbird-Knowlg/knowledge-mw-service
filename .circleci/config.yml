@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/node:6.17-browsers
+    working_directory: ~/project/src
     steps:
       - checkout
       - run: git submodule update --init --recursive src/libs
