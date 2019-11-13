@@ -2,11 +2,11 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: node:6-alpine
+      - image: circleci/node:6.17-browsers
     steps:
       - checkout
-      - run: apk add zip git
-      - run: apk add python make g++
+        #- run: apk add zip git
+        #      - run: apk add python make g++
       - run: git submodule update --init --recursive src/libs
       - run: mkdir -p opt/content && cp -r src/* opt/content/
       - restore_cache:
@@ -19,6 +19,15 @@ jobs:
       - store_artifacts:
           path: opt/content.zip 
           destination: content.zip
+      - run: 
+          name: Install sonar scanner
+          command: 'sudo npm install -g sonarqube-scanner'
+          
+      - run: 
+          name: Sonar scanner
+          command: |
+                  sonar-scanner -Dsonar.projectKey=project-sunbird_sunbird-content-service -Dsonar.organization=project-sunbird -Dsonar.projectName=sunbird-content-service -Dsonar.projectVersion=1.0 -Dsonar.sources=. -Dsonar.language=js -Dsonar.host.url=https://sonarcloud.io
+
 workflows:
   version: 2.1
   build_and_test:
