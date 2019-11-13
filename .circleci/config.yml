@@ -21,7 +21,7 @@ jobs:
           destination: content.zip
       - run: 
           name: Install sonar scanner
-          command: 'sudo npm install -g sonarqube-scanner'
+          command: 'npm install -g sonarqube-scanner'
           
       - run: 
           name: Sonar scanner
