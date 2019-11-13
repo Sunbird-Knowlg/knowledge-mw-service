@@ -5,8 +5,6 @@ jobs:
       - image: circleci/node:6.17-browsers
     steps:
       - checkout
-        #- run: apk add zip git
-        #      - run: apk add python make g++
       - run: git submodule update --init --recursive src/libs
       - run: mkdir -p opt/content && cp -r src/* opt/content/
       - restore_cache:
@@ -26,7 +24,7 @@ jobs:
       - run: 
           name: Sonar scanner
           command: |
-                  sonar-scanner -Dsonar.projectKey=project-sunbird_sunbird-content-service -Dsonar.organization=project-sunbird -Dsonar.projectName=sunbird-content-service -Dsonar.projectVersion=1.0 -Dsonar.sources=. -Dsonar.language=js -Dsonar.host.url=https://sonarcloud.io
+                  sonar-scanner -Dsonar.projectKey=project-sunbird_sunbird-content-service -Dsonar.organization=project-sunbird -Dsonar.projectName=sunbird-content-service -Dsonar.projectVersion=1.0 -Dsonar.sources=src -Dsonar.language=js -Dsonar.host.url=https://sonarcloud.io
 
 workflows:
   version: 2.1
