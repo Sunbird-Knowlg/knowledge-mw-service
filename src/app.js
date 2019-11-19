@@ -50,7 +50,7 @@ const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_i
 const sunbirdPortalBaseUrl = process.env.sunbird_portal_base_url || 'https://staging.open-sunbird.org'
 const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
 const isHealthCheckEnabled = process.env.sunbird_health_check_enable || 'true'
-const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://content-service:5000'
+const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://knowledge-mw-service:5000'
 const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
