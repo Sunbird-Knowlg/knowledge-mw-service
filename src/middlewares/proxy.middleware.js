@@ -8,6 +8,7 @@ var configUtil = require('sb-config-util')
 
 module.exports = function (app) {
   var contentRepoBaseUrl = configUtil.getConfig('CONTENT_REPO_BASE_URL')
+  var contentServiceBaseUrl = configUtil.getConfig('CONTENT_SERVICE_BASE_URL')
   var dialRepoBaseUrl = configUtil.getConfig('DIAL_REPO_BASE_URL')
   var ekstepProxyUrl = globalEkstepProxyBaseUrl
   var contentRepoApiKey = configUtil.getConfig(
@@ -75,6 +76,22 @@ module.exports = function (app) {
     proxy(ekstepProxyUrl, {
       proxyReqPathResolver: function (req) {
         return require('url').parse(ekstepProxyUrl + req.originalUrl).path
+      }
+    })
+  )
+
+  app.use(['/action/content/v3/hierarchy/add', '/action/content/v3/hierarchy/remove'],
+    requestMiddleware.validateUserToken,
+    proxy(contentServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/', '')
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
       }
     })
   )
@@ -387,6 +404,7 @@ module.exports = function (app) {
       }
     })
   )
+
   app.use(
     '/action/*',
     requestMiddleware.validateUserToken,
