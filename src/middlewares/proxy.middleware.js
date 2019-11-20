@@ -163,7 +163,8 @@ module.exports = function (app) {
     .patch(
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.apiAccessForCreatorUser
+      requestMiddleware.apiAccessForCreatorUser,
+      contentService.updateContentAPI
     )
 
   app
