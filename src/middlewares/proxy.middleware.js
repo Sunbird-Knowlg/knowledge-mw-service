@@ -417,4 +417,22 @@ module.exports = function (app) {
       }
     })
   )
+
+  app.use(['/action/content/v3/hierarchy/add', '/action/content/v3/hierarchy/remove'],
+    requestMiddleware.validateUserToken,
+    proxy(contentRepoBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/', '')
+        var proxyUrl = configUtil.getConfig('CONTENT_SERVICE_BASE_URL') + originalUrl
+        console.log("Proxy for hierarchy add/remove: " + proxyUrl)
+        return require('url').parse(proxyUrl).path
+      }
+    })
+  )
 }
