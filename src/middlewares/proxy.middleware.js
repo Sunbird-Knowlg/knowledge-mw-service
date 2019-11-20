@@ -90,9 +90,7 @@ module.exports = function (app) {
       proxyReqPathResolver: function (req) {
         var originalUrl = req.originalUrl
         originalUrl = originalUrl.replace('action/', '')
-        var proxyUrl = contentServiceBaseUrl + originalUrl
-        console.log('Proxy for hierarchy add/remove: ' + proxyUrl)
-        return require('url').parse(proxyUrl).path
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
       }
     })
   )
