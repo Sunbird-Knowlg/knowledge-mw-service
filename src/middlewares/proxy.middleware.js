@@ -158,6 +158,18 @@ module.exports = function (app) {
 
   app
     .route(
+      '/action/content/v3/create'
+    )
+    .patch(
+      requestMiddleware.gzipCompression(),
+      requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
+      requestMiddleware.apiAccessForCreatorUser,
+      contentService.createContentAPI
+    )
+
+  app
+    .route(
       '/action' + configUtil.getConfig('UPDATE_CONTENT_URI') + '/:contentId'
     )
     .patch(
