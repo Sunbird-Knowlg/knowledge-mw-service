@@ -160,7 +160,7 @@ module.exports = function (app) {
     .route(
       '/action/content/v3/create'
     )
-    .patch(
+    .post(
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.validateToken,
