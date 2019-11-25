@@ -80,6 +80,23 @@ module.exports = function (app) {
     })
   )
 
+  app.use(
+    '/action/content/v3/create',
+    requestMiddleware.validateUserToken,
+    proxy(contentServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/', '')
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
+      }
+    })
+  )
+
   app.use(['/action/content/v3/hierarchy/add', '/action/content/v3/hierarchy/remove'],
     requestMiddleware.validateUserToken,
     proxy(contentServiceBaseUrl, {
@@ -163,7 +180,9 @@ module.exports = function (app) {
     .patch(
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.apiAccessForCreatorUser
+      requestMiddleware.validateToken,
+      requestMiddleware.apiAccessForCreatorUser,
+      contentService.updateContentAPI
     )
 
   app

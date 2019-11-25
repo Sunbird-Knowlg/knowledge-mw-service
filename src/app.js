@@ -29,7 +29,7 @@ globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process
 const contentRepoBaseUrl = process.env.sunbird_content_repo_api_base_url || 'https://qa.ekstep.in/api'
 const contentRepoApiKey = process.env.sunbird_content_repo_api_key
 
-const contentServiceBaseUrl = process.env.sunbird_contnet_service_base_url || 'http://learning-service:9000'
+const contentServiceBaseUrl = process.env.sunbird_contnet_service_base_url || 'http://content-service:9000'
 const contentServiceAuthToken = process.env.sunbird_content_service_auth_token
 
 const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_base_url
@@ -192,7 +192,7 @@ function startServer () {
       process.exit(1)
     })
   })
-  this.server.keepAliveTimeout = 60000 * 5;
+  this.server.keepAliveTimeout = 60000 * 5
 }
 
 // Create server
