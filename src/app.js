@@ -153,7 +153,7 @@ app.use(function (req, res, next) {
     res.sendStatus(200)
   } else {
     next()
-  };
+  }
 })
 
 require('./routes/healthCheckRoutes')(app)
