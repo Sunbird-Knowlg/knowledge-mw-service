@@ -19,9 +19,9 @@ function includeLicenseDetails (req, res, cb) {
     let contents = inputContentIsArray ? res.result.content : [res.result.content]
     if (_.size(fieldsToPopulate) && _.size(contents)) {
       populateLicenseDetailsByName(contents, fieldsToPopulate, function
-        (err, contentwithorgdetails) {
+        (err, contentWithLicenseDetails) {
         if (!err) {
-          res.result.content = inputContentIsArray ? contentwithorgdetails : contentwithorgdetails[0]
+          res.result.content = inputContentIsArray ? contentWithLicenseDetails : contentWithLicenseDetails[0]
         }
         return cb(null, res)
       })
@@ -33,7 +33,7 @@ function includeLicenseDetails (req, res, cb) {
   }
 }
 /**
- * This function loops each object from the input and maps channel id with hasTagId from orgdetails and prepares orgDetails obj for each obj in the array
+ * This function loops each object from the input and maps channel id with hasTagId from licenseDetails and prepares licenseDetails obj for each obj in the array
  * @param inputdata is array of objects, it might be content or course
  * @param cb callback after success or error
  */
@@ -49,7 +49,7 @@ function populateLicenseDetailsByName (contents, inputfields, cb) {
   }
   let tryFromCache = true
   async.waterfall([
-    // intially fetch all the orgs till the default limit
+    // intially fetch all the licenses till the default limit
     function (CBW) {
       getLicenseFromCache(licenseSearchQuery, tryFromCache, contents, function (err, licenseData) {
         if (!err && licenseData) {
@@ -65,7 +65,7 @@ function populateLicenseDetailsByName (contents, inputfields, cb) {
         }
       })
     },
-    // mapping channel with orgdetails in contents
+    // mapping channel with licenseDetails in contents
     function (CBW) {
       let licenseDetailsWithKey = _.keyBy(licenseDetails, 'name')
       _.forEach(contents, (content, index) => {
@@ -81,8 +81,8 @@ function populateLicenseDetailsByName (contents, inputfields, cb) {
 
 /**
  * This function tries to get the license from cache if not exits fetches from search api and sets to cache
- * @param requestObj is filter query that is sent to fetch org api call, tryfromcache is a boolean flag,
-   inputdata is array of contents that needs org data
+ * @param requestObj is filter query that is sent to fetch composite-search api call, tryfromcache is a boolean flag,
+   inputdata is array of contents that needs license data
  * @param CBW callback after success or error
  */
 function getLicenseFromCache (licenseSearchquery, tryfromcache, inputdata, cb) {
@@ -93,6 +93,7 @@ function getLicenseFromCache (licenseSearchquery, tryfromcache, inputdata, cb) {
         cacheManager.mget(keyNames, function (err, cacheresponse) {
           let cachedata = _.compact(cacheresponse)
           if (!err && _.size(cachedata) > 0) {
+            logger.debug({msg: 'license details - cache.', additionalInfo: {keys: keyNames, cache: cachedata}})
             return cb(null, cachedata)
           } else {
             if (err) {
@@ -125,7 +126,7 @@ function getLicenseFromCache (licenseSearchquery, tryfromcache, inputdata, cb) {
 }
 
 /**
- * This function executes the org search lms API to get all orgs
+ * This function executes the composite-search API to get all licenses
  * @param requestObj  js object which contains the search request with filters,offset,limit,query etc
  * @param cb callback after success or error
  */
@@ -155,9 +156,9 @@ function getLicense (requestObj, cb, noExitOnError) {
 function insertDataToCache (cacheinputdata) {
   cacheManager.mset({ data: cacheinputdata, ttl: configData.licenseCacheExpiryTime }, function (err, data) {
     if (err) {
-      logger.error({ msg: 'Caching allRootOrgs data failed', err, additionalInfo: { data: cacheinputdata } })
+      logger.error({ msg: 'Caching all License data failed', err, additionalInfo: { data: cacheinputdata } })
     } else {
-      logger.debug({ msg: 'Caching allRootOrgs data successful', additionalInfo: { data: cacheinputdata } })
+      logger.debug({ msg: 'Caching all License data successful', additionalInfo: { data: cacheinputdata } })
     }
   })
 }
