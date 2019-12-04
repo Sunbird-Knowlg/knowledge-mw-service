@@ -21,6 +21,7 @@ var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
 var emailService = require('./emailService')
 var orgHelper = require('../helpers/orgHelper')
+var licenseHelper = require('../helpers/licenseHelper')
 
 var CacheManager = require('sb_cache_manager')
 var cacheManager = new CacheManager({})
@@ -800,6 +801,9 @@ function getContentAPI(req, response) {
     },
     function (res, CBW) {
       orgHelper.includeOrgDetails(req, res, CBW)
+    },
+    function (res, CBW) {
+      licenseHelper.includeLicenseDetails(req, res, CBW)
     },
     function (resp, CBW) {
       if (lodash.get(resp, 'result.content.assets')) {
