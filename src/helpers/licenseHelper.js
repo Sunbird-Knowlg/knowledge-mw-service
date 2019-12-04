@@ -112,10 +112,10 @@ function getLicenseFromCache (licenseSearchquery, tryfromcache, inputdata, cb) {
           logger.error({ msg: 'Error while fetching license', err, additionalInfo: { licenseSearchquery } })
           return cb(err)
         } else {
-          if (_.get(res, 'result') && _.get(res.result, 'License')) {
-            let cacheinputdata = prepareCacheDataToInsert(res.result.License)
+          if (_.get(res, 'result') && _.get(res.result, 'license')) {
+            let cacheinputdata = prepareCacheDataToInsert(res.result.license)
             insertDataToCache(cacheinputdata)
-            return cb(null, res.result.License)
+            return cb(null, res.result.license)
           } else {
             return cb(null, [])
           }
