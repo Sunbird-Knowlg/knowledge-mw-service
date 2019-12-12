@@ -27,6 +27,7 @@ jobs:
           command: |
                   sonar-scanner
                   
+                  
 workflows:
   version: 2.1
   build_and_test:
