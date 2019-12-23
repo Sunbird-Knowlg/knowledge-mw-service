@@ -31,6 +31,24 @@ module.exports = function (app) {
   )
 
   app.use(
+    '/api/itemset/*',
+    requestMiddleware.validateUserToken,
+    proxy(assessmentServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('api/', '')
+        originalUrl = originalUrl.replace('v1/', 'v3/')
+        return require('url').parse(assessmentServiceBaseUrl + originalUrl).path
+      }
+    })
+  )
+
+  app.use(
     '/api/*',
     proxy(contentRepoBaseUrl, {
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
