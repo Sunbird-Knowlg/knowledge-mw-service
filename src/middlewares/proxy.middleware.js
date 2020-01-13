@@ -41,7 +41,6 @@ module.exports = function (app) {
       },
       proxyReqPathResolver: function (req) {
         var originalUrl = req.originalUrl
-        originalUrl = originalUrl.replace('api/', '')
         originalUrl = originalUrl.replace('v1/', 'v3/')
         return require('url').parse(assessmentServiceBaseUrl + originalUrl).path
       }
