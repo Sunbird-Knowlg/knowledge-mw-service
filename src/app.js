@@ -32,6 +32,8 @@ const contentRepoApiKey = process.env.sunbird_content_repo_api_key
 const contentServiceBaseUrl = process.env.sunbird_contnet_service_base_url || 'http://content-service:9000'
 const contentServiceAuthToken = process.env.sunbird_content_service_auth_token
 
+const assessmentServiceBaseUrl = process.env.sunbird_assessment_service_base_url || 'http://assessment-service:9000'
+
 const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_base_url
   ? process.env.sunbird_learner_service_local_base_url
   : 'http://learner-service:9000'
@@ -59,6 +61,7 @@ const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('CONTENT_SERVICE_BASE_URL', contentServiceBaseUrl)
 configUtil.setConfig('CONTENT_SERVICE_AUTH_TOKEN', contentServiceAuthToken)
+configUtil.setConfig('ASSESSMENT_SERVICE_BASE_URL', assessmentServiceBaseUrl)
 configUtil.setConfig('CONTENT_REPO_BASE_URL', contentRepoBaseUrl)
 configUtil.setConfig('TELEMETRY_BASE_URL', telemetryBaseUrl)
 configUtil.setConfig('CONTENT_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + contentRepoApiKey)

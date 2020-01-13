@@ -9,6 +9,7 @@ var configUtil = require('sb-config-util')
 module.exports = function (app) {
   var contentRepoBaseUrl = configUtil.getConfig('CONTENT_REPO_BASE_URL')
   var contentServiceBaseUrl = configUtil.getConfig('CONTENT_SERVICE_BASE_URL')
+  var assessmentServiceBaseUrl = configUtil.getConfig('ASSESSMENT_SERVICE_BASE_URL')
   var dialRepoBaseUrl = configUtil.getConfig('DIAL_REPO_BASE_URL')
   var ekstepProxyUrl = globalEkstepProxyBaseUrl
   var contentRepoApiKey = configUtil.getConfig(
@@ -27,6 +28,24 @@ module.exports = function (app) {
   )
   var languageServiceApiKey = configUtil.getConfig(
     'LANGUAGE_SERVICE_AUTHORIZATION_TOKEN'
+  )
+
+  app.use(
+    '/itemset/*',
+    requestMiddleware.validateUserToken,
+    proxy(assessmentServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('api/', '')
+        originalUrl = originalUrl.replace('v1/', 'v3/')
+        return require('url').parse(assessmentServiceBaseUrl + originalUrl).path
+      }
+    })
   )
 
   app.use(
@@ -427,7 +446,7 @@ module.exports = function (app) {
   app.use(
     '/action/itemset/*',
     requestMiddleware.validateUserToken,
-    proxy(contentServiceBaseUrl, {
+    proxy(assessmentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
         proxyReqOpts.headers['Authorization'] = contentRepoApiKey
@@ -436,7 +455,7 @@ module.exports = function (app) {
       proxyReqPathResolver: function (req) {
         var originalUrl = req.originalUrl
         originalUrl = originalUrl.replace('action/', '')
-        return require('url').parse(contentServiceBaseUrl + originalUrl).path
+        return require('url').parse(assessmentServiceBaseUrl + originalUrl).path
       }
     })
   )
