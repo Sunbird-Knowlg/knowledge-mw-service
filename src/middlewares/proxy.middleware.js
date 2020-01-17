@@ -279,8 +279,7 @@ module.exports = function (app) {
     })
   )
   app.use(
-    ['/action/framework/v3/read/*', '/action/content/v3/read/*', '/action/content/v1/read/*',
-      '/action/content/v3/hierarchy/*'],
+    ['/action/framework/v3/read/*', '/action/content/v3/read/*', '/action/content/v1/read/*'],
     proxy(contentRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
@@ -486,6 +485,22 @@ module.exports = function (app) {
       proxyReqPathResolver: function (req) {
         return require('url').parse(configUtil.getConfig('TELEMETRY_BASE_URL') + 'v1/telemetry')
           .path
+      }
+    })
+  )
+
+  app.use(
+      '/action/content/v3/hierarchy/*',
+    proxy(contentServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/', '')
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
       }
     })
   )
