@@ -279,7 +279,7 @@ module.exports = function (app) {
     })
   )
   app.use(
-    ['/action/framework/v3/read/*', '/action/content/v3/read/*', '/action/content/v1/read/*'],
+    ['/action/framework/v3/read/*', '/action/content/v3/read/*', '/action/content/v1/read/*', '/action/content/v3/hierarchy/update'],
     proxy(contentRepoBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
