@@ -296,7 +296,7 @@ module.exports = function (app) {
 
   app.use(
     ['/action/content/v3/hierarchy/update'],
-    proxy(contentRepoBaseUrl, {
+    proxy(contentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
         proxyReqOpts.headers['Authorization'] = contentRepoApiKey
@@ -305,14 +305,14 @@ module.exports = function (app) {
       proxyReqPathResolver: function (req) {
         var originalUrl = req.originalUrl
         originalUrl = originalUrl.replace('action/', '')
-        return require('url').parse(contentRepoBaseUrl + originalUrl).path
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
       }
     })
   )
 
   app.use(
     ['/action/content/v3/hierarchy/*'],
-    proxy(contentRepoBaseUrl, {
+    proxy(contentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
         proxyReqOpts.headers['Authorization'] = contentRepoApiKey
@@ -321,7 +321,7 @@ module.exports = function (app) {
       proxyReqPathResolver: function (req) {
         var originalUrl = req.originalUrl
         originalUrl = originalUrl.replace('action/', '')
-        return require('url').parse(contentRepoBaseUrl + originalUrl).path
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
       }
     })
   )
