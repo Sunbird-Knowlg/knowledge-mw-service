@@ -295,22 +295,6 @@ module.exports = function (app) {
   )
 
   app.use(
-    ['/action/content/v3/hierarchy/update/'],
-    proxy(contentServiceBaseUrl, {
-      limit: reqDataLimitOfContentUpload,
-      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
-        return proxyReqOpts
-      },
-      proxyReqPathResolver: function (req) {
-        var originalUrl = req.originalUrl
-        originalUrl = originalUrl.replace('action/', '')
-        return require('url').parse(contentServiceBaseUrl + originalUrl).path
-      }
-    })
-  )
-
-  app.use(
     ['/action/content/v3/hierarchy/*'],
     proxy(contentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
