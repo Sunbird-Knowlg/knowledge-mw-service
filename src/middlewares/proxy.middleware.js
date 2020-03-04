@@ -295,7 +295,7 @@ module.exports = function (app) {
   )
 
   app.use(
-    ['/action/content/v3/hierarchy/update'],
+    ['/action/content/v3/hierarchy/update/'],
     proxy(contentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
