@@ -1,5 +1,6 @@
 var proxy = require('express-http-proxy')
 var contentService = require('../service/contentService')
+var courseService = require('../service/courseService')
 var collaboratorService = require('../service/collaboratorService')
 var dialCodeService = require('../service/dialCodeService')
 var lockService = require('../service/lockService')
@@ -233,6 +234,7 @@ module.exports = function (app) {
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
       requestMiddleware.hierarchyUpdateApiAccess
+      courseService.updateCourseHierarchyAPI
     )
 
   app
