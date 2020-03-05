@@ -233,6 +233,7 @@ module.exports = function (app) {
     .patch(
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
+      requestMiddleware.validateToken,
       requestMiddleware.hierarchyUpdateApiAccess,
       courseService.updateCourseHierarchyAPI
     )
