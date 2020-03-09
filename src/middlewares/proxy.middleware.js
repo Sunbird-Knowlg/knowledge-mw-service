@@ -1,5 +1,6 @@
 var proxy = require('express-http-proxy')
 var contentService = require('../service/contentService')
+var courseService = require('../service/courseService')
 var collaboratorService = require('../service/collaboratorService')
 var dialCodeService = require('../service/dialCodeService')
 var lockService = require('../service/lockService')
@@ -232,7 +233,9 @@ module.exports = function (app) {
     .patch(
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody,
-      requestMiddleware.hierarchyUpdateApiAccess
+      requestMiddleware.validateToken,
+      requestMiddleware.hierarchyUpdateApiAccess,
+      courseService.updateCourseHierarchyAPI
     )
 
   app
@@ -295,24 +298,8 @@ module.exports = function (app) {
   )
 
   app.use(
-    ['/action/content/v3/hierarchy/update'],
-    proxy(contentRepoBaseUrl, {
-      limit: reqDataLimitOfContentUpload,
-      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
-        return proxyReqOpts
-      },
-      proxyReqPathResolver: function (req) {
-        var originalUrl = req.originalUrl
-        originalUrl = originalUrl.replace('action/', '')
-        return require('url').parse(contentRepoBaseUrl + originalUrl).path
-      }
-    })
-  )
-
-  app.use(
     ['/action/content/v3/hierarchy/*'],
-    proxy(contentRepoBaseUrl, {
+    proxy(contentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
         proxyReqOpts.headers['Authorization'] = contentRepoApiKey
@@ -321,7 +308,7 @@ module.exports = function (app) {
       proxyReqPathResolver: function (req) {
         var originalUrl = req.originalUrl
         originalUrl = originalUrl.replace('action/', '')
-        return require('url').parse(contentRepoBaseUrl + originalUrl).path
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
       }
     })
   )
