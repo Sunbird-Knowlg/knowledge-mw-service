@@ -496,7 +496,7 @@ module.exports = function (app) {
   )
 
   app.use(
-    '/etextbook/v1/create',
+    ['/etextbook/v1/create', '/etextbook/v1/update'],
     requestMiddleware.validateUserToken,
     proxy(contentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
@@ -506,9 +506,7 @@ module.exports = function (app) {
       },
       proxyReqPathResolver: function (req) {
         var originalUrl = req.originalUrl
-        originalUrl = originalUrl.replace('api/', '/')
-        originalUrl = originalUrl.replace('v1/', 'v3/')
-        originalUrl = originalUrl.replace('etextbook/', 'content/')
+        originalUrl = originalUrl.replace('etextbook/v1/', 'content/v3/')
         return require('url').parse(contentServiceBaseUrl + originalUrl).path
       }
     })
