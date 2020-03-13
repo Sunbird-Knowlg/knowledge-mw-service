@@ -498,6 +498,7 @@ module.exports = function (app) {
   app.use(
     ['/etextbook/v1/create', '/etextbook/v1/update'],
     requestMiddleware.validateUserToken,
+    requestMiddleware.seteTextbook,
     proxy(contentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {

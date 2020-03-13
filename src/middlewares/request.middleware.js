@@ -449,6 +449,15 @@ function checkChannelID (req, res, next) {
   next()
 }
 
+function seteTextbook (req, res, next) {
+  console.log("Before Set e-Textbook: " + JSON.stringify(req.body.content))
+  if(!_.isEmpty(req.body.content)) {
+    req.body.content['contentType'] = 'eTextbook'
+  }
+  console.log("After Set e-Textbook: " + JSON.stringify(req.body.content))
+  next()
+}
+
 // Exports required function
 module.exports.validateToken = validateToken
 module.exports.createAndValidateRequestBody = createAndValidateRequestBody
@@ -458,3 +467,4 @@ module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess
 module.exports.checkChannelID = checkChannelID
 module.exports.validateUserToken = validateUserToken
 module.exports.gzipCompression = gzipCompression
+module.exports.seteTextbook = seteTextbook
