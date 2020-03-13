@@ -450,7 +450,8 @@ function checkChannelID (req, res, next) {
 }
 
 function seteTextbook (req, res, next) {
-  console.log("Before Set e-Textbook: " + JSON.stringify(req.body.content))
+  console.log("Before Set e-Textbook request: " + JSON.stringify(req))
+  console.log("Before Set e-Textbook request body: " + JSON.stringify(req.body))
   if(!_.isEmpty(req.body.content)) {
     req.body.content['contentType'] = 'eTextbook'
   }
