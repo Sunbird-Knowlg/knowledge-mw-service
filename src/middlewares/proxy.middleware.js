@@ -496,6 +496,25 @@ module.exports = function (app) {
   )
 
   app.use(
+    '/api/etextbook/v1/create',
+    requestMiddleware.validateUserToken,
+    proxy(contentServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('api/', '/')
+        originalUrl = originalUrl.replace('v1/', 'v3/')
+        originalUrl = originalUrl.replace('etextbook/', 'content/')
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
+      }
+    })
+  )
+
+  app.use(
     '/v1/telemetry',
     proxy(configUtil.getConfig('TELEMETRY_BASE_URL'), {
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
