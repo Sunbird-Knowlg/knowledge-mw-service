@@ -496,7 +496,7 @@ module.exports = function (app) {
   )
 
   app.use(
-    '/api/etextbook/v1/create',
+    '/etextbook/v1/create',
     requestMiddleware.validateUserToken,
     proxy(contentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
