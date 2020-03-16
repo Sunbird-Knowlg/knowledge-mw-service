@@ -312,6 +312,39 @@ module.exports = function (app) {
       }
     })
   )
+  app.use(
+    '/action/content/v3/upload/url/*',
+    requestMiddleware.validateUserToken,
+    proxy(contentRepoBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/', '')
+        return require('url').parse(contentRepoBaseUrl + originalUrl).path
+      }
+    })
+  )
+
+  app.use(
+    '/action/content/v3/upload/*',
+    requestMiddleware.validateUserToken,
+    proxy(contentServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/', '')
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
+      }
+    })
+  )
 
   app
     .route(
@@ -491,6 +524,24 @@ module.exports = function (app) {
         var originalUrl = req.originalUrl
         originalUrl = originalUrl.replace('action/', '')
         return require('url').parse(contentRepoBaseUrl + originalUrl).path
+      }
+    })
+  )
+
+  app.use(
+    ['/etextbook/v1/create', '/etextbook/v1/update'],
+    requestMiddleware.validateUserToken,
+    requestMiddleware.seteTextbook,
+    proxy(contentServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('etextbook/v1/', 'content/v3/')
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
       }
     })
   )
