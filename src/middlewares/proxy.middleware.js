@@ -513,7 +513,7 @@ module.exports = function (app) {
   )
 
   app.use(
-    ['/action/channel/v3/create', '/action/channel/v3/update/*', '/action/channel/v3/read/*'],
+    ['/action/channel/v3/create', '/action/channel/v3/update/*', '/action/channel/v3/read/*', '/action/channel/v3/retire/*'],
     requestMiddleware.validateUserToken,
     proxy(contentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
