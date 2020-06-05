@@ -19,7 +19,8 @@ var keyCloakConfig = {
   'authServerUrl': process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : 'https://staging.open-sunbird.org/auth',
   'realm': process.env.sunbird_keycloak_realm ? process.env.sunbird_keycloak_realm : 'sunbird',
   'clientId': process.env.sunbird_keycloak_client_id ? process.env.sunbird_keycloak_client_id : 'portal',
-  'public': process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true
+  'public': process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true,
+  'publicKey': process.env.sunbird_keycloak_public_key || ''
 }
 
 var cacheConfig = {
@@ -116,7 +117,7 @@ function validateToken (req, res, next) {
       rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
       rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
       logger.error({
-        msg: 'Invalid token',
+        msg: 'validateToken token failed, Invalid token',
         err: {
           err,
           errCode: rspObj.errCode,
@@ -187,7 +188,7 @@ function validateUserToken (req, res, next) {
       rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
       rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
       logger.error({
-        msg: 'Invalid token',
+        msg: 'validateUserToken token failed, Invalid token',
         err: {
           err,
           errCode: rspObj.errCode,
