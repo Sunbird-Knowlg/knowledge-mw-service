@@ -91,7 +91,7 @@ function createAndValidateRequestBody (req, res, next) {
  * @param  {Function} next
  */
 function validateToken (req, res, next) {
-  logger.debug({ msg: 'validateToken() called' }, req)
+  logger.info({ msg: 'validateToken() called, offline token validation enabled' }, req)
   var token = req.get('x-authenticated-user-token')
   var rspObj = req.rspObj
   if (!token) {
