@@ -22,7 +22,7 @@ var keyCloakConfig = {
   'public': process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true,
   'realmPublicKey': process.env.sunbird_keycloak_public_key
 }
-logger.info({ msg: 'keyCloakConfig' }, keyCloakConfig)
+logger.info({ msg: 'keyCloakConfig', keyCloakConfig })
 
 var cacheConfig = {
   store: process.env.sunbird_cache_store ? process.env.sunbird_cache_store : 'memory',
