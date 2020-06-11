@@ -20,7 +20,7 @@ var keyCloakConfig = {
   'realm': process.env.sunbird_keycloak_realm ? process.env.sunbird_keycloak_realm : 'sunbird',
   'clientId': process.env.sunbird_keycloak_client_id ? process.env.sunbird_keycloak_client_id : 'portal',
   'public': process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true,
-  'publicKey': process.env.sunbird_keycloak_public_key
+  'realmPublicKey': process.env.sunbird_keycloak_public_key
 }
 
 var cacheConfig = {
