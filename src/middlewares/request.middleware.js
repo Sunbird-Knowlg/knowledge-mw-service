@@ -116,11 +116,13 @@ function validateToken (req, res, next) {
       rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
       rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
       rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+      console.log('validateToken error', err);
       logger.error({
         msg: 'validateToken token failed, Invalid token',
         keyCloakConfig: keyCloakConfig,
         token: token,
         tokenData: tokenData,
+        errorMessage: err.message,
         err: {
           err,
           errCode: rspObj.errCode,
