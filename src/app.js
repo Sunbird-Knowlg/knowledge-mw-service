@@ -235,9 +235,11 @@ const telemetryConfig = {
 logger.debug({ msg: 'Telemetry is initialized.' })
 telemetry.init(telemetryConfig)
 process.on('unhandledRejection', (reason, p) => { 
+  console.log("Kp-mw Unhandled Rejection", p, reason);
   logger.error({msg:"Kp-mw Unhandled Rejection",  p, reason})
 });
 process.on('uncaughtException', (err) => {
+  console.log("Kp-mw Uncaught Exception", err);
   logger.error({msg:"Kp-mw Uncaught Exception",  err})
   process.exit(1);
 });
