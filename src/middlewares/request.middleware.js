@@ -20,8 +20,9 @@ var keyCloakConfig = {
   'realm': process.env.sunbird_keycloak_realm ? process.env.sunbird_keycloak_realm : 'sunbird',
   'clientId': process.env.sunbird_keycloak_client_id ? process.env.sunbird_keycloak_client_id : 'portal',
   'public': process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true,
-  'publicKey': process.env.sunbird_keycloak_public_key || ''
+  'realmPublicKey': process.env.sunbird_keycloak_public_key
 }
+logger.info({ msg: 'keyCloakConfig', keyCloakConfig })
 
 var cacheConfig = {
   store: process.env.sunbird_cache_store ? process.env.sunbird_cache_store : 'memory',
@@ -91,7 +92,7 @@ function createAndValidateRequestBody (req, res, next) {
  * @param  {Function} next
  */
 function validateToken (req, res, next) {
-  logger.info({ msg: 'validateToken() called, offline token validation enabled' }, req)
+  logger.debug({ msg: 'validateToken() called, offline token validation enabled' }, req)
   var token = req.get('x-authenticated-user-token')
   var rspObj = req.rspObj
   if (!token) {
@@ -119,7 +120,7 @@ function validateToken (req, res, next) {
       logger.error({
         msg: 'validateToken token failed, Invalid token',
         err: {
-          err,
+          err: _.get(err, 'message') || err,
           errCode: rspObj.errCode,
           errMsg: rspObj.errMsg,
           responseCode: rspObj.responseCode
