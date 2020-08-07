@@ -350,7 +350,8 @@ function hierarchyUpdateApiAccess (req, response, next) {
   var data = req.body
   var rspObj = req.rspObj
   var qs = {
-    fields: 'createdBy,collaborators'
+    fields: 'createdBy,collaborators',
+    mode: 'edit'
   }
   var contentMessage = messageUtil.CONTENT
 
