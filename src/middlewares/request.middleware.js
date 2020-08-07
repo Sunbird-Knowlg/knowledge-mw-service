@@ -218,7 +218,8 @@ function apiAccessForCreatorUser (req, response, next) {
   var data = {}
   var rspObj = req.rspObj
   var qs = {
-    fields: 'createdBy,collaborators'
+    fields: 'createdBy,collaborators',
+    mode: 'edit'
   }
   var contentMessage = messageUtil.CONTENT
 
@@ -285,7 +286,8 @@ function apiAccessForReviewerUser (req, response, next) {
   var data = {}
   var rspObj = req.rspObj
   var qs = {
-    fields: 'createdBy,collaborators'
+    fields: 'createdBy,collaborators',
+    mode: 'edit'
   }
   var contentMessage = messageUtil.CONTENT
 
