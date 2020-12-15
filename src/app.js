@@ -11,8 +11,7 @@ var configUtil = require('sb-config-util')
 var _ = require('lodash')
 var logger = require('sb_logger_util_v2')
 
-// TODO: Commenting for testing purpose
-// const { loadTokenPublicKeys } = require('sb_api_interceptor')
+var loadTokenPublicKeys = require('sb_api_interceptor')
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
@@ -61,8 +60,7 @@ const isHealthCheckEnabled = process.env.sunbird_health_check_enable || 'true'
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://knowledge-mw-service:5000'
 const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
 
-// TODO: Commenting for testing purpose
-// const kidTokenPublicKeyBasePath = process.env.sunbird_kid_public_key_base_path || '/keys/'
+const kidTokenPublicKeyBasePath = process.env.sunbird_kid_public_key_base_path || '/keys/'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API) 
 configUtil.setConfig('CONTENT_SERVICE_BASE_URL', contentServiceBaseUrl)
@@ -184,9 +182,9 @@ require('./routes/lockRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer () {
+async function startServer () {
   // TODO: Commenting for testing purpose
-  // await loadTokenPublicKeys(path.join(__dirname, kidTokenPublicKeyBasePath));
+  await loadTokenPublicKeys(path.join(__dirname, kidTokenPublicKeyBasePath));
   this.server = http.createServer(app).listen(port, function () {
     logger.info({ msg: `server running at PORT ${port}` })
     logger.debug({ msg: `server started at ${new Date()}` })
