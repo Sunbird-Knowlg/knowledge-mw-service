@@ -50,7 +50,6 @@ module.exports = function (app) {
 
   app.use(
     '/assessment/*',
-    requestMiddleware.validateUserToken,
     proxy(contentRepoBaseUrl, {
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
         proxyReqOpts.headers['Authorization'] = contentRepoApiKey
