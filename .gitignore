@@ -2,3 +2,4 @@
 /src/npm-debug.log
 /src/coverage/
 /src/**/*.log
+src/.env
