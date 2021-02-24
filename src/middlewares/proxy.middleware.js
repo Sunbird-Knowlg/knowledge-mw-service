@@ -49,22 +49,6 @@ module.exports = function (app) {
   )
 
   app.use(
-    '/assessment/*',
-    requestMiddleware.validateUserToken,
-    proxy(contentRepoBaseUrl, {
-      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
-        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
-        return proxyReqOpts
-      },
-      proxyReqPathResolver: function (req) {
-        var originalUrl = req.originalUrl
-        originalUrl = originalUrl.replace('v1/', 'v3/')
-        return require('url').parse(contentRepoBaseUrl + originalUrl).path
-      }
-    })
-  )
-
-  app.use(
     '/api/*',
     proxy(contentRepoBaseUrl, {
       proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
