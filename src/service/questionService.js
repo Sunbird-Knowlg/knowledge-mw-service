@@ -5,7 +5,7 @@
  */
 
 var respUtil = require('response_util')
-var ekStepUtil = require('sb_content_provider_util')
+var contentProviderUtil = require('sb_content_provider_util')
 var logger = require('sb_logger_util_v2')
 var messageUtils = require('./messageUtil')
 var utilsService = require('./utilsService')
@@ -20,7 +20,7 @@ var responseCode = messageUtils.RESPONSE_CODE
 
 function readQuestion(identifier, headers) {
   return (new Promise((resolve, reject) => {
-    ekStepUtil.readQuestion(identifier, headers, (error, res) => {
+    contentProviderUtil.readQuestion(identifier, headers, (error, res) => {
       if (error) {
         reject(error)
       } else {
