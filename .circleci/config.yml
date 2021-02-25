@@ -18,6 +18,9 @@ jobs:
       - store_artifacts:
           path: opt/content.zip 
           destination: content.zip
+      - run:
+          name: Run test cases
+          command: 'npm run coverage'    
       - run: 
           name: Install sonar scanner
           command: 'sudo npm install -g sonarqube-scanner'
