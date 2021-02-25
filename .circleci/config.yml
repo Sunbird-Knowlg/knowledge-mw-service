@@ -14,10 +14,9 @@ jobs:
       - save_cache:
           key: dependency-cache-{{ checksum "src/package.json" }}
           paths: ./node_modules
-      - run: 'ls'    
       - run:
           name: Run test cases
-          command: 'npm run coverage'      
+          command: 'cd src && npm run coverage'      
       - run: cd opt && zip -r content.zip content
       - store_artifacts:
           path: opt/content.zip 
