@@ -14,13 +14,13 @@ jobs:
       - save_cache:
           key: dependency-cache-{{ checksum "src/package.json" }}
           paths: ./node_modules
+      - run:
+          name: Run test cases
+          command: 'npm run coverage'      
       - run: cd opt && zip -r content.zip content
       - store_artifacts:
           path: opt/content.zip 
-          destination: content.zip
-      - run:
-          name: Run test cases
-          command: 'npm run coverage'    
+          destination: content.zip  
       - run: 
           name: Install sonar scanner
           command: 'sudo npm install -g sonarqube-scanner'
