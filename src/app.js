@@ -10,7 +10,6 @@ var fs = require('fs')
 var configUtil = require('sb-config-util')
 var _ = require('lodash')
 var logger = require('sb_logger_util_v2')
-let isServerRunning = false;
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
@@ -182,7 +181,6 @@ require('./middlewares/proxy.middleware')(app)
 
 function startServer(cb) {
   this.server = http.createServer(app).listen(port, function () {
-    isServerRunning = true;
     logger.info({ msg: `server running at PORT ${port}` })
     logger.debug({ msg: `server started at ${new Date()}` })
     if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
@@ -218,20 +216,6 @@ if (defaultChannel) {
   startServer()
 }
 
-// Close server, when we start for test cases
-exports.close = function (cb) {
-  logger.debug({ msg: `server stopped at ${new Date()}` })
-  this.server.close(cb)
-}
-
-exports.start = function (cb) {
-  if (isServerRunning === false) {
-    startServer(cb)
-  } else {
-    process.nextTick(cb)
-  }
-}
-
 // Telemetry initialization
 const telemetryBatchSize = parseInt(process.env.sunbird_telemetry_sync_batch_size, 10) || 20
 telemtryEventConfig.pdata.id = producerId
@@ -255,3 +239,5 @@ process.on('uncaughtException', (err) => {
   logger.error({ msg: "Kp-mw Uncaught Exception", err })
   process.exit(1);
 });
+
+exports.app = startServer;
