@@ -227,6 +227,8 @@ exports.close = function (cb) {
 exports.start = function (cb) {
   if (isServerRunning === false) {
     startServer(cb)
+  } else {
+    process.nextTick(cb)
   }
 }
 
