@@ -179,7 +179,7 @@ require('./routes/questionRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer () {
+function startServer (cb) {
   this.server = http.createServer(app).listen(port, function () {
     logger.info({ msg: `server running at PORT ${port}` })
     logger.debug({ msg: `server started at ${new Date()}` })
@@ -195,6 +195,7 @@ function startServer () {
       logger.fatal({ msg: 'error in getting meta filters', err })
       process.exit(1)
     })
+    cb && cb();
   })
   this.server.keepAliveTimeout = 30000 * 5
 }
@@ -216,9 +217,13 @@ if (defaultChannel) {
 }
 
 // Close server, when we start for test cases
-exports.close = function () {
+exports.close = function (cb) {
   logger.debug({ msg: `server stopped at ${new Date()}` })
-  this.server.close()
+  this.server.close(cb)
+}
+
+exports.start = function (cb) {
+  startServer(cb)
 }
 
 // Telemetry initialization

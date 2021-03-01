@@ -3,3 +3,4 @@
 /src/coverage/
 /src/**/*.log
 src/.env
+/src/.nyc_output

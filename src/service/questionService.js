@@ -45,6 +45,7 @@ function getList(req, response) {
   let questionIds = _.get(data, 'body.request.search.identifier');
   if (_.isEmpty(questionIds) || !_.isArray(questionIds)) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    rspObj.errMsg = 'Either identifier is missing or it is not list type';
     logger.error({
       msg: 'Either identifier is missing or it is not list type',
       additionalInfo: { data },
