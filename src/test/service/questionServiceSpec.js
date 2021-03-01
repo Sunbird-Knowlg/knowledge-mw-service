@@ -12,7 +12,7 @@ describe.only('Question service', function () {
     
   before((done) => {
     var server = require('./../../app.js');
-    done()
+    server.start(done)
   })
 
     it('should return error when identifer is not provided', function (done) {
@@ -25,6 +25,7 @@ describe.only('Question service', function () {
             },
             json: true
         }, function (error, response, body) {
+            console.log(error)
             expect(response.statusCode).eql(400);
             expect(body).to.not.undefined;
             expect(body.responseCode).eql("CLIENT_ERROR");
