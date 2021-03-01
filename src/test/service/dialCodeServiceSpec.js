@@ -1,6 +1,7 @@
 var request = require('request');
 var host = "http://localhost:5000";
 var base_url = host + "/v1/dialcode";
+var expect = require('chai').expect;
 var dialCodeId = 'JAG546';
 var contentId = 'do_2123277638089523201167';
 var channel = 'sunbird'

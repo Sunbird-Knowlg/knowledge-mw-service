@@ -175,10 +175,17 @@ require('./routes/externalUrlMetaRoute')(app)
 require('./routes/pluginsRoutes')(app)
 require('./routes/collaborationRoutes')(app)
 require('./routes/lockRoutes')(app)
+require('./routes/questionRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer () {
+function startServer(cb) {
+
+  if(this.server) {
+    cb && cb()
+    return;
+  }
+
   this.server = http.createServer(app).listen(port, function () {
     logger.info({ msg: `server running at PORT ${port}` })
     logger.debug({ msg: `server started at ${new Date()}` })
@@ -194,6 +201,7 @@ function startServer () {
       logger.fatal({ msg: 'error in getting meta filters', err })
       process.exit(1)
     })
+    cb && cb();
   })
   this.server.keepAliveTimeout = 30000 * 5
 }
@@ -214,12 +222,6 @@ if (defaultChannel) {
   startServer()
 }
 
-// Close server, when we start for test cases
-exports.close = function () {
-  logger.debug({ msg: `server stopped at ${new Date()}` })
-  this.server.close()
-}
-
 // Telemetry initialization
 const telemetryBatchSize = parseInt(process.env.sunbird_telemetry_sync_batch_size, 10) || 20
 telemtryEventConfig.pdata.id = producerId
@@ -234,12 +236,15 @@ const telemetryConfig = {
 
 logger.debug({ msg: 'Telemetry is initialized.' })
 telemetry.init(telemetryConfig)
-process.on('unhandledRejection', (reason, p) => { 
+process.on('unhandledRejection', (reason, p) => {
   console.log("Kp-mw Unhandled Rejection", p, reason);
-  logger.error({msg:"Kp-mw Unhandled Rejection",  p, reason})
+  logger.error({ msg: "Kp-mw Unhandled Rejection", p, reason })
 });
 process.on('uncaughtException', (err) => {
   console.log("Kp-mw Uncaught Exception", err);
-  logger.error({msg:"Kp-mw Uncaught Exception",  err})
+  logger.error({ msg: "Kp-mw Uncaught Exception", err })
   process.exit(1);
 });
+
+exports.start = startServer;
+exports.close = (cb) => { this.server.close(cb)};

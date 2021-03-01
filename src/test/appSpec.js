@@ -1,22 +1,28 @@
 var server = require('../app.js')
+var expect = require('chai').expect
 var request = require('request')
 var host = 'http://localhost:5000'
+const nock = require('nock');
 
-describe('Check health api', function (done) {
+describe('Check health api', function () {
+
+  before((done) => {
+    server.start(done)
+  })
+
+  after((done) => {
+    server.close(done)
+  })
+
   it('Check with different methods, it should return status code 200', function (done) {
+    nock(host).persist().get('/health').reply(200, 'OK');
     request.options({
       url: host + '/health',
       json: true
     }, function (_error, response, body) {
-      expect(body).toBe('OK')
+      expect(body).eql('OK')
       done()
     })
   })
 })
 
-// below method used to close server once all the specs are executed
-var _finishCallback = jasmine.Runner.prototype.finishCallback
-jasmine.Runner.prototype.finishCallback = function () {
-  _finishCallback.bind(this)()
-  server.close()
-}
