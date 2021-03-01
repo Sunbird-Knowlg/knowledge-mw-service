@@ -10,6 +10,7 @@ var fs = require('fs')
 var configUtil = require('sb-config-util')
 var _ = require('lodash')
 var logger = require('sb_logger_util_v2')
+let serverRunning = false;
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
@@ -179,8 +180,9 @@ require('./routes/questionRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer (cb) {
+function startServer(cb) {
   this.server = http.createServer(app).listen(port, function () {
+    serverRunning = true;
     logger.info({ msg: `server running at PORT ${port}` })
     logger.debug({ msg: `server started at ${new Date()}` })
     if (!process.env.sunbird_environment || !process.env.sunbird_instance) {
@@ -223,7 +225,9 @@ exports.close = function (cb) {
 }
 
 exports.start = function (cb) {
-  startServer(cb)
+  if (serverRunning === false) {
+    startServer(cb)
+  }
 }
 
 // Telemetry initialization
@@ -240,12 +244,12 @@ const telemetryConfig = {
 
 logger.debug({ msg: 'Telemetry is initialized.' })
 telemetry.init(telemetryConfig)
-process.on('unhandledRejection', (reason, p) => { 
+process.on('unhandledRejection', (reason, p) => {
   console.log("Kp-mw Unhandled Rejection", p, reason);
-  logger.error({msg:"Kp-mw Unhandled Rejection",  p, reason})
+  logger.error({ msg: "Kp-mw Unhandled Rejection", p, reason })
 });
 process.on('uncaughtException', (err) => {
   console.log("Kp-mw Uncaught Exception", err);
-  logger.error({msg:"Kp-mw Uncaught Exception",  err})
+  logger.error({ msg: "Kp-mw Uncaught Exception", err })
   process.exit(1);
 });
