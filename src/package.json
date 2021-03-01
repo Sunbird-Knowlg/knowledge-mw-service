@@ -9,7 +9,7 @@
     "precommit": "lint-staged",
     "preinstall": "npm install ./libs/sb-config-util && npm install ./libs/sb-http-util && npm install ./libs/sb_content_provider_util && npm install ./libs/sb_logger_util && npm install ./libs/sb_logger_util_v2 && npm install ./libs/sb_req_validator_util && npm install ./libs/response_util && npm install ./libs/sb_api_interceptor && npm install ./libs/sb_cache_manager && npm install ./libs/sb_telemetry_util",
     "test": "mocha test/**/*Spec.js",
-    "coverage": "cross-env sunbird_environment=test  sunbird_instance=sunbird nyc --reporter=lcov mocha  test/**/*Spec.js --exit"
+    "coverage": "cross-env sunbird_environment=test  sunbird_instance=sunbird nyc --reporter=lcov mocha --timeout 10000  test/**/*Spec.js --exit"
   },
   "lint-staged": {
     "*.js": "eslint"
