@@ -12,7 +12,6 @@ describe.only('Question service', function () {
     
   before((done) => {
     var server = require('./../../app.js');
-    server.start(done)
   })
 
     it('should return error when identifer is not provided', function (done) {
