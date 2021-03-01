@@ -10,8 +10,9 @@ var base_url = host + "/v1/question";
 
 describe.only('Question service', function () {
     
-  before(() => {
+  before((done) => {
     var server = require('./../../app.js');
+    done()
   })
 
     it('should return error when identifer is not provided', function (done) {
