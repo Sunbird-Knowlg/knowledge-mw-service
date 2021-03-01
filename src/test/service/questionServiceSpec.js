@@ -10,7 +10,7 @@ var base_url = host + "/v1/question";
 
 describe.only('Question service', function () {
     
-  before((done) => {
+  before(() => {
     var server = require('./../../app.js');
   })
 
