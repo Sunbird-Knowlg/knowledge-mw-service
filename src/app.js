@@ -180,6 +180,12 @@ require('./routes/questionRoutes')(app)
 require('./middlewares/proxy.middleware')(app)
 
 function startServer(cb) {
+
+  if(this.server) {
+    cb && cb()
+    return;
+  }
+
   this.server = http.createServer(app).listen(port, function () {
     logger.info({ msg: `server running at PORT ${port}` })
     logger.debug({ msg: `server started at ${new Date()}` })
@@ -240,4 +246,5 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-exports.app = startServer;
+exports.start = startServer;
+exports.close = (cb) => { this.server.close(cb)};

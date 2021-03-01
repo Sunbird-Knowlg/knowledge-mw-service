@@ -1,6 +1,6 @@
 var request = require('request');
 var expect = require('chai').expect;
-var app = require('./../../app.js').app;
+var start = require('./../../app.js').start;
 require('chai').use(require("chai-as-promised"));
 const nock = require('nock');
 var questionServiceTestData = require('../fixtures/services/questionServiceTestData').questionServiceListAPIDATA;
@@ -11,7 +11,7 @@ var base_url = host + "/v1/question";
 describe.only('Question service', function () {
 
     before((done) => {
-        app(done)
+        start(done)
     })
 
     it('should return error when identifer is not provided', function (done) {
