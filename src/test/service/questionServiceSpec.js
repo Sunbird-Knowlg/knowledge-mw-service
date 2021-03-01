@@ -1,6 +1,6 @@
 var request = require('request');
 var expect = require('chai').expect;
-var server = require('./../../app.js')
+
 require('chai').use(require("chai-as-promised"));
 const nock = require('nock');
 var questionServiceTestData = require('../fixtures/services/questionServiceTestData').questionServiceListAPIDATA;
@@ -11,6 +11,7 @@ var base_url = host + "/v1/question";
 describe.only('Question service', function () {
     
   before((done) => {
+    var server = require('./../../app.js');
     server.start(done)
   })
 
