@@ -11,6 +11,7 @@ var messageUtils = require('./messageUtil')
 var utilsService = require('./utilsService')
 var _ = require('lodash')
 var responseCode = messageUtils.RESPONSE_CODE
+const questionAllFields = "name,code,description,mimeType,primaryCategory,additionalCategories,visibility,copyright,license,lockKey,assets,audience,author,owner,attributions,consumerId,contentEncoding,contentDisposition,appIcon,publishCheckList,publishComment,compatibilityLevel,status,prevState,prevStatus,lastStatusChangedOn,keywords,pkgVersion,version,versionKey,language,channel,framework,subject,medium,board,gradeLevel,topic,boardIds,gradeLevelIds,subjectIds,mediumIds,topicsIds,targetFWIds,targetBoardIds,targetGradeLevelIds,targetSubjectIds,targetMediumIds,targetTopicIds,createdOn,createdFor,createdBy,lastUpdatedOn,lastUpdatedBy,lastSubmittedOn,lastSubmittedBy,publisher,lastPublishedOn,lastPublishedBy,publishError,reviewError,body,editorState,answer,solutions,instructions,hints,media,responseDeclaration,interactions,qType,scoringMode,qumlVersion,timeLimit,maxScore,showTimer,showFeedback,showSolutions,interactionTypes,templateId,bloomsLevel,feedback,responseProcessing,templateDeclaration,dailySummaryReportEnabled,allowAnonymousAccess,termsAndConditions,expectedDuration,completionCriteria,collaborators,semanticVersion,schemaVersion"
 
 /**
  * This function helps to get all domain from ekstep
@@ -18,9 +19,9 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {Object} response
  */
 
-function readQuestion(identifier, headers) {
+function readQuestion(identifier, query, headers) {
   return (new Promise((resolve, reject) => {
-    contentProviderUtil.readQuestion(identifier, headers, (error, res) => {
+    contentProviderUtil.readQuestion(identifier, query, headers, (error, res) => {
       if (error) {
         reject(error)
       } else {
@@ -41,6 +42,8 @@ function getList(req, response) {
   let data = {}
   let rspObj = req.rspObj
   data.body = req.body
+  req.query.fields = req.query.fields || questionAllFields
+  data.query = req.query
 
   let questionIds = _.get(data, 'body.request.search.identifier');
   if (_.isEmpty(questionIds) || !_.isArray(questionIds)) {
@@ -59,7 +62,7 @@ function getList(req, response) {
   logger.debug({ msg: 'Request to get questions by ids ', additionalInfo: { questionIds } }, req)
 
   const questionsRequestPromises = questionIds.map(id => {
-    return readQuestion(id, req.headers)
+    return readQuestion(id, req.query, req.headers)
   })
 
   Promise.all(questionsRequestPromises).then(questionResponses => {
