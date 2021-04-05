@@ -59,7 +59,7 @@ function searchAPI (req, response) {
 }
 
 function searchContentAPI (req, response) {
-  return search(getContentTypeForContent(), req, response, ['Content'])
+  return search(getContentTypeForContent(), req, response, ['Content', 'QuestionSet'])
 }
 
 function search (defaultContentTypes, req, response, objectType) {
