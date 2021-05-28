@@ -13,7 +13,8 @@ var configUtil = require('sb-config-util')
 var PDATA = require('../config/telemetryEventConfig.json').pdata
 const uuidV1 = require('uuid/v1')
 var logger = require('sb_logger_util_v2')
-const LOG_PREFIX = 'KMW';
+const LOG_PREFIX = 'KMW'
+
 /**
  * this function helps to create apiId for error and success response
  * @param {String} path
@@ -212,7 +213,14 @@ function getErrorResponse (rspObj, serverRsp, msgObject) {
   return rspObj
 }
 
-function logDebugInfo(api, rspObj, logMessage, objectInfo){
+/**
+ * This function helps to log debug info
+ * @param {String} api
+ * @param {object} rspObj
+ * @param {String} logMessage
+ * @param {object} objectInfo
+ */
+function logDebugInfo (api, rspObj, logMessage, objectInfo) {
   var data = {
     'eid': 'LOG',
     'ets': Date.now(),
@@ -229,18 +237,20 @@ function logDebugInfo(api, rspObj, logMessage, objectInfo){
       'message': logMessage
     }
   }
-  if(!_.isEmpty(objectInfo)) {
-    data.object = objectInfo;
+
+  if (!_.isEmpty(objectInfo)) {
+    data.object = objectInfo
   }
-  if(_.get(rspObj, 'telemetryData.params')) {
+  if (_.get(rspObj, 'telemetryData.params')) {
     data.edata.params = rspObj.telemetryData.params
   }
-  if(rspObj.requestid || rspObj.msgid) {
-    data.edata.requestid = rspObj.requestid || rspObj.msgid;
+  if (rspObj.requestid || rspObj.msgid) {
+    data.edata.requestid = rspObj.requestid || rspObj.msgid
   }
-  logger.debug(data);
+  logger.debug(data)
 }
-function logErrorInfo(api, rspObj, error, objectInfo){
+
+function logErrorInfo (api, rspObj, error, objectInfo) {
   var data = {
     'eid': 'ERROR',
     'ets': Date.now(),
@@ -256,18 +266,19 @@ function logErrorInfo(api, rspObj, error, objectInfo){
       'errtype': rspObj.errMsg
     }
   }
-  if(!_.isEmpty(objectInfo)) {
-    data.object = objectInfo;
+  if (!_.isEmpty(objectInfo)) {
+    data.object = objectInfo
   }
-  if(!_.isEmpty(error)) {
+  if (!_.isEmpty(error)) {
     data.edata.stacktrace = error
   }
-  if(rspObj.requestid || rspObj.msgid) {
-    data.edata.requestid = rspObj.requestid || rspObj.msgid;
+  if (rspObj.requestid || rspObj.msgid) {
+    data.edata.requestid = rspObj.requestid || rspObj.msgid
   }
-  logger.error(data);
+  logger.error(data)
 }
-function getContextInfo() {
+
+function getContextInfo () {
   return {
     'channel': 'sunbird-content-service',
     'env': 'knowledge-mw-service',

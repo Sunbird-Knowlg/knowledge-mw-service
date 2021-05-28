@@ -58,8 +58,8 @@ function createAndValidateRequestBody (req, res, next) {
     did: req.get('x-device-id')
   }
 
-  if(req.get('x-request-id')){
-    rspObj['requestid'] = req.get('x-request-id');
+  if (req.get('x-request-id')) {
+    rspObj['requestid'] = req.get('x-request-id')
   }
 
   rspObj.telemetryData = {
@@ -459,10 +459,10 @@ function checkChannelID (req, res, next) {
 }
 
 function seteTextbook (req, res, next) {
-  if(!_.isEmpty(req.body.request) && !_.isEmpty(req.body.request.content)) {
+  if (!_.isEmpty(req.body.request) && !_.isEmpty(req.body.request.content)) {
     req.body.request.content['contentType'] = 'eTextBook'
   }
-  console.log("After Set e-Textbook: " + JSON.stringify(req.body))
+  console.log('After Set e-Textbook: ' + JSON.stringify(req.body))
   next()
 }
 

@@ -75,7 +75,7 @@ function search (defaultContentTypes, req, response, objectType) {
     rspObj.errCode = contentMessage.SEARCH.MISSING_CODE
     rspObj.errMsg = contentMessage.SEARCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('search', rspObj, 'Error due to required request || request.filters are missing');
+    utilsService.logErrorInfo('search', rspObj, 'Error due to required request || request.filters are missing')
     logger.error({
       msg: 'Error due to required request || request.filters are missing',
       err: {
@@ -124,7 +124,7 @@ function search (defaultContentTypes, req, response, objectType) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
 
-          utilsService.logErrorInfo('search', rspObj, 'Getting error from content provider composite search');
+          utilsService.logErrorInfo('search', rspObj, 'Getting error from content provider composite search')
           logger.error({
             msg: 'Getting error from content provider composite search',
             err: {
@@ -135,8 +135,6 @@ function search (defaultContentTypes, req, response, objectType) {
             },
             additionalInfo: { ekStepReqData }
           }, req)
-
-
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -145,7 +143,8 @@ function search (defaultContentTypes, req, response, objectType) {
           if (req.query.framework && req.query.framework !== 'null') {
             getFrameworkDetails(req, function (err, data) {
               if (err || res.responseCode !== responseCode.SUCCESS) {
-                utilsService.logErrorInfo('frameworkRead', rspObj, `Framework API failed with framework - ${req.query.framework}`)
+                let errorMsg = `Framework API failed with framework - ${req.query.framework}`
+                utilsService.logErrorInfo('frameworkRead', rspObj, errorMsg)
                 logger.error({ msg: `Framework API failed with framework - ${req.query.framework}`, err }, req)
                 rspObj.result = res.result
                 return response.status(200).send(respUtil.successResponse(rspObj))
@@ -169,14 +168,8 @@ function search (defaultContentTypes, req, response, objectType) {
     },
     function (res) {
       rspObj.result = res.result
-      utilsService.logDebugInfo('search', rspObj, `Content searched successfully with ${lodash.get(rspObj.result, 'count')}`);
-      logger.debug({
-        msg: `Content searched successfully with ${lodash.get(rspObj.result, 'count')}`,
-        additionalInfo: {
-          contentCount: lodash.get(rspObj.result, 'count')
-        }
-      }, req)
-
+      let debugInfo = `Content searched successfully with ${lodash.get(rspObj.result, 'count')}`
+      utilsService.logDebugInfo('search', rspObj, debugInfo)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -187,19 +180,17 @@ function getFrameworkDetails (req, CBW) {
     if (err || !data) {
       contentProvider.getFrameworkById(req.query.framework, '', req.headers, function (err, result) {
         if (err || result.responseCode !== responseCode.SUCCESS) {
-          utilsService.logErrorInfo('frameworkRead', rspObj, `Fetching framework data failed ${lodash.get(req.query, 'framework')}`)
-          logger.error({ msg: `Fetching framework data failed ${lodash.get(req.query, 'framework')}`, err }, req)
+          let errorMsg = `Fetching framework data failed ${lodash.get(req.query, 'framework')}`
+          utilsService.logErrorInfo('frameworkRead', req, errorMsg)
           CBW(new Error('Fetching framework data failed'), null)
         } else {
-          utilsService.logDebugInfo('framework', req, `Fetching framework data success ${lodash.get(req.query, 'framework')}`);
-          logger.debug({ msg: `Fetching framework data success ${lodash.get(req.query, 'framework')}` }, req)
+          let debugInfo = `Fetching framework data success ${lodash.get(req.query, 'framework')}`
+          utilsService.logDebugInfo('framework', req, debugInfo)
           cacheManager.set({ key: req.query.framework, value: result },
             function (err, data) {
               if (err) {
-                utilsService.logErrorInfo('frameworkRead', rspObj, `Setting framework cache data failed ${lodash.get(req.query, 'framework')}`)
-                logger.error({
-                  msg: `Setting framework cache data failed ${lodash.get(req.query, 'framework')}`, err
-                }, req)
+                let errorMsg = `Setting framework cache data failed ${lodash.get(req.query, 'framework')}`
+                utilsService.logErrorInfo('frameworkRead', req, errorMsg)
               } else {
                 logger.debug({ msg: `Setting framework cache data success ${lodash.get(req.query, 'framework')}` }, req)
               }
@@ -257,8 +248,7 @@ function createContentAPI (req, response) {
     rspObj.errCode = contentMessage.CREATE.MISSING_CODE
     rspObj.errMsg = contentMessage.CREATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-
-    utilsService.logErrorInfo('contentCreate', rspObj, 'Error due to missing request || request.content');
+    utilsService.logErrorInfo('contentCreate', rspObj, 'Error due to missing request || request.content')
     logger.error({
       msg: 'Error due to missing request || request.content',
       err: {
@@ -280,7 +270,7 @@ function createContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentCreate', req, 'Request to content provider to create content');
+      utilsService.logDebugInfo('contentCreate', req, 'Request to content provider to create content')
       logger.debug({
         msg: 'Request to content provider to create content',
         additionalInfo: { body: ekStepReqData }
@@ -290,7 +280,8 @@ function createContentAPI (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.CREATE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.CREATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('contentCreate', rspObj, `Getting error from content provider while creating content`)
+          let errorMsg = 'Getting error from content provider while creating content'
+          utilsService.logErrorInfo('contentCreate', rspObj, errorMsg)
           logger.error({
             msg: 'Getting error from content provider while creating content',
             err: {
@@ -313,7 +304,7 @@ function createContentAPI (req, response) {
     function (res) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      utilsService.logDebugInfo('contentCreate', rspObj, 'contentService.search() called');
+      utilsService.logDebugInfo('contentCreate', rspObj, 'contentService.search() called')
       logger.debug({ msg: 'Sending response back to user', res: rspObj.result }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -332,7 +323,7 @@ function updateContentAPI (req, response) {
   data.contentId = req.params.contentId
 
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('updateContent', rspObj, 'contentService.updateContentAPI() called');
+  utilsService.logDebugInfo('updateContent', rspObj, 'contentService.updateContentAPI() called')
   logger.debug({
     msg: 'contentService.updateContentAPI() called',
     additionalInfo: {
@@ -351,7 +342,7 @@ function updateContentAPI (req, response) {
     rspObj.errMsg = contentMessage.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
 
-    utilsService.logErrorInfo('updateContent', rspObj, 'Error due to missing request || request.content');
+    utilsService.logErrorInfo('updateContent', rspObj, 'Error due to missing request || request.content')
     logger.error({
       msg: 'Error due to missing request || request.content',
       err: {
@@ -371,7 +362,7 @@ function updateContentAPI (req, response) {
         mode: 'edit',
         fields: 'versionKey'
       }
-      utilsService.logDebugInfo('contentRead', req, 'Request to content provider to get the latest version key');
+      utilsService.logDebugInfo('contentRead', req, 'Request to content provider to get the latest version key')
 
       logger.debug({
         msg: 'Request to content provider to get the latest version key',
@@ -385,18 +376,8 @@ function updateContentAPI (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-
-          utilsService.logErrorInfo('getContent', rspObj, 'Getting error from content provider while getting content using jquery');
-          logger.error({
-            msg: 'Getting error from content provider while getting content using jquery',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, qs }
-          }, req)
+          let errorMsg = 'Getting error from content provider while getting content using jquery'
+          utilsService.logErrorInfo('getContent', rspObj, errorMsg)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -411,7 +392,7 @@ function updateContentAPI (req, response) {
       var ekStepReqData = {
         request: data.request
       }
-      utilsService.logDebugInfo('contentUpdate', req, 'Request to content provider to update the content');
+      utilsService.logDebugInfo('contentUpdate', req, 'Request to content provider to update the content')
       logger.debug({
         msg: 'Request to content provider to update the content',
         additionalInfo: {
@@ -423,7 +404,8 @@ function updateContentAPI (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('updateContent', rspObj, 'Error due to required request || request.filters are missing');
+          let errorMsg = 'Error due to required request || request.filters are missing'
+          utilsService.logErrorInfo('updateContent', rspObj, errorMsg)
           logger.error({
             msg: 'Getting error from content provider while updating content',
             err: {
@@ -448,7 +430,7 @@ function updateContentAPI (req, response) {
     function (res) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      utilsService.logDebugInfo('updateContent', rspObj, 'Sending response back to user');
+      utilsService.logDebugInfo('updateContent', rspObj, 'Sending response back to user')
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -460,7 +442,7 @@ function uploadContentAPI (req, response) {
   data.contentId = req.params.contentId
   data.queryParams = req.query
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('uploadContent', rspObj, 'contentService.uploadContentAPI() called');
+  utilsService.logDebugInfo('uploadContent', rspObj, 'contentService.uploadContentAPI() called')
   logger.debug({
     msg: 'contentService.uploadContentAPI() called',
     additionalInfo: {
@@ -482,7 +464,7 @@ function uploadContentAPI (req, response) {
         rspObj.errCode = contentMessage.UPLOAD.MISSING_CODE
         rspObj.errMsg = contentMessage.UPLOAD.MISSING_MESSAGE
         rspObj.responseCode = responseCode.CLIENT_ERROR
-        utilsService.logErrorInfo('uploadContent', rspObj, 'Error due to upload files are missing');
+        utilsService.logErrorInfo('uploadContent', rspObj, 'Error due to upload files are missing')
         logger.error({
           msg: 'Error due to upload files are missing',
           additionalInfo: {
@@ -512,7 +494,7 @@ function uploadContentAPI (req, response) {
       async.waterfall([
 
         function (CBW) {
-          utilsService.logDebugInfo('contentUpdate', req, 'Request to content provider to upload the content');
+          utilsService.logDebugInfo('contentUpdate', req, 'Request to content provider to upload the content')
           logger.debug({
             msg: 'Request to content provider to upload the content',
             additionalInfo: {
@@ -526,17 +508,9 @@ function uploadContentAPI (req, response) {
               rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE
               rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD.FAILED_MESSAGE
               rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-              utilsService.logErrorInfo('uploadContent', rspObj, 'Getting error from content provider while uploading content');
-              logger.error({
-                msg: 'Getting error from content provider while uploading content',
-                err: {
-                  err,
-                  errCode: rspObj.errCode,
-                  errMsg: rspObj.errMsg,
-                  responseCode: rspObj.responseCode
-                },
-                additionalInfo: { formData, contentId: data.contentId }
-              }, req)
+              utilsService.logErrorInfo('uploadContent',
+                rspObj,
+                'Getting error from content provider while uploading content')
               var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
               rspObj.result = res && res.result ? res.result : {}
               rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -548,7 +522,7 @@ function uploadContentAPI (req, response) {
         },
         function (res) {
           rspObj.result = res.result
-          utilsService.logDebugInfo('uploadContent', rspObj, 'Sending response back to user');
+          utilsService.logDebugInfo('uploadContent', rspObj, 'Sending response back to user')
           logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
           var modifyRsp = respUtil.successResponse(rspObj)
           modifyRsp.success = true
@@ -561,7 +535,7 @@ function uploadContentAPI (req, response) {
     async.waterfall([
 
       function (CBW) {
-        utilsService.logDebugInfo('uploadContent', req, 'Request to content provider to upload the content');
+        utilsService.logDebugInfo('uploadContent', req, 'Request to content provider to upload the content')
         logger.debug({
           msg: 'Request to content provider to upload the content',
           additionalInfo: {
@@ -574,7 +548,9 @@ function uploadContentAPI (req, response) {
             rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-            utilsService.logErrorInfo('uploadContent', rspObj, 'Getting error from content provider while uploading content with file urls');
+            utilsService.logErrorInfo('uploadContent',
+              rspObj,
+              'Getting error from content provider while uploading content with file urls')
             logger.error({
               msg: 'Getting error from content provider while uploading content with file url',
               err: {
@@ -596,7 +572,7 @@ function uploadContentAPI (req, response) {
       },
       function (res) {
         rspObj.result = res.result
-        utilsService.logDebugInfo('uploadContent', rspObj, 'Sending response back to user');
+        utilsService.logDebugInfo('uploadContent', rspObj, 'Sending response back to user')
         logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
         var modifyRsp = respUtil.successResponse(rspObj)
         modifyRsp.success = true
@@ -617,7 +593,7 @@ function reviewContentAPI (req, response) {
   }
 
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('reviewContent', rspObj, 'contentService.reviewContentAPI() called');
+  utilsService.logDebugInfo('reviewContent', rspObj, 'contentService.reviewContentAPI() called')
   logger.debug({
     msg: 'contentService.reviewContentAPI() called',
     additionalInfo: {
@@ -633,7 +609,7 @@ function reviewContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentReview', req, 'Request to content provider to review the content');
+      utilsService.logDebugInfo('contentReview', req, 'Request to content provider to review the content')
       logger.debug({
         msg: 'Request to content provider to review the content',
         additionalInfo: {
@@ -647,7 +623,9 @@ function reviewContentAPI (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.REVIEW.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REVIEW.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('reviewContent', rspObj, 'Getting error from content provider while reviewing content');
+          utilsService.logErrorInfo('reviewContent',
+            rspObj,
+            'Getting error from content provider while reviewing content')
           logger.error({
             msg: 'Getting error from content provider while reviewing content',
             err: {
@@ -671,7 +649,7 @@ function reviewContentAPI (req, response) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
       emailService.reviewContentEmail(req, function () { })
-      utilsService.logDebugInfo('contentReview', rspObj, 'Sending response back to user');
+      utilsService.logDebugInfo('contentReview', rspObj, 'Sending response back to user')
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -685,7 +663,7 @@ function publishContentAPI (req, response) {
   var ekStepReqData = {
     request: data.request
   }
-  utilsService.logDebugInfo('contentPublish', rspObj, 'contentService.publishContentAPI() called');
+  utilsService.logDebugInfo('contentPublish', rspObj, 'contentService.publishContentAPI() called')
   logger.debug({
     msg: 'contentService.publishContentAPI() called',
     additionalInfo: {
@@ -703,7 +681,9 @@ function publishContentAPI (req, response) {
     rspObj.errCode = contentMessage.PUBLISH.MISSING_CODE
     rspObj.errMsg = contentMessage.PUBLISH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('contentPublish', rspObj, 'Error due to missing request || request.content || request.content.lastPublishedBy')
+    utilsService.logErrorInfo('contentPublish',
+      rspObj,
+      'Error due to missing request || request.content || request.content.lastPublishedBy')
     logger.error({
       msg: 'Error due to missing request || request.content || request.content.lastPublishedBy',
       err: {
@@ -718,32 +698,16 @@ function publishContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentPublish', rspObj, 'Request to content provider to publish the content');
-      logger.debug({
-        msg: 'Request to content provider to publish the content',
-        additionalInfo: {
-          contentId: data.contentId,
-          reqData: ekStepReqData
-
-        }
-      }, req)
+      utilsService.logDebugInfo('contentPublish', rspObj, 'Request to content provider to publish the content')
       contentProvider.publishContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.PUBLISH.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.PUBLISH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('contentPublish', rspObj, 'Getting error from content provider while publishing content')
-          logger.error({
-            msg: 'Getting error from content provider while publishing content',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, ekStepReqData }
-          }, req)
+          utilsService.logErrorInfo('contentPublish',
+            rspObj,
+            'Getting error from content provider while publishing content')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -758,7 +722,7 @@ function publishContentAPI (req, response) {
       rspObj.result.versionKey = res.result.versionKey
       rspObj.result.publishStatus = res.result.publishStatus
       emailService.publishedContentEmail(req, function () { })
-      utilsService.logDebugInfo('contentPublish', rspObj, 'Sending response back to user');
+      utilsService.logDebugInfo('contentPublish', rspObj, 'Sending response back to user')
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -771,7 +735,7 @@ function getContentAPI (req, response) {
   data.contentId = req.params.contentId
   data.queryParams = req.query
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('contentRead', rspObj, 'contentService.getContentAPI() called');
+  utilsService.logDebugInfo('contentRead', rspObj, 'contentService.getContentAPI() called')
   logger.debug({
     msg: 'contentService.getContentAPI() called', additionalInfo: { rspObj }
   }, req)
@@ -803,7 +767,7 @@ function getContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentRead', rspObj, 'Request to content provider to get the content meta data');
+      utilsService.logDebugInfo('contentRead', rspObj, 'Request to content provider to get the content meta data')
       logger.debug({
         msg: 'Request to content provider to get the content meta data',
         additionalInfo: {
@@ -817,17 +781,9 @@ function getContentAPI (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('contentRead', rspObj, 'Getting error from content provider while getting content using jquery')
-          logger.error({
-            msg: 'Getting error from content provider while getting content using jquery',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, queryParams: data.queryParams }
-          }, req)
+          utilsService.logErrorInfo('contentRead',
+            rspObj,
+            'Getting error from content provider while getting content using jquery')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -854,7 +810,7 @@ function getContentAPI (req, response) {
             fields: ['streamingUrl', 'artifactUrl']
           }
         }
-        utilsService.logDebugInfo('search', rspObj, 'Request to content provider to search for assets');
+        utilsService.logDebugInfo('search', rspObj, 'Request to content provider to search for assets')
         logger.debug({
           msg: 'Request to content provider to search for assets',
           additionalInfo: {
@@ -866,17 +822,9 @@ function getContentAPI (req, response) {
             rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET_MY.FAILED_CODE
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-            utilsService.logErrorInfo('search', rspObj, 'Getting error from content provider during composite search for assets')
-            logger.error({
-              msg: 'Getting error from content provider during composite search for assets',
-              err: {
-                err,
-                errCode: rspObj.errCode,
-                errMsg: rspObj.errMsg,
-                responseCode: rspObj.responseCode
-              },
-              additionalInfo: { ekStepReqData }
-            }, req)
+            utilsService.logErrorInfo('search',
+              rspObj,
+              'Getting error from content provider during composite search for assets')
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj.result = res && res.result ? res.result : {}
             rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -894,7 +842,7 @@ function getContentAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      utilsService.logDebugInfo('search', rspObj, 'Sending response back to user');
+      utilsService.logDebugInfo('search', rspObj, 'Sending response back to user')
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -915,7 +863,7 @@ function getMyContentAPI (req, response) {
     request: request
   }
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('contentRead', rspObj, 'contentService.getMyContentAPI() called');
+  utilsService.logDebugInfo('contentRead', rspObj, 'contentService.getMyContentAPI() called')
   logger.debug({
     msg: 'contentService.getMyContentAPI() called', additionalInfo: { request, rspObj }
   }, req)
@@ -923,7 +871,7 @@ function getMyContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentRead', rspObj, 'Request to content provider to get user content');
+      utilsService.logDebugInfo('contentRead', rspObj, 'Request to content provider to get user content')
       logger.debug({
         msg: 'Request to content provider to get user content',
         additionalInfo: {
@@ -957,7 +905,7 @@ function getMyContentAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      utilsService.logDebugInfo('contentRead', rspObj, 'My Content searched successfully');
+      utilsService.logDebugInfo('contentRead', rspObj, 'My Content searched successfully')
       logger.debug({
         msg: 'My Content searched successfully',
         additionalInfo: {
@@ -975,7 +923,7 @@ function retireContentAPI (req, response) {
   var failedContent = []
   var userId = req.headers['x-authenticated-userid']
   var errCode, errMsg, respCode, httpStatus
-  utilsService.logDebugInfo('contentRetire', rspObj, 'contentService.retireContentAPI() called');
+  utilsService.logDebugInfo('contentRetire', rspObj, 'contentService.retireContentAPI() called')
   logger.debug({
     msg: 'contentService.retireContentAPI() called', additionalInfo: { rspObj }
   }, req)
@@ -1048,7 +996,7 @@ function retireContentAPI (req, response) {
 
     function (CBW) {
       async.each(data.request.contentIds, function (contentId, CBE) {
-        utilsService.logDebugInfo('contentRetire', rspObj, 'Request to content provider to retire content');
+        utilsService.logDebugInfo('contentRetire', rspObj, 'Request to content provider to retire content')
         logger.debug({
           msg: 'Request to content provider to retire content',
           additionalInfo: {
@@ -1096,7 +1044,7 @@ function retireContentAPI (req, response) {
     },
     function () {
       rspObj.result = failedContent
-      utilsService.logDebugInfo('contentRetire', rspObj, 'Sending response back to user');
+      utilsService.logDebugInfo('contentRetire', rspObj, 'Sending response back to user')
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
 
       return response.status(200).send(respUtil.successResponse(rspObj))
@@ -1110,7 +1058,7 @@ function rejectContentAPI (req, response) {
   }
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('contentReject', rspObj, 'contentService.rejectContentAPI() called');
+  utilsService.logDebugInfo('contentReject', rspObj, 'contentService.rejectContentAPI() called')
   logger.debug({
     msg: 'contentService.rejectContentAPI() called',
     additionalInfo: {
@@ -1146,7 +1094,7 @@ function rejectContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentReject', rspObj, 'Request to content provider to reject content');
+      utilsService.logDebugInfo('contentReject', rspObj, 'Request to content provider to reject content')
       logger.debug({
         msg: 'Request to content provider to reject content',
         additionalInfo: {
@@ -1158,17 +1106,9 @@ function rejectContentAPI (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.REJECT.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REJECT.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('contentReject', rspObj, 'Getting error from content provider while rejecting content')
-          logger.error({
-            msg: 'Getting error from content provider while rejecting content',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, ekStepReqData }
-          }, req)
+          utilsService.logErrorInfo('contentReject',
+            rspObj,
+            'Getting error from content provider while rejecting content')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1181,7 +1121,7 @@ function rejectContentAPI (req, response) {
     function (res) {
       rspObj.result = res.result
       emailService.rejectContentEmail(req, function () { })
-      utilsService.logDebugInfo('contentRejectFlag', rspObj, 'Sending response back to user');
+      utilsService.logDebugInfo('contentRejectFlag', rspObj, 'Sending response back to user')
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -1250,7 +1190,7 @@ function acceptFlagContentAPI (req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'contentService.acceptFlagContentAPI() called');
+  utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'contentService.acceptFlagContentAPI() called')
   logger.debug({
     msg: 'contentService.acceptFlagContentAPI() called',
     additionalInfo: {
@@ -1286,7 +1226,7 @@ function acceptFlagContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'Request to content provider to accept flag');
+      utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'Request to content provider to accept flag')
       logger.debug({
         msg: 'Request to content provider to accept flag',
         additionalInfo: {
@@ -1300,17 +1240,9 @@ function acceptFlagContentAPI (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.ACCEPT_FLAG.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.ACCEPT_FLAG.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('contentAcceptFlag', rspObj, 'Getting error from content provider while accepting flag content')
-          logger.error({
-            msg: 'Getting error from content provider while accepting flag content',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, ekStepReqData }
-          }, req)
+          utilsService.logErrorInfo('contentAcceptFlag',
+            rspObj,
+            'Getting error from content provider while accepting flag content')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1323,7 +1255,7 @@ function acceptFlagContentAPI (req, response) {
     function (res) {
       rspObj.result = res.result
       emailService.acceptFlagContentEmail(req, function () { })
-      utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'Sending response back to user');
+      utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'Sending response back to user')
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -1384,17 +1316,9 @@ function rejectFlagContentAPI (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.REJECT_FLAG.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REJECT_FLAG.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('contentRejectFlag', rspObj, 'Getting error from content provider while rejecting flag Content')
-          logger.error({
-            msg: 'Getting error from content provider while rejecting flag Content',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, ekStepReqData }
-          }, req)
+          utilsService.logErrorInfo('contentRejectFlag',
+            rspObj,
+            'Getting error from content provider while rejecting flag Content')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1435,16 +1359,9 @@ function uploadContentUrlAPI (req, response) {
     rspObj.errCode = contentMessage.UPLOAD_URL.MISSING_CODE
     rspObj.errMsg = contentMessage.UPLOAD_URL.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('contentUploadUrl', rspObj, 'Error due to missing contentId || request || request.content || request.content.fileName')
-    logger.error({
-      msg: 'Error due to missing contentId || request || request.content || request.content.fileName',
-      err: {
-        errCode: rspObj.errCode,
-        errMsg: rspObj.errMsg,
-        responseCode: rspObj.responseCode
-      },
-      additionalInfo: { data }
-    }, req)
+    utilsService.logErrorInfo('contentUploadUrl',
+      rspObj,
+      'Error due to missing contentId || request || request.content || request.content.fileName')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   var ekStepReqData = {
@@ -1467,17 +1384,9 @@ function uploadContentUrlAPI (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD_URL.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD_URL.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('contentUploadUrl', rspObj, 'Getting error from content provider while uploading content Url')
-          logger.error({
-            msg: 'Getting error from content provider while uploading content Url',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, ekStepReqData }
-          }, req)
+          utilsService.logErrorInfo('contentUploadUrl',
+            rspObj,
+            'Getting error from content provider while uploading content Url')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1523,46 +1432,26 @@ function unlistedPublishContentAPI (req, response) {
     rspObj.errCode = contentMessage.UNLISTED_PUBLISH.MISSING_CODE
     rspObj.errMsg = contentMessage.UNLISTED_PUBLISH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('ContentUnlistedPublish', rspObj, 'Error due to missing request || request.content || request.content.lastPublishedBy')
-    logger.error({
-      msg: 'Error due to missing request || request.content || request.content.lastPublishedBy',
-      err: {
-        errCode: rspObj.errCode,
-        errMsg: rspObj.errMsg,
-        responseCode: rspObj.responseCode
-      },
-      additionalInfo: { data }
-    }, req)
+    utilsService.logErrorInfo('ContentUnlistedPublish',
+      rspObj,
+      'Error due to missing request || request.content || request.content.lastPublishedBy')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('ContentUnlistedPublish', rspObj, 'Request to content provider to unlisted published content')
-      logger.debug({
-        msg: 'Request to content provider to unlisted published content',
-        additionalInfo: {
-          contentId: data.contentId,
-          reqData: ekStepReqData
-        }
-      }, req)
+      utilsService.logDebugInfo('ContentUnlistedPublish',
+        rspObj,
+        'Request to content provider to unlisted published content')
       contentProvider.unlistedPublishContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.UNLISTED_PUBLISH.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UNLISTED_PUBLISH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('ContentUnlistedPublish', rspObj, 'Getting error from content provider while fetching unlisted published content')
-          logger.error({
-            msg: 'Getting error from content provider while fetching unlisted published content',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, ekStepReqData }
-          }, req)
+          utilsService.logErrorInfo('ContentUnlistedPublish',
+            rspObj,
+            'Getting error from content provider while fetching unlisted published content')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1596,16 +1485,9 @@ function assignBadge (req, response) {
     rspObj.errCode = contentMessage.ASSIGN_BADGE.MISSING_CODE
     rspObj.errMsg = contentMessage.ASSIGN_BADGE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('badgeAssign', rspObj, 'Error due to missing request || request.content || request.content.badgeAssertion')
-    logger.error({
-      msg: 'Error due to missing request || request.content || request.content.badgeAssertion',
-      err: {
-        errCode: rspObj.errCode,
-        errMsg: rspObj.errMsg,
-        responseCode: rspObj.responseCode
-      },
-      additionalInfo: { data }
-    }, req)
+    utilsService.logErrorInfo('badgeAssign',
+      rspObj,
+      'Error due to missing request || request.content || request.content.badgeAssertion')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -1677,17 +1559,9 @@ function assignBadge (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('badgeAssign', rspObj, 'Getting error from content provider while updating system content')
-          logger.error({
-            msg: 'Getting error from content provider while updating system content',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, requestBody }
-          }, req)
+          utilsService.logErrorInfo('badgeAssign',
+            rspObj,
+            'Getting error from content provider while updating system content')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1700,7 +1574,6 @@ function assignBadge (req, response) {
   }, function (res) {
     rspObj.result = res.result
     utilsService.logDebugInfo('badgeAssign', rspObj, 'Sending response back to user')
-    logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
     return response.status(200).send(respUtil.successResponse(rspObj))
   }])
 }
@@ -1717,16 +1590,9 @@ function revokeBadge (req, response) {
     rspObj.errCode = contentMessage.REVOKE_BADGE.MISSING_CODE
     rspObj.errMsg = contentMessage.REVOKE_BADGE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('badgeRevoke', rspObj, 'Error due to missing request || request.content || request.content.badgeAssertion')
-    logger.error({
-      msg: 'Error due to missing request || request.content || request.content.badgeAssertion',
-      err: {
-        errCode: rspObj.errCode,
-        errMsg: rspObj.errMsg,
-        responseCode: rspObj.responseCode
-      },
-      additionalInfo: { data }
-    }, req)
+    utilsService.logErrorInfo('badgeRevoke',
+      rspObj,
+      'Error due to missing request || request.content || request.content.badgeAssertion')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   async.waterfall([function (CBW) {
@@ -1796,17 +1662,9 @@ function revokeBadge (req, response) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('badgeRevoke', rspObj, 'Getting error from content provider while updating system content')
-          logger.error({
-            msg: 'Getting error from content provider while updating system content',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { contentId: data.contentId, requestBody }
-          }, req)
+          utilsService.logErrorInfo('badgeRevoke',
+            rspObj,
+            'Getting error from content provider while updating system content')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -1835,8 +1693,8 @@ function copyContentAPI (req, response) {
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
   var query = {}
-  if (req.query){
-    query = req.query;
+  if (req.query) {
+    query = req.query
   }
   utilsService.logDebugInfo('contentCopy', rspObj, 'contentService.copyContentAPI() called')
   logger.debug({
@@ -1965,17 +1823,9 @@ function searchPluginsAPI (req, response, objectType) {
           rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH_PLUGINS.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH_PLUGINS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('searchPlugins', rspObj, 'Getting error from content provider during plugins search')
-          logger.error({
-            msg: 'Getting error from content provider during plugins search',
-            err: {
-              err,
-              errCode: rspObj.errCode,
-              errMsg: rspObj.errMsg,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: { requestData }
-          }, req)
+          utilsService.logErrorInfo('searchPlugins',
+            rspObj,
+            'Getting error from content provider during plugins search')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -2001,7 +1851,7 @@ function searchPluginsAPI (req, response, objectType) {
 function validateContentLock (req, response) {
   var rspObj = req.rspObj
   var userId = req.get('x-authenticated-userid')
-  var isRootOrgAdmin = lodash.has(req.body.request, "isRootOrgAdmin") ? req.body.request.isRootOrgAdmin : false
+  var isRootOrgAdmin = lodash.has(req.body.request, 'isRootOrgAdmin') ? req.body.request.isRootOrgAdmin : false
   utilsService.logDebugInfo('contentValidateLock', rspObj, 'contentService.validateContentLock() called')
   logger.debug({ msg: 'contentService.validateContentLock() called', additionalInfo: { rspObj } }, req)
   var qs = {
