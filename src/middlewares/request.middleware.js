@@ -58,6 +58,10 @@ function createAndValidateRequestBody (req, res, next) {
     did: req.get('x-device-id')
   }
 
+  if(req.get('x-request-id')){
+    rspObj['requestid'] = req.get('x-request-id');
+  }
+
   rspObj.telemetryData = {
     params: utilsService.getParamsDataForLogEvent(rspObj),
     context: utilsService.getTelemetryContextData(req),
