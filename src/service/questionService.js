@@ -47,7 +47,7 @@ function readQuestion (identifier, query, headers) {
 
 function getList (req, response) {
   delete req.headers['accept-encoding']
-  utilsService.logDebugInfo('question.list', req.rspObj, 'question list api called')
+  utilsService.logDebugInfo('question-list', req.rspObj, 'question list api called')
   let data = {}
   let rspObj = req.rspObj
   data.body = req.body
@@ -58,13 +58,13 @@ function getList (req, response) {
   if (_.isEmpty(questionIds) || !_.isArray(questionIds)) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
     rspObj.errMsg = 'Either identifier is missing or it is not list type'
-    utilsService.logErrorInfo('question.list', rspObj, 'Either identifier is missing or it is not list type')
+    utilsService.logErrorInfo('question-list', rspObj, 'Either identifier is missing or it is not list type')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   const questionsLimit = parseInt(process.env.questions_list_limit, 10) || 20
   questionIds = _.take(questionIds, questionsLimit)
 
-  utilsService.logDebugInfo('question.list', rspObj, 'Request to get questions by ids')
+  utilsService.logDebugInfo('question-list', rspObj, 'Request to get questions by ids')
 
   const questionsRequestPromises = questionIds.map(id => {
     return readQuestion(id, req.query, req.headers)
@@ -76,11 +76,11 @@ function getList (req, response) {
       return _.get(questionResponse, 'result.question')
     })
     rspObj.result.count = questionResponses.length
-    utilsService.logDebugInfo('question.list', rspObj, 'questions details')
+    utilsService.logDebugInfo('question-list', rspObj, 'questions details')
     return response.status(200).send(respUtil.successResponse(rspObj))
   }).catch(err => {
     rspObj.responseCode = _.get(err, 'responseCode') || responseCode.SERVER_ERROR
-    utilsService.logErrorInfo('question.list', rspObj, 'Getting error  fetching questions by ids')
+    utilsService.logErrorInfo('question-list', rspObj, 'Getting error  fetching questions by ids')
     var httpStatus = err && err.statusCode >= 100 && err.statusCode < 600 ? err.statusCode : 500
     rspObj.result = err && err.result ? err.result : {}
     rspObj = utilsService.getErrorResponse(rspObj, err)
