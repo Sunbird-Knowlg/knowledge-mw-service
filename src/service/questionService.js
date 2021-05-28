@@ -10,8 +10,18 @@ var messageUtils = require('./messageUtil')
 var utilsService = require('./utilsService')
 var _ = require('lodash')
 var responseCode = messageUtils.RESPONSE_CODE
-/* eslint max-len: ["error", { "code": 3000 }] */  
-const questionAllFields = 'name,code,description,mimeType,primaryCategory,additionalCategories,visibility,copyright,license,lockKey,assets,audience,author,owner,attributions,consumerId,contentEncoding,contentDisposition,appIcon,publishCheckList,publishComment,compatibilityLevel,status,prevState,prevStatus,lastStatusChangedOn,keywords,pkgVersion,version,versionKey,language,channel,framework,subject,medium,board,gradeLevel,topic,boardIds,gradeLevelIds,subjectIds,mediumIds,topicsIds,targetFWIds,targetBoardIds,targetGradeLevelIds,targetSubjectIds,targetMediumIds,targetTopicIds,createdOn,createdFor,createdBy,lastUpdatedOn,lastUpdatedBy,lastSubmittedOn,lastSubmittedBy,publisher,lastPublishedOn,lastPublishedBy,publishError,reviewError,body,editorState,answer,solutions,instructions,hints,media,responseDeclaration,interactions,qType,scoringMode,qumlVersion,timeLimit,maxScore,showTimer,showFeedback,showSolutions,interactionTypes,templateId,bloomsLevel,feedback,responseProcessing,templateDeclaration,dailySummaryReportEnabled,allowAnonymousAccess,termsAndConditions,expectedDuration,completionCriteria,collaborators,semanticVersion,schemaVersion'
+const questionAllFields = 'name,code,description,mimeType,primaryCategory,additionalCategories,' +
+'visibility,copyright,license,lockKey,assets,audience,author,owner,attributions,consumerId,' +
+'contentEncoding,contentDisposition,appIcon,publishCheckList,publishComment,compatibilityLevel,' +
+'status,prevState,prevStatus,lastStatusChangedOn,keywords,pkgVersion,version,versionKey,language,' +
+'channel,framework,subject,medium,board,gradeLevel,topic,boardIds,gradeLevelIds,subjectIds,mediumIds,' +
+'topicsIds,targetFWIds,targetBoardIds,targetGradeLevelIds,targetSubjectIds,targetMediumIds,targetTopicIds,' +
+'createdOn,createdFor,createdBy,lastUpdatedOn,lastUpdatedBy,lastSubmittedOn,lastSubmittedBy,publisher,' +
+'lastPublishedOn,lastPublishedBy,publishError,reviewError,body,editorState,answer,solutions,instructions,' +
+'hints,media,responseDeclaration,interactions,qType,scoringMode,qumlVersion,timeLimit,maxScore,showTimer,' +
+'showFeedback,showSolutions,interactionTypes,templateId,bloomsLevel,feedback,responseProcessing,' +
+'templateDeclaration,dailySummaryReportEnabled,allowAnonymousAccess,termsAndConditions,expectedDuration,' +
+'completionCriteria,collaborators,semanticVersion,schemaVersion'
 
 /**
  * This function helps to get all domain from ekstep
