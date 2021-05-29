@@ -76,6 +76,7 @@ function search (defaultContentTypes, req, response, objectType) {
     rspObj.errMsg = contentMessage.SEARCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     utilsService.logErrorInfo('search', rspObj, 'Error due to required request || request.filters are missing')
+
     logger.error({
       msg: 'Error due to required request || request.filters are missing',
       err: {
