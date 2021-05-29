@@ -5,14 +5,10 @@
  */
 
 var async = require('async')
-var path = require('path')
 var respUtil = require('response_util')
 var ekStepUtil = require('sb_content_provider_util')
-var logger = require('sb_logger_util_v2')
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
-
-var filename = path.basename(__filename)
 var responseCode = messageUtils.RESPONSE_CODE
 
 /**
@@ -33,29 +29,22 @@ function getFrameworkCategoryInstance (req, response) {
 
   if (!data.queryParams) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    logger.error({
-      msg: 'Error due to missing request body or query Parameters or categoryId',
-      err: {responseCode: rspObj.responseCode},
-      additionalInfo: { data }
-    }, req)
+    utilsService.logErrorInfo('getFrameworkCategoryInstance',
+      rspObj,
+      'Error due to missing request body or query Parameters or categoryId')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
   async.waterfall([
 
     function (CBW) {
-      logger.debug({ msg: 'Request to get Framework Category instance', additionalInfo: { data } }, req)
+      utilsService.logDebugInfo('getFrameworkCategoryInstance', rspObj, 'Request to get Framework Category instance')
       ekStepUtil.getFrameworkCategoryInstance(data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({
-            msg: 'Error while fetching framework category instance from ekstep',
-            err: {
-              err,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: {data}
-          }, req)
+          utilsService.logErrorInfo('getFrameworkCategoryInstance',
+            rspObj,
+            'Error while fetching framework category instance from ekstep')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -79,11 +68,9 @@ function frameworkCategoryInstanceSearch (req, response) {
   data.queryParams = req.query
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    logger.error({
-      msg: 'Error due to missing request body or query params',
-      err: {responseCode: rspObj.responseCode},
-      additionalInfo: { data }
-    }, req)
+    utilsService.logErrorInfo('frameworkCategoryInstanceSearch',
+      rspObj,
+      'Error due to missing request body or query params')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -92,20 +79,16 @@ function frameworkCategoryInstanceSearch (req, response) {
   }
 
   async.waterfall([
-
     function (CBW) {
-      logger.debug({ msg: 'Request to search Framework Category instance', additionalInfo: { data } }, req)
+      utilsService.logDebugInfo('frameworkCategoryInstanceSearch',
+        rspObj,
+        'Request to search Framework Category instance')
       ekStepUtil.frameworkCategoryInstanceSearch(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({
-            msg: 'Error while searching framework category instance from ekstep',
-            err: {
-              err,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: {data}
-          }, req)
+          utilsService.logErrorInfo('frameworkCategoryInstanceSearch',
+            rspObj,
+            'Error while searching framework category instance from ekstep')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -128,11 +111,9 @@ function frameworkCategoryInstanceCreate (req, response) {
   data.queryParams = req.query
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    logger.error({
-      msg: 'Error due to missing request body or query params',
-      err: {responseCode: rspObj.responseCode},
-      additionalInfo: { data }
-    }, req)
+    utilsService.logErrorInfo('frameworkCategoryInstanceCreate',
+      rspObj,
+      'Error due to missing request body or query params')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -141,20 +122,16 @@ function frameworkCategoryInstanceCreate (req, response) {
   }
 
   async.waterfall([
-
     function (CBW) {
-      logger.debug({ msg: 'Request to create Framework Category instance', additionalInfo: { data } }, req)
+      utilsService.logDebugInfo('frameworkCategoryInstanceCreate',
+        rspObj,
+        'Request to create Framework Category instance')
       ekStepUtil.frameworkCategoryInstanceCreate(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          logger.error({
-            msg: 'Error while creating framework category instance from ekstep',
-            err: {
-              err,
-              responseCode: rspObj.responseCode
-            },
-            additionalInfo: {data}
-          }, req)
+          utilsService.logErrorInfo('frameworkCategoryInstanceCreate',
+            rspObj,
+            'Error while creating framework category instance from ekstep')
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -181,11 +158,9 @@ function frameworkCategoryInstanceUpdate (req, response) {
   }
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    logger.error({
-      msg: 'Error due to missing request body or query params or categoryId',
-      err: {responseCode: rspObj.responseCode},
-      additionalInfo: { data }
-    }, req)
+    utilsService.logErrorInfo('frameworkCategoryInstanceUpdate',
+      rspObj,
+      'Error due to missing request body or query params or categoryId')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -194,21 +169,17 @@ function frameworkCategoryInstanceUpdate (req, response) {
   }
 
   async.waterfall([
-
     function (CBW) {
-      logger.debug({ msg: 'Request to update Framework Category instance', additionalInfo: { data } }, req)
+      utilsService.logDebugInfo('frameworkCategoryInstanceUpdate',
+        rspObj,
+        'Request to update Framework Category instance')
       ekStepUtil.frameworkCategoryInstanceUpdate(ekStepReqData, data.queryParams, data.category, req.headers,
         function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-            logger.error({
-              msg: 'Error while updating framework category instance from ekstep',
-              err: {
-                err,
-                responseCode: rspObj.responseCode
-              },
-              additionalInfo: {data}
-            }, req)
+            utilsService.logErrorInfo('frameworkCategoryInstanceUpdate',
+              rspObj,
+              'Error while updating framework category instance from ekstep')
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj = utilsService.getErrorResponse(rspObj, res)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
