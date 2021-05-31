@@ -29,6 +29,7 @@ var contentMessage = messageUtils.CONTENT
 var compositeMessage = messageUtils.COMPOSITE
 var responseCode = messageUtils.RESPONSE_CODE
 var reqMsg = messageUtils.REQUEST
+const SERVICE_PREFIX = 'CNT';
 
 /**
  * This function helps to generate code for create course
@@ -71,7 +72,7 @@ function search (defaultContentTypes, req, response, objectType) {
   }, req)
 
   if (!data.request || !data.request.filters) {
-    rspObj.errCode = contentMessage.SEARCH.MISSING_CODE
+    rspObj.errCode = contentMessage.SEARCH.MISSING_ERR_CODE
     rspObj.errMsg = contentMessage.SEARCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
 
@@ -119,7 +120,7 @@ function search (defaultContentTypes, req, response, objectType) {
 
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_ERR_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -244,7 +245,7 @@ function createContentAPI (req, response) {
 
   if (!data.request || !data.request.content || !validatorUtil.validate(data.request.content, contentModel.CREATE)) {
     // prepare
-    rspObj.errCode = contentMessage.CREATE.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.CREATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
 
@@ -275,7 +276,7 @@ function createContentAPI (req, response) {
       }, req)
       contentProvider.createContent(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.CREATE.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.CREATE.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.CREATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -331,7 +332,7 @@ function updateContentAPI (req, response) {
   }
 
   if (!data.request || !data.request.content || !validatorUtil.validate(data.request.content, contentModel.UPDATE)) {
-    rspObj.errCode = contentMessage.UPDATE.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.UPDATE.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -362,7 +363,7 @@ function updateContentAPI (req, response) {
       }, req)
       contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.UPDATE.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -454,7 +455,7 @@ function uploadContentAPI (req, response) {
 
     form.parse(req, function (err, fields, files) {
       if (err || (files && Object.keys(files).length === 0)) {
-        rspObj.errCode = contentMessage.UPLOAD.MISSING_CODE
+        rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.UPLOAD.MISSING_ERR_CODE}`
         rspObj.errMsg = contentMessage.UPLOAD.MISSING_MESSAGE
         rspObj.responseCode = responseCode.CLIENT_ERROR
         logger.error({
@@ -496,7 +497,7 @@ function uploadContentAPI (req, response) {
           delete req.headers['content-type']
           contentProvider.uploadContent(formData, data.contentId, req.headers, function (err, res) {
             if (err || res.responseCode !== responseCode.SUCCESS) {
-              rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE
+              rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.UPLOAD.FAILED_ERR_CODE}`
               rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD.FAILED_MESSAGE
               rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
               logger.error({
@@ -542,7 +543,7 @@ function uploadContentAPI (req, response) {
         delete req.headers['content-type']
         contentProvider.uploadContentWithFileUrl(data.contentId, queryString, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD.FAILED_CODE
+            rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.UPLOAD.FAILED_ERR_CODE}`
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
 
@@ -614,7 +615,7 @@ function reviewContentAPI (req, response) {
       contentProvider.reviewContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.REVIEW.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.REVIEW.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REVIEW.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -668,7 +669,7 @@ function publishContentAPI (req, response) {
   }
 
   if (!data.request || !data.request.content || !data.request.content.lastPublishedBy) {
-    rspObj.errCode = contentMessage.PUBLISH.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.PUBLISH.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.PUBLISH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -697,7 +698,7 @@ function publishContentAPI (req, response) {
       contentProvider.publishContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.PUBLISH.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.PUBLISH.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.PUBLISH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -749,7 +750,7 @@ function getContentAPI (req, response) {
   }
 
   if (!data.contentId) {
-    rspObj.errCode = contentMessage.GET.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.GET.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.GET.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -779,7 +780,7 @@ function getContentAPI (req, response) {
       contentProvider.getContentUsingQuery(data.contentId, data.queryParams, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.GET.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -826,7 +827,7 @@ function getContentAPI (req, response) {
         }, req)
         contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET_MY.FAILED_CODE
+            rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.GET_MY.FAILED_ERR_CODE}`
             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             logger.error({
@@ -892,7 +893,7 @@ function getMyContentAPI (req, response) {
       }, req)
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET_MY.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.GET_MY.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -939,7 +940,7 @@ function retireContentAPI (req, response) {
   }, req)
 
   if (!data.request || !data.request.contentIds) {
-    rspObj.errCode = contentMessage.RETIRE.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.RETIRE.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.RETIRE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -967,7 +968,7 @@ function retireContentAPI (req, response) {
       }
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.SEARCH.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -995,7 +996,7 @@ function retireContentAPI (req, response) {
       if (createdByOfContents.length === 1 && createdByOfContents[0] === userId) {
         CBW()
       } else {
-        rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
+        rspObj.errCode = `${SERVICE_PREFIX}_${reqMsg.TOKEN.INVALID_ERR_CODE}`
         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
         return response.status(401).send(respUtil.errorResponse(rspObj))
@@ -1017,7 +1018,7 @@ function retireContentAPI (req, response) {
         }
         contentProvider.retireContent(contentId, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            errCode = res && res.params ? res.params.err : contentMessage.GET_MY.FAILED_CODE
+            errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.GET_MY.FAILED_ERR_CODE}`
             errMsg = res && res.params ? res.params.errmsg : contentMessage.GET_MY.FAILED_MESSAGE
             respCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             logger.error({
@@ -1076,7 +1077,7 @@ function rejectContentAPI (req, response) {
   }
 
   if (!data.contentId) {
-    rspObj.errCode = contentMessage.REJECT.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REJECT.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.REJECT.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -1105,7 +1106,7 @@ function rejectContentAPI (req, response) {
       }, req)
       contentProvider.rejectContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.REJECT.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.REJECT.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REJECT.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -1212,7 +1213,7 @@ function acceptFlagContentAPI (req, response) {
   }
 
   if (!data.contentId || !data.request) {
-    rspObj.errCode = contentMessage.ACCEPT_FLAG.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.ACCEPT_FLAG.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.ACCEPT_FLAG.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -1243,7 +1244,7 @@ function acceptFlagContentAPI (req, response) {
 
       contentProvider.acceptFlagContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.ACCEPT_FLAG.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.ACCEPT_FLAG.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.ACCEPT_FLAG.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -1291,7 +1292,7 @@ function rejectFlagContentAPI (req, response) {
   }
 
   if (!data.contentId || !data.request) {
-    rspObj.errCode = contentMessage.REJECT_FLAG.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REJECT_FLAG.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.REJECT_FLAG.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -1322,7 +1323,7 @@ function rejectFlagContentAPI (req, response) {
 
       contentProvider.rejectFlagContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.REJECT_FLAG.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.REJECT_FLAG.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.REJECT_FLAG.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -1370,7 +1371,7 @@ function uploadContentUrlAPI (req, response) {
   }
 
   if (!data.contentId || !data.request || !data.request.content || !data.request.content.fileName) {
-    rspObj.errCode = contentMessage.UPLOAD_URL.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.UPLOAD_URL.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.UPLOAD_URL.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -1400,7 +1401,7 @@ function uploadContentUrlAPI (req, response) {
       }, req)
       contentProvider.uploadContentUrl(ekStepReqData, data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPLOAD_URL.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.UPLOAD_URL.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPLOAD_URL.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -1521,7 +1522,7 @@ function assignBadge (req, response) {
     msg: 'contentService.assignBadge() called', additionalInfo: { contentId: req.params.contentId, rspObj }
   }, req)
   if (!data.request || !data.request.content || !data.request.content.badgeAssertion) {
-    rspObj.errCode = contentMessage.ASSIGN_BADGE.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.ASSIGN_BADGE.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.ASSIGN_BADGE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -1546,7 +1547,7 @@ function assignBadge (req, response) {
     }, req)
     contentProvider.getContent(data.contentId, req.headers, function (err, res) {
       if (err || res.responseCode !== responseCode.SUCCESS) {
-        rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
+        rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.GET.FAILED_ERR_CODE}`
         rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
         rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
         logger.error({
@@ -1598,7 +1599,7 @@ function assignBadge (req, response) {
       }
       contentProvider.systemUpdateContent(requestBody, data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.UPDATE.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -1635,7 +1636,7 @@ function revokeBadge (req, response) {
     msg: 'contentService.revokeBadge() called', additionalInfo: { contentId: req.params.contentId, rspObj }
   }, req)
   if (!data.request || !data.request.content || !data.request.content.badgeAssertion) {
-    rspObj.errCode = contentMessage.REVOKE_BADGE.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REVOKE_BADGE.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.REVOKE_BADGE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -1660,7 +1661,7 @@ function revokeBadge (req, response) {
 
     contentProvider.getContent(data.contentId, req.headers, function (err, res) {
       if (err || res.responseCode !== responseCode.SUCCESS) {
-        rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
+        rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.GET.FAILED_ERR_CODE}`
         rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
         rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
         logger.error({
@@ -1710,7 +1711,7 @@ function revokeBadge (req, response) {
       }
       contentProvider.systemUpdateContent(requestBody, data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.UPDATE.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.UPDATE.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -1768,7 +1769,7 @@ function copyContentAPI (req, response) {
   }
 
   if (!data['contentId']) {
-    rspObj.errCode = contentMessage.COPY.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.COPY.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.COPY.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -1798,7 +1799,7 @@ function copyContentAPI (req, response) {
       }, req)
       contentProvider.copyContentWithQuery(ekStepReqData, query, data['contentId'], req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.COPY.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.COPY.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.COPY.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -1838,7 +1839,7 @@ function searchPluginsAPI (req, response, objectType) {
   }, req)
 
   if (!data.request || !data.request.filters) {
-    rspObj.errCode = contentMessage.SEARCH_PLUGINS.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.SEARCH_PLUGINS.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.SEARCH_PLUGINS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -1871,7 +1872,7 @@ function searchPluginsAPI (req, response, objectType) {
       }, req)
       contentProvider.pluginsSearch(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : contentMessage.SEARCH_PLUGINS.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.SEARCH_PLUGINS.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.SEARCH_PLUGINS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({

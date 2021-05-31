@@ -22,6 +22,7 @@ var contentMessage = messageUtils.CONTENT
 var responseCode = messageUtils.RESPONSE_CODE
 var defaultLockExpiryTime = parseInt(configUtil.getConfig('LOCK_EXPIRY_TIME'))
 var contentProvider = require('sb_content_provider_util')
+const SERVICE_PREFIX = 'LOC'
 
 function createLock (req, response) {
   var lockId = dbModel.uuid()
@@ -33,7 +34,7 @@ function createLock (req, response) {
   logger.debug({ msg: 'lockService.createLock() called', additionalInfo: { rspObj } }, req)
 
   if (!req.get('x-device-id')) {
-    rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE_LOCK.FAILED_ERR_CODE}`
     rspObj.errMsg = contentMessage.CREATE_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -48,7 +49,7 @@ function createLock (req, response) {
   }
 
   if (req.get('x-authenticated-userid') !== data.request.createdBy) {
-    rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE_LOCK.FAILED_ERR_CODE}`
     rspObj.errMsg = contentMessage.CREATE_LOCK.UNAUTHORIZED
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -64,7 +65,7 @@ function createLock (req, response) {
   }
 
   if (!data.request) {
-    rspObj.errCode = contentMessage.CREATE_LOCK.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE_LOCK.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.CREATE_LOCK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -81,7 +82,7 @@ function createLock (req, response) {
 
   var result = validateCreateLockRequestBody(data.request)
   if (result.error) {
-    rspObj.errCode = contentMessage.CREATE_LOCK.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE_LOCK.MISSING_ERR_CODE}`
     rspObj.errMsg = result.error.details[0].message
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -107,7 +108,7 @@ function createLock (req, response) {
     function (CBW) {
       checkResourceTypeValidation(req, function (res, body) {
         if (!res) {
-          rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
+          rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE_LOCK.FAILED_ERR_CODE}`
           rspObj.errMsg = body.message
           rspObj.responseCode = responseCode.CLIENT_ERROR
           logger.error({
@@ -131,7 +132,7 @@ function createLock (req, response) {
         resourceType: data.request.resourceType
       }, function (error, result) {
         if (error) {
-          rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
+          rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE_LOCK.FAILED_ERR_CODE}`
           rspObj.errMsg = contentMessage.CREATE_LOCK.FAILED_MESSAGE
           rspObj.responseCode = responseCode.SERVER_ERROR
           logger.error({
@@ -158,7 +159,7 @@ function createLock (req, response) {
             rspObj.result.versionKey = versionKey
             return response.status(200).send(respUtil.successResponse(rspObj))
           } else if (req.get('x-authenticated-userid') === result.createdBy) {
-            rspObj.errCode = contentMessage.CREATE_LOCK.SELF_LOCKED_CODE
+            rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE_LOCK.SELF_LOCKED_ERR_CODE}`
             rspObj.errMsg = contentMessage.CREATE_LOCK.SAME_USER_ERR_MSG
             logger.error({
               msg: 'Error due to self lock , Resource already locked by user ',
@@ -170,7 +171,7 @@ function createLock (req, response) {
             }, req)
             var statusCode = 400
           } else {
-            rspObj.errCode = contentMessage.CREATE_LOCK.LOCKED_CODE
+            rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE_LOCK.LOCKED_ERR_CODE}`
             statusCode = 423
             try { var user = JSON.parse(result.creatorInfo).name } catch (e) {
               user = 'another user'
@@ -205,7 +206,7 @@ function createLock (req, response) {
 
           lockObject.save({ ttl: defaultLockExpiryTime }, function (err, resp) {
             if (err) {
-              rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
+              rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.CREATE_LOCK.FAILED_ERR_CODE}`
               rspObj.errMsg = contentMessage.CREATE_LOCK.FAILED_MESSAGE
               rspObj.responseCode = responseCode.SERVER_ERROR
               logger.error({
@@ -276,7 +277,7 @@ function refreshLock (req, response) {
   var rspObj = req.rspObj
 
   if (!req.get('x-device-id')) {
-    rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REFRESH_LOCK.FAILED_ERR_CODE}`
     rspObj.errMsg = contentMessage.REFRESH_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -291,7 +292,7 @@ function refreshLock (req, response) {
   }
 
   if (!data.request) {
-    rspObj.errCode = contentMessage.REFRESH_LOCK.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REFRESH_LOCK.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.REFRESH_LOCK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -308,7 +309,7 @@ function refreshLock (req, response) {
 
   var result = validateRefreshLockRequestBody(data.request)
   if (result.error) {
-    rspObj.errCode = contentMessage.REFRESH_LOCK.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REFRESH_LOCK.MISSING_ERR_CODE}`
     rspObj.errMsg = result.error.details[0].message
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -334,7 +335,7 @@ function refreshLock (req, response) {
     function (CBW) {
       checkResourceTypeValidation(req, function (res, body) {
         if (!res) {
-          rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
+          rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REFRESH_LOCK.FAILED_ERR_CODE}`
           rspObj.errMsg = body.message
           rspObj.responseCode = responseCode.CLIENT_ERROR
           logger.error({
@@ -353,7 +354,7 @@ function refreshLock (req, response) {
     },
     function (CBW) {
       if (data.request.lockId !== contentBody.contentdata.lockKey) {
-        rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
+        rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REFRESH_LOCK.FAILED_ERR_CODE}`
         rspObj.errMsg = contentMessage.REFRESH_LOCK.INVALID_LOCK_KEY
         rspObj.responseCode = responseCode.CLIENT_ERROR
         logger.error({
@@ -371,7 +372,7 @@ function refreshLock (req, response) {
         resourceType: data.request.resourceType
       }, function (error, result) {
         if (error) {
-          rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
+          rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REFRESH_LOCK.FAILED_ERR_CODE}`
           rspObj.errMsg = contentMessage.REFRESH_LOCK.FAILED_MESSAGE
           rspObj.responseCode = responseCode.SERVER_ERROR
           logger.error({
@@ -391,7 +392,7 @@ function refreshLock (req, response) {
         } else if (result) {
           lockId = result.lockId
           if (result.createdBy !== req.get('x-authenticated-userid')) {
-            rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
+            rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REFRESH_LOCK.FAILED_ERR_CODE}`
             rspObj.errMsg = contentMessage.REFRESH_LOCK.UNAUTHORIZED
             rspObj.responseCode = responseCode.CLIENT_ERROR
             logger.error({
@@ -422,7 +423,7 @@ function refreshLock (req, response) {
               expiresAt: newDateObj
             }, options, function (err) {
               if (err) {
-                rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
+                rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REFRESH_LOCK.FAILED_ERR_CODE}`
                 rspObj.errMsg = contentMessage.REFRESH_LOCK.FAILED_MESSAGE
                 rspObj.responseCode = responseCode.SERVER_ERROR
                 logger.error({
@@ -462,7 +463,7 @@ function refreshLock (req, response) {
             delete requestBody.request.lockId
             createLock(req, response)
           } else {
-            rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
+            rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.REFRESH_LOCK.FAILED_ERR_CODE}`
             rspObj.errMsg = contentMessage.REFRESH_LOCK.NOT_FOUND_FAILED_MESSAGE
             rspObj.responseCode = responseCode.CLIENT_ERROR
             logger.error({
@@ -503,7 +504,7 @@ function retireLock (req, response) {
   var rspObj = req.rspObj
 
   if (!req.get('x-device-id')) {
-    rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.RETIRE_LOCK.FAILED_ERR_CODE}`
     rspObj.errMsg = contentMessage.RETIRE_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -518,7 +519,7 @@ function retireLock (req, response) {
   }
 
   if (!data.request) {
-    rspObj.errCode = contentMessage.RETIRE_LOCK.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.RETIRE_LOCK.MISSING_ERR_CODE}`
     rspObj.errMsg = contentMessage.RETIRE_LOCK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -535,7 +536,7 @@ function retireLock (req, response) {
 
   var result = validateCommonRequestBody(data.request)
   if (result.error) {
-    rspObj.errCode = contentMessage.RETIRE_LOCK.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.RETIRE_LOCK.MISSING_ERR_CODE}`
     rspObj.errMsg = result.error.details[0].message
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -561,7 +562,7 @@ function retireLock (req, response) {
     function (CBW) {
       checkResourceTypeValidation(req, function (res, body) {
         if (!res) {
-          rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
+          rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.RETIRE_LOCK.FAILED_ERR_CODE}`
           rspObj.errMsg = body.message
           rspObj.responseCode = responseCode.CLIENT_ERROR
           logger.error({
@@ -581,7 +582,7 @@ function retireLock (req, response) {
       dbModel.instance.lock.findOne({ resourceId: data.request.resourceId },
         { resourceType: data.request.resourceType }, function (error, result) {
           if (error) {
-            rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
+            rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.RETIRE_LOCK.FAILED_ERR_CODE}`
             rspObj.errMsg = contentMessage.RETIRE_LOCK.FAILED_MESSAGE
             rspObj.responseCode = responseCode.SERVER_ERROR
             logger.error({
@@ -597,7 +598,7 @@ function retireLock (req, response) {
             return response.status(500).send(respUtil.errorResponse(rspObj))
           } else if (result) {
             if (result.createdBy !== req.get('x-authenticated-userid')) {
-              rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
+              rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.RETIRE_LOCK.FAILED_ERR_CODE}`
               rspObj.errMsg = contentMessage.RETIRE_LOCK.UNAUTHORIZED
               rspObj.responseCode = responseCode.CLIENT_ERROR
               logger.error({
@@ -617,7 +618,7 @@ function retireLock (req, response) {
             dbModel.instance.lock.delete({ resourceId: data.request.resourceId },
               { resourceType: data.request.resourceType }, function (err) {
                 if (err) {
-                  rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
+                  rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.RETIRE_LOCK.FAILED_ERR_CODE}`
                   rspObj.errMsg = contentMessage.RETIRE_LOCK.FAILED_MESSAGE
                   rspObj.responseCode = responseCode.SERVER_ERROR
                   logger.error({
@@ -634,7 +635,7 @@ function retireLock (req, response) {
                 } else CBW()
               })
           } else {
-            rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
+            rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.RETIRE_LOCK.FAILED_ERR_CODE}`
             rspObj.errMsg = contentMessage.RETIRE_LOCK.NOT_FOUND_FAILED_MESSAGE
             rspObj.responseCode = responseCode.CLIENT_ERROR
             logger.error({
@@ -666,7 +667,7 @@ function listLock (req, response) {
   var rspObj = req.rspObj
 
   if (!req.get('x-device-id')) {
-    rspObj.errCode = contentMessage.LIST_LOCK.FAILED_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.LIST_LOCK.FAILED_ERR_CODE}`
     rspObj.errMsg = contentMessage.LIST_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -696,7 +697,7 @@ function listLock (req, response) {
 
   dbModel.instance.lock.find(query, function (error, result) {
     if (error) {
-      rspObj.errCode = contentMessage.LIST_LOCK.FAILED_CODE
+      rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.LIST_LOCK.FAILED_ERR_CODE}`
       rspObj.errMsg = contentMessage.LIST_LOCK.FAILED_MESSAGE
       rspObj.responseCode = responseCode.SERVER_ERROR
       logger.error({
