@@ -28,8 +28,7 @@ function createLock (req, response) {
   var rspObj = req.rspObj
   var contentBody = ''
   var versionKey = ''
-  utilsService.logDebugInfo('createLock', rspObj, 'lockService.createLock() called')
-
+  utilsService.logDebugInfo('createLock', rspObj, 'lockService.createLock() called', req)
   if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.CREATE_LOCK.DEVICE_ID_MISSING
@@ -230,7 +229,7 @@ function refreshLock (req, response) {
   var newDateObj = createExpiryTime()
   var data = req.body
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('refreshLock', rspObj, 'lockService.refreshLock() called')
+  utilsService.logDebugInfo('refreshLock', rspObj, 'lockService.refreshLock() called', req)
 
   if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
@@ -418,7 +417,7 @@ function refreshLock (req, response) {
 function retireLock (req, response) {
   var data = req.body
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('retireLock', rspObj, 'lockService.retireLock() called')
+  utilsService.logDebugInfo('retireLock', rspObj, 'lockService.retireLock() called', req)
 
   if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
@@ -551,7 +550,7 @@ function retireLock (req, response) {
 function listLock (req, response) {
   var data = req.body
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('listLock', rspObj, 'lockService.listLock() called')
+  utilsService.logDebugInfo('listLock', rspObj, 'lockService.listLock() called', req)
 
   if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.LIST_LOCK.FAILED_CODE
@@ -594,7 +593,9 @@ function listLock (req, response) {
     } else {
       rspObj.result.count = result.length
       rspObj.result.data = result
-      utilsService.logDebugInfo('listLock', rspObj, 'list locks API result')
+      let objectInfo = { result: rspObj.result }
+      utilsService.logDebugInfo('listLock', rspObj, 'list locks API result', objectInfo)
+
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   })
@@ -640,7 +641,7 @@ function createExpiryTime () {
 function checkResourceTypeValidation (req, cbw) {
   utilsService.logDebugInfo('checkResourceTypeValidation',
     req.rspObj,
-    'lockService.checkResourceTypeValidation() called')
+    'lockService.checkResourceTypeValidation() called', req)
 
   switch (lodash.lowerCase(req.body.request.resourceType)) {
   case 'content':
