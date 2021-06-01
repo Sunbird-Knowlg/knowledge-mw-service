@@ -112,6 +112,7 @@ function search (defaultContentTypes, req, response, objectType) {
   async.waterfall([
 
     function (CBW) {
+      utilsService.logDebugInfo('search', rspObj, 'Request to content provider to search the content')
       logger.debug({
         msg: 'Request to content provider to search the content',
         additionalInfo: {
@@ -193,6 +194,9 @@ function getFrameworkDetails (req, CBW) {
                 let errorMsg = `Setting framework cache data failed ${lodash.get(req.query, 'framework')}`
                 utilsService.logErrorInfo('frameworkRead', req, errorMsg)
               } else {
+                utilsService.logDebugInfo('search',
+                  req.rspObj,
+                  `Setting framework cache data success ${lodash.get(req.query, 'framework')}`)
                 logger.debug({ msg: `Setting framework cache data success ${lodash.get(req.query, 'framework')}` }, req)
               }
             })
@@ -249,7 +253,9 @@ function createContentAPI (req, response) {
     rspObj.errCode = contentMessage.CREATE.MISSING_CODE
     rspObj.errMsg = contentMessage.CREATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('contentCreate', rspObj, 'Error due to missing request || request.content')
+    utilsService.logErrorInfo('contentCreate',
+      rspObj,
+      'Error due to missing request || request.content')
     logger.error({
       msg: 'Error due to missing request || request.content',
       err: {
@@ -271,7 +277,7 @@ function createContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentCreate', req, 'Request to content provider to create content')
+      utilsService.logDebugInfo('contentCreate', rspObj, 'Request to content provider to create content')
       logger.debug({
         msg: 'Request to content provider to create content',
         additionalInfo: { body: ekStepReqData }
@@ -305,7 +311,7 @@ function createContentAPI (req, response) {
     function (res) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      utilsService.logDebugInfo('contentCreate', rspObj, 'contentService.search() called')
+      utilsService.logDebugInfo('contentCreate', rspObj, 'Sending response back to user')
       logger.debug({ msg: 'Sending response back to user', res: rspObj.result }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -324,7 +330,8 @@ function updateContentAPI (req, response) {
   data.contentId = req.params.contentId
 
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('updateContent', rspObj, 'contentService.updateContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'id'), 'type': 'Content'}
+  utilsService.logDebugInfo('updateContent', rspObj, 'contentService.updateContentAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.updateContentAPI() called',
     additionalInfo: {
@@ -363,8 +370,11 @@ function updateContentAPI (req, response) {
         mode: 'edit',
         fields: 'versionKey'
       }
-      utilsService.logDebugInfo('contentRead', req, 'Request to content provider to get the latest version key')
 
+      utilsService.logDebugInfo('contentRead',
+        rspObj,
+        'Request to content provider to get the latest version key',
+        objectInfo)
       logger.debug({
         msg: 'Request to content provider to get the latest version key',
         additionalInfo: {
@@ -393,7 +403,10 @@ function updateContentAPI (req, response) {
       var ekStepReqData = {
         request: data.request
       }
-      utilsService.logDebugInfo('contentUpdate', req, 'Request to content provider to update the content')
+      utilsService.logDebugInfo('contentUpdate',
+        rspObj,
+        'Request to content provider to update the content',
+        objectInfo)
       logger.debug({
         msg: 'Request to content provider to update the content',
         additionalInfo: {
@@ -406,7 +419,7 @@ function updateContentAPI (req, response) {
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           let errorMsg = 'Error due to required request || request.filters are missing'
-          utilsService.logErrorInfo('updateContent', rspObj, errorMsg)
+          utilsService.logErrorInfo('updateContent', rspObj, errorMsg, objectInfo)
           logger.error({
             msg: 'Getting error from content provider while updating content',
             err: {
@@ -431,7 +444,8 @@ function updateContentAPI (req, response) {
     function (res) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
-      utilsService.logDebugInfo('updateContent', rspObj, 'Sending response back to user')
+      let obj = {'id': _.get(res, 'result.node_id'), 'type': 'Content'}
+      utilsService.logDebugInfo('updateContent', rspObj, 'Sending response back to user', obj)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -443,7 +457,8 @@ function uploadContentAPI (req, response) {
   data.contentId = req.params.contentId
   data.queryParams = req.query
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('uploadContent', rspObj, 'contentService.uploadContentAPI() called')
+  let obj = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('uploadContent', rspObj, 'contentService.uploadContentAPI() called', obj)
   logger.debug({
     msg: 'contentService.uploadContentAPI() called',
     additionalInfo: {
@@ -495,7 +510,7 @@ function uploadContentAPI (req, response) {
       async.waterfall([
 
         function (CBW) {
-          utilsService.logDebugInfo('contentUpdate', req, 'Request to content provider to upload the content')
+          utilsService.logDebugInfo('contentUpdate', rspObj, 'Request to content provider to upload the content', obj)
           logger.debug({
             msg: 'Request to content provider to upload the content',
             additionalInfo: {
@@ -523,7 +538,7 @@ function uploadContentAPI (req, response) {
         },
         function (res) {
           rspObj.result = res.result
-          utilsService.logDebugInfo('uploadContent', rspObj, 'Sending response back to user')
+          utilsService.logDebugInfo('uploadContent', rspObj, 'Sending response back to user', obj)
           logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
           var modifyRsp = respUtil.successResponse(rspObj)
           modifyRsp.success = true
@@ -536,7 +551,7 @@ function uploadContentAPI (req, response) {
     async.waterfall([
 
       function (CBW) {
-        utilsService.logDebugInfo('uploadContent', req, 'Request to content provider to upload the content')
+        utilsService.logDebugInfo('uploadContent', rspObj, 'Request to content provider to upload the content', obj)
         logger.debug({
           msg: 'Request to content provider to upload the content',
           additionalInfo: {
@@ -573,7 +588,7 @@ function uploadContentAPI (req, response) {
       },
       function (res) {
         rspObj.result = res.result
-        utilsService.logDebugInfo('uploadContent', rspObj, 'Sending response back to user')
+        utilsService.logDebugInfo('uploadContent', rspObj, 'Sending response back to user', obj)
         logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
         var modifyRsp = respUtil.successResponse(rspObj)
         modifyRsp.success = true
@@ -594,7 +609,8 @@ function reviewContentAPI (req, response) {
   }
 
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('reviewContent', rspObj, 'contentService.reviewContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('reviewContent', rspObj, 'contentService.reviewContentAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.reviewContentAPI() called',
     additionalInfo: {
@@ -608,9 +624,11 @@ function reviewContentAPI (req, response) {
   }
 
   async.waterfall([
-
     function (CBW) {
-      utilsService.logDebugInfo('contentReview', req, 'Request to content provider to review the content')
+      utilsService.logDebugInfo('contentReview',
+        rspObj,
+        'Request to content provider to review the content',
+        objectInfo)
       logger.debug({
         msg: 'Request to content provider to review the content',
         additionalInfo: {
@@ -650,7 +668,7 @@ function reviewContentAPI (req, response) {
       rspObj.result.content_id = res.result.node_id
       rspObj.result.versionKey = res.result.versionKey
       emailService.reviewContentEmail(req, function () { })
-      utilsService.logDebugInfo('contentReview', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('contentReview', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -664,7 +682,8 @@ function publishContentAPI (req, response) {
   var ekStepReqData = {
     request: data.request
   }
-  utilsService.logDebugInfo('contentPublish', rspObj, 'contentService.publishContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('contentPublish', rspObj, 'contentService.publishContentAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.publishContentAPI() called',
     additionalInfo: {
@@ -723,7 +742,7 @@ function publishContentAPI (req, response) {
       rspObj.result.versionKey = res.result.versionKey
       rspObj.result.publishStatus = res.result.publishStatus
       emailService.publishedContentEmail(req, function () { })
-      utilsService.logDebugInfo('contentPublish', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('contentPublish', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -736,7 +755,8 @@ function getContentAPI (req, response) {
   data.contentId = req.params.contentId
   data.queryParams = req.query
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('contentRead', rspObj, 'contentService.getContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('contentRead', rspObj, 'contentService.getContentAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.getContentAPI() called', additionalInfo: { rspObj }
   }, req)
@@ -768,7 +788,10 @@ function getContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentRead', rspObj, 'Request to content provider to get the content meta data')
+      utilsService.logDebugInfo('contentRead',
+        rspObj,
+        'Request to content provider to get the content meta data',
+        objectInfo)
       logger.debug({
         msg: 'Request to content provider to get the content meta data',
         additionalInfo: {
@@ -811,7 +834,7 @@ function getContentAPI (req, response) {
             fields: ['streamingUrl', 'artifactUrl']
           }
         }
-        utilsService.logDebugInfo('search', rspObj, 'Request to content provider to search for assets')
+        utilsService.logDebugInfo('search', rspObj, 'Request to content provider to search for assets', objectInfo)
         logger.debug({
           msg: 'Request to content provider to search for assets',
           additionalInfo: {
@@ -843,7 +866,7 @@ function getContentAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      utilsService.logDebugInfo('search', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('search', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -924,7 +947,8 @@ function retireContentAPI (req, response) {
   var failedContent = []
   var userId = req.headers['x-authenticated-userid']
   var errCode, errMsg, respCode, httpStatus
-  utilsService.logDebugInfo('contentRetire', rspObj, 'contentService.retireContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'id'), 'type': 'Content'}
+  utilsService.logDebugInfo('contentRetire', rspObj, 'contentService.retireContentAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.retireContentAPI() called', additionalInfo: { rspObj }
   }, req)
@@ -997,7 +1021,7 @@ function retireContentAPI (req, response) {
 
     function (CBW) {
       async.each(data.request.contentIds, function (contentId, CBE) {
-        utilsService.logDebugInfo('contentRetire', rspObj, 'Request to content provider to retire content')
+        utilsService.logDebugInfo('contentRetire', rspObj, 'Request to content provider to retire content', objectInfo)
         logger.debug({
           msg: 'Request to content provider to retire content',
           additionalInfo: {
@@ -1045,7 +1069,7 @@ function retireContentAPI (req, response) {
     },
     function () {
       rspObj.result = failedContent
-      utilsService.logDebugInfo('contentRetire', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('contentRetire', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
 
       return response.status(200).send(respUtil.successResponse(rspObj))
@@ -1059,7 +1083,8 @@ function rejectContentAPI (req, response) {
   }
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('contentReject', rspObj, 'contentService.rejectContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('contentReject', rspObj, 'contentService.rejectContentAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.rejectContentAPI() called',
     additionalInfo: {
@@ -1095,7 +1120,7 @@ function rejectContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentReject', rspObj, 'Request to content provider to reject content')
+      utilsService.logDebugInfo('contentReject', rspObj, 'Request to content provider to reject content', objectInfo)
       logger.debug({
         msg: 'Request to content provider to reject content',
         additionalInfo: {
@@ -1122,7 +1147,7 @@ function rejectContentAPI (req, response) {
     function (res) {
       rspObj.result = res.result
       emailService.rejectContentEmail(req, function () { })
-      utilsService.logDebugInfo('contentRejectFlag', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('contentRejectFlag', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -1191,7 +1216,8 @@ function acceptFlagContentAPI (req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'contentService.acceptFlagContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'contentService.acceptFlagContentAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.acceptFlagContentAPI() called',
     additionalInfo: {
@@ -1227,7 +1253,7 @@ function acceptFlagContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'Request to content provider to accept flag')
+      utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'Request to content provider to accept flag', objectInfo)
       logger.debug({
         msg: 'Request to content provider to accept flag',
         additionalInfo: {
@@ -1256,7 +1282,7 @@ function acceptFlagContentAPI (req, response) {
     function (res) {
       rspObj.result = res.result
       emailService.acceptFlagContentEmail(req, function () { })
-      utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('contentAcceptFlag', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -1267,7 +1293,8 @@ function rejectFlagContentAPI (req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('contentRejectFlag', rspObj, 'contentService.rejectFlagContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('contentRejectFlag', rspObj, 'contentService.rejectFlagContentAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.rejectFlagContentAPI() called',
     additionalInfo: {
@@ -1303,7 +1330,7 @@ function rejectFlagContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentRejectFlag', rspObj, 'Request to content provider to reject flag')
+      utilsService.logDebugInfo('contentRejectFlag', rspObj, 'Request to content provider to reject flag', objectInfo)
       logger.debug({
         msg: 'Request to content provider to reject flag',
         additionalInfo: {
@@ -1332,7 +1359,7 @@ function rejectFlagContentAPI (req, response) {
     function (res) {
       rspObj.result = res.result
       emailService.rejectFlagContentEmail(req, function () { })
-      utilsService.logDebugInfo('contentRejectFlag', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('contentRejectFlag', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -1343,7 +1370,8 @@ function uploadContentUrlAPI (req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('contentUploadUrl', rspObj, 'contentService.uploadContentUrlAPI() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('contentUploadUrl', rspObj, 'contentService.uploadContentUrlAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.uploadContentUrlAPI() called',
     additionalInfo: {
@@ -1372,7 +1400,10 @@ function uploadContentUrlAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentUploadUrl', rspObj, 'Request to content provider get upload content url')
+      utilsService.logDebugInfo('contentUploadUrl',
+        rspObj,
+        'Request to content provider get upload content url',
+        objectInfo)
       logger.debug({
         msg: 'Request to content provider get upload content url',
         additionalInfo: {
@@ -1399,7 +1430,7 @@ function uploadContentUrlAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      utilsService.logDebugInfo('contentUploadUrl', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('contentUploadUrl', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       var modifyRsp = respUtil.successResponse(rspObj)
       modifyRsp.success = true
@@ -1412,7 +1443,11 @@ function unlistedPublishContentAPI (req, response) {
   var data = req.body
   var rspObj = req.rspObj
   data.contentId = req.params.contentId
-  utilsService.logDebugInfo('ContentUnlistedPublish', rspObj, 'contentService.unlistedPublishContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('ContentUnlistedPublish',
+    rspObj,
+    'contentService.unlistedPublishContentAPI() called',
+    objectInfo)
   logger.debug({
     msg: 'contentService.unlistedPublishContentAPI() called',
     additionalInfo: {
@@ -1443,7 +1478,8 @@ function unlistedPublishContentAPI (req, response) {
     function (CBW) {
       utilsService.logDebugInfo('ContentUnlistedPublish',
         rspObj,
-        'Request to content provider to unlisted published content')
+        'Request to content provider to unlisted published content',
+        objectInfo)
       contentProvider.unlistedPublishContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
@@ -1467,7 +1503,7 @@ function unlistedPublishContentAPI (req, response) {
       rspObj.result.versionKey = res.result.versionKey
       rspObj.result.publishStatus = res.result.publishStatus
       emailService.unlistedPublishContentEmail(req, function () { })
-      utilsService.logDebugInfo('ContentUnlistedPublish', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('ContentUnlistedPublish', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -1478,7 +1514,8 @@ function assignBadge (req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('badgeAssign', rspObj, 'contentService.assignBadge() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('badgeAssign', rspObj, 'contentService.assignBadge() called', objectInfo)
   logger.debug({
     msg: 'contentService.assignBadge() called', additionalInfo: { contentId: req.params.contentId, rspObj }
   }, req)
@@ -1493,7 +1530,10 @@ function assignBadge (req, response) {
   }
 
   async.waterfall([function (CBW) {
-    utilsService.logDebugInfo('badgeAssign', rspObj, 'Request to content provider to  get the content meta data')
+    utilsService.logDebugInfo('badgeAssign',
+      rspObj,
+      'Request to content provider to  get the content meta data',
+      objectInfo)
     logger.debug({
       msg: 'Request to content provider to  get the content meta data',
       additionalInfo: {
@@ -1574,7 +1614,7 @@ function assignBadge (req, response) {
     }
   }, function (res) {
     rspObj.result = res.result
-    utilsService.logDebugInfo('badgeAssign', rspObj, 'Sending response back to user')
+    utilsService.logDebugInfo('badgeAssign', rspObj, 'Sending response back to user', objectInfo)
     return response.status(200).send(respUtil.successResponse(rspObj))
   }])
 }
@@ -1583,7 +1623,8 @@ function revokeBadge (req, response) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('badgeRevoke', rspObj, 'contentService.revokeBadge() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('badgeRevoke', rspObj, 'contentService.revokeBadge() called', objectInfo)
   logger.debug({
     msg: 'contentService.revokeBadge() called', additionalInfo: { contentId: req.params.contentId, rspObj }
   }, req)
@@ -1597,7 +1638,10 @@ function revokeBadge (req, response) {
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   async.waterfall([function (CBW) {
-    utilsService.logDebugInfo('badgeRevoke', rspObj, 'Request to content provider to  get the content meta data')
+    utilsService.logDebugInfo('badgeRevoke',
+      rspObj,
+      'Request to content provider to  get the content meta data',
+      objectInfo)
     logger.debug({
       msg: 'Request to content provider to  get the content meta data',
       additionalInfo: {
@@ -1677,7 +1721,7 @@ function revokeBadge (req, response) {
     }
   }, function (res) {
     rspObj.result = res.result
-    utilsService.logDebugInfo('badgeRevoke', rspObj, 'Sending response back to user')
+    utilsService.logDebugInfo('badgeRevoke', rspObj, 'Sending response back to user', objectInfo)
     logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
     return response.status(200).send(respUtil.successResponse(rspObj))
   }])
@@ -1697,7 +1741,8 @@ function copyContentAPI (req, response) {
   if (req.query) {
     query = req.query
   }
-  utilsService.logDebugInfo('contentCopy', rspObj, 'contentService.copyContentAPI() called')
+  let objectInfo = {'id': _.get(data, 'contentId'), 'type': 'Content'}
+  utilsService.logDebugInfo('contentCopy', rspObj, 'contentService.copyContentAPI() called', objectInfo)
   logger.debug({
     msg: 'contentService.copyContentAPI() called',
     additionalInfo: {
@@ -1735,7 +1780,7 @@ function copyContentAPI (req, response) {
   async.waterfall([
 
     function (CBW) {
-      utilsService.logDebugInfo('contentCopy', rspObj, 'Request to content provider to  to copy content')
+      utilsService.logDebugInfo('contentCopy', rspObj, 'Request to content provider to  to copy content', objectInfo)
       logger.debug({
         msg: 'Request to content provider to  to copy content',
         additionalInfo: {
@@ -1769,7 +1814,7 @@ function copyContentAPI (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      utilsService.logDebugInfo('contentCopy', rspObj, 'Sending response back to user')
+      utilsService.logDebugInfo('contentCopy', rspObj, 'Sending response back to user', objectInfo)
       logger.debug({ msg: 'Sending response back to user', res: rspObj }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
