@@ -6,6 +6,7 @@
 
 var respUtil = require('response_util')
 var contentProviderUtil = require('sb_content_provider_util')
+var logger = require('sb_logger_util_v2')
 var messageUtils = require('./messageUtil')
 var utilsService = require('./utilsService')
 var _ = require('lodash')
@@ -47,6 +48,7 @@ function readQuestion (identifier, query, headers) {
 
 function getList (req, response) {
   delete req.headers['accept-encoding']
+  logger.debug({ msg: 'questionService.getList() called' }, req)
   utilsService.logDebugInfo('question-list', req.rspObj, 'question list api called')
   let data = {}
   let rspObj = req.rspObj
@@ -58,12 +60,17 @@ function getList (req, response) {
   if (_.isEmpty(questionIds) || !_.isArray(questionIds)) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
     rspObj.errMsg = 'Either identifier is missing or it is not list type'
+    logger.error({
+      msg: 'Either identifier is missing or it is not list type',
+      additionalInfo: { data },
+      err: { responseCode: rspObj.responseCode }
+    }, req)
     utilsService.logErrorInfo('question-list', rspObj, 'Either identifier is missing or it is not list type')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   const questionsLimit = parseInt(process.env.questions_list_limit, 10) || 20
   questionIds = _.take(questionIds, questionsLimit)
-
+  logger.debug({ msg: 'Request to get questions by ids ', additionalInfo: { questionIds } }, req)
   utilsService.logDebugInfo('question-list', rspObj, 'Request to get questions by ids')
 
   const questionsRequestPromises = questionIds.map(id => {
@@ -76,11 +83,15 @@ function getList (req, response) {
       return _.get(questionResponse, 'result.question')
     })
     rspObj.result.count = questionResponses.length
+    logger.debug({ msg: 'questions details', additionalInfo: { questionResponses } }, req)
     utilsService.logDebugInfo('question-list', rspObj, 'questions details')
     return response.status(200).send(respUtil.successResponse(rspObj))
   }).catch(err => {
     rspObj.responseCode = _.get(err, 'responseCode') || responseCode.SERVER_ERROR
-    utilsService.logErrorInfo('question-list', rspObj, 'Getting error  fetching questions by ids')
+    const errorMessage = 'Getting error  fetching questions by ids'
+    const errorObject = { err, responseCode: rspObj.responseCode }
+    logger.error({ msg: errorMessage, additionalInfo: { questionIds }, err: errorObject }, req)
+    utilsService.logErrorInfo('question-list', rspObj, err)
     var httpStatus = err && err.statusCode >= 100 && err.statusCode < 600 ? err.statusCode : 500
     rspObj.result = err && err.result ? err.result : {}
     rspObj = utilsService.getErrorResponse(rspObj, err)
