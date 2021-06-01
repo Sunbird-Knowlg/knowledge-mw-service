@@ -27,8 +27,9 @@ function getForm (req, response) {
     rspObj.errCode = formMessages.READ.MISSING_CODE
     rspObj.errMsg = formMessages.READ.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    const errorMessage = 'Error due to missing request or request type or request subtype or request action'
     logger.error({
-      msg: 'Error due to missing request or request type or request subtype or request action',
+      msg: errorMessage,
       err: {
         errCode: rspObj.errCode,
         errMsg: rspObj.errMsg,
@@ -36,7 +37,7 @@ function getForm (req, response) {
       },
       additionalInfo: { data }
     }, req)
-    utilsService.logErrorInfo('form-read', rspObj, 'Error due to missing request or request type or request subtype or request action')
+    utilsService.logErrorInfo('form-read', rspObj, errorMessage)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -44,7 +45,7 @@ function getForm (req, response) {
 
     function (CBW) {
       logger.debug({ msg: 'Request to content provider to get Form data', additionalInfo: { data } }, req)
-      utilsService.logDebugInfo('form-read', rspObj, 'Request to content provider to get Form data');
+      utilsService.logDebugInfo('form-read', rspObj, 'Request to content provider to get Form data')
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
         '.' + data.request.action.toLowerCase()
       var requestData = {
@@ -107,7 +108,8 @@ function updateForm (req, response) {
     rspObj.errCode = formMessages.UPDATE.MISSING_CODE
     rspObj.errMsg = formMessages.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    const errorMessage = 'Error due to missing request or request type or request subtype or request action or request data'
+    const errorMessage = 'Error due to missing request or request type or request subtype' +
+    ' or request action or request data'
     logger.error({
       msg: errorMessage,
       err: {
@@ -124,7 +126,7 @@ function updateForm (req, response) {
   async.waterfall([
     function (CBW) {
       logger.debug({ msg: 'Request to content provider to update Form data', additionalInfo: { data } }, req)
-      utilsService.logDebugInfo('form-update', rspObj, 'Request to content provider to update Form data');
+      utilsService.logDebugInfo('form-update', rspObj, 'Request to content provider to update Form data')
       var key = data.request.type.toLowerCase() + '.' + data.request.subType.toLowerCase() +
         '.' + data.request.action.toLowerCase()
       var requestData = {
@@ -227,7 +229,8 @@ function createForm (req, response) {
     rspObj.errCode = formMessages.CREATE.MISSING_CODE
     rspObj.errMsg = formMessages.CREATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    const errorMessage = 'Error due to missing request or request type or request subtype or request action or request data'
+    const errorMessage = 'Error due to missing request or request type or' +
+    'request subtype or request action or request data'
     logger.error({
       msg: errorMessage,
       err: {
@@ -261,7 +264,7 @@ function createForm (req, response) {
       requestData.request.tenantPreference[0].data[frameworkKey] = data.request.data
       requestData.request.tenantPreference[0].data = JSON.stringify(requestData.request.tenantPreference[0].data)
       logger.debug({ msg: 'Request to content provider to create form', additionalInfo: { requestData } }, req)
-      utilsService.logDebugInfo('form-create', rspObj, 'Request to content provider to create form');
+      utilsService.logDebugInfo('form-create', rspObj, 'Request to content provider to create form')
       contentProvider.learnerServiceCreateForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.result = res && res.result ? res.result : {}
