@@ -12,7 +12,7 @@ var request = require('request')
 
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
-var lodash = require('lodash')
+var _ = require('lodash')
 var dbModel = require('./../utils/cassandraUtil').getConnections('lock_db')
 var Joi = require('joi')
 
@@ -42,9 +42,7 @@ function createLock (req, response) {
     rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.CREATE_LOCK.UNAUTHORIZED
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    let objectInfo = { userId: req.get('x-authenticated-userid'),
-      createdBy: data.request.createdBy }
-    utilsService.logErrorInfo('createLock', rspObj, 'Unauthorized access', objectInfo)
+    utilsService.logErrorInfo('createLock', rspObj, 'Unauthorized access')
 
     return response.status(403).send(respUtil.errorResponse(rspObj))
   }
@@ -53,11 +51,7 @@ function createLock (req, response) {
     rspObj.errCode = contentMessage.CREATE_LOCK.MISSING_CODE
     rspObj.errMsg = contentMessage.CREATE_LOCK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    let objectInfo = { data }
-    utilsService.logErrorInfo('createLock',
-      rspObj,
-      'Error due to required request is missing',
-      objectInfo)
+    utilsService.logErrorInfo('createLock', rspObj, 'Error due to required request is missing')
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -67,11 +61,7 @@ function createLock (req, response) {
     rspObj.errCode = contentMessage.CREATE_LOCK.MISSING_CODE
     rspObj.errMsg = result.error.details[0].message
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    let objectInfo = { requestObj: data.request }
-    utilsService.logErrorInfo('createLock',
-      rspObj,
-      result.error,
-      objectInfo)
+    utilsService.logErrorInfo('createLock', rspObj, result.error)
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -107,14 +97,7 @@ function createLock (req, response) {
           rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
           rspObj.errMsg = contentMessage.CREATE_LOCK.FAILED_MESSAGE
           rspObj.responseCode = responseCode.SERVER_ERROR
-          let objectInfo = {
-            resourceId: data.request.resourceId,
-            resourceType: data.request.resourceType
-          }
-          utilsService.logErrorInfo('createLock',
-            rspObj,
-            error,
-            objectInfo)
+          utilsService.logErrorInfo('createLock', rspObj, error)
 
           return response.status(500).send(respUtil.errorResponse(rspObj))
         } else if (result) {
@@ -129,11 +112,9 @@ function createLock (req, response) {
           } else if (req.get('x-authenticated-userid') === result.createdBy) {
             rspObj.errCode = contentMessage.CREATE_LOCK.SELF_LOCKED_CODE
             rspObj.errMsg = contentMessage.CREATE_LOCK.SAME_USER_ERR_MSG
-            let objectInfo = { userId: req.get('x-authenticated-userid'), createdBy: result.createdBy }
             utilsService.logErrorInfo('createLock',
               rspObj,
-              'Error due to self lock , Resource already locked by user',
-              objectInfo)
+              'Error due to self lock , Resource already locked by user')
 
             var statusCode = 400
           } else {
@@ -170,8 +151,7 @@ function createLock (req, response) {
               rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
               rspObj.errMsg = contentMessage.CREATE_LOCK.FAILED_MESSAGE
               rspObj.responseCode = responseCode.SERVER_ERROR
-              let objectInfo = { lockObject }
-              utilsService.logErrorInfo('createLock', rspObj, err, objectInfo)
+              utilsService.logErrorInfo('createLock', rspObj, err)
 
               return response.status(500).send(respUtil.errorResponse(rspObj))
             } else {
@@ -194,12 +174,11 @@ function createLock (req, response) {
       contentProvider.updateContent(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.result = res && res.result ? res.result : {}
-          let objectInfo = { resourceId: data.request.resourceId, ekStepReqData }
-          utilsService.logErrorInfo('updateContent', rspObj, err, objectInfo)
+          utilsService.logErrorInfo('updateContent', rspObj, err)
           // Sending success cbw as content is already locked in db and ignoring content update error
           cbw(null, res)
         } else {
-          versionKey = lodash.get(res.result.versionKey)
+          versionKey = _.get(res.result.versionKey)
           cbw(null, res)
         }
       })
@@ -235,9 +214,7 @@ function refreshLock (req, response) {
     rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.REFRESH_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('refreshLock',
-      rspObj,
-      'x-device-id missing')
+    utilsService.logErrorInfo('refreshLock', rspObj, 'x-device-id missing')
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -246,11 +223,9 @@ function refreshLock (req, response) {
     rspObj.errCode = contentMessage.REFRESH_LOCK.MISSING_CODE
     rspObj.errMsg = contentMessage.REFRESH_LOCK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    let objectInfo = { data }
     utilsService.logErrorInfo('refreshLock',
       rspObj,
-      'Error due to required request are missing',
-      objectInfo)
+      'Error due to required request are missing')
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -260,8 +235,7 @@ function refreshLock (req, response) {
     rspObj.errCode = contentMessage.REFRESH_LOCK.MISSING_CODE
     rspObj.errMsg = result.error.details[0].message
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    let objectInfo = { requestObj: data.request }
-    utilsService.logErrorInfo('refreshLock', rspObj, result.error, objectInfo)
+    utilsService.logErrorInfo('refreshLock', rspObj, result.error)
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -308,11 +282,7 @@ function refreshLock (req, response) {
           rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
           rspObj.errMsg = contentMessage.REFRESH_LOCK.FAILED_MESSAGE
           rspObj.responseCode = responseCode.SERVER_ERROR
-          let objectInfo = {
-            resourceId: data.request.resourceId,
-            resourceType: data.request.resourceType
-          }
-          utilsService.logErrorInfo('refreshLock', rspObj, error, objectInfo)
+          utilsService.logErrorInfo('refreshLock', rspObj, error)
           return response.status(500).send(respUtil.errorResponse(rspObj))
         } else if (result) {
           lockId = result.lockId
@@ -320,15 +290,9 @@ function refreshLock (req, response) {
             rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.REFRESH_LOCK.UNAUTHORIZED
             rspObj.responseCode = responseCode.CLIENT_ERROR
-            let objectInfo = {
-              createdBy: lodash.get(result, 'createdBy'),
-              requestedBy: req.get('x-authenticated-userid'),
-              result: lodash.toString(result)
-            }
             utilsService.logErrorInfo('refreshLock',
               rspObj,
-              'Unauthorized to refresh this lock',
-              objectInfo)
+              'Unauthorized to refresh this lock')
 
             return response.status(403).send(respUtil.errorResponse(rspObj))
           }
@@ -348,22 +312,7 @@ function refreshLock (req, response) {
                 rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
                 rspObj.errMsg = contentMessage.REFRESH_LOCK.FAILED_MESSAGE
                 rspObj.responseCode = responseCode.SERVER_ERROR
-                let objectInfo = {
-                  resourceInfo: { resourceId: data.request.resourceId, resourceType: data.request.resourceType },
-                  lockObject: {
-                    lockId: result.lockId,
-                    resourceInfo: result.resourceInfo,
-                    createdBy: result.createdBy,
-                    creatorInfo: result.creatorInfo,
-                    deviceId: result.deviceId,
-                    createdOn: result.createdOn,
-                    expiresAt: newDateObj
-                  }
-                }
-                utilsService.logErrorInfo('refreshLock',
-                  rspObj,
-                  err,
-                  objectInfo)
+                utilsService.logErrorInfo('refreshLock', rspObj, err)
 
                 return response.status(500).send(respUtil.errorResponse(rspObj))
               }
@@ -384,13 +333,9 @@ function refreshLock (req, response) {
             rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.REFRESH_LOCK.NOT_FOUND_FAILED_MESSAGE
             rspObj.responseCode = responseCode.CLIENT_ERROR
-            let objectInfo = { contentLockKey: contentBody.contentdata.lockKey,
-              requestLockKey: data.request.lockId,
-              resourceInfo: requestBody.request.resourceInfo }
             utilsService.logErrorInfo('createLock',
               rspObj,
-              'no data found from db for refreshing lock',
-              objectInfo)
+              'no data found from db for refreshing lock')
             return response.status(400).send(respUtil.errorResponse(rspObj))
           }
         }
@@ -423,9 +368,7 @@ function retireLock (req, response) {
     rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.RETIRE_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('retireLock',
-      rspObj,
-      'x-device-id missing')
+    utilsService.logErrorInfo('retireLock', rspObj, 'x-device-id missing')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -433,11 +376,9 @@ function retireLock (req, response) {
     rspObj.errCode = contentMessage.RETIRE_LOCK.MISSING_CODE
     rspObj.errMsg = contentMessage.RETIRE_LOCK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    let objectInfo = { data }
     utilsService.logErrorInfo('retireLock',
       rspObj,
-      'Error due to required request body are missing',
-      objectInfo)
+      'Error due to required request body are missing')
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -447,11 +388,7 @@ function retireLock (req, response) {
     rspObj.errCode = contentMessage.RETIRE_LOCK.MISSING_CODE
     rspObj.errMsg = result.error.details[0].message
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    let objectInfo = { requestObj: data.request }
-    utilsService.logErrorInfo('retireLock',
-      rspObj,
-      result.error,
-      objectInfo)
+    utilsService.logErrorInfo('retireLock', rspObj, result.error)
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -471,8 +408,7 @@ function retireLock (req, response) {
           rspObj.responseCode = responseCode.CLIENT_ERROR
           utilsService.logErrorInfo('retireLock',
             rspObj,
-            'Error as resource type validation failed',
-            req)
+            'Error as resource type validation failed')
           return response.status(412).send(respUtil.errorResponse(rspObj))
         }
         cbw()
@@ -485,26 +421,18 @@ function retireLock (req, response) {
             rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.RETIRE_LOCK.FAILED_MESSAGE
             rspObj.responseCode = responseCode.SERVER_ERROR
-            let objectInfo = { resourceId: data.request.resourceId,
-              resourceType: data.request.resourceType }
             utilsService.logErrorInfo('retireLock',
               rspObj,
-              error,
-              objectInfo)
+              error)
             return response.status(500).send(respUtil.errorResponse(rspObj))
           } else if (result) {
             if (result.createdBy !== req.get('x-authenticated-userid')) {
               rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
               rspObj.errMsg = contentMessage.RETIRE_LOCK.UNAUTHORIZED
               rspObj.responseCode = responseCode.CLIENT_ERROR
-              let objectInfo = {
-                createdBy: lodash.get(result, 'createdBy'),
-                requestedBy: req.get('x-authenticated-userid')
-              }
               utilsService.logErrorInfo('retireLock',
                 rspObj,
-                'Unauthorized to retire lock',
-                objectInfo)
+                'Unauthorized to retire lock')
               return response.status(403).send(respUtil.errorResponse(rspObj))
             }
             dbModel.instance.lock.delete({ resourceId: data.request.resourceId },
@@ -513,11 +441,9 @@ function retireLock (req, response) {
                   rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
                   rspObj.errMsg = contentMessage.RETIRE_LOCK.FAILED_MESSAGE
                   rspObj.responseCode = responseCode.SERVER_ERROR
-                  let objectInfo = { resourceId: data.request.resourceId, resourceType: data.request.resourceType }
                   utilsService.logErrorInfo('retireLock',
                     rspObj,
-                    err,
-                    objectInfo)
+                    err)
 
                   return response.status(500).send(respUtil.errorResponse(rspObj))
                 } else cbw()
@@ -526,12 +452,9 @@ function retireLock (req, response) {
             rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
             rspObj.errMsg = contentMessage.RETIRE_LOCK.NOT_FOUND_FAILED_MESSAGE
             rspObj.responseCode = responseCode.CLIENT_ERROR
-            let objectInfo = { resourceId: data.request.resourceId,
-              resourceType: data.request.resourceType }
             utilsService.logErrorInfo('retireLock',
               rspObj,
-              'no data found from db for retiring lock',
-              objectInfo)
+              'no data found from db for retiring lock')
 
             return response.status(400).send(respUtil.errorResponse(rspObj))
           }
@@ -540,7 +463,7 @@ function retireLock (req, response) {
 
     function () {
       logger.info({
-        msg: 'retire lock successful', additionalInfo: { resourceId: lodash.get(data.request, 'resourceId') }
+        msg: 'retire lock successful', additionalInfo: { resourceId: _.get(data.request, 'resourceId') }
       }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -556,10 +479,7 @@ function listLock (req, response) {
     rspObj.errCode = contentMessage.LIST_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.LIST_LOCK.DEVICE_ID_MISSING
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    utilsService.logErrorInfo('listLock',
-      rspObj,
-      'x-device-id missing',
-      req)
+    utilsService.logErrorInfo('listLock', rspObj, 'x-device-id missing')
 
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
@@ -570,7 +490,7 @@ function listLock (req, response) {
   }
 
   var query = {}
-  if (lodash.get(data, 'request.filters.resourceId')) {
+  if (_.get(data, 'request.filters.resourceId')) {
     if (typeof data.request.filters === 'string') {
       query = { resourceId: { '$in': [data.request.filters.resourceId] } }
     } else {
@@ -583,11 +503,7 @@ function listLock (req, response) {
       rspObj.errCode = contentMessage.LIST_LOCK.FAILED_CODE
       rspObj.errMsg = contentMessage.LIST_LOCK.FAILED_MESSAGE
       rspObj.responseCode = responseCode.SERVER_ERROR
-      let objectInfo = { query }
-      utilsService.logErrorInfo('listLock',
-        rspObj,
-        error,
-        objectInfo)
+      utilsService.logErrorInfo('listLock', rspObj, error)
 
       return response.status(500).send(respUtil.errorResponse(rspObj))
     } else {
@@ -602,7 +518,7 @@ function listLock (req, response) {
 }
 
 function validateCreateLockRequestBody (request) {
-  var body = lodash.pick(request, ['resourceId', 'resourceType', 'resourceInfo', 'createdBy', 'creatorInfo'])
+  var body = _.pick(request, ['resourceId', 'resourceType', 'resourceInfo', 'createdBy', 'creatorInfo'])
   var schema = Joi.object().keys({
     resourceId: Joi.string().required(),
     resourceType: Joi.string().required(),
@@ -614,7 +530,7 @@ function validateCreateLockRequestBody (request) {
 }
 
 function validateRefreshLockRequestBody (request) {
-  var body = lodash.pick(request, ['lockId', 'resourceId', 'resourceType'])
+  var body = _.pick(request, ['lockId', 'resourceId', 'resourceType'])
   var schema = Joi.object().keys({
     lockId: Joi.string().required(),
     resourceId: Joi.string().required(),
@@ -624,7 +540,7 @@ function validateRefreshLockRequestBody (request) {
 }
 
 function validateCommonRequestBody (request) {
-  var body = lodash.pick(request, ['resourceId', 'resourceType'])
+  var body = _.pick(request, ['resourceId', 'resourceType'])
   var schema = Joi.object().keys({
     resourceId: Joi.string().required(),
     resourceType: Joi.string().required()
@@ -643,7 +559,7 @@ function checkResourceTypeValidation (req, cbw) {
     req.rspObj,
     'lockService.checkResourceTypeValidation() called', req)
 
-  switch (lodash.lowerCase(req.body.request.resourceType)) {
+  switch (_.lowerCase(req.body.request.resourceType)) {
   case 'content':
     var httpOptions = {
       url: configUtil.getConfig('CONTENT_SERVICE_LOCAL_BASE_URL') + '/v1/content/getContentLockValidation',
@@ -654,13 +570,9 @@ function checkResourceTypeValidation (req, cbw) {
     }
     request(httpOptions, function (err, httpResponse, body) {
       if (err) {
-        let objectInfo = { httpOpt: lodash.omit(httpOptions, 'headers') }
-        utilsService.logErrorInfo('listLock',
-          req.rspObj,
-          err,
-          objectInfo)
+        utilsService.logErrorInfo('listLock', req.rspObj, err)
         cbw(false, err)
-      } else if (lodash.get(body, 'result.message')) {
+      } else if (_.get(body, 'result.message')) {
         cbw(body.result.validation, body.result)
       } else {
         cbw(false, body)
