@@ -19,7 +19,7 @@ var emailMessage = messageUtils.EMAIL
 
 var contentMessage = messageUtils.CONTENT
 var responseCode = messageUtils.RESPONSE_CODE
-const SERVICE_PREFIX = 'CNT'
+const SERVICE_PREFIX = 'COL'
 
 function updateCollaborators (req, response) {
   var data = req.body

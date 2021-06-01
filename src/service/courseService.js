@@ -23,7 +23,7 @@ var cacheManager = new CacheManager({})
 
 var courseMessage = messageUtils.COURSE
 var responseCode = messageUtils.RESPONSE_CODE
-const SERVICE_PREFIX = 'CRU'
+const SERVICE_PREFIX = 'COU'
 
 /**
  * This function help to transform the object body with oldKey and newKey
