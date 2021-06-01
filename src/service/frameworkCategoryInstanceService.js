@@ -42,9 +42,8 @@ function getFrameworkCategoryInstance (req, response) {
       ekStepUtil.getFrameworkCategoryInstance(data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('getFrameworkCategoryInstance',
-            rspObj,
-            'Error while fetching framework category instance from ekstep')
+          rspObj.errMsg = 'Error while fetching framework category instance from ekstep'
+          utilsService.logErrorInfo('getFrameworkCategoryInstance', rspObj, err)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -86,9 +85,8 @@ function frameworkCategoryInstanceSearch (req, response) {
       ekStepUtil.frameworkCategoryInstanceSearch(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('frameworkCategoryInstanceSearch',
-            rspObj,
-            'Error while searching framework category instance from ekstep')
+          rspObj.errMsg = 'Error while searching framework category instance from ekstep'
+          utilsService.logErrorInfo('frameworkCategoryInstanceSearch', rspObj, err)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -129,9 +127,8 @@ function frameworkCategoryInstanceCreate (req, response) {
       ekStepUtil.frameworkCategoryInstanceCreate(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          utilsService.logErrorInfo('frameworkCategoryInstanceCreate',
-            rspObj,
-            'Error while creating framework category instance from ekstep')
+          rspObj.errMsg = 'Error while creating framework category instance from ekstep'
+          utilsService.logErrorInfo('frameworkCategoryInstanceCreate', rspObj, err)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -177,9 +174,8 @@ function frameworkCategoryInstanceUpdate (req, response) {
         function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-            utilsService.logErrorInfo('frameworkCategoryInstanceUpdate',
-              rspObj,
-              'Error while updating framework category instance from ekstep')
+            rspObj.errMsg = 'Error while updating framework category instance from ekstep'
+            utilsService.logErrorInfo('frameworkCategoryInstanceUpdate', rspObj, err)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj = utilsService.getErrorResponse(rspObj, res)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
