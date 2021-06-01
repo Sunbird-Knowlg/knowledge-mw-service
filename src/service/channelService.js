@@ -9,6 +9,7 @@ var respUtil = require('response_util')
 var ekStepUtil = require('sb_content_provider_util')
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
+var _ = require('lodash')
 var responseCode = messageUtils.RESPONSE_CODE
 
 /**
@@ -25,15 +26,17 @@ function getChannelValuesById (req, response) {
     'channelService.getChannelValuesById() called')
   data.body = req.body
   data.channelId = req.params.channelId
+  let objectInfo = {'id': _.get(data, 'channelId'), 'type': 'Channel'}
   if (rspObj.telemetryData) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.channelId, 'channel', '', {})
   }
 
   if (!data.channelId) {
     rspObj.responseCode = responseCode
-      .utilsService.logErrorInfo('channelRead',
-        rspObj,
-        'Error due to required channel Id is missing')
+    utilsService.logErrorInfo('channelRead',
+      rspObj,
+      'Error due to required channel Id is missing',
+      objectInfo)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -46,9 +49,11 @@ function getChannelValuesById (req, response) {
       ekStepUtil.getChannelValuesById(data.channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          rspObj.errMsg = 'Getting error from ekstep while fetching channel by id'
           utilsService.logErrorInfo('channelRead',
             rspObj,
-            'Getting error from ekstep while fetching channel by id')
+            err,
+            objectInfo)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -96,9 +101,10 @@ function ChannelCreate (req, response) {
       ekStepUtil.ChannelCreate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          rspObj.errMsg = 'Getting error from ekstep while creating channel'
           utilsService.logErrorInfo('channelCreate',
             rspObj,
-            'Getting error from ekstep while creating channel')
+            err)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -126,6 +132,8 @@ function ChannelUpdate (req, response) {
     rspObj,
     'channelService.ChannelUpdate() called')
   data.channelId = req.params.channelId
+  let objectInfo = {'id': _.get(req, 'params.channelId'), 'type': 'Channel'}
+
   // Adding telemetry object data
   if (rspObj.telemetryData) {
     rspObj.telemetryData.object = utilsService.getObjectData(data.channelId, 'channel', '', {})
@@ -134,7 +142,8 @@ function ChannelUpdate (req, response) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
     utilsService.logErrorInfo('channelCreate',
       rspObj,
-      'Error due to required request body is missing')
+      'Error due to required request body is missing',
+      objectInfo)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -151,9 +160,11 @@ function ChannelUpdate (req, response) {
       ekStepUtil.ChannelUpdate(ekStepReqData, data.channelId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          rspObj.errMsg = 'Getting error from ekstep while updating channel'
           utilsService.logErrorInfo('channelUpdate',
             rspObj,
-            'Getting error from ekstep while updating channel')
+            err,
+            objectInfo)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
