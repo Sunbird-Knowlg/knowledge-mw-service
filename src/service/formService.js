@@ -229,7 +229,7 @@ function createForm (req, response) {
     rspObj.errCode = formMessages.CREATE.MISSING_CODE
     rspObj.errMsg = formMessages.CREATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    const errorMessage = 'Error due to missing request or request type or' +
+    const errorMessage = 'Error due to missing request or request type or ' +
     'request subtype or request action or request data'
     logger.error({
       msg: errorMessage,
