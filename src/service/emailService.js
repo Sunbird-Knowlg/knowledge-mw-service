@@ -5,7 +5,6 @@ var messageUtils = require('./messageUtil')
 var emailMessage = messageUtils.EMAIL
 var responseCode = messageUtils.RESPONSE_CODE
 var configUtil = require('sb-config-util')
-var lodash = require('lodash')
 var _ = require('lodash')
 
 /**
@@ -378,8 +377,8 @@ function sendContentEmail (req, action, callback) {
       })
     },
     function (data, callback) {
-      if (lodash.get(data.contentDetails, 'result.content') &&
-        lodash.get(data.templateConfig, 'result.form.data.fields[0]')) {
+      if (_.get(data.contentDetails, 'result.content') &&
+        _.get(data.templateConfig, 'result.form.data.fields[0]')) {
         var cData = data.contentDetails.result.content
         var eData = data.templateConfig.result.form.data.fields[0]
         var subject = eData.subject
@@ -479,9 +478,9 @@ function reviewContentEmail (req, callback) {
       })
     },
     function (data, callback) {
-      if (lodash.get(data.contentDetails, 'result.content') &&
-        lodash.get(data.templateConfig, 'result.form.data.fields[0]') &&
-        lodash.get(data.userDetails, 'result.response.content[0].rootOrgId')) {
+      if (_.get(data.contentDetails, 'result.content') &&
+        _.get(data.templateConfig, 'result.form.data.fields[0]') &&
+        _.get(data.userDetails, 'result.response.content[0].rootOrgId')) {
         var cData = data.contentDetails.result.content
         var eData = data.templateConfig.result.form.data.fields[0]
         var subject = eData.subject
@@ -561,8 +560,8 @@ function getReviwerUserIds (req, userdata, contentType, callback) {
     }
   }
   var orgIds = []
-  if (lodash.get(userdata, 'organisations[0]')) {
-    lodash.forEach(userdata.organisations, function (value) {
+  if (_.get(userdata, 'organisations[0]')) {
+    _.forEach(userdata.organisations, function (value) {
       var result = value.roles.some((e) => { return creatorRoles.indexOf(e) !== -1 })
       if (result) {
         orgIds.push(value.organisationId)
@@ -578,7 +577,7 @@ function getReviwerUserIds (req, userdata, contentType, callback) {
   var subOrgReviewerRequest = {
     'request': {
       'filters': {
-        'organisations.organisationId': lodash.uniq(orgIds),
+        'organisations.organisationId': _.uniq(orgIds),
         'organisations.roles': reviewerRoles
       },
       'limit': reviewerQueryLimit,
@@ -594,9 +593,9 @@ function getReviwerUserIds (req, userdata, contentType, callback) {
       utilsService.logErrorInfo('getReviwerUserIds', rspObj, err)
       callback(err, null)
     } else {
-      var rootOrgReviewersId = lodash.map(results.rootOrgReviewers, 'id')
-      var subOrgReviewersId = lodash.map(results.subOrgReviewers, 'id')
-      var allReviewerIds = lodash.union(rootOrgReviewersId, subOrgReviewersId)
+      var rootOrgReviewersId = _.map(results.rootOrgReviewers, 'id')
+      var subOrgReviewersId = _.map(results.subOrgReviewers, 'id')
+      var allReviewerIds = _.union(rootOrgReviewersId, subOrgReviewersId)
       callback(null, allReviewerIds)
     }
   })
@@ -646,7 +645,7 @@ function getUserIds (req, body, fetchDetailsFlag) {
                   })
                 }
               }
-              var reqBody = lodash.cloneDeep(body)
+              var reqBody = _.cloneDeep(body)
               reqBody.request.offset = reviewerQueryLimit * i
               parallelFunctions.push(fetchUserIds(reqBody))
             }
@@ -656,7 +655,7 @@ function getUserIds (req, body, fetchDetailsFlag) {
                 utilsService.logErrorInfo('userSearch', rspObj, err)
                 callback(new Error('User Search failed'), null)
               } else {
-                lodash.forEach(data, function (userData) {
+                _.forEach(data, function (userData) {
                   userDetails = userDetails.concat(userData)
                 })
                 callback(null, userDetails)
