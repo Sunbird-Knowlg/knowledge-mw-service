@@ -29,6 +29,8 @@ function createLock (req, response) {
   var contentBody = ''
   var versionKey = ''
   utilsService.logDebugInfo('createLock', rspObj, 'lockService.createLock() called')
+  logger.debug({ msg: 'lockService.createLock() called', additionalInfo: { rspObj } }, req)
+
   if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.CREATE_LOCK.FAILED_CODE
     rspObj.errMsg = contentMessage.CREATE_LOCK.DEVICE_ID_MISSING
@@ -287,6 +289,7 @@ function refreshLock (req, response) {
   var data = req.body
   var rspObj = req.rspObj
   utilsService.logDebugInfo('refreshLock', rspObj, 'lockService.refreshLock() called')
+  logger.debug({ msg: 'lockService.refreshLock() called' }, req)
 
   if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.REFRESH_LOCK.FAILED_CODE
@@ -522,6 +525,7 @@ function retireLock (req, response) {
   var data = req.body
   var rspObj = req.rspObj
   utilsService.logDebugInfo('retireLock', rspObj, 'lockService.retireLock() called')
+  logger.debug({ msg: 'lockService.retireLock() called' }, req)
 
   if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.RETIRE_LOCK.FAILED_CODE
@@ -701,6 +705,7 @@ function listLock (req, response) {
   var data = req.body
   var rspObj = req.rspObj
   utilsService.logDebugInfo('listLock', rspObj, 'lockService.listLock() called')
+  logger.debug({ msg: 'lockService.listLock() called' }, req)
 
   if (!req.get('x-device-id')) {
     rspObj.errCode = contentMessage.LIST_LOCK.FAILED_CODE
@@ -753,6 +758,7 @@ function listLock (req, response) {
       rspObj.result.count = result.length
       rspObj.result.data = result
       utilsService.logDebugInfo('listLock', rspObj, 'list locks API result')
+      logger.debug({ msg: 'list locks API result ', additionalInfo: { result: rspObj.result } }, req)
 
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
@@ -800,6 +806,7 @@ function checkResourceTypeValidation (req, cbw) {
   utilsService.logDebugInfo('checkResourceTypeValidation',
     req.rspObj,
     'lockService.checkResourceTypeValidation() called')
+  logger.debug({ msg: 'lockService.checkResourceTypeValidation() called' }, req)
 
   switch (_.lowerCase(req.body.request.resourceType)) {
   case 'content':
