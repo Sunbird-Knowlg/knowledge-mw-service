@@ -19,7 +19,6 @@ var emailMessage = messageUtils.EMAIL
 
 var contentMessage = messageUtils.CONTENT
 var responseCode = messageUtils.RESPONSE_CODE
-const SERVICE_PREFIX = 'COL'
 
 function updateCollaborators (req, response) {
   var data = req.body
@@ -33,7 +32,7 @@ function updateCollaborators (req, response) {
 
   if (!data.request || !data.request.content ||
     !validatorUtil.validate(data.request.content, contentModel.COLLABORATORS)) {
-    rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.COLLABORATORS.MISSING_ERR_CODE}`
+    rspObj.errCode = contentMessage.COLLABORATORS.MISSING_CODE
     rspObj.errMsg = contentMessage.COLLABORATORS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -65,7 +64,7 @@ function updateCollaborators (req, response) {
       }, req)
       contentProvider.getContentUsingQuery(data.contentId, qs, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.COLLABORATORS.FAILED_ERR_CODE}`
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.COLLABORATORS.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.COLLABORATORS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -84,7 +83,7 @@ function updateCollaborators (req, response) {
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
         } else {
           if (res.result.content.status !== 'Draft') {
-            rspObj.errCode = `${SERVICE_PREFIX}_${contentMessage.COLLABORATORS.FAILED_ERR_CODE}`
+            rspObj.errCode = contentMessage.COLLABORATORS.FAILED_CODE
             rspObj.errMsg = contentMessage.COLLABORATORS.FAILED_MESSAGE
             rspObj.responseCode = res.result.content.status === 'Retired'
               ? responseCode.RESOURCE_NOT_FOUND : contentMessage.COLLABORATORS.FORBIDDEN
@@ -129,7 +128,7 @@ function updateCollaborators (req, response) {
       }, req)
       contentProvider.updateContent(ekStepReqData, data.contentId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${contentMessage.COLLABORATORS.FAILED_ERR_CODE}`
+          rspObj.errCode = res && res.params ? res.params.err : contentMessage.COLLABORATORS.FAILED_CODE
           rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.COLLABORATORS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
