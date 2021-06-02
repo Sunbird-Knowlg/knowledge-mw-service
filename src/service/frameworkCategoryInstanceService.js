@@ -9,6 +9,7 @@ var respUtil = require('response_util')
 var ekStepUtil = require('sb_content_provider_util')
 var messageUtils = require('./messageUtil')
 var utilsService = require('../service/utilsService')
+var logger = require('sb_logger_util_v2')
 var responseCode = messageUtils.RESPONSE_CODE
 
 /**
@@ -32,6 +33,11 @@ function getFrameworkCategoryInstance (req, response) {
     utilsService.logErrorInfo('getFrameworkCategoryInstance',
       rspObj,
       'Error due to missing request body or query Parameters or categoryId')
+    logger.error({
+      msg: 'Error due to missing request body or query Parameters or categoryId',
+      err: {responseCode: rspObj.responseCode},
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -44,6 +50,14 @@ function getFrameworkCategoryInstance (req, response) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           rspObj.errMsg = 'Error while fetching framework category instance from ekstep'
           utilsService.logErrorInfo('getFrameworkCategoryInstance', rspObj, err)
+          logger.error({
+            msg: 'Error while fetching framework category instance from ekstep',
+            err: {
+              err,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
           rspObj = utilsService.getErrorResponse(rspObj, res)
@@ -70,6 +84,11 @@ function frameworkCategoryInstanceSearch (req, response) {
     utilsService.logErrorInfo('frameworkCategoryInstanceSearch',
       rspObj,
       'Error due to missing request body or query params')
+    logger.error({
+      msg: 'Error due to missing request body or query params',
+      err: {responseCode: rspObj.responseCode},
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -87,6 +106,14 @@ function frameworkCategoryInstanceSearch (req, response) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           rspObj.errMsg = 'Error while searching framework category instance from ekstep'
           utilsService.logErrorInfo('frameworkCategoryInstanceSearch', rspObj, err)
+          logger.error({
+            msg: 'Error while searching framework category instance from ekstep',
+            err: {
+              err,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -112,6 +139,11 @@ function frameworkCategoryInstanceCreate (req, response) {
     utilsService.logErrorInfo('frameworkCategoryInstanceCreate',
       rspObj,
       'Error due to missing request body or query params')
+    logger.error({
+      msg: 'Error due to missing request body or query params',
+      err: {responseCode: rspObj.responseCode},
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -129,6 +161,14 @@ function frameworkCategoryInstanceCreate (req, response) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           rspObj.errMsg = 'Error while creating framework category instance from ekstep'
           utilsService.logErrorInfo('frameworkCategoryInstanceCreate', rspObj, err)
+          logger.error({
+            msg: 'Error while creating framework category instance from ekstep',
+            err: {
+              err,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: {data}
+          }, req)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj = utilsService.getErrorResponse(rspObj, res)
           return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
@@ -158,6 +198,11 @@ function frameworkCategoryInstanceUpdate (req, response) {
     utilsService.logErrorInfo('frameworkCategoryInstanceUpdate',
       rspObj,
       'Error due to missing request body or query params or categoryId')
+    logger.error({
+      msg: 'Error due to missing request body or query params or categoryId',
+      err: {responseCode: rspObj.responseCode},
+      additionalInfo: { data }
+    }, req)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -176,6 +221,14 @@ function frameworkCategoryInstanceUpdate (req, response) {
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
             rspObj.errMsg = 'Error while updating framework category instance from ekstep'
             utilsService.logErrorInfo('frameworkCategoryInstanceUpdate', rspObj, err)
+            logger.error({
+              msg: 'Error while updating framework category instance from ekstep',
+              err: {
+                err,
+                responseCode: rspObj.responseCode
+              },
+              additionalInfo: {data}
+            }, req)
             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
             rspObj = utilsService.getErrorResponse(rspObj, res)
             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
