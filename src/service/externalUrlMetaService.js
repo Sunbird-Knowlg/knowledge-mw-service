@@ -29,7 +29,7 @@ function fetchUrlMeta (req, response) {
       },
       additionalInfo: {data}
     }, req)
-    utilsService.logErrorInfo('fetch-url-meta', rspObj, 'Error due to missing url property in request');
+    utilsService.logErrorInfo('fetch-url-meta', rspObj, 'Error due to missing url property in request')
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -53,7 +53,7 @@ function fetchUrlMeta (req, response) {
         },
         additionalInfo: {url: data.url}
       }, req)
-      utilsService.logErrorInfo('fetch-url-meta', rspObj, error);
+      utilsService.logErrorInfo('fetch-url-meta', rspObj, error)
       return response.status(500).send(respUtil.errorResponse(rspObj))
     })
 }
