@@ -40,9 +40,9 @@ function getFrameworkById (req, response) {
 
   if (!data.frameworkId) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    const errorMessage = 'Error due to required framework Id is missing'
-    logger.error({ msg: errorMessage, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
-    utilsService.logErrorInfo('framework-read', rspObj, errorMessage)
+    rspObj.errMsg = 'Error due to required framework Id is missing'
+    logger.error({ msg: rspObj.errMsg, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
+    utilsService.logErrorInfo('framework-read', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -56,10 +56,10 @@ function getFrameworkById (req, response) {
       ekStepUtil.getFrameworkById(data.frameworkId, queryString, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          const errorMessage = 'Getting error from ekstep while fetching framework by id'
+          rspObj.errMsg = 'Getting error from ekstep while fetching framework by id'
           const errorObject = { err, responseCode: rspObj.responseCode }
           const additionalInfo = { frameworkId: data.frameworkId, queryString }
-          logger.error({ msg: errorMessage, additionalInfo: additionalInfo, err: errorObject }, req)
+          logger.error({ msg: rspObj.errMsg, additionalInfo: additionalInfo, err: errorObject }, req)
           utilsService.logErrorInfo('framework-read', rspObj, err, objectInfo)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -85,9 +85,9 @@ function frameworklList (req, response) {
   var data = req.body
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    const errorMessage = 'Error due to required request body is missing'
-    logger.error({ msg: errorMessage, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
-    utilsService.logErrorInfo('framework-list', rspObj, errorMessage)
+    rspObj.errMsg = 'Error due to required request body is missing'
+    logger.error({ msg: rspObj.errMsg, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
+    utilsService.logErrorInfo('framework-list', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -103,9 +103,9 @@ function frameworklList (req, response) {
       ekStepUtil.frameworklList(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          const errorMessage = 'Getting error from ekstep while fetching frameworkList'
+          rspObj.errMsg = 'Getting error from ekstep while fetching frameworkList'
           const errorObject = { err, responseCode: rspObj.responseCode }
-          logger.error({ msg: errorMessage, additionalInfo: { ekStepReqData }, err: errorObject }, req)
+          logger.error({ msg: rspObj.errMsg, additionalInfo: { ekStepReqData }, err: errorObject }, req)
           utilsService.logErrorInfo('framework-list', rspObj, err)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -127,16 +127,16 @@ function frameworklList (req, response) {
 }
 
 function frameworkCreate (req, response) {
-  let errorMessage = 'frameworkService.frameworkCreate() called'
+  const errorMessage = 'frameworkService.frameworkCreate() called'
   logger.debug({ msg: errorMessage }, req)
   utilsService.logDebugInfo('framework-create', req.rspObj, errorMessage)
   var rspObj = req.rspObj
   var data = req.body
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    errorMessage = 'Error due to required request body is missing'
-    logger.error({ msg: errorMessage, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
-    utilsService.logErrorInfo('framework-create', rspObj, errorMessage)
+    rspObj.errMsg = 'Error due to required request body is missing'
+    logger.error({ msg: rspObj.errMsg, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
+    utilsService.logErrorInfo('framework-create', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -152,9 +152,9 @@ function frameworkCreate (req, response) {
       ekStepUtil.frameworkCreate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          const errorMessage = 'Getting error from ekstep while framework creation'
+          rspObj.errMsg = 'Getting error from ekstep while framework creation'
           const errorObject = { err, responseCode: rspObj.responseCode }
-          logger.error({ msg: errorMessage, additionalInfo: { ekStepReqData }, err: errorObject }, req)
+          logger.error({ msg: rspObj.errMsg, additionalInfo: { ekStepReqData }, err: errorObject }, req)
           utilsService.logErrorInfo('framework-create', rspObj, err)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -187,9 +187,9 @@ function frameworkUpdate (req, response) {
   }
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    const errorMessage = 'Error due to required request body is missing'
-    logger.error({ msg: errorMessage, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
-    utilsService.logErrorInfo('framework-update', rspObj, errorMessage)
+    rspObj.errMsg = 'Error due to required request body is missing'
+    logger.error({ msg: rspObj.errMsg, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
+    utilsService.logErrorInfo('framework-update', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -207,10 +207,10 @@ function frameworkUpdate (req, response) {
       ekStepUtil.frameworkUpdate(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          const errorMessage = 'Getting error from ekstep while framework update'
+          rspObj.errMsg = 'Getting error from ekstep while framework update'
           const errorObject = { err, responseCode: rspObj.responseCode }
           const additionalInfo = { frameworkId: data.frameworkId, ekStepReqData }
-          logger.error({ msg: errorMessage, additionalInfo: additionalInfo, err: errorObject }, req)
+          logger.error({ msg: rspObj.errMsg, additionalInfo: additionalInfo, err: errorObject }, req)
           utilsService.logErrorInfo('framework-update', rspObj, err, objectInfo)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -244,9 +244,9 @@ function frameworkCopy (req, response) {
   }
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    const errorMessage = 'Error due to required request body is missing'
-    logger.error({ msg: errorMessage, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
-    utilsService.logErrorInfo('framework-copy', rspObj, errorMessage)
+    rspObj.errMsg = 'Error due to required request body is missing'
+    logger.error({ msg: rspObj.errMsg, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
+    utilsService.logErrorInfo('framework-copy', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -257,17 +257,17 @@ function frameworkCopy (req, response) {
   async.waterfall([
 
     function (CBW) {
-      let errorMessage = 'request to copy framework'
+      const errorMessage = 'request to copy framework'
       logger.debug({ msg: errorMessage, additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       const objectInfo = {id: _.get(data, 'frameworkId'), 'type': 'Framework'}
       utilsService.logDebugInfo('framework-copy', rspObj, errorMessage, objectInfo)
       ekStepUtil.frameworkCopy(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          errorMessage = 'Getting error from ekstep while framework copy'
+          rspObj.errMsg = 'Getting error from ekstep while framework copy'
           const additionalInfo = { frameworkId: data.frameworkId, ekStepReqData }
           const errorObject = { err, responseCode: rspObj.responseCode }
-          logger.error({ msg: errorMessage, additionalInfo: additionalInfo, err: errorObject }, req)
+          logger.error({ msg: rspObj.errMsg, additionalInfo: additionalInfo, err: errorObject }, req)
           utilsService.logErrorInfo('framework-copy', rspObj, err, objectInfo)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
@@ -301,9 +301,9 @@ function frameworkPublish (req, response) {
   }
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
-    const errorMessage = 'Error due to required request body is missing'
-    logger.error({ msg: errorMessage, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
-    utilsService.logErrorInfo('framework-publish', rspObj, errorMessage)
+    rspObj.errMsg = 'Error due to required request body is missing'
+    logger.error({ msg: rspObj.errMsg, additionalInfo: { data }, err: { responseCode: rspObj.responseCode } }, req)
+    utilsService.logErrorInfo('framework-publish', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -314,17 +314,17 @@ function frameworkPublish (req, response) {
   async.waterfall([
 
     function (CBW) {
-      let errorMessage = 'request to publish framework'
+      const errorMessage = 'request to publish framework'
       logger.debug({ msg: errorMessage, additionalInfo: { frameworkId: _.get(data, 'frameworkId') } }, req)
       const objectInfo = {id: _.get(data, 'frameworkId'), 'type': 'Framework'}
       utilsService.logDebugInfo('framework-publish', rspObj, errorMessage, objectInfo)
       ekStepUtil.frameworkPublish(ekStepReqData, data.frameworkId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
-          errorMessage = 'Getting error from ekstep while framework publish'
+          rspObj.errMsg = 'Getting error from ekstep while framework publish'
           const errorObject = { err, responseCode: rspObj.responseCode }
           const additionalInfo = { ekStepReqData, frameworkId: data.frameworkId }
-          logger.error({ msg: errorMessage, additionalInfo: additionalInfo, err: errorObject }, req)
+          logger.error({ msg: rspObj.errMsg, additionalInfo: additionalInfo, err: errorObject }, req)
           utilsService.logErrorInfo('framework-publish', rspObj, err, objectInfo)
           var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
           rspObj.result = res && res.result ? res.result : {}
