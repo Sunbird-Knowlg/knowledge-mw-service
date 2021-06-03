@@ -56,8 +56,9 @@ function getForm (req, response) {
       }
       contentProvider.learnerServiceGetForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          rspObj.errMsg = 'Error from content provider while fetching form data from learner service'
           logger.error({
-            msg: 'Error from content provider while fetching form data from learner service',
+            msg: rspObj.errMsg,
             err,
             additionalInfo: { requestData }
           }, req)
@@ -76,7 +77,8 @@ function getForm (req, response) {
             }
             responseData.result.form.data = formData[data.request.framework] || formData['default']
           } catch (error) {
-            logger.error({ msg: 'Error while parsing response data', error }, req)
+            rspObj.errMsg = 'Error while parsing response data'
+            logger.error({ msg: rspObj.errMsg, error }, req)
             utilsService.logErrorInfo('form-read', rspObj, error)
           }
 
@@ -137,8 +139,9 @@ function updateForm (req, response) {
       }
       contentProvider.learnerServiceGetForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          rspObj.errMsg = 'Error from content provider while fetching form data from learner service'
           logger.error({
-            msg: 'Error from content provider while fetching form data from learner service',
+            msg: rspObj.errMsg,
             err,
             additionalInfo: { requestData }
           }, req)
@@ -191,8 +194,9 @@ function updateForm (req, response) {
       requestData.request.tenantPreference[0].data = JSON.stringify(formData)
       contentProvider.learnerServiceUpdateForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
+          rspObj.errMsg = 'Error from content provider while updating form in learner service'
           logger.error({
-            msg: 'Error from content provider while updating form in learner service',
+            msg: rspObj.errMsg,
             err,
             additionalInfo: { requestData }
           }, req)
@@ -268,8 +272,9 @@ function createForm (req, response) {
       contentProvider.learnerServiceCreateForm(requestData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.result = res && res.result ? res.result : {}
+          rspObj.errMsg = 'Error from content provider while creating form in learner service'
           logger.error({
-            msg: 'Error from content provider while creating form in learner service',
+            msg: rspObj.errMsg,
             err,
             additionalInfo: { requestData }
           }, req)
