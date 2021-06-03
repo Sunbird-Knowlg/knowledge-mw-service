@@ -90,7 +90,7 @@ function getList (req, response) {
     rspObj.responseCode = _.get(err, 'responseCode') || responseCode.SERVER_ERROR
     const errorObject = { err, responseCode: rspObj.responseCode }
     rspObj.errMsg = 'Getting error  fetching questions by ids'
-    logger.error({ msg: rspObj.errMsg , additionalInfo: { questionIds }, err: errorObject }, req)
+    logger.error({ msg: rspObj.errMsg, additionalInfo: { questionIds }, err: errorObject }, req)
     utilsService.logErrorInfo('question-list', rspObj, err)
     var httpStatus = err && err.statusCode >= 100 && err.statusCode < 600 ? err.statusCode : 500
     rspObj.result = err && err.result ? err.result : {}
