@@ -61,11 +61,11 @@ function getList (req, response) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
     rspObj.errMsg = 'Either identifier is missing or it is not list type'
     logger.error({
-      msg: 'Either identifier is missing or it is not list type',
+      msg: rspObj.errMsg,
       additionalInfo: { data },
       err: { responseCode: rspObj.responseCode }
     }, req)
-    utilsService.logErrorInfo('question-list', rspObj, 'Either identifier is missing or it is not list type')
+    utilsService.logErrorInfo('question-list', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
   const questionsLimit = parseInt(process.env.questions_list_limit, 10) || 20
@@ -88,9 +88,9 @@ function getList (req, response) {
     return response.status(200).send(respUtil.successResponse(rspObj))
   }).catch(err => {
     rspObj.responseCode = _.get(err, 'responseCode') || responseCode.SERVER_ERROR
-    const errorMessage = 'Getting error  fetching questions by ids'
     const errorObject = { err, responseCode: rspObj.responseCode }
-    logger.error({ msg: errorMessage, additionalInfo: { questionIds }, err: errorObject }, req)
+    rspObj.errMsg = 'Getting error  fetching questions by ids'
+    logger.error({ msg: rspObj.errMsg , additionalInfo: { questionIds }, err: errorObject }, req)
     utilsService.logErrorInfo('question-list', rspObj, err)
     var httpStatus = err && err.statusCode >= 100 && err.statusCode < 600 ? err.statusCode : 500
     rspObj.result = err && err.result ? err.result : {}
