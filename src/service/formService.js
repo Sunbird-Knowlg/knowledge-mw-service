@@ -13,6 +13,7 @@ var utilsService = require('../service/utilsService')
 
 var formMessages = messageUtils.FORM
 var responseCode = messageUtils.RESPONSE_CODE
+const SERVICE_PREFIX = 'FRM'
 
 /**
  * This controller function helps to get form data
@@ -24,7 +25,7 @@ function getForm (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.type || !data.request.subType || !data.request.action) {
-    rspObj.errCode = formMessages.READ.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${formMessages.READ.MISSING_ERR_CODE}`
     rspObj.errMsg = formMessages.READ.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     const errorMessage = 'Error due to missing request or request type or request subtype or request action'
@@ -107,7 +108,7 @@ function updateForm (req, response) {
     !data.request.subType ||
     !data.request.action ||
     !data.request.data) {
-    rspObj.errCode = formMessages.UPDATE.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${formMessages.UPDATE.MISSING_ERR_CODE}`
     rspObj.errMsg = formMessages.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     const errorMessage = 'Error due to missing request or request type or request subtype' +
@@ -175,7 +176,7 @@ function updateForm (req, response) {
         var frameworkKey = data.request.framework || 'default'
         formData[frameworkKey] = data.request.data
       } catch (error) {
-        rspObj.errCode = formMessages.UPDATE.FAILED_CODE
+        rspObj.errCode = `${SERVICE_PREFIX}_${formMessages.UPDATE.FAILED_ERR_CODE}`
         rspObj.errMsg = formMessages.UPDATE.FAILED_MESSAGE
         rspObj.responseCode = responseCode.CLIENT_ERROR
         logger.error({
@@ -230,7 +231,7 @@ function createForm (req, response) {
     !data.request.subType ||
     !data.request.action ||
     !data.request.data) {
-    rspObj.errCode = formMessages.CREATE.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${formMessages.CREATE.MISSING_ERR_CODE}`
     rspObj.errMsg = formMessages.CREATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     const errorMessage = 'Error due to missing request or request type or ' +
