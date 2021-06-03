@@ -33,12 +33,13 @@ function getFrameworkTerm (req, response) {
 
   if (!data.queryParams) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    rspObj.errMsg = 'Error due to missing query Parameters'
     logger.error({
-      msg: 'Error due to missing query Parameters',
+      msg: rspObj.errMsg,
       err: {responseCode: rspObj.responseCode},
       additionalInfo: { data }
     }, req)
-    utilsService.logErrorInfo('framework-term-read', rspObj, 'Error due to missing query Parameters')
+    utilsService.logErrorInfo('framework-term-read', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -50,8 +51,9 @@ function getFrameworkTerm (req, response) {
       ekStepUtil.getFrameworkTerm(data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          rspObj.errMsg = 'Error while fetching framework terms from ekstep'
           logger.error({
-            msg: 'Error while fetching framework terms from ekstep',
+            msg: rspObj.errMsg,
             err: {
               err,
               responseCode: rspObj.responseCode
@@ -82,12 +84,13 @@ function frameworkTermSearch (req, response) {
   data.queryParams = req.query
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    rspObj.errMsg = 'Error due to missing query Parameters or request body'
     logger.error({
-      msg: 'Error due to missing query Parameters or request body',
+      msg: rspObj.errMsg,
       err: {responseCode: rspObj.responseCode},
       additionalInfo: { data }
     }, req)
-    utilsService.logErrorInfo('framework-term-search', rspObj, 'Error due to missing query Parameters or request body')
+    utilsService.logErrorInfo('framework-term-search', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -103,8 +106,9 @@ function frameworkTermSearch (req, response) {
       ekStepUtil.frameworkTermSearch(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          rspObj.errMsg = 'Error while searching framework terms from ekstep'
           logger.error({
-            msg: 'Error while searching framework terms from ekstep',
+            msg: rspObj.errMsg,
             err: {
               err,
               responseCode: rspObj.responseCode
@@ -135,12 +139,13 @@ function frameworkTermCreate (req, response) {
   data.queryParams = req.query
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    rspObj.errMsg = 'Error due to missing query Parameters or request body'
     logger.error({
-      msg: 'Error due to missing query Parameters or request body',
+      msg: rspObj.errMsg,
       err: {responseCode: rspObj.responseCode},
       additionalInfo: { data }
     }, req)
-    utilsService.logErrorInfo('framework-term-create', rspObj, 'Error due to missing query Parameters or request body')
+    utilsService.logErrorInfo('framework-term-create', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -156,8 +161,9 @@ function frameworkTermCreate (req, response) {
       ekStepUtil.frameworkTermCreate(ekStepReqData, data.queryParams, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          rspObj.errMsg = 'Error while creating framework terms from ekstep'
           logger.error({
-            msg: 'Error while creating framework terms from ekstep',
+            msg: rspObj.errMsg,
             err: {
               err,
               responseCode: rspObj.responseCode
@@ -194,12 +200,13 @@ function frameworkTermUpdate (req, response) {
 
   if (!data) {
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    rspObj.errMsg = 'Error due to missing query Parameters or request body'
     logger.error({
-      msg: 'Error due to missing query Parameters or request body',
+      msg: rspObj.errMsg,
       err: {responseCode: rspObj.responseCode},
       additionalInfo: { data }
     }, req)
-    utilsService.logErrorInfo('framework-term-update', rspObj, 'Error due to missing query Parameters or request body')
+    utilsService.logErrorInfo('framework-term-update', rspObj, rspObj.errMsg)
     return response.status(400).send(respUtil.errorResponse(rspObj))
   }
 
@@ -215,8 +222,9 @@ function frameworkTermUpdate (req, response) {
       ekStepUtil.frameworkTermUpdate(ekStepReqData, data.queryParams, data.category, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          rspObj.errMsg = 'Error while updating framework terms from ekstep'
           logger.error({
-            msg: 'Error while updating framework terms from ekstep',
+            msg: rspObj.errMsg,
             err: {
               err,
               responseCode: rspObj.responseCode
