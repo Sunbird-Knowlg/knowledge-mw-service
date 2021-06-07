@@ -35,6 +35,7 @@ function getDomainsAPI (req, response) {
           rspObj.errCode = domainMessage.GET_DOMAINS.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_DOMAINS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          utilsService.logErrorInfo('getDomains', rspObj, err)
           logger.error({
             msg: 'Error while getting domains from content provider',
             err: {
@@ -77,6 +78,7 @@ function getDomainByIDAPI (req, response) {
     rspObj.errCode = domainMessage.GET_DOMAIN_BY_ID.MISSING_CODE
     rspObj.errMsg = domainMessage.GET_DOMAIN_BY_ID.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    utilsService.logErrorInfo('getDomains', rspObj, 'Error due to missing domainId')
     logger.error({
       msg: 'Error due to missing domainId',
       err: {
@@ -98,6 +100,7 @@ function getDomainByIDAPI (req, response) {
           rspObj.errCode = domainMessage.GET_DOMAIN_BY_ID.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_DOMAIN_BY_ID.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          utilsService.logErrorInfo('getDomains', rspObj, err)
           logger.error({
             msg: 'Error while getting domain By Id from content provider',
             err: {
@@ -141,6 +144,7 @@ function getObjectTypesAPI (req, response) {
     rspObj.errCode = domainMessage.GET_OBJECTS.MISSING_CODE
     rspObj.errMsg = domainMessage.GET_OBJECTS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    utilsService.logErrorInfo('getObjectTypes', rspObj, 'Error due to missing domainId or objectType')
     logger.error({
       msg: 'Error due to missing domainId or objectType',
       err: {
@@ -165,6 +169,7 @@ function getObjectTypesAPI (req, response) {
           rspObj.errCode = domainMessage.GET_OBJECTS.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_OBJECTS.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          utilsService.logErrorInfo('getObjectTypes', rspObj, err)
           logger.error({
             msg: 'Error while getting Object Types from content provider',
             err: {
@@ -202,7 +207,6 @@ function getObjectTypeByIDAPI (req, response) {
     'conceptService.getObjectTypeByIDAPI() called')
   logger.debug({ msg: 'conceptService.getObjectTypeByIDAPI() called' }, req)
   var data = {}
-
   data.domainId = req.params.domainId
   data.objectType = req.params.objectType
   data.objectId = req.params.objectId
@@ -211,6 +215,9 @@ function getObjectTypeByIDAPI (req, response) {
     rspObj.errCode = domainMessage.GET_OBJECT_BY_ID.MISSING_CODE
     rspObj.errMsg = domainMessage.GET_OBJECT_BY_ID.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    utilsService.logErrorInfo('getObjectTypes',
+      rspObj,
+      'Error due to missing domainId or objectType or objectId')
     logger.error({
       msg: 'Error due to missing domainId or objectType or objectId',
       err: {
@@ -235,6 +242,9 @@ function getObjectTypeByIDAPI (req, response) {
           rspObj.errCode = domainMessage.GET_OBJECT_BY_ID.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_OBJECT_BY_ID.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          utilsService.logErrorInfo('getObjectTypes',
+            rspObj,
+            'Error while getting Object Types by Id from content provider')
           logger.error({
             msg: 'Error while getting Object Types by Id from content provider',
             err: {
@@ -279,6 +289,9 @@ function getConceptByIdAPI (req, response) {
     rspObj.errCode = domainMessage.GET_OBJECTS.MISSING_CODE
     rspObj.errMsg = domainMessage.GET_OBJECTS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    utilsService.logErrorInfo('getConcept',
+      rspObj,
+      'Error due to missing conceptID')
     logger.error({
       msg: 'Error due to missing conceptID',
       err: {
@@ -303,6 +316,7 @@ function getConceptByIdAPI (req, response) {
           rspObj.errCode = domainMessage.GET_CONCEPT_BY_ID.FAILED_CODE
           rspObj.errMsg = domainMessage.GET_CONCEPT_BY_ID.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          utilsService.logErrorInfo('getConcept', rspObj, err)
           logger.error({
             msg: 'Error while getting concept from content provider',
             err: {
@@ -348,6 +362,9 @@ function searchObjectTypeAPI (req, response) {
     rspObj.errCode = domainMessage.SEARCH_OBJECT_TYPE.MISSING_CODE
     rspObj.errMsg = domainMessage.SEARCH_OBJECT_TYPE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    utilsService.logErrorInfo('searchObjectType',
+      rspObj,
+      'Error due to missing domainId or objectType or request or search property in request')
     logger.error({
       msg: 'Error due to missing domainId or objectType or request or search property in request',
       err: {
@@ -377,6 +394,7 @@ function searchObjectTypeAPI (req, response) {
             rspObj.errCode = domainMessage.SEARCH_OBJECT_TYPE.FAILED_CODE
             rspObj.errMsg = domainMessage.SEARCH_OBJECT_TYPE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            utilsService.logErrorInfo('searchObjectType', rspObj, err)
             logger.error({
               msg: 'Error while searching objectTypes from content provider',
               err: {
@@ -422,6 +440,9 @@ function createObjectTypeAPI (req, response) {
     rspObj.errCode = domainMessage.CREATE_OBJECT_TYPE.MISSING_CODE
     rspObj.errMsg = domainMessage.CREATE_OBJECT_TYPE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    utilsService.logErrorInfo('createObjectType',
+      rspObj,
+      'Error due to missing domainId or objectType or request or object property in request')
     logger.error({
       msg: 'Error due to missing domainId or objectType or request or object property in request',
       err: {
@@ -450,6 +471,7 @@ function createObjectTypeAPI (req, response) {
           rspObj.errCode = domainMessage.CREATE_OBJECT_TYPE.FAILED_CODE
           rspObj.errMsg = domainMessage.CREATE_OBJECT_TYPE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          utilsService.logErrorInfo('createObjectType', rspObj, err)
           logger.error({
             msg: 'Error from content provider while creating objectTypes ',
             err: {
@@ -496,6 +518,9 @@ function updateObjectTypeAPI (req, response) {
     rspObj.errCode = domainMessage.UPDATE_OBJECT_TYPE.MISSING_CODE
     rspObj.errMsg = domainMessage.UPDATE_OBJECT_TYPE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    utilsService.logErrorInfo('updateObjectType',
+      rspObj,
+      'Error due to missing domainId or objectType or ObjectId or request or object property in request')
     logger.error({
       msg: 'Error due to missing domainId or objectType or ObjectId or request or object property in request',
       err: {
@@ -525,6 +550,7 @@ function updateObjectTypeAPI (req, response) {
             rspObj.errCode = domainMessage.UPDATE_OBJECT_TYPE.FAILED_CODE
             rspObj.errMsg = domainMessage.UPDATE_OBJECT_TYPE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            utilsService.logErrorInfo('updateObjectType', rspObj, err)
             logger.error({
               msg: 'Error from content provider while updating objectTypes ',
               err: {
@@ -571,6 +597,9 @@ function retireObjectTypeAPI (req, response) {
     rspObj.errCode = domainMessage.RETIRE_OBJECT_TYPE.MISSING_CODE
     rspObj.errMsg = domainMessage.RETIRE_OBJECT_TYPE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
+    utilsService.logErrorInfo('retireObjectType',
+      rspObj,
+      'Error due to missing domainId or objectType or ObjectId')
     logger.error({
       msg: 'Error due to missing domainId or objectType or ObjectId',
       err: {
@@ -598,6 +627,7 @@ function retireObjectTypeAPI (req, response) {
             rspObj.errCode = domainMessage.RETIRE_OBJECT_TYPE.FAILED_CODE
             rspObj.errMsg = domainMessage.RETIRE_OBJECT_TYPE.FAILED_MESSAGE
             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+            utilsService.logErrorInfo('retireObjectType', rspObj, err)
             logger.error({
               msg: 'Error from content provider while retiring objectTypes ',
               err: {
@@ -639,6 +669,7 @@ function listTermsAPI (req, response) {
     function (CBW) {
       contentProvider.listTerms(req.headers, function (err, res) {
         if (err) {
+          utilsService.logErrorInfo('listTerms', rspObj, err)
           logger.error({msg: 'Error from content provider while listing Terms'}, req)
         }
         CBW(null, res)
@@ -660,7 +691,7 @@ function listTermsAPI (req, response) {
  */
 function listResourceBundlesAPI (req, response) {
   var rspObj = req.rspObj
-  utilsService.logDebugInfo('listTerms',
+  utilsService.logDebugInfo('listResource',
     rspObj,
     'conceptService.listResourceBundlesAPI() called')
   logger.debug({ msg: 'conceptService.listResourceBundlesAPI() called' }, req)
@@ -668,6 +699,7 @@ function listResourceBundlesAPI (req, response) {
     function (CBW) {
       contentProvider.listResourceBundles(req.headers, function (err, res) {
         if (err) {
+          utilsService.logErrorInfo('listResource', rspObj, err)
           logger.error({msg: 'Error from content provider while listing resourceBundles'}, req)
         }
         CBW(null, res)
@@ -697,6 +729,7 @@ function listOrdinalsAPI (req, response) {
     function (CBW) {
       contentProvider.listOrdinals(req.headers, function (err, res) {
         if (err) {
+          utilsService.logErrorInfo('listOrdinals', rspObj, err)
           logger.error({msg: 'Error from content provider while listing ordinals'}, req)
         }
         CBW(null, res)
