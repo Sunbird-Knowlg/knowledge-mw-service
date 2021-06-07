@@ -21,6 +21,7 @@ var ImageService = require('./dialCode/imageService.js')
 var filename = path.basename(__filename)
 var dialCodeMessage = messageUtils.DIALCODE
 var responseCode = messageUtils.RESPONSE_CODE
+const SERVICE_PREFIX = 'DLC'
 
 function getBatchImageInstance (req) {
   let defaultConfig = {
@@ -55,12 +56,11 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
   } else {
     _.forIn(dialcodes, function (index, dialcode) {
       tasks[dialcode] = function (callback) {
-        var fileName = index + '_' + dialcode;
+        var fileName = index + '_' + dialcode
         imageService.insertImg(dialcode, channel, publisher, fileName, callback)
       }
     })
   }
-
 
   async.parallelLimit(tasks, 100, function (err, results) {
     if (err) {
@@ -128,7 +128,7 @@ function generateDialCodeAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.dialcodes) {
-    rspObj.errCode = dialCodeMessage.GENERATE.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.GENERATE.MISSING_ERR_CODE}`
     rspObj.errMsg = dialCodeMessage.GENERATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -144,7 +144,7 @@ function generateDialCodeAPI (req, response) {
   }
 
   if (!_.get(data, 'request.dialcodes.count') || !_.isSafeInteger(data.request.dialcodes.count)) {
-    rspObj.errCode = dialCodeMessage.GENERATE.MISSING_COUNT
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.GENERATE.MISSING_ERR_COUNT}`
     rspObj.errMsg = dialCodeMessage.GENERATE.MISSING_COUNT_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -176,7 +176,7 @@ function generateDialCodeAPI (req, response) {
 
       dialCodeServiceHelper.generateDialcodes(reqData, req.headers, function (err, res) {
         if (err || _.indexOf([responseCode.SUCCESS, responseCode.PARTIAL_SUCCESS], res.responseCode) === -1) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GENERATE.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.GENERATE.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GENERATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -275,7 +275,7 @@ function dialCodeListAPI (req, response) {
   }
 
   if (!data.request || !data.request.search) {
-    rspObj.errCode = dialCodeMessage.LIST.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.LIST.MISSING_ERR_CODE}`
     rspObj.errMsg = dialCodeMessage.LIST.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -303,7 +303,7 @@ function dialCodeListAPI (req, response) {
     function (CBW) {
       contentProvider.dialCodeList(reqData, req.headers, function (err, res) {
         if (err || _.indexOf([responseCode.SUCCESS, responseCode.PARTIAL_SUCCESS], res.responseCode) === -1) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.LIST.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.LIST.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.LIST.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -462,7 +462,7 @@ function getDialCodeAPI (req, response) {
   }
 
   if (!data.dialCodeId) {
-    rspObj.errCode = dialCodeMessage.GET.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.GET.MISSING_ERR_CODE}`
     rspObj.errMsg = dialCodeMessage.GET.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -490,7 +490,7 @@ function getDialCodeAPI (req, response) {
       contentProvider.getDialCode(data.dialCodeId, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GET.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.GET.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -549,7 +549,7 @@ function contentLinkDialCodeAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!checkContentLinkRequest(data)) {
-    rspObj.errCode = dialCodeMessage.CONTENT_LINK.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.CONTENT_LINK.MISSING_ERR_CODE}`
     rspObj.errMsg = dialCodeMessage.CONTENT_LINK.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -574,7 +574,7 @@ function contentLinkDialCodeAPI (req, response) {
       logger.debug({ msg: 'Request to link the content', additionalInfo: { body: reqData } }, req)
       contentProvider.contentLinkDialCode(reqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.CONTENT_LINK.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.CONTENT_LINK.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.CONTENT_LINK.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -621,7 +621,7 @@ function getProcessIdStatusAPI (req, response) {
   }
 
   if (!data.processId) {
-    rspObj.errCode = dialCodeMessage.PROCESS.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.PROCESS.MISSING_ERR_CODE}`
     rspObj.errMsg = dialCodeMessage.PROCESS.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -658,7 +658,7 @@ function searchDialCodeAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.search) {
-    rspObj.errCode = dialCodeMessage.SEARCH.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.SEARCH.MISSING_ERR_CODE}`
     rspObj.errMsg = dialCodeMessage.SEARCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -684,7 +684,7 @@ function searchDialCodeAPI (req, response) {
       logger.debug({ msg: 'request to search dialCode', additionalInfo: { body: reqData } }, req)
       contentProvider.searchDialCode(reqData, req.headers, function (err, res) {
         if (err || _.indexOf([responseCode.SUCCESS, responseCode.PARTIAL_SUCCESS], res.responseCode) === -1) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.SEARCH.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.SEARCH.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.SEARCH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -730,7 +730,7 @@ function publishDialCodeAPI (req, response) {
   }
 
   if (!data.request || !data.dialCodeId) {
-    rspObj.errCode = dialCodeMessage.PUBLISH.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.PUBLISH.MISSING_ERR_CODE}`
     rspObj.errMsg = dialCodeMessage.PUBLISH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -756,7 +756,7 @@ function publishDialCodeAPI (req, response) {
       logger.debug({ msg: 'Request to publish the dial code', additionalInfo: { body: reqData } }, req)
       contentProvider.publishDialCode(reqData, data.dialCodeId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.PUBLISH.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.PUBLISH.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.PUBLISH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -797,7 +797,7 @@ function createPublisherAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.publisher || !data.request.publisher.identifier || !data.request.publisher.name) {
-    rspObj.errCode = dialCodeMessage.CREATE_PUBLISHER.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.CREATE_PUBLISHER.MISSING_ERR_CODE}`
     rspObj.errMsg = dialCodeMessage.CREATE_PUBLISHER.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -823,7 +823,7 @@ function createPublisherAPI (req, response) {
       logger.debug({ msg: 'Request to create a publisher ', additionalInfo: { body: reqData } }, req)
       contentProvider.createPublisher(reqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.CREATE_PUBLISHER.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.CREATE_PUBLISHER.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.CREATE_PUBLISHER.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -870,7 +870,7 @@ function updatePublisherAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.publisher || !data.publisherId) {
-    rspObj.errCode = dialCodeMessage.UPDATE_PUBLISHER.MISSING_CODE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.UPDATE_PUBLISHER.MISSING_ERR_CODE}`
     rspObj.errMsg = dialCodeMessage.UPDATE_PUBLISHER.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -896,7 +896,7 @@ function updatePublisherAPI (req, response) {
       logger.debug({ msg: 'request to update the publisher', additionalInfo: { body: reqData } }, req)
       contentProvider.updatePublisher(reqData, data.publisherId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.UPDATE_PUBLISHER.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.UPDATE_PUBLISHER.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.UPDATE_PUBLISHER.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -938,8 +938,8 @@ function getPublisherAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.publisherId) {
-    rspObj.errCode = dialCodeMessage.GET.MISSING_CODE
-    rspObj.errMsg = dialCodeMessage.GET.MISSING_MESSAGE
+    rspObj.errCode = `${SERVICE_PREFIX}_${dialCodeMessage.GET_PUBLISHER.MISSING_ERR_CODE}`
+    rspObj.errMsg = dialCodeMessage.GET_PUBLISHER.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
       msg: 'Error due to missing publisher Id',
@@ -960,8 +960,8 @@ function getPublisherAPI (req, response) {
       contentProvider.getPublisher(data.publisherId, req.headers, function (err, res) {
         // After check response, we perform other operation
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GET.FAILED_CODE
-          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GET.FAILED_MESSAGE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.GET_PUBLISHER.FAILED_ERR_CODE}`
+          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GET_PUBLISHER.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
             msg: 'Error from content provider fetching publisher details',
@@ -999,7 +999,7 @@ function reserveDialCode (req, response) {
     function (CBW) {
       contentProvider.reserveDialcode(req.params.contentId, data, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RESERVE.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.RESERVE.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RESERVE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.CLIENT_ERROR
           logger.error({
@@ -1075,7 +1075,7 @@ function reserveDialCode (req, response) {
         }
         contentProvider.updateContent(ekStepReqData, req.params.contentId, req.headers, function (err, updateResponse) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
-            rspObj.errCode = updateResponse && updateResponse.params ? updateResponse.params.err : dialCodeMessage.RESERVE.FAILED_CODE
+            rspObj.errCode = updateResponse && updateResponse.params ? updateResponse.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.RESERVE.FAILED_ERR_CODE}`
             rspObj.errMsg = updateResponse && updateResponse.params ? updateResponse.params.errmsg : dialCodeMessage.RESERVE.FAILED_MESSAGE
             rspObj.responseCode = updateResponse && updateResponse.responseCode ? updateResponse.responseCode : responseCode.SERVER_ERROR
             logger.error({
@@ -1120,7 +1120,7 @@ function releaseDialCode (req, response) {
     function (CBW) {
       contentProvider.releaseDialcode(req.params.contentId, data, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.RELEASE.FAILED_CODE
+          rspObj.errCode = res && res.params ? res.params.err : `${SERVICE_PREFIX}_${dialCodeMessage.RELEASE.FAILED_ERR_CODE}`
           rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.RELEASE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.CLIENT_ERROR
           logger.error({
