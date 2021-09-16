@@ -10,7 +10,7 @@ var fs = require('fs')
 var configUtil = require('sb-config-util')
 var _ = require('lodash')
 var logger = require('sb_logger_util_v2')
-var loadTokenPublicKeys = require('sb_api_interceptor');
+var { loadTokenPublicKeys } = require('sb_api_interceptor');
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
