@@ -8,28 +8,22 @@ exports.COMPOSITE = {
 exports.COURSE = {
 
   SEARCH: {
-    MISSING_ERR_CODE: 'SER01',
     MISSING_CODE: 'ERR_COURSE_SEARCH_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for search course are missing',
-    FAILED_ERR_CODE: 'SER02',
     FAILED_CODE: 'ERR_COURSE_SEARCH_FAILED',
     FAILED_MESSAGE: 'Search course failed'
   },
 
   CREATE: {
-    MISSING_ERR_CODE: 'CRT01',
     MISSING_CODE: 'ERR_COURSE_CREATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for create course are missing',
-    FAILED_ERR_CODE: 'CRT02',
     FAILED_CODE: 'ERR_COURSE_CREATE_FAILED',
     FAILED_MESSAGE: 'Create course failed'
   },
 
   UPDATE: {
-    MISSING_ERR_CODE: 'UPD01',
     MISSING_CODE: 'ERR_COURSE_UPDATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for update course are missing',
-    FAILED_ERR_CODE: 'UPD02',
     FAILED_CODE: 'ERR_COURSE_UPDATE_FAILED',
     FAILED_MESSAGE: 'Update course failed'
   },
@@ -37,46 +31,37 @@ exports.COURSE = {
   REVIEW: {
     MISSING_CODE: 'ERR_COURSE_REVIEW_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for review course are missing',
-    FAILED_ERR_CODE: 'REW01',
     FAILED_CODE: 'ERR_COURSE_REVIEW_FAILED',
     FAILED_MESSAGE: 'Review course failed'
   },
 
   PUBLISH: {
-    MISSING_ERR_CODE: 'PUB01',
     MISSING_CODE: 'ERR_COURSE_PUBLISH_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for publish course are missing',
-    FAILED_ERR_CODE: 'PUB02',
     FAILED_CODE: 'ERR_COURSE_PUBLISH_FAILED',
     FAILED_MESSAGE: 'Publish course failed'
   },
 
   GET: {
-    FAILED_ERR_CODE: 'RED01',
     FAILED_CODE: 'ERR_COURSE_GET_FAILED',
     FAILED_MESSAGE: 'Get course failed'
   },
 
   GET_MY: {
-    FAILED_ERR_CODE: 'RDC01',
     FAILED_CODE: 'ERR_COURSE_GET_MY_FAILED',
     FAILED_MESSAGE: 'Get my course failed'
   },
 
   HIERARCHY: {
-    MISSING_ERR_CODE: 'HCY01',
     MISSING_CODE: 'ERR_COURSE_HIERARCHY_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for get course hierarchy are missing',
-    FAILED_ERR_CODE: 'HCY02',
     FAILED_CODE: 'ERR_COURSE_HIERARCHY_FAILED',
     FAILED_MESSAGE: 'Get course hierarchy failed'
   },
 
   HIERARCHY_UPDATE: {
-    MISSING_ERR_CODE: 'HRU01',
     MISSING_CODE: 'ERR_COURSE_HIERARCHY_UPDATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for update course hierarchy are missing',
-    FAILED_ERR_CODE: 'HRU02',
     FAILED_CODE: 'ERR_COURSE_HIERARCHY_UPDATE_FAILED',
     FAILED_MESSAGE: 'Update course hierarchy failed'
   },
@@ -87,38 +72,31 @@ exports.COURSE = {
 }
 
 exports.CONTENT = {
+
   SEARCH: {
-    MISSING_ERR_CODE: 'SER01',
     MISSING_CODE: 'ERR_CONTENT_SEARCH_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for search content are missing',
-    FAILED_ERR_CODE: 'SER02',
     FAILED_CODE: 'ERR_CONTENT_SEARCH_FAILED',
     FAILED_MESSAGE: 'Search content failed'
   },
 
   CREATE: {
-    MISSING_ERR_CODE: 'CRT01',
     MISSING_CODE: 'ERR_CONTENT_CREATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for create content are missing',
-    FAILED_ERR_CODE: 'CRT02',
     FAILED_CODE: 'ERR_CONTENT_CREATE_FAILED',
     FAILED_MESSAGE: 'Create content failed'
   },
 
   UPDATE: {
-    MISSING_ERR_CODE: 'UPD01',
     MISSING_CODE: 'ERR_CONTENT_UPDATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for update content are missing',
-    FAILED_ERR_CODE: 'UPD02',
     FAILED_CODE: 'ERR_CONTENT_UPDATE_FAILED',
     FAILED_MESSAGE: 'Update content failed'
   },
 
   UPLOAD: {
-    MISSING_ERR_CODE: 'UPL01',
     MISSING_CODE: 'ERR_CONTENT_UPLOAD_FILES_MISSING',
     MISSING_MESSAGE: 'Required files for upload content are missing',
-    FAILED_ERR_CODE: 'UPL02',
     FAILED_CODE: 'ERR_CONTENT_UPLOAD_FAILED',
     FAILED_MESSAGE: 'Upload content failed'
   },
@@ -126,49 +104,39 @@ exports.CONTENT = {
   REVIEW: {
     MISSING_CODE: 'ERR_CONTENT_REVIEW_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for review content are missing',
-    FAILED_ERR_CODE: 'REW01',
     FAILED_CODE: 'ERR_CONTENT_REVIEW_FAILED',
     FAILED_MESSAGE: 'Review content failed'
   },
 
   PUBLISH: {
-    MISSING_ERR_CODE: 'PUB01',
     MISSING_CODE: 'ERR_CONTENT_PUBLISH_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for publish content are missing',
-    FAILED_ERR_CODE: 'PUB02',
     FAILED_CODE: 'ERR_CONTENT_PUBLISH_FAILED',
     FAILED_MESSAGE: 'Publish content failed'
   },
 
   GET: {
-    MISSING_ERR_CODE: 'RED01',
     MISSING_CODE: 'ERR_CONTENT_GET_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for get content are missing',
-    FAILED_ERR_CODE: 'RED02',
     FAILED_CODE: 'ERR_CONTENT_GET_FAILED',
     FAILED_MESSAGE: 'Get content failed'
   },
 
   GET_MY: {
-    FAILED_ERR_CODE: 'RDM01',
     FAILED_CODE: 'ERR_CONTENT_GET_MY_FAILED',
     FAILED_MESSAGE: 'Get my content failed'
   },
 
   RETIRE: {
-    MISSING_ERR_CODE: 'RTR01',
     MISSING_CODE: 'ERR_CONTENT_RETIRE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for retire content are missing',
-    FAILED_ERR_CODE: 'RTR02',
     FAILED_CODE: 'ERR_CONTENT_RETIRE_FAILED',
     FAILED_MESSAGE: 'Retire content failed'
   },
 
   REJECT: {
-    MISSING_ERR_CODE: 'REJ01',
     MISSING_CODE: 'ERR_CONTENT_REJECT_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for reject content are missing',
-    FAILED_ERR_CODE: 'REJ02',
     FAILED_CODE: 'ERR_CONTENT_REJECT_FAILED',
     FAILED_MESSAGE: 'Reject content failed'
   },
@@ -181,28 +149,22 @@ exports.CONTENT = {
   },
 
   ACCEPT_FLAG: {
-    MISSING_ERR_CODE: 'FLA01',
     MISSING_CODE: 'ERR_CONTENT_ACCEPT_FLAG_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for accept flag are missing',
-    FAILED_ERR_CODE: 'FLA02',
     FAILED_CODE: 'ERR_CONTENT_ACCEPT_FLAG_FAILED',
     FAILED_MESSAGE: 'Accept flag for content failed'
   },
 
   REJECT_FLAG: {
-    MISSING_ERR_CODE: 'FLR01',
     MISSING_CODE: 'ERR_CONTENT_REJECT_FLAG_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for reject flag are missing',
-    FAILED_ERR_CODE: 'FLR02',
     FAILED_CODE: 'ERR_CONTENT_REJECT_FLAG_FAILED',
     FAILED_MESSAGE: 'Reject flag for content failed'
   },
 
   UPLOAD_URL: {
-    MISSING_ERR_CODE: 'UPU01',
     MISSING_CODE: 'ERR_CONTENT_UPLOAD_URL_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for upload url are missing',
-    FAILED_ERR_CODE: 'UPU02',
     FAILED_CODE: 'ERR_CONTENT_UPLOAD_URL_FAILED',
     FAILED_MESSAGE: 'Upload url for content failed'
   },
@@ -261,72 +223,56 @@ exports.CONTENT = {
   ],
   PREFIX_CODE: 'org.sunbird.',
   ASSIGN_BADGE: {
-    MISSING_ERR_CODE: 'BGA01',
     MISSING_CODE: 'ERR_CONTENT_ASSIGN_BADGE_MISSING',
     MISSING_MESSAGE: 'Required fields for assigning badge are missing',
-    FAILED_ERR_CODE: 'BGA02',
     FAILED_CODE: 'ERR_CONTENT_ASSIGN_BADGE_FAILED',
     FAILED_MESSAGE: 'Assigning badge to content failed'
   },
   REVOKE_BADGE: {
-    MISSING_ERR_CODE: 'BGR01',
     MISSING_CODE: 'ERR_CONTENT_REVOKE_BADGE_MISSING',
     MISSING_MESSAGE: 'Required fields for revoking badge are missing',
-    FAILED_ERR_CODE: 'BGR02',
     FAILED_CODE: 'ERR_CONTENT_REVOKE_BADGE_FAILED',
     FAILED_MESSAGE: 'Assigning badge to content failed'
   },
 
   COPY: {
-    MISSING_ERR_CODE: 'CPY01',
     MISSING_CODE: 'ERR_CONTENT_ID_MISSING',
     MISSING_MESSAGE: 'Content Id is missing for copying content',
-    FAILED_ERR_CODE: 'CPY02',
     FAILED_CODE: 'ERR_CONTENT_COPY_FAILED',
     FAILED_MESSAGE: 'content copy failed'
   },
 
   SEARCH_PLUGINS: {
-    MISSING_ERR_CODE: 'SER01',
     MISSING_CODE: 'ERR_PLUGINS_SEARCH_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for search plugins are missing',
-    FAILED_ERR_CODE: 'SER02',
     FAILED_CODE: 'ERR_PLUGINS_SEARCH_FAILED',
     FAILED_MESSAGE: 'Searching plugins failed'
   },
 
   COLLABORATORS: {
-    MISSING_ERR_CODE: 'CBU01',
     MISSING_CODE: 'ERR_CONTENT_COLLABORATORS_UPDATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for update collaborators are missing',
-    FAILED_ERR_CODE: 'CBU02',
     FAILED_CODE: 'ERR_CONTENT_COLLABORATORS_UPDATE_FAILED',
     FAILED_MESSAGE: 'Update collaborators failed',
     FORBIDDEN: 'FORBIDDEN'
   },
 
   CREATE_LOCK: {
-    MISSING_ERR_CODE: 'CRT02',
     MISSING_CODE: 'ERR_LOCK_CREATION_FIELDS_MISSING',
     MISSING_MESSAGE: 'request is required',
-    FAILED_ERR_CODE: 'CRT01',
     FAILED_CODE: 'ERR_LOCK_CREATION_FAILED',
     FAILED_MESSAGE: 'Creating lock failed',
     ALREADY_LOCKED: 'The resource is already locked by {{Name}}',
     DEVICE_ID_MISSING: 'X-device-Id is missing in headers',
     SAME_USER_ERR_MSG: 'The resource is already locked by you in a different window/device',
     UNAUTHORIZED: 'You are not authorized to lock this resource',
-    SELF_LOCKED_ERR_CODE: 'CRT03',
     SELF_LOCKED_CODE: 'RESOURCE_SELF_LOCKED',
-    LOCKED_ERR_CODE: 'CRT04',
     LOCKED_CODE: 'RESOURCE_LOCKED'
   },
 
   REFRESH_LOCK: {
-    MISSING_ERR_CODE: 'REF02',
     MISSING_CODE: 'ERR_LOCK_REFRESHING_FIELDS_MISSING',
     MISSING_MESSAGE: 'request is required',
-    FAILED_ERR_CODE: 'REF01',
     FAILED_CODE: 'ERR_LOCK_REFRESHING_FAILED',
     FAILED_MESSAGE: 'Refreshing lock failed',
     NOT_FOUND_FAILED_MESSAGE: 'Resource is not locked',
@@ -336,10 +282,8 @@ exports.CONTENT = {
   },
 
   RETIRE_LOCK: {
-    MISSING_ERR_CODE: 'RTR02',
     MISSING_CODE: 'ERR_LOCK_RETIRING_FIELDS_MISSING',
     MISSING_MESSAGE: 'request is required',
-    FAILED_ERR_CODE: 'RTR01',
     FAILED_CODE: 'ERR_LOCK_RETIRING_FAILED',
     FAILED_MESSAGE: 'Retiring lock failed',
     NOT_FOUND_FAILED_MESSAGE: 'Resource is not locked',
@@ -348,7 +292,6 @@ exports.CONTENT = {
   },
 
   LIST_LOCK: {
-    FAILED_ERR_CODE: 'LST01',
     FAILED_CODE: 'ERR_LISTING_LOCK_FAILED',
     FAILED_MESSAGE: 'Listing lock failed',
     DEVICE_ID_MISSING: 'X-device-Id is missing in headers'
@@ -364,10 +307,8 @@ exports.REQUEST = {
     MISSING_CHANNELID_MESSAGE: 'Required field channel id is missing'
   },
   TOKEN: {
-    MISSING_ERR_CODE: 'TKN01',
     MISSING_CODE: 'ERR_TOKEN_FIELD_MISSING',
     MISSING_MESSAGE: 'Required field token is missing',
-    INVALID_ERR_CODE: 'TKN02',
     INVALID_CODE: 'ERR_TOKEN_INVALID',
     INVALID_MESSAGE: 'Access denied'
   }
@@ -572,56 +513,44 @@ exports.HEALTH_CHECK = {
 
 exports.DIALCODE = {
   GENERATE: {
-    MISSING_ERR_CODE: 'GEN01',
     MISSING_CODE: 'ERR_DIALCODE_GENERATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for generate dialcode are missing',
-    FAILED_ERR_CODE: 'GEN03',
     FAILED_CODE: 'ERR_DIALCODE_GENERATE_FAILED',
     FAILED_MESSAGE: 'Generate dialcode failed',
-    MISSING_ERR_COUNT: 'GEN02',
     MISSING_COUNT: 'ERR_DIALCODE_GENERATE_COUNT_ERROR',
     MISSING_COUNT_MESSAGE: 'Required fields count is missing or invalid'
 
   },
 
   LIST: {
-    MISSING_ERR_CODE: 'LIS01',
     MISSING_CODE: 'ERR_DIALCODE_LIST_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for getting dialcode list are missing',
-    FAILED_ERR_CODE: 'LIS02',
     FAILED_CODE: 'ERR_DIALCODE_LIST_FAILED',
     FAILED_MESSAGE: 'Getting dialcode list failed'
   },
 
   UPDATE: {
-    MISSING_ERR_CODE: 'UPD01',
     MISSING_CODE: 'ERR_DIALCODE_UPDATE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for update dialcode are missing',
-    FAILED_ERR_CODE: 'UPD02',
     FAILED_CODE: 'ERR_DIALCODE_UPDATE_FAILED',
     FAILED_MESSAGE: 'Update dialcode failed'
   },
 
   GET: {
-    MISSING_ERR_CODE: 'RED01',
     MISSING_CODE: 'ERR_DIALCODE_GET_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for get dialcode are missing',
-    FAILED_ERR_CODE: 'RED02',
     FAILED_CODE: 'ERR_DIALCODE_GET_FAILED',
     FAILED_MESSAGE: 'Get dialcode failed'
   },
 
   CONTENT_LINK: {
-    MISSING_ERR_CODE: 'CNL01',
     MISSING_CODE: 'ERR_DIALCODE_CONTENT_LINK_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for content link dialcode are missing',
-    FAILED_ERR_CODE: 'CNL02',
     FAILED_CODE: 'ERR_DIALCODE_CONTENT_LINK_FAILED',
     FAILED_MESSAGE: 'Content link dialcode failed'
   },
 
   PROCESS: {
-    MISSING_ERR_CODE: 'PRS01',
     MISSING_ID: 'ERR_DIALCODE_PROCESS_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for process status are missing',
     FAILED_CODE: 'ERR_DIALCODE_PROCESS_ID_FAILED',
@@ -633,58 +562,46 @@ exports.DIALCODE = {
   },
 
   SEARCH: {
-    MISSING_ERR_CODE: 'SER01',
     MISSING_CODE: 'ERR_DIALCODE_SEARCH_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for search dialcode are missing',
-    FAILED_ERR_CODE: 'SER02',
     FAILED_CODE: 'ERR_DIALCODE_SEARCH_FAILED',
     FAILED_MESSAGE: 'Search dialcode failed'
   },
 
   PUBLISH: {
-    MISSING_ERR_CODE: 'PUB01',
     MISSING_CODE: 'ERR_DIALCODE_PUBLISH_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for publish dialcode are missing',
-    FAILED_ERR_CODE: 'PUB02',
     FAILED_CODE: 'ERR_DIALCODE_PUBLISH_FAILED',
     FAILED_MESSAGE: 'Publish dialcode failed'
   },
 
   CREATE_PUBLISHER: {
-    MISSING_ERR_CODE: 'PBC01',
     MISSING_CODE: 'ERR_CREATE_PUBLISHER_DIALCODE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for create publisher are missing',
-    FAILED_ERR_CODE: 'PBC02',
     FAILED_CODE: 'ERR_CREATE_PUBLISHER_DIALCODE_FAILED',
     FAILED_MESSAGE: 'Create publisher failed'
   },
 
   UPDATE_PUBLISHER: {
-    MISSING_ERR_CODE: 'PBU01',
     MISSING_CODE: 'ERR_UPDATE_PUBLISHER_DIALCODE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for update publisher are missing',
-    FAILED_ERR_CODE: 'PBU02',
     FAILED_CODE: 'ERR_UPDATE_PUBLISHER_DIALCODE_FAILED',
     FAILED_MESSAGE: 'Update publisher failed'
   },
 
   GET_PUBLISHER: {
-    MISSING_ERR_CODE: 'PBR01',
     MISSING_CODE: 'ERR_GET_PUBLISHER_DIALCODE_FIELDS_MISSING',
     MISSING_MESSAGE: 'Required fields for get publisher are missing',
-    FAILED_ERR_CODE: 'PBR02',
     FAILED_CODE: 'ERR_GET_PUBLISHER_DIALCODE_FAILED',
     FAILED_MESSAGE: 'GET publisher failed'
   },
 
   RELEASE: {
-    FAILED_ERR_CODE: 'REL01',
     FAILED_CODE: 'ERR_RELEASING_DIALCODE_FAILED',
     FAILED_MESSAGE: 'Unable to release the dial code'
   },
 
   RESERVE: {
-    FAILED_ERR_CODE: 'REV01',
     FAILED_CODE: 'ERR_RESERVING_DIALCODE_FAILED',
     FAILED_MESSAGE: 'Unable to reserve the dial code'
   }
@@ -711,34 +628,28 @@ exports.DATASET = {
 
 exports.FORM = {
   READ: {
-    MISSING_ERR_CODE: 'RED01',
     MISSING_CODE: 'ERR_GET_FORM_DATA',
     MISSING_MESSAGE: 'Required fields to get form are missing',
     FAILED_CODE: 'ERR_GET_FORM_DATA_FAILED',
     FAILED_MESSAGE: 'Unable to get the form data'
   },
   CREATE: {
-    MISSING_ERR_CODE: 'CRT01',
     MISSING_CODE: 'ERR_CREATE_FORM_DATA',
     MISSING_MESSAGE: 'Required fields for creating form data are missing',
     FAILED_CODE: 'ERR_CREATE_FORM_DATA_FAILED',
     FAILED_MESSAGE: 'Unable to create the form data'
   },
   UPDATE: {
-    MISSING_ERR_CODE: 'UPD01',
     MISSING_CODE: 'ERR_UPDATE_FORM_DATA',
     MISSING_MESSAGE: 'Required fields while updating form data are missing',
-    FAILED_ERR_CODE: 'UPD02',
     FAILED_CODE: 'ERR_UPDATE_FORM_DATA_FAILED',
     FAILED_MESSAGE: 'Unable to update the form data'
   }
 }
 exports.EXTERNAL_URL_META = {
   FETCH: {
-    MISSING_ERR_CODE: 'FCM01',
     MISSING_CODE: 'ERR_FETCH_URLMETA_MISSING',
     MISSING_MESSAGE: 'Required fields for fetching url meta data are missing',
-    FAILED_ERR_CODE: 'FCM02',
     FAILED_CODE: 'ERR_FETCH_URLMETA_FAILED',
     FAILED_MESSAGE: 'Unable to load the url metadata'
   }

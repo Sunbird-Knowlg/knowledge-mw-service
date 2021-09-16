@@ -23,7 +23,6 @@ var cacheManager = new CacheManager({})
 
 var courseMessage = messageUtils.COURSE
 var responseCode = messageUtils.RESPONSE_CODE
-const SERVICE_PREFIX = 'COU'
 
 /**
  * This function help to transform the object body with oldKey and newKey
@@ -97,7 +96,7 @@ function searchCourseAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.filters) {
-    rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.SEARCH.MISSING_ERR_CODE}`
+    rspObj.errCode = courseMessage.SEARCH.MISSING_CODE
     rspObj.errMsg = courseMessage.SEARCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -123,7 +122,7 @@ function searchCourseAPI (req, response) {
       logger.debug({ msg: 'Request to content provider for course composite search', additionalInfo: { data } }, req)
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.SEARCH.FAILED_ERR_CODE}`
+          rspObj.errCode = courseMessage.SEARCH.FAILED_CODE
           rspObj.errMsg = courseMessage.SEARCH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -242,7 +241,7 @@ function createCourseAPI (req, response) {
 
   if (!data.request || !data.request.course || !validatorUtil.validate(data.request.course, courseModel.CREATE)) {
     // prepare
-    rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.CREATE.MISSING_ERR_CODE}`
+    rspObj.errCode = courseMessage.CREATE.MISSING_CODE
     rspObj.errMsg = courseMessage.CREATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -270,8 +269,8 @@ function createCourseAPI (req, response) {
       logger.debug({ msg: 'Request to content provider for creating course', additionalInfo: { data } }, req)
       contentProvider.createContent(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.CREATE.FAILED_ERR_CODE}`
-          rspObj.errMsg = courseMessage.CREATE.FAILED_MESSAGE
+          rspObj.errCode = courseMessage.CREATE.MISSING_CODE
+          rspObj.errMsg = courseMessage.CREATE.MISSING_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
             msg: 'Error from content provider during content creation',
@@ -321,7 +320,7 @@ function updateCourseAPI (req, response) {
   }
 
   if (!data.request || !data.request.course || !validatorUtil.validate(data.request.course, courseModel.UPDATE)) {
-    rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.UPDATE.MISSING_ERR_CODE}`
+    rspObj.errCode = courseMessage.UPDATE.MISSING_CODE
     rspObj.errMsg = courseMessage.UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -349,7 +348,7 @@ function updateCourseAPI (req, response) {
       logger.debug({ msg: 'Request to content provider for updating course', additionalInfo: { data } }, req)
       contentProvider.getContentUsingQuery(data.courseId, qs, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.UPDATE.FAILED_ERR_CODE}`
+          rspObj.errCode = courseMessage.UPDATE.FAILED_CODE
           rspObj.errMsg = courseMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -376,7 +375,7 @@ function updateCourseAPI (req, response) {
       var ekStepReqData = transformReqBody(data.request, 'course', 'content')
       contentProvider.updateContent(ekStepReqData, data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.UPDATE.FAILED_ERR_CODE}`
+          rspObj.errCode = courseMessage.UPDATE.FAILED_CODE
           rspObj.errMsg = courseMessage.UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -434,7 +433,7 @@ function reviewCourseAPI (req, response) {
       logger.debug({ msg: 'Request to content provider to review course', additionalInfo: { data } }, req)
       contentProvider.reviewContent(ekStepReqData, data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.REVIEW.FAILED_ERR_CODE}`
+          rspObj.errCode = courseMessage.REVIEW.FAILED_CODE
           rspObj.errMsg = courseMessage.REVIEW.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -482,7 +481,7 @@ function publishCourseAPI (req, response) {
   }
 
   if (!data.request || !data.request.course || !data.request.course.lastPublishedBy) {
-    rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.PUBLISH.MISSING_ERR_CODE}`
+    rspObj.errCode = courseMessage.PUBLISH.MISSING_CODE
     rspObj.errMsg = courseMessage.PUBLISH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -504,7 +503,7 @@ function publishCourseAPI (req, response) {
       logger.debug({ msg: 'Request to content provider to publish course', additionalInfo: { data } }, req)
       contentProvider.publishContent(ekStepReqData, data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.PUBLISH.FAILED_ERR_CODE}`
+          rspObj.errCode = courseMessage.PUBLISH.FAILED_CODE
           rspObj.errMsg = courseMessage.PUBLISH.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -554,7 +553,7 @@ function getCourseAPI (req, response) {
   }
 
   if (!data.courseId) {
-    rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.GET.FAILED_ERR_CODE}`
+    rspObj.errCode = courseMessage.GET.FAILED_CODE
     rspObj.errMsg = courseMessage.GET.FAILED_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -575,7 +574,7 @@ function getCourseAPI (req, response) {
       logger.debug({ msg: 'Request to content provider to get Course Details', additionalInfo: { data } }, req)
       contentProvider.getContent(data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.GET.FAILED_ERR_CODE}`
+          rspObj.errCode = courseMessage.GET.FAILED_CODE
           rspObj.errMsg = courseMessage.GET.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -637,7 +636,7 @@ function getMyCourseAPI (req, response) {
       logger.debug({ msg: 'Request to content provider to get Course Details', additionalInfo: { data: request } }, req)
       contentProvider.compositeSearch(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.GET_MY.FAILED_ERR_CODE}`
+          rspObj.errCode = courseMessage.GET_MY.FAILED_CODE
           rspObj.errMsg = courseMessage.GET_MY.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -690,8 +689,8 @@ function getCourseHierarchyAPI (req, response) {
   }
 
   if (!data.courseId) {
-    rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.HIERARCHY.MISSING_ERR_CODE}`
-    rspObj.errMsg = courseMessage.HIERARCHY.MISSING_MESSAGE
+    rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE
+    rspObj.errMsg = courseMessage.HIERARCHY.FAILED_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
       msg: 'Error due to missing courseId',
@@ -711,7 +710,7 @@ function getCourseHierarchyAPI (req, response) {
       logger.debug({ msg: 'Request to content provider to get content Hierarchy', additionalInfo: { data } }, req)
       contentProvider.contentHierarchy(data.courseId, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.HIERARCHY.FAILED_ERR_CODE}`
+          rspObj.errCode = courseMessage.HIERARCHY.FAILED_CODE
           rspObj.errMsg = courseMessage.HIERARCHY.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({
@@ -757,7 +756,7 @@ function updateCourseHierarchyAPI (req, response) {
   var rspObj = req.rspObj
 
   if (!data.request || !data.request.data || !data.request.data.hierarchy) {
-    rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.HIERARCHY_UPDATE.MISSING_CODE}`
+    rspObj.errCode = courseMessage.HIERARCHY_UPDATE.MISSING_CODE
     rspObj.errMsg = courseMessage.HIERARCHY_UPDATE.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -787,7 +786,7 @@ function updateCourseHierarchyAPI (req, response) {
       logger.debug({ msg: 'Request to content provider to update content Hierarchy', additionalInfo: { data } }, req)
       contentProvider.contentHierarchyUpdate(ekStepReqData, req.headers, function (err, res) {
         if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.errCode = `${SERVICE_PREFIX}_${courseMessage.HIERARCHY_UPDATE.FAILED_CODE}`
+          rspObj.errCode = courseMessage.HIERARCHY_UPDATE.FAILED_CODE
           rspObj.errMsg = courseMessage.HIERARCHY_UPDATE.FAILED_MESSAGE
           rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
           logger.error({

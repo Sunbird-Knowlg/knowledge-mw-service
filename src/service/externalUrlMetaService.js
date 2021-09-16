@@ -10,7 +10,6 @@ var responseCode = messageUtils.RESPONSE_CODE
 var respUtil = require('response_util')
 var utilsService = require('../service/utilsService')
 var logger = require('sb_logger_util_v2')
-const SERVICE_PREFIX = 'URL'
 
 function fetchUrlMetaAPI (req, response) {
   return fetchUrlMeta(req, response)
@@ -20,7 +19,7 @@ function fetchUrlMeta (req, response) {
   var data = req.body.request
   var rspObj = {}
   if (!data['url']) {
-    rspObj.errCode = `${SERVICE_PREFIX}_${extUrlMessage.FETCH.MISSING_ERR_CODE}`
+    rspObj.errCode = extUrlMessage.FETCH.MISSING_CODE
     rspObj.errMsg = extUrlMessage.FETCH.MISSING_MESSAGE
     rspObj.responseCode = responseCode.CLIENT_ERROR
     logger.error({
@@ -42,7 +41,7 @@ function fetchUrlMeta (req, response) {
       return response.status(200).send(respUtil.successResponse(rspObj))
     },
     function (error) {
-      rspObj.errCode = error.code || `${SERVICE_PREFIX}_${extUrlMessage.FETCH.FAILED_ERR_CODE}`
+      rspObj.errCode = error.code || extUrlMessage.FETCH.FAILED_CODE
       rspObj.errMsg = extUrlMessage.FETCH.FAILED_MESSAGE
       rspObj.responseCode = responseCode.INTERNAL_SERVER_ERROR
       logger.error({
