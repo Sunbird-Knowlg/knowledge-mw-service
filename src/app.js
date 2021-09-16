@@ -10,7 +10,6 @@ var fs = require('fs')
 var configUtil = require('sb-config-util')
 var _ = require('lodash')
 var logger = require('sb_logger_util_v2')
-var { loadTokenPublicKeys } = require('sb_api_interceptor');
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
@@ -58,7 +57,6 @@ const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
 const isHealthCheckEnabled = process.env.sunbird_health_check_enable || 'true'
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://knowledge-mw-service:5000'
 const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
-const kidTokenPublicKeyBasePath = process.env.sunbird_kid_public_key_base_path || '/keys/'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('CONTENT_SERVICE_BASE_URL', contentServiceBaseUrl)
@@ -181,8 +179,7 @@ require('./routes/questionRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-async function startServer(cb) {
-  await loadTokenPublicKeys(path.join(__dirname, kidTokenPublicKeyBasePath));
+function startServer(cb) {
 
   if(this.server) {
     cb && cb()

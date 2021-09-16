@@ -25,6 +25,7 @@ node('build-slave') {
                 env.NODE_ENV = "build"
                 print "Environment will be : ${env.NODE_ENV}"
                 sh('git submodule update --init')
+                sh('git submodule update --init --recursive --remote')
                 sh('chmod 777 build.sh')
                 sh("./build.sh ${build_tag} ${env.NODE_NAME} ${hub_org}")
             }
@@ -33,9 +34,11 @@ node('build-slave') {
                 currentBuild.description = "${build_tag}"
             }
         }
+
     }
     catch (err) {
         currentBuild.result = "FAILURE"
         throw err
     }
+
 }
