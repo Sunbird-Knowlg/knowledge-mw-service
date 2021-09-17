@@ -10,6 +10,7 @@ var fs = require('fs')
 var configUtil = require('sb-config-util')
 var _ = require('lodash')
 var logger = require('sb_logger_util_v2')
+var ApiInterceptor = require('sb_api_interceptor')
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
@@ -57,6 +58,7 @@ const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
 const isHealthCheckEnabled = process.env.sunbird_health_check_enable || 'true'
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://knowledge-mw-service:5000'
 const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
+const kidTokenPublicKeyBasePath = process.env.sunbird_kid_public_key_base_path || '/keys/'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('CONTENT_SERVICE_BASE_URL', contentServiceBaseUrl)
@@ -179,11 +181,28 @@ require('./routes/questionRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer(cb) {
+async function startServer (cb) {
+  var keyCloakConfig = {
+    'authServerUrl': process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : 'https://staging.open-sunbird.org/auth',
+    'realm': process.env.sunbird_keycloak_realm ? process.env.sunbird_keycloak_realm : 'sunbird',
+    'clientId': process.env.sunbird_keycloak_client_id ? process.env.sunbird_keycloak_client_id : 'portal',
+    'public': process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true,
+    'realmPublicKey': process.env.sunbird_keycloak_public_key
+  }
+  logger.info({ msg: 'keyCloakConfig', keyCloakConfig })
 
-  if(this.server) {
+  var cacheConfig = {
+    store: process.env.sunbird_cache_store ? process.env.sunbird_cache_store : 'memory',
+    ttl: process.env.sunbird_cache_ttl ? process.env.sunbird_cache_ttl : 1800
+  }
+
+  var apiInterceptor = new ApiInterceptor(keyCloakConfig, cacheConfig)
+
+  await apiInterceptor.loadTokenPublicKeys(path.join(__dirname, kidTokenPublicKeyBasePath))
+
+  if (this.server) {
     cb && cb()
-    return;
+    return
   }
 
   this.server = http.createServer(app).listen(port, function () {
@@ -201,7 +220,7 @@ function startServer(cb) {
       logger.fatal({ msg: 'error in getting meta filters', err })
       process.exit(1)
     })
-    cb && cb();
+    cb && cb()
   })
   this.server.keepAliveTimeout = 30000 * 5
 }
@@ -237,14 +256,14 @@ const telemetryConfig = {
 logger.debug({ msg: 'Telemetry is initialized.' })
 telemetry.init(telemetryConfig)
 process.on('unhandledRejection', (reason, p) => {
-  console.log("Kp-mw Unhandled Rejection", p, reason);
-  logger.error({ msg: "Kp-mw Unhandled Rejection", p, reason })
-});
+  console.log('Kp-mw Unhandled Rejection', p, reason)
+  logger.error({ msg: 'Kp-mw Unhandled Rejection', p, reason })
+})
 process.on('uncaughtException', (err) => {
-  console.log("Kp-mw Uncaught Exception", err);
-  logger.error({ msg: "Kp-mw Uncaught Exception", err })
-  process.exit(1);
-});
+  console.log('Kp-mw Uncaught Exception', err)
+  logger.error({ msg: 'Kp-mw Uncaught Exception', err })
+  process.exit(1)
+})
 
-exports.start = startServer;
-exports.close = (cb) => { this.server.close(cb)};
+exports.start = startServer
+exports.close = (cb) => { this.server.close(cb) }
