@@ -511,7 +511,7 @@ function updateDialCodeV2API (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.debug({ msg: 'updateDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'updateDialCodeV2API results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
