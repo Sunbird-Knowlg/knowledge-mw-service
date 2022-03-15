@@ -9,7 +9,7 @@ var requestMiddleware = require('../middlewares/request.middleware')
 var healthService = require('../service/healthCheckService')
 
 var BASE_URL = '/v1/dialcode'
-var BASE_URL_v2 = '/v2/dialcode'
+var BASE_URL_V2 = '/v2/dialcode'
 var dependentServiceHealth = ['EKSTEP', 'CASSANDRA']
 
 module.exports = function (app) {
