@@ -627,7 +627,7 @@ function getDialCodeV2API (req, response) {
 
     function (CBW) {
       logger.debug({
-        msg: 'Request to get dialcode meta data',
+        msg: 'Request to get dialcode context info',
         additionalInfo: {
           dialCodeId: data.dialCodeId,
           qs: data.queryParams
@@ -660,7 +660,7 @@ function getDialCodeV2API (req, response) {
     },
     function (res) {
       rspObj.result = res.result
-      logger.debug({ msg: 'getDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
+      logger.debug({ msg: 'getDialCodeV2API results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
