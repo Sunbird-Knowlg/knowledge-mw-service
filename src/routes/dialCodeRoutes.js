@@ -31,11 +31,11 @@ module.exports = function (app) {
       requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID,
       dialCodeService.getDialCodeAPI)
 
-  app.route(BASE_URL_V2 + '/read')
+  /* app.route(BASE_URL_V2 + '/read')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID,
-       dialCodeService.getDialCodeV2API)
+       dialCodeService.getDialCodeV2API) */
 
   app.route(BASE_URL + '/update/:dialCodeId')
     .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
