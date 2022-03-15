@@ -43,11 +43,11 @@ module.exports = function (app) {
       requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID,
       dialCodeService.updateDialCodeAPI)
 
-  app.route(BASE_URL_V2 + '/update/:dialCodeId')
+  /* app.route(BASE_URL_V2 + '/update/:dialCodeId')
     .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID,
-      dialCodeService.updateDialCodeV2API)
+      dialCodeService.updateDialCodeV2API) */
 
   app.route(BASE_URL + '/content/link')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
