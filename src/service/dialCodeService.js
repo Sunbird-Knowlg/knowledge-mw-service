@@ -1299,7 +1299,9 @@ function releaseDialCode (req, response) {
 module.exports.generateDialCodeAPI = generateDialCodeAPI
 module.exports.dialCodeListAPI = dialCodeListAPI
 module.exports.updateDialCodeAPI = updateDialCodeAPI
+module.exports.updateDialCodeV2API = updateDialCodeV2API
 module.exports.getDialCodeAPI = getDialCodeAPI
+module.exports.getDialCodeV2API = getDialCodeV2API
 module.exports.contentLinkDialCodeAPI = contentLinkDialCodeAPI
 module.exports.getProcessIdStatusAPI = getProcessIdStatusAPI
 module.exports.searchDialCodeAPI = searchDialCodeAPI
