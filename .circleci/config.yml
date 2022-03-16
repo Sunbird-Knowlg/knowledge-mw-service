@@ -6,6 +6,7 @@ jobs:
     working_directory: ~/project/src
     steps:
       - checkout
+      - run: npm cache clean --force 
       - run: git submodule update --init --recursive src/libs
       - run: mkdir -p opt/content && cp -r src/* opt/content/
       - restore_cache:
