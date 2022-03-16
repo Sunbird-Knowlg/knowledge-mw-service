@@ -35,7 +35,7 @@ module.exports = function (app) {
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID,
-       dialCodeService.getDialCodeV2API)
+      dialCodeService.getDialCodeV2API)
 
   app.route(BASE_URL + '/update/:dialCodeId')
     .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
