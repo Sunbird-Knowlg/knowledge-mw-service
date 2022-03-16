@@ -28,6 +28,8 @@
         "GENERATE_DIALCODE_URI": "/dialcode/v3/generate",
         "GET_DIALCODE_URI": "/dialcode/v3/read",
         "UPDATE_DIALCODE_URI": "/dialcode/v3/update",
+        "GET_DIALCODEV4_URI": "/dialcode/v4/read",
+        "UPDATE_DIALCODEV4_URI": "/dialcode/v4/update",
         "LIST_DIALCODE_URI": "/dialcode/v3/list",
         "CONTENT_LINK_DIALCODE_URI": "/content/v3/dialcode/link",
         "SEARCH_DIALCODE_URI": "/dialcode/v3/search",
