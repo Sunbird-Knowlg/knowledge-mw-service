@@ -1,8 +1,8 @@
 version: 2.1
 jobs:
   build:
-    docker:
-      - image: circleci/classic:latest
+    machine:
+      image: circleci/classic:latest
     working_directory: ~/project/src
     steps:
       - checkout
