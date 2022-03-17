@@ -1,8 +1,8 @@
 version: 2.1
 jobs:
   build:
-     docker:
-      - image: circleci/node:12.13.0
+    machine:
+      image: circleci/classic
     working_directory: ~/project/src
     steps:
       - checkout
@@ -24,10 +24,17 @@ jobs:
           command: 'cd src && npm install --unsafe-perm && npm run coverage'     
       - run:
           name: install sonar scanner
-          command: sudo npm install -g sonarqube-scanner@2.7.0
+          command: |
+            cd ~/project && mkdir -p /tmp
+            cd /tmp
+            wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+            unzip || sudo apt install unzip -y
+            unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+            cd -
       - run:
-          name: Run SonarScan
-          command: sonar-scanner
+         name: run sonar scanner
+         command: 'cd ~/project && /tmp/sonar-scanner-4.6.2.2472-linux/bin/sonar-scanner'
+
                   
 workflows:
   version: 2.1
