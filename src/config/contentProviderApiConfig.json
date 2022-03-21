@@ -28,6 +28,8 @@
         "GENERATE_DIALCODE_URI": "/dialcode/v3/generate",
         "GET_DIALCODE_URI": "/dialcode/v3/read",
         "UPDATE_DIALCODE_URI": "/dialcode/v3/update",
+        "GET_DIALCODEV4_URI": "/dialcode/v4/read",
+        "UPDATE_DIALCODEV4_URI": "/dialcode/v4/update",
         "LIST_DIALCODE_URI": "/dialcode/v3/list",
         "CONTENT_LINK_DIALCODE_URI": "/content/v3/dialcode/link",
         "SEARCH_DIALCODE_URI": "/dialcode/v3/search",
@@ -38,25 +40,25 @@
         "UPDATE_COLLABORATOR": "/content/v1/collaborator/update",
         "RESERVE_DIALCODE": "/content/v3/dialcode/reserve",
         "RELEASE_DIALCODE": "/content/v3/dialcode/release",
-        
+
         "CHANNEL_URI": "/channel/v3/read",
         "CHANNEL_LIST_URI": "/channel/v3/list",
         "CHANNEL_SEARCH_URI": "/channel/v3/search",
         "CHANNEL_CREATE_URI": "/channel/v3/create",
         "CHANNEL_UPDATE_URI": "/channel/v3/update",
-      
+
         "FRAMEWORK_URI": "/framework/v3/read",
         "FRAMEWORK_LIST_URI": "/framework/v3/list",
         "FRAMEWORK_CREATE_URI": "/framework/v3/create",
         "FRAMEWORK_UPDATE_URI": "/framework/v3/update",
         "FRAMEWORK_COPY_URI": "/framework/v3/copy",
         "FRAMEWORK_PUBLISH_URI":"/framework/v3/publish",
-      
+
         "FRAMEWORK_TERM_URI": "/framework/v3/term/read",
         "FRAMEWORK_TERM_SEARCH_URI": "/framework/v3/term/search",
         "FRAMEWORK_TERM_CREATE_URI": "/framework/v3/term/create",
         "FRAMEWORK_TERM_UPDATE_URI": "/framework/v3/term/update",
-      
+
         "FRAMEWORK_CATEGORY_INSTANCE_URI": "/framework/v3/category/read",
         "FRAMEWORK_CATEGORY_INSTANCE_SEARCH_URI": "/framework/v3/category/search",
         "FRAMEWORK_CATEGORY_INSTANCE_CREATE_URI": "/framework/v3/category/create",
