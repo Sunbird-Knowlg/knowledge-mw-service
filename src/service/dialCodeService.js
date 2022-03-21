@@ -524,6 +524,7 @@ function updateDialCodeV2API (req, response) {
  * @returns {object} return response object with http status
  */
 function getDialCodeAPI (req, response) {
+  logger.info("dialCodeService.js:: getDialCodeAPI function invoked!")
   var data = {}
   data.body = req.body
   data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
@@ -599,6 +600,7 @@ function getDialCodeAPI (req, response) {
  * @returns {object} return response object with http status
  */
 function getDialCodeV2API (req, response) {
+  logger.info("dialCodeService.js:: getDialCodeV2API function invoked!")
   var data = {}
   data.body = req.body
   data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
