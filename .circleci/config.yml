@@ -1,9 +1,8 @@
 version: 2.1
 jobs:
   build:
-    docker:
-      - image: circleci/node:12.13.0 
-    parallelism: 2
+    machine:
+      image: circleci/classic:latest
     working_directory: ~/project/src 
     steps:
       - checkout
