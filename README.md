@@ -39,7 +39,9 @@ The code in this repository is licensed under MIT unless otherwise noted. Please
 
 ## Setup Instructions
 * Clone the project.eg .(git clone --recursive  url)
-* Run "git submodule update --init --recursive" to pull the latest sunbird-js-utils sub module
+* Run "git submodule init"
+* Run "git submodule update"
+* Run "git submodule update --init --recursive" to pull the latest sunbird-js-utils sub module (if you want to pull from specific branch, "git submodule foreach git pull origin 'branch_name'" )
 * Change to src folder
 * Run `npm install`
 * Run `node app.js`
