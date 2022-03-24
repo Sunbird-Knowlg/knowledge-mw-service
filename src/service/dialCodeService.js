@@ -602,8 +602,7 @@ function getDialCodeAPI (req, response) {
 function getDialCodeV2API (req, response) {
   logger.info("dialCodeService.js:: getDialCodeV2API function invoked!")
   var data = {}
-  data.body = req.body
-  data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
+  data.dialCodeId = req.params.dialCodeId
   var rspObj = req.rspObj
   // Adding objectData in telemetryData object
   if (rspObj.telemetryData) {
@@ -632,8 +631,7 @@ function getDialCodeV2API (req, response) {
       logger.debug({
         msg: 'Request to get dialcode context info',
         additionalInfo: {
-          dialCodeId: data.dialCodeId,
-          qs: data.queryParams
+          dialCodeId: data.dialCodeId
         }
       }, req)
       contentProvider.getDialCodeV2(data.dialCodeId, req.headers, function (err, res) {
