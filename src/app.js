@@ -20,7 +20,7 @@ const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderA
 var contentProviderApiConfig = JSON.parse(fs.readFileSync(contentProviderConfigPath))
 const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/telemetryEventConfig.json')))
 
-var reqDataLimitOfContentUpload = '50mb'
+var reqDataLimitOfContentUpload = process.env.sunbird_content_upload_data_limit || '50mb'
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000
 const defaultChannel = process.env.sunbird_default_channel || 'sunbird'
