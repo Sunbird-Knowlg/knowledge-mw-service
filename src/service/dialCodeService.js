@@ -84,32 +84,8 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
 
       // if content id present then we will send zip file name
       if (contentId) {
-        var qs = {
-          mode: 'edit',
-          fields: 'medium,subject,gradeLevel'
-        }
-        contentProvider.getContentUsingQuery(contentId, qs, {},
-          function (err, res) {
-            if (err || res.responseCode !== responseCode.SUCCESS) {
-              logger.error({ msg: 'Error while getting content', err, additionalInfo: { contentId, qs } })
-              cb(null, data)
-            } else {
-              let medium = _.get(res, 'result.content.medium')
-              let subject = _.get(res, 'result.content.subject')
-              let gradeLevel = _.get(res, 'result.content.gradeLevel')
-              let fileNameArray = [contentId, medium]
-              fileNameArray = _.concat(fileNameArray, gradeLevel)
-              fileNameArray.push(subject)
-              fileNameArray.push(Date.now())
-              fileNameArray = _.compact(fileNameArray)
-
-              let fileName = _.join(fileNameArray, '_')
-              fileName = _.lowerCase(fileName)
-              fileName = fileName.split(' ').join('_')
-              data['storage']['fileName'] = fileName
-              cb(null, data)
-            }
-          })
+        data['storage']['fileName'] = contentId + '_' + Date.now();
+        cb(null, data);
       } else {
         logger.warn({ msg: 'contentId not present', additionalInfo: { data } })
         cb(null, data)
