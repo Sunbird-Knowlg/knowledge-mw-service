@@ -237,7 +237,7 @@ function createLock (req, response) {
       };
       const resourceInfo = parse.JSON(data.request.resourceInfo);
       if (lodash.has(resourceInfo, 'mimeType') && lodash.lowerCase(resourceInfo.mimeType) === 'application/vnd.sunbird.questionset') {
-        ekStepReqData.request = lockData;
+        ekStepReqData.request = {'questionset': lockData};
         contentProvider.updateQuestionset(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             rspObj.result = res && res.result ? res.result : {}
