@@ -78,6 +78,8 @@
         "CREATE_LOCK": "/lock/v1/create",
         "REFRESH_LOCK": "/lock/v1/refresh",
         "RETIRE_LOCK": "/lock/v1/retire",
-        "LIST_LOCK": "/lock/v1/list"
+        "LIST_LOCK": "/lock/v1/list",
+
+        "UPDATE_QUESTION_SET_URI": "questionset/v1/update"
     }
 }   
