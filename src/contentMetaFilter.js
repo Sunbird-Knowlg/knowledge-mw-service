@@ -7,11 +7,9 @@ var configHelper = require('./helpers/configHelper.js')
 var cron = require('node-cron')
 var channelRefreshCronStr = process.env.sunbird_content_service_channel_refresh_cron
 var ischannelRefreshEnabled = false
-var async = require('asyncawait/async');
-var await = require('asyncawait/await');
 // Function to generate the Config Array
 
-var generateConfigString = async(function(metaFiltersArray) {
+var generateConfigString =  ( async function(metaFiltersArray) {
     var configArray = {}
     _.forOwn(metaFiltersArray, function (value, key) {
       var allowedMetadata = value[0]
@@ -23,7 +21,7 @@ var generateConfigString = async(function(metaFiltersArray) {
         }
         LOG.info(utilsService.getLoggerData({}, 'INFO',
           filename, 'generateConfigString', 'allowed channels', allowedMetadata))
-          var allChannels = await(configHelper.getAllChannelsFromAPI())
+          var allChannels = await (configHelper.getAllChannelsFromAPI())
           allowedMetadata = _.pull(allowedMetadata, '$.instance.all').concat(allChannels)
           LOG.info(utilsService.getLoggerData({}, 'INFO',
             filename, 'generateConfigString', 'all whitelisted channels count', allowedMetadata.length))

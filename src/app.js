@@ -10,6 +10,7 @@ var fs = require('fs')
 var configUtil = require('sb-config-util')
 var _ = require('lodash')
 var logger = require('sb_logger_util_v2')
+var ApiInterceptor = require('sb_api_interceptor')
 
 const contentProvider = require('sb_content_provider_util')
 var contentMetaProvider = require('./contentMetaFilter')
@@ -19,7 +20,7 @@ const contentProviderConfigPath = path.join(__dirname, '/config/contentProviderA
 var contentProviderApiConfig = JSON.parse(fs.readFileSync(contentProviderConfigPath))
 const telemtryEventConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/telemetryEventConfig.json')))
 
-var reqDataLimitOfContentUpload = '50mb'
+var reqDataLimitOfContentUpload = process.env.sunbird_content_upload_data_limit || '50mb'
 
 const port = process.env.sunbird_content_service_port ? process.env.sunbird_content_service_port : 5000
 const defaultChannel = process.env.sunbird_default_channel || 'sunbird'
@@ -28,6 +29,11 @@ globalEkstepProxyBaseUrl = process.env.sunbird_content_plugin_base_url ? process
 
 const contentRepoBaseUrl = process.env.sunbird_content_repo_api_base_url || 'https://qa.ekstep.in/api'
 const contentRepoApiKey = process.env.sunbird_content_repo_api_key
+
+const contentServiceBaseUrl = process.env.sunbird_contnet_service_base_url || 'http://content-service:9000'
+const contentServiceAuthToken = process.env.sunbird_content_service_auth_token
+
+const assessmentServiceBaseUrl = process.env.sunbird_assessment_service_base_url || 'http://assessment-service:9000'
 
 const learnerServiceLocalBaseUrl = process.env.sunbird_learner_service_local_base_url
   ? process.env.sunbird_learner_service_local_base_url
@@ -50,10 +56,14 @@ const producerId = process.env.sunbird_environment + '.' + process.env.sunbird_i
 const sunbirdPortalBaseUrl = process.env.sunbird_portal_base_url || 'https://staging.open-sunbird.org'
 const lockExpiryTime = process.env.sunbird_lock_expiry_time || 3600
 const isHealthCheckEnabled = process.env.sunbird_health_check_enable || 'true'
-const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://content-service:5000'
+const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://knowledge-mw-service:5000'
 const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
+const kidTokenPublicKeyBasePath = process.env.sunbird_kid_public_key_base_path || '/keys/'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
+configUtil.setConfig('CONTENT_SERVICE_BASE_URL', contentServiceBaseUrl)
+configUtil.setConfig('CONTENT_SERVICE_AUTH_TOKEN', contentServiceAuthToken)
+configUtil.setConfig('ASSESSMENT_SERVICE_BASE_URL', assessmentServiceBaseUrl)
 configUtil.setConfig('CONTENT_REPO_BASE_URL', contentRepoBaseUrl)
 configUtil.setConfig('TELEMETRY_BASE_URL', telemetryBaseUrl)
 configUtil.setConfig('CONTENT_REPO_AUTHORIZATION_TOKEN', 'Bearer ' + contentRepoApiKey)
@@ -148,7 +158,7 @@ app.use(function (req, res, next) {
     res.sendStatus(200)
   } else {
     next()
-  };
+  }
 })
 
 require('./routes/healthCheckRoutes')(app)
@@ -167,10 +177,34 @@ require('./routes/externalUrlMetaRoute')(app)
 require('./routes/pluginsRoutes')(app)
 require('./routes/collaborationRoutes')(app)
 require('./routes/lockRoutes')(app)
+require('./routes/questionRoutes')(app)
 // this middleware route add after all the routes
 require('./middlewares/proxy.middleware')(app)
 
-function startServer () {
+async function startServer (cb) {
+  var keyCloakConfig = {
+    'authServerUrl': process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : 'https://staging.open-sunbird.org/auth',
+    'realm': process.env.sunbird_keycloak_realm ? process.env.sunbird_keycloak_realm : 'sunbird',
+    'clientId': process.env.sunbird_keycloak_client_id ? process.env.sunbird_keycloak_client_id : 'portal',
+    'public': process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true,
+    'realmPublicKey': process.env.sunbird_keycloak_public_key
+  }
+  logger.info({ msg: 'keyCloakConfig', keyCloakConfig })
+
+  var cacheConfig = {
+    store: process.env.sunbird_cache_store ? process.env.sunbird_cache_store : 'memory',
+    ttl: process.env.sunbird_cache_ttl ? process.env.sunbird_cache_ttl : 1800
+  }
+
+  var apiInterceptor = new ApiInterceptor(keyCloakConfig, cacheConfig)
+
+  await apiInterceptor.loadTokenPublicKeys(path.join(__dirname, kidTokenPublicKeyBasePath))
+
+  if (this.server) {
+    cb && cb()
+    return
+  }
+
   this.server = http.createServer(app).listen(port, function () {
     logger.info({ msg: `server running at PORT ${port}` })
     logger.debug({ msg: `server started at ${new Date()}` })
@@ -186,8 +220,9 @@ function startServer () {
       logger.fatal({ msg: 'error in getting meta filters', err })
       process.exit(1)
     })
+    cb && cb()
   })
-  this.server.keepAliveTimeout = 60000 * 5;
+  this.server.keepAliveTimeout = 30000 * 5
 }
 
 // Create server
@@ -206,12 +241,6 @@ if (defaultChannel) {
   startServer()
 }
 
-// Close server, when we start for test cases
-exports.close = function () {
-  logger.debug({ msg: `server stopped at ${new Date()}` })
-  this.server.close()
-}
-
 // Telemetry initialization
 const telemetryBatchSize = parseInt(process.env.sunbird_telemetry_sync_batch_size, 10) || 20
 telemtryEventConfig.pdata.id = producerId
@@ -226,3 +255,15 @@ const telemetryConfig = {
 
 logger.debug({ msg: 'Telemetry is initialized.' })
 telemetry.init(telemetryConfig)
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Kp-mw Unhandled Rejection', p, reason)
+  logger.error({ msg: 'Kp-mw Unhandled Rejection', p, reason })
+})
+process.on('uncaughtException', (err) => {
+  console.log('Kp-mw Uncaught Exception', err)
+  logger.error({ msg: 'Kp-mw Uncaught Exception', err })
+  process.exit(1)
+})
+
+exports.start = startServer
+exports.close = (cb) => { this.server.close(cb) }

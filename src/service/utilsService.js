@@ -205,7 +205,7 @@ function getErrorResponse (rspObj, serverRsp, msgObject) {
     : (msgObject && msgObject['FAILED_CODE'] ? msgObject['FAILED_CODE'] : null)
   rspObj.errMsg = _.get(serverRsp, 'params.errmsg') ? serverRsp.params.errmsg
     : (msgObject && msgObject['FAILED_MESSAGE'] ? msgObject['FAILED_MESSAGE'] : null)
-  rspObj.responseCode = serverRsp && serverRsp.responseCode ? serverRsp.responseCode : responseCode['SERVER_ERROR']
+  rspObj.responseCode = _.get(serverRsp, 'responseCode') ? serverRsp.responseCode : responseCode['SERVER_ERROR']
   return rspObj
 }
 

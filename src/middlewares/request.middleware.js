@@ -19,8 +19,10 @@ var keyCloakConfig = {
   'authServerUrl': process.env.sunbird_keycloak_auth_server_url ? process.env.sunbird_keycloak_auth_server_url : 'https://staging.open-sunbird.org/auth',
   'realm': process.env.sunbird_keycloak_realm ? process.env.sunbird_keycloak_realm : 'sunbird',
   'clientId': process.env.sunbird_keycloak_client_id ? process.env.sunbird_keycloak_client_id : 'portal',
-  'public': process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true
+  'public': process.env.sunbird_keycloak_public ? process.env.sunbird_keycloak_public : true,
+  'realmPublicKey': process.env.sunbird_keycloak_public_key
 }
+logger.info({ msg: 'keyCloakConfig', keyCloakConfig })
 
 var cacheConfig = {
   store: process.env.sunbird_cache_store ? process.env.sunbird_cache_store : 'memory',
@@ -90,7 +92,7 @@ function createAndValidateRequestBody (req, res, next) {
  * @param  {Function} next
  */
 function validateToken (req, res, next) {
-  logger.debug({ msg: 'validateToken() called' }, req)
+  logger.debug({ msg: 'validateToken() called, offline token validation enabled' }, req)
   var token = req.get('x-authenticated-user-token')
   var rspObj = req.rspObj
   if (!token) {
@@ -116,9 +118,9 @@ function validateToken (req, res, next) {
       rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
       rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
       logger.error({
-        msg: 'Invalid token',
+        msg: 'validateToken token failed, Invalid token',
         err: {
-          err,
+          err: _.get(err, 'message') || err,
           errCode: rspObj.errCode,
           errMsg: rspObj.errMsg,
           responseCode: rspObj.responseCode
@@ -187,7 +189,7 @@ function validateUserToken (req, res, next) {
       rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
       rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
       logger.error({
-        msg: 'Invalid token',
+        msg: 'validateUserToken token failed, Invalid token',
         err: {
           err,
           errCode: rspObj.errCode,
@@ -216,7 +218,8 @@ function apiAccessForCreatorUser (req, response, next) {
   var data = {}
   var rspObj = req.rspObj
   var qs = {
-    fields: 'createdBy,collaborators'
+    fields: 'createdBy,collaborators',
+    mode: 'edit'
   }
   var contentMessage = messageUtil.CONTENT
 
@@ -283,7 +286,8 @@ function apiAccessForReviewerUser (req, response, next) {
   var data = {}
   var rspObj = req.rspObj
   var qs = {
-    fields: 'createdBy,collaborators'
+    fields: 'createdBy,collaborators',
+    mode: 'edit'
   }
   var contentMessage = messageUtil.CONTENT
 
@@ -348,7 +352,8 @@ function hierarchyUpdateApiAccess (req, response, next) {
   var data = req.body
   var rspObj = req.rspObj
   var qs = {
-    fields: 'createdBy,collaborators'
+    fields: 'createdBy,collaborators',
+    mode: 'edit'
   }
   var contentMessage = messageUtil.CONTENT
 
@@ -449,6 +454,14 @@ function checkChannelID (req, res, next) {
   next()
 }
 
+function seteTextbook (req, res, next) {
+  if(!_.isEmpty(req.body.request) && !_.isEmpty(req.body.request.content)) {
+    req.body.request.content['contentType'] = 'eTextBook'
+  }
+  console.log("After Set e-Textbook: " + JSON.stringify(req.body))
+  next()
+}
+
 // Exports required function
 module.exports.validateToken = validateToken
 module.exports.createAndValidateRequestBody = createAndValidateRequestBody
@@ -458,3 +471,4 @@ module.exports.hierarchyUpdateApiAccess = hierarchyUpdateApiAccess
 module.exports.checkChannelID = checkChannelID
 module.exports.validateUserToken = validateUserToken
 module.exports.gzipCompression = gzipCompression
+module.exports.seteTextbook = seteTextbook
