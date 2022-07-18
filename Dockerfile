@@ -12,7 +12,6 @@ RUN sed -i '/jessie-updates/d' /etc/apt/sources.list \
     && apt-get clean \
     && useradd -m sunbird
 USER sunbird
-ADD ImageMagick-i386-pc-solaris2.11.tar.gz /home/sunbird
 ENV GRAPH_HOME "/home/sunbird/ImageMagick-6.9.3"
 ENV PATH "$GRAPH_HOME/bin:$PATH"
 ENV MAGICK_HOME "/home/sunbird/ImageMagick-6.9.3"
