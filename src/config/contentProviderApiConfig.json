@@ -80,6 +80,6 @@
         "RETIRE_LOCK": "/lock/v1/retire",
         "LIST_LOCK": "/lock/v1/list",
 
-        "UPDATE_QUESTION_SET_URI": "questionset/v1/update"
+        "UPDATE_QUESTION_SET_URI": "/questionset/v1/update"
     }
 }   
