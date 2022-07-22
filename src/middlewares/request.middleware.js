@@ -93,7 +93,7 @@ function createAndValidateRequestBody (req, res, next) {
  */
 function validateToken (req, res, next) {
   logger.debug({ msg: 'validateToken() called, offline token validation enabled' }, req)
-  if (configUtil.getConfig('USER_TOKEN_VALIDATE') === 'false') {
+  if (configUtil.getConfig('ENABLE_USER_TOKEN_VALIDATION') === 'false') {
     next()
     return
   }
