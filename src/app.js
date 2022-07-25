@@ -59,6 +59,7 @@ const isHealthCheckEnabled = process.env.sunbird_health_check_enable || 'true'
 const contentServiceLocalBaseUrl = process.env.sunbird_content_service_local_base_url ? process.env.sunbird_content_service_local_base_url : 'http://knowledge-mw-service:5000'
 const sunbirdGzipEnable = process.env.sunbird_gzip_enable || 'true'
 const kidTokenPublicKeyBasePath = process.env.sunbird_kid_public_key_base_path || '/keys/'
+const userTokenValidateEnable = process.env.enable_user_token_validation || 'true'
 
 configUtil.setContentProviderApi(contentProviderApiConfig.API)
 configUtil.setConfig('CONTENT_SERVICE_BASE_URL', contentServiceBaseUrl)
@@ -88,6 +89,7 @@ configUtil.setConfig('CASSANDRA_DB_HEALTH_STATUS', 'true')
 configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'true')
 configUtil.setConfig('CONTENT_SERVICE_LOCAL_BASE_URL', contentServiceLocalBaseUrl)
 configUtil.setConfig('ENABLE_GZIP', sunbirdGzipEnable)
+configUtil.setConfig('ENABLE_USER_TOKEN_VALIDATION', userTokenValidateEnable)
 
 process.env.sunbird_cassandra_urls = process.env.sunbird_cassandra_urls || '127.0.0.1'
 process.env.dial_code_image_temp_folder = 'temp'
