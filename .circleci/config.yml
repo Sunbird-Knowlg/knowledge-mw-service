@@ -2,10 +2,12 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/node:10.0.0
-    working_directory: ~/project/src
+      - image: circleci/node:12.13.0 
+    parallelism: 2
+    working_directory: ~/project/src 
     steps:
       - checkout
+      - run: npm cache clean --force 
       - run: git submodule update --init --recursive src/libs
       - run: mkdir -p opt/content && cp -r src/* opt/content/
       - restore_cache:
@@ -21,15 +23,12 @@ jobs:
       - run:
           name: Run test cases
           command: 'cd src && npm install --unsafe-perm && npm run coverage'     
-      - run: 
-          name: Install sonar scanner
-          command: 'sudo npm install -g sonarqube-scanner'
-          
-      - run: 
-          name: Sonar scanner
-          command: |
-                  sonar-scanner
-                  
+      - run:
+          name: install sonar scanner
+          command: sudo npm install -g sonarqube-scanner@2.8.0
+      - run:
+          name: Run SonarScan
+          command: sonar-scanner
                   
 workflows:
   version: 2.1

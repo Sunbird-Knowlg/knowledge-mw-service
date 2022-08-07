@@ -36,10 +36,13 @@ The code in this repository is licensed under MIT unless otherwise noted. Please
 * sunbird_telemetry_sync_batch_size e.g: 20
 * sunbird_learner_service_local_base_url e.g: 'http://learner-service:9000'
 * sunbird_content_service_local_base_url e.g: 'http://localhost:5000'
+* sunbird_content_upload_data_limit: Content upload data limit e.g.: 50mb (string)
 
 ## Setup Instructions
 * Clone the project.eg .(git clone --recursive  url)
-* Run "git submodule update --init --recursive" to pull the latest sunbird-js-utils sub module
+* Run "git submodule init"
+* Run "git submodule update"
+* Run "git submodule update --init --recursive" to pull the latest sunbird-js-utils sub module (if you want to pull from specific branch, "git submodule foreach git pull origin 'branch_name'" )
 * Change to src folder
 * Run `npm install`
 * Run `node app.js`

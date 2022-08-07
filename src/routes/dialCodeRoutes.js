@@ -9,6 +9,7 @@ var requestMiddleware = require('../middlewares/request.middleware')
 var healthService = require('../service/healthCheckService')
 
 var BASE_URL = '/v1/dialcode'
+var BASE_URL_V2 = '/v2/dialcode'
 var dependentServiceHealth = ['EKSTEP', 'CASSANDRA']
 
 module.exports = function (app) {
@@ -30,11 +31,21 @@ module.exports = function (app) {
       requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID,
       dialCodeService.getDialCodeAPI)
 
+  app.route(BASE_URL_V2 + '/read/:dialCodeId')
+    .get(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.createAndValidateRequestBody, dialCodeService.getDialCodeV2API)
+
   app.route(BASE_URL + '/update/:dialCodeId')
     .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
       requestMiddleware.gzipCompression(),
       requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID,
       dialCodeService.updateDialCodeAPI)
+
+  app.route(BASE_URL_V2 + '/update/:dialCodeId')
+    .patch(healthService.checkDependantServiceHealth(dependentServiceHealth),
+      requestMiddleware.gzipCompression(),
+      requestMiddleware.createAndValidateRequestBody, requestMiddleware.checkChannelID,
+      dialCodeService.updateDialCodeV2API)
 
   app.route(BASE_URL + '/content/link')
     .post(healthService.checkDependantServiceHealth(dependentServiceHealth),
