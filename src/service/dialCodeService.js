@@ -84,32 +84,8 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
 
       // if content id present then we will send zip file name
       if (contentId) {
-        var qs = {
-          mode: 'edit',
-          fields: 'medium,subject,gradeLevel'
-        }
-        contentProvider.getContentUsingQuery(contentId, qs, {},
-          function (err, res) {
-            if (err || res.responseCode !== responseCode.SUCCESS) {
-              logger.error({ msg: 'Error while getting content', err, additionalInfo: { contentId, qs } })
-              cb(null, data)
-            } else {
-              let medium = _.get(res, 'result.content.medium')
-              let subject = _.get(res, 'result.content.subject')
-              let gradeLevel = _.get(res, 'result.content.gradeLevel')
-              let fileNameArray = [contentId, medium]
-              fileNameArray = _.concat(fileNameArray, gradeLevel)
-              fileNameArray.push(subject)
-              fileNameArray.push(Date.now())
-              fileNameArray = _.compact(fileNameArray)
-
-              let fileName = _.join(fileNameArray, '_')
-              fileName = _.lowerCase(fileName)
-              fileName = fileName.split(' ').join('_')
-              data['storage']['fileName'] = fileName
-              cb(null, data)
-            }
-          })
+        data['storage']['fileName'] = contentId + '_' + Date.now();
+        cb(null, data);
       } else {
         logger.warn({ msg: 'contentId not present', additionalInfo: { data } })
         cb(null, data)
@@ -446,12 +422,85 @@ function updateDialCodeAPI (req, response) {
 }
 
 /**
+ * This function helps to update dialcode
+ * @param {type} req
+ * @param {type} response
+ * @returns {object} return response object with http status
+ */
+function updateDialCodeV2API (req, response) {
+  var data = req.body
+  data.dialCodeId = req.params.dialCodeId
+  var rspObj = req.rspObj
+  // Adding objectData in telemetryData object
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.dialCodeId, 'dialcode', '', {})
+  }
+
+  if (!data.request || !data.request.dialcode || !data.dialCodeId) {
+    rspObj.errCode = dialCodeMessage.UPDATE.MISSING_CODE
+    rspObj.errMsg = dialCodeMessage.UPDATE.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing dialcode',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: { data }
+    }, req)
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+
+  // Transform request for Ek step
+  var reqData = {
+    request: data.request
+  }
+
+  async.waterfall([
+
+    function (CBW) {
+      logger.debug({ msg: 'request to update the dial code', additionalInfo: { body: reqData } }, req)
+      contentProvider.updateDialCodeV2(reqData, data.dialCodeId, req.headers, function (err, res) {
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.UPDATE.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.UPDATE.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content Provider while updating the dial code',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: { dialCodeId: data.dialCodeId, reqData }
+          }, req)
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
+          rspObj = utilsService.getErrorResponse(rspObj, res)
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      logger.debug({ msg: 'updateDialCodeV2API results', additionalInfo: { result: rspObj.result } }, req)
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
+}
+
+/**
  * This function helps to get dialcode meta
  * @param {type} req
  * @param {type} response
  * @returns {object} return response object with http status
  */
 function getDialCodeAPI (req, response) {
+  logger.info("dialCodeService.js:: getDialCodeAPI function invoked!")
   var data = {}
   data.body = req.body
   data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
@@ -515,6 +564,80 @@ function getDialCodeAPI (req, response) {
     function (res) {
       rspObj.result = res.result
       logger.debug({ msg: 'getDialCodeAPI results', additionalInfo: { result: rspObj.result } }, req)
+      return response.status(200).send(respUtil.successResponse(rspObj))
+    }
+  ])
+}
+
+/**
+ * This function helps to get dialcode meta
+ * @param {type} req
+ * @param {type} response
+ * @returns {object} return response object with http status
+ */
+function getDialCodeV2API (req, response) {
+  logger.info("dialCodeService.js:: getDialCodeV2API function invoked!")
+  var data = {}
+  data.dialCodeId = req.params.dialCodeId
+  var rspObj = req.rspObj
+  // Adding objectData in telemetryData object
+  if (rspObj.telemetryData) {
+    rspObj.telemetryData.object = utilsService.getObjectData(data.dialCodeId, 'dialcode', '', {})
+  }
+
+  if (!data.dialCodeId) {
+    rspObj.errCode = dialCodeMessage.GET.MISSING_CODE
+    rspObj.errMsg = dialCodeMessage.GET.MISSING_MESSAGE
+    rspObj.responseCode = responseCode.CLIENT_ERROR
+    logger.error({
+      msg: 'Error due to missing dialCode Id',
+      err: {
+        errCode: rspObj.errCode,
+        errMsg: rspObj.errMsg,
+        responseCode: rspObj.responseCode
+      },
+      additionalInfo: { data }
+    }, req)
+    return response.status(400).send(respUtil.errorResponse(rspObj))
+  }
+
+  async.waterfall([
+
+    function (CBW) {
+      logger.debug({
+        msg: 'Request to get dialcode context info',
+        additionalInfo: {
+          dialCodeId: data.dialCodeId
+        }
+      }, req)
+      contentProvider.getDialCodeV2(data.dialCodeId, req.headers, function (err, res) {
+        // After check response, we perform other operation
+        if (err || res.responseCode !== responseCode.SUCCESS) {
+          rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GET.FAILED_CODE
+          rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GET.FAILED_MESSAGE
+          rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+          logger.error({
+            msg: 'Error from content provider while fetching dialcode',
+            err: {
+              err,
+              errCode: rspObj.errCode,
+              errMsg: rspObj.errMsg,
+              responseCode: rspObj.responseCode
+            },
+            additionalInfo: { dialCodeId: data.dialCodeId }
+          }, req)
+          var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+          rspObj.result = res && res.result ? res.result : {}
+          rspObj = utilsService.getErrorResponse(rspObj, res)
+          return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+        } else {
+          CBW(null, res)
+        }
+      })
+    },
+    function (res) {
+      rspObj.result = res.result
+      logger.debug({ msg: 'getDialCodeV2API results', additionalInfo: { result: rspObj.result } }, req)
       return response.status(200).send(respUtil.successResponse(rspObj))
     }
   ])
@@ -1152,7 +1275,9 @@ function releaseDialCode (req, response) {
 module.exports.generateDialCodeAPI = generateDialCodeAPI
 module.exports.dialCodeListAPI = dialCodeListAPI
 module.exports.updateDialCodeAPI = updateDialCodeAPI
+module.exports.updateDialCodeV2API = updateDialCodeV2API
 module.exports.getDialCodeAPI = getDialCodeAPI
+module.exports.getDialCodeV2API = getDialCodeV2API
 module.exports.contentLinkDialCodeAPI = contentLinkDialCodeAPI
 module.exports.getProcessIdStatusAPI = getProcessIdStatusAPI
 module.exports.searchDialCodeAPI = searchDialCodeAPI

@@ -25,7 +25,8 @@
 
 ##Setup Instructions
 * Clone the project.
-* Run "git submodule foreach git pull origin master" to pull the latest sunbird-js-utils sub module
+* RUN "git submodule init" followed by "git submodule update" to load submodules to the latest version.
+* Run "git submodule foreach git pull origin master" to pull the latest sunbird-js-utils sub module. Rename `master` to specific remote branch name if you want to load from specific branch.
 * Change to src folder
 * Run `npm install`
 * Run `node app.js`
