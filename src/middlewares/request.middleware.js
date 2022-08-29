@@ -172,6 +172,11 @@ function validateUserToken (req, res, next) {
   var token = req.get('x-authenticated-user-token')
   var rspObj = req.rspObj || {}
 
+  if (configUtil.getConfig('ENABLE_USER_TOKEN_VALIDATION') === 'false') {
+    next()
+    return
+  }
+
   if (!token) {
     rspObj.errCode = reqMsg.TOKEN.MISSING_CODE
     rspObj.errMsg = reqMsg.TOKEN.MISSING_MESSAGE
