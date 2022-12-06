@@ -40,6 +40,7 @@
         "UPDATE_COLLABORATOR": "/content/v1/collaborator/update",
         "RESERVE_DIALCODE": "/content/v3/dialcode/reserve",
         "RELEASE_DIALCODE": "/content/v3/dialcode/release",
+        "GET_DIALCODE_BATCH": "/dialcode/v2/read/batch",
 
         "CHANNEL_URI": "/channel/v3/read",
         "CHANNEL_LIST_URI": "/channel/v3/list",
