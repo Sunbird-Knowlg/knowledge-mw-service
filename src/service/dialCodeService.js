@@ -760,9 +760,9 @@ function getProcessIdStatusAPI (req, response) {
 
   contentProvider.getDialCodeBatch(data.processId, {}, function (err, res) {
     if (err || _.upperCase(res.responseCode) !== responseCode.SUCCESS) {
-      rspObj.errCode = res && res.params ? res.params.err : dialCodeMessage.GET.FAILED_CODE
-      rspObj.errMsg = res && res.params ? res.params.errmsg : dialCodeMessage.GET.FAILED_MESSAGE
-      rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+      rspObj.errCode = _.get(res, 'params') ? res.params.err : dialCodeMessage.GET.FAILED_CODE
+      rspObj.errMsg = _.get(res, 'params') ? res.params.errmsg : dialCodeMessage.GET.FAILED_MESSAGE
+      rspObj.responseCode = _.get(res, 'responseCode') ? res.responseCode : responseCode.SERVER_ERROR
       logger.error({
         msg: 'Error from content provider while fetching dialcode batch',
         err: {
@@ -773,13 +773,13 @@ function getProcessIdStatusAPI (req, response) {
         },
         additionalInfo: { dialCodeId: data.dialCodeId }
       }, req)
-      var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
-      rspObj.result = res && res.result ? res.result : {}
+      const httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+      rspObj.result = _.get(res, 'result') ? res.result : {}
       rspObj = utilsService.getErrorResponse(rspObj, res)
       return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
     } else {
       logger.debug({ msg: 'getDialCodeBatchAPI results', additionalInfo: { result: rspObj.result } }, req)
-      var status = _.get(res, 'result.batchInfo.status')
+      const status = _.get(res, 'result.batchInfo.status')
       if (status !== 2) {
         rspObj.result.status = dialCodeMessage.PROCESS.INPROGRESS_MESSAGE
       } else {
