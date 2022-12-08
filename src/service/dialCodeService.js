@@ -771,7 +771,7 @@ function getProcessIdStatusAPI (req, response) {
           errMsg: rspObj.errMsg,
           responseCode: rspObj.responseCode
         },
-        additionalInfo: { dialCodeId: data.dialCodeId }
+        additionalInfo: { processId: data.processId }
       }, req)
       const httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
       rspObj.result = _.get(res, 'result') ? res.result : {}
