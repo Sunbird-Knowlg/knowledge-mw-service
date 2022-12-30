@@ -76,7 +76,7 @@
     "istanbul": "^0.4.5",
     "jasmine-node": "^1.14.5",
     "lint-staged": "^6.0.1",
-    "mocha": "^6.0.2",
+    "mocha": "^10.2.0",
     "nock": "^13.0.8",
     "node-mocks-http": "^1.7.0",
     "nyc": "^13.3.0",
