@@ -15,7 +15,7 @@ RUN echo "deb http://archive.debian.org/debian/ jessie main" > /etc/apt/sources.
     echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/99no-check-valid-until && \
     echo "APT::Get::AllowUnauthenticated 1;" > /etc/apt/apt.conf.d/99allow-unauthenticated && \
     apt-get update && \
-    apt-get update-ca-certificates && \
+    apt-get install -y ca-certificates && \
     apt-get clean && \
     useradd -m sunbird
 USER sunbird
