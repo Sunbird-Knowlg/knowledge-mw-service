@@ -9,8 +9,6 @@ FROM node:8.11-slim
 MAINTAINER "Manojvv" "manojv@ilimi.in"
 # RUN sed -i '/jessie-updates/d' /etc/apt/sources.list \
 RUN echo "deb http://archive.debian.org/debian/ jessie main" > /etc/apt/sources.list && \
-#     echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/99no-check-valid-until && \
-#     echo "APT::Get::AllowUnauthenticated 1;" > /etc/apt/apt.conf.d/99allow-unauthenticated && \
     apt-get update && \
     apt-get install -y curl ca-certificates && \
     update-ca-certificates && \
