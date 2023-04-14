@@ -11,11 +11,9 @@ MAINTAINER "Manojvv" "manojv@ilimi.in"
 RUN echo "deb http://archive.debian.org/debian/ jessie main" > /etc/apt/sources.list && \
     apt-get update && \
     apt-get install ca-certificates && \
-    update-ca-certificates && \
-    apt-get update && \
-    apt-get install -y && \ 
     apt-get clean && \
-    useradd -m sunbird     
+    useradd -m sunbird
+RUN sed -i '/^mozilla\/DST_Root_CA_X3/s/^/!/' /etc/ca-certificates.conf && update-ca-certificates -f    
 USER sunbird
 COPY --from=0 --chown=sunbird /opt/content /home/sunbird/mw/content
 WORKDIR /home/sunbird/mw/content/
