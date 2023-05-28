@@ -5,7 +5,7 @@ COPY src /opt/content/
 WORKDIR /opt/content/
 RUN npm install --unsafe-perm
 
-FROM node:8.11-slim
+FROM node:8-buster-slim
 MAINTAINER "Manojvv" "manojv@ilimi.in"
 RUN sed -i '/jessie-updates/d' /etc/apt/sources.list \
     && apt update \
