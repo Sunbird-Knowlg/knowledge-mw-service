@@ -44,6 +44,7 @@ const dialRepoBaseUrl = process.env.sunbird_dial_repo_api_base_url || 'https://q
 const pluginRepoBaseUrl = process.env.sunbird_plugin_repo_api_base_url || 'https://qa.ekstep.in/api'
 const dataServiceBaseUrl = process.env.sunbird_data_service_api_base_url || 'https://qa.ekstep.in/api'
 const languageServiceBaseUrl = process.env.sunbird_language_service_api_base_url || 'https://qa.ekstep.in/api/language'
+const taxonomyServiceBaseUrl = process.env.sunbird_taxonomy_service_api_base_url || 'http://taxonomy-service:9000'
 
 const searchServiceApiKey = process.env.sunbird_search_service_api_key
 const dialRepoApiKey = process.env.sunbird_dial_repo_api_key
@@ -90,6 +91,7 @@ configUtil.setConfig('EKSTEP_HEALTH_STATUS', 'true')
 configUtil.setConfig('CONTENT_SERVICE_LOCAL_BASE_URL', contentServiceLocalBaseUrl)
 configUtil.setConfig('ENABLE_GZIP', sunbirdGzipEnable)
 configUtil.setConfig('ENABLE_USER_TOKEN_VALIDATION', userTokenValidateEnable)
+configUtil.setConfig('TAXONOMY_SERVICE_BASE_URL', taxonomyServiceBaseUrl)
 
 process.env.sunbird_cassandra_urls = process.env.sunbird_cassandra_urls || '127.0.0.1'
 process.env.dial_code_image_temp_folder = 'temp'
