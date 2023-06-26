@@ -7,7 +7,9 @@ RUN npm install --unsafe-perm
 
 FROM node:8.11-slim
 MAINTAINER "Manojvv" "manojv@ilimi.in"
+
 RUN sed -i '/jessie-updates/d' /etc/apt/sources.list \
+    sed -i '/deb http:\/\/deb.debian.org\/debian jessie-updates main/d' /etc/apt/sources.list \
     && apt update \
     && apt-get clean \
     && useradd -m sunbird
