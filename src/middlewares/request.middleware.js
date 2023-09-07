@@ -93,6 +93,10 @@ function createAndValidateRequestBody (req, res, next) {
  */
 function validateToken (req, res, next) {
   logger.debug({ msg: 'validateToken() called, offline token validation enabled' }, req)
+  if (configUtil.getConfig('ENABLE_USER_TOKEN_VALIDATION') === 'false') {
+    next()
+    return
+  }
   var token = req.get('x-authenticated-user-token')
   var rspObj = req.rspObj
   if (!token) {
@@ -167,6 +171,11 @@ function gzipCompression (req, res, next) {
 function validateUserToken (req, res, next) {
   var token = req.get('x-authenticated-user-token')
   var rspObj = req.rspObj || {}
+
+  if (configUtil.getConfig('ENABLE_USER_TOKEN_VALIDATION') === 'false') {
+    next()
+    return
+  }
 
   if (!token) {
     rspObj.errCode = reqMsg.TOKEN.MISSING_CODE
@@ -455,10 +464,10 @@ function checkChannelID (req, res, next) {
 }
 
 function seteTextbook (req, res, next) {
-  if(!_.isEmpty(req.body.request) && !_.isEmpty(req.body.request.content)) {
+  if (!_.isEmpty(req.body.request) && !_.isEmpty(req.body.request.content)) {
     req.body.request.content['contentType'] = 'eTextBook'
   }
-  console.log("After Set e-Textbook: " + JSON.stringify(req.body))
+  console.log('After Set e-Textbook: ' + JSON.stringify(req.body))
   next()
 }
 

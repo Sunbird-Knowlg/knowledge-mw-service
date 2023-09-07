@@ -229,24 +229,40 @@ function createLock (req, response) {
     },
     function (CBW) {
       var ekStepReqData = {
-        'request': {
-          'content': {
-            'lockKey': lockId,
-            'versionKey': versionKey
+        request: {}
+      };
+      const lockData = {
+        'lockKey': lockId,
+        'versionKey': versionKey
+      };
+      const resourceInfo = JSON.parse(data.request.resourceInfo);
+      if (lodash.has(resourceInfo, 'mimeType') && resourceInfo.mimeType === 'application/vnd.sunbird.questionset') {
+        ekStepReqData.request = {'questionset': lockData};
+        contentProvider.updateQuestionset(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
+          if (err || res.responseCode !== responseCode.SUCCESS) {
+            rspObj.result = res && res.result ? res.result : {}
+            logger.error({ msg: 'Updating questionset failed with lock key', err, additionalInfo: { resourceId: data.request.resourceId, ekStepReqData } }, req)
+            // Sending success CBW as content is already locked in db and ignoring content update error
+            CBW(null, res)
+          } else {
+            versionKey = lodash.get(res.result.versionKey)
+            CBW(null, res)
           }
-        }
+        })
+      } else {
+        ekStepReqData.request = {'content': lockData };
+        contentProvider.updateContent(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
+          if (err || res.responseCode !== responseCode.SUCCESS) {
+            rspObj.result = res && res.result ? res.result : {}
+            logger.error({ msg: 'Updating content failed with lock key', err, additionalInfo: { resourceId: data.request.resourceId, ekStepReqData } }, req)
+            // Sending success CBW as content is already locked in db and ignoring content update error
+            CBW(null, res)
+          } else {
+            versionKey = lodash.get(res.result.versionKey)
+            CBW(null, res)
+          }
+        })
       }
-      contentProvider.updateContent(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
-        if (err || res.responseCode !== responseCode.SUCCESS) {
-          rspObj.result = res && res.result ? res.result : {}
-          logger.error({ msg: 'Updating content failed with lock key', err, additionalInfo: { resourceId: data.request.resourceId, ekStepReqData } }, req)
-          // Sending success CBW as content is already locked in db and ignoring content update error
-          CBW(null, res)
-        } else {
-          versionKey = lodash.get(res.result.versionKey)
-          CBW(null, res)
-        }
-      })
     },
     function () {
       rspObj.result.lockKey = lockId

@@ -40,6 +40,7 @@
         "UPDATE_COLLABORATOR": "/content/v1/collaborator/update",
         "RESERVE_DIALCODE": "/content/v3/dialcode/reserve",
         "RELEASE_DIALCODE": "/content/v3/dialcode/release",
+        "GET_DIALCODE_BATCH": "/dialcode/v4/batch/read",
 
         "CHANNEL_URI": "/channel/v3/read",
         "CHANNEL_LIST_URI": "/channel/v3/list",
@@ -78,6 +79,8 @@
         "CREATE_LOCK": "/lock/v1/create",
         "REFRESH_LOCK": "/lock/v1/refresh",
         "RETIRE_LOCK": "/lock/v1/retire",
-        "LIST_LOCK": "/lock/v1/list"
+        "LIST_LOCK": "/lock/v1/list",
+
+        "UPDATE_QUESTION_SET_URI": "/questionset/v1/update"
     }
 }   
