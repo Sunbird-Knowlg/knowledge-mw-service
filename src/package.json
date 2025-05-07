@@ -19,7 +19,6 @@
   "dependencies": {
     "@project-sunbird/telemetry-sdk": "0.0.9",
     "async": "^2.4.0",
-    "azure-storage": "2.7.0",
     "body-parser": "^1.14.2",
     "cassandra-driver": "^3.4.1",
     "compression": "^1.7.4",
