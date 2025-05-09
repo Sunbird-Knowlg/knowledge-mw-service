@@ -1,0 +1,54 @@
+name: Code Quality Checks
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  code-quality:
+    name: Run Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.15'
+
+      - name: Restore node_modules cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: src/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: src
+
+      - name: Save node_modules cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v3
+        with:
+          path: src/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Run lint
+        run: npm run lint
+        working-directory: src
+
+      - name: Run tests
+        run: npm test
+        working-directory: src
+
+      - name: Run coverage
+        run: npm run coverage
+        working-directory: src
