@@ -4,8 +4,29 @@
         "globalEkstepProxyBaseUrl": true
     },
     "rules": {
+        "no-console": "warn",
+        "no-debugger": "warn",
+        "no-undef": "warn",
+        "one-var": "warn",
+        "handle-callback-err": "warn",
+        "no-unused-expressions": "warn",
+        "no-unused-vars": "warn",
+        "new-cap": "warn",
+        "eqeqeq": "warn",
+        "no-sequences": "warn",
+        "no-return-assign": "warn",
+        "no-fallthrough": "warn",
+        "no-mixed-operators": "warn",
+        "no-unsafe-finally": "warn",
+        "no-unmodified-loop-condition": "warn",
+        "no-useless-escape": "warn",
+        "no-redeclare": "warn",
+        "no-use-before-define": "warn",
+        "no-duplicate-imports": "warn",
+        "no-duplicate-keys": "warn",
+        "object-curly-even-spacing": ["warn", "never"],
         "indent": ["error", 2],
-        "max-len": ["error", 120, 2, {"ignoreUrls": true, "ignoreComments": true}],
-        "quotes": ["error", "single"]
+        "quotes": ["error", "single"],
+        "camelcase": "off"
     }
 }
