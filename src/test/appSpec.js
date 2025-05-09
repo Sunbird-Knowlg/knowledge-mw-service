@@ -2,10 +2,9 @@ var server = require('../app.js')
 var expect = require('chai').expect
 var request = require('request')
 var host = 'http://localhost:5000'
-const nock = require('nock');
+const nock = require('nock')
 
 describe('Check health api', function () {
-
   before((done) => {
     server.start(done)
   })
@@ -15,7 +14,7 @@ describe('Check health api', function () {
   })
 
   it('Check with different methods, it should return status code 200', function (done) {
-    nock(host).persist().get('/health').reply(200, 'OK');
+    nock(host).persist().get('/health').reply(200, 'OK')
     request.options({
       url: host + '/health',
       json: true
@@ -25,4 +24,3 @@ describe('Check health api', function () {
     })
   })
 })
-

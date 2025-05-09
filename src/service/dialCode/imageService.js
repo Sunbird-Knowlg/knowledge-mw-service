@@ -2,11 +2,11 @@ var _ = require('lodash')
 var logger = require('sb_logger_util_v2')
 var dbModel = require('./../../utils/cassandraUtil').getConnections('dialcodes')
 
-function ImageService(config) {
+function ImageService (config) {
   this.config = config
 }
 
-ImageService.prototype.getImage = function generateImage(dialcode, channel, publisher, cb) {
+ImageService.prototype.getImage = function generateImage (dialcode, channel, publisher, cb) {
   var self = this
   this.getImgFromDB(dialcode, channel, publisher, function (error, images) {
     var image = compareImageConfig(images, self.configToString())

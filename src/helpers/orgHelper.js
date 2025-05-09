@@ -14,7 +14,7 @@ var async = require('async')
  * @param requestObj  js object which contains the search request with filters,offset,limit,query etc
  * @param cb callback after success or error
  */
-function getRootOrgs(requestObj, cb, noExitOnError) {
+function getRootOrgs (requestObj, cb, noExitOnError) {
   logger.debug({ msg: 'getRootOrgs() called', additionalInfo: { requestObj } })
   contentProvider.getAllRootOrgs(requestObj, (err, res) => {
     if (!err) {
@@ -43,7 +43,7 @@ function getRootOrgs(requestObj, cb, noExitOnError) {
    inputdata is array of contents that needs org data
  * @param CBW callback after success or error
  */
-function getRootOrgsFromCache(orgfetchquery, tryfromcache, inputdata, cb) {
+function getRootOrgsFromCache (orgfetchquery, tryfromcache, inputdata, cb) {
   async.waterfall([
     function (CBW) {
       if (tryfromcache) {
@@ -82,7 +82,7 @@ function getRootOrgsFromCache(orgfetchquery, tryfromcache, inputdata, cb) {
   ])
 }
 
-function insertDataToCache(cacheinputdata) {
+function insertDataToCache (cacheinputdata) {
   cacheManager.mset({ data: cacheinputdata, ttl: configData.orgCacheExpiryTime }, function (err, data) {
     if (err) {
       logger.error({ msg: 'Caching allRootOrgs data failed', err, additionalInfo: { data: cacheinputdata } })
@@ -97,7 +97,7 @@ function insertDataToCache(cacheinputdata) {
  * @param inputdata is array of objects, it might be content or course
  * @param cb callback after success or error
  */
-function populateOrgDetailsByHasTag(contents, inputfields, cb) {
+function populateOrgDetailsByHasTag (contents, inputfields, cb) {
   var orgDetails = []
   var orgFetchQuery = {
     'request': {
@@ -168,7 +168,7 @@ function populateOrgDetailsByHasTag(contents, inputfields, cb) {
  * @param inputdata is req object and res object
  * @param cb there will be no error callback , always returns success
  */
-function includeOrgDetails(req, res, cb) {
+function includeOrgDetails (req, res, cb) {
   if (_.get(req, 'query.orgdetails') && _.get(res, 'result.content')) {
     var inputfields = req.query.orgdetails.split(',')
     var fieldsToPopulate = configData.orgfieldsAllowedToSend.filter(eachfield => inputfields.includes(eachfield))
@@ -177,7 +177,7 @@ function includeOrgDetails(req, res, cb) {
     var contents = inputContentIsArray ? res.result.content : [res.result.content]
     if (_.size(fieldsToPopulate) && _.size(contents)) {
       populateOrgDetailsByHasTag(contents, fieldsToPopulate, function
-        (err, contentwithorgdetails) {
+      (err, contentwithorgdetails) {
         if (!err) {
           res.result.content = inputContentIsArray ? contentwithorgdetails : contentwithorgdetails[0]
         }
@@ -192,7 +192,7 @@ function includeOrgDetails(req, res, cb) {
 }
 
 // prepares the set data for inserting in cache
-function prepareCacheDataToInsert(data) {
+function prepareCacheDataToInsert (data) {
   var cacheKeyValuePairs = []
   _.forEach(data, function (eachdata) {
     if (eachdata.hashTagId) {
@@ -205,7 +205,7 @@ function prepareCacheDataToInsert(data) {
 }
 
 // prepares the get data for fetching from cache
-function getKeyNames(data) {
+function getKeyNames (data) {
   var keyNames = []
   _.forEach(data, function (eachdata) {
     if (eachdata.channel) {

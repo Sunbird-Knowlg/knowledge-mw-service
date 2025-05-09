@@ -28,7 +28,7 @@ var reviewerQueryLimit = 200
  * @param {string} orgName
  * @param {string} fromEmail
  */
-function getEmailData(name, subject, body, actionUrl, actionName, emailArray,
+function getEmailData (name, subject, body, actionUrl, actionName, emailArray,
   recipientUserIds, emailTemplateType, imageUrl, orgName, fromEmail) {
   var request = {
     name: name,
@@ -51,7 +51,7 @@ function getEmailData(name, subject, body, actionUrl, actionName, emailArray,
  * @param {object} req
  * @param {function} callback
  */
-function createFlagContentEmail(req, callback) {
+function createFlagContentEmail (req, callback) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -114,7 +114,7 @@ function createFlagContentEmail(req, callback) {
  * @param {object} req
  * @param {function} callback
  */
-function acceptFlagContentEmail(req, callback) {
+function acceptFlagContentEmail (req, callback) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -175,7 +175,7 @@ function acceptFlagContentEmail(req, callback) {
  * @param {object} req
  * @param {function} callback
  */
-function rejectFlagContentEmail(req, callback) {
+function rejectFlagContentEmail (req, callback) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
@@ -235,7 +235,7 @@ function rejectFlagContentEmail(req, callback) {
  * Below function is used to fetch content details using content id
  * @param {object} req
  */
-function getContentDetails(req) {
+function getContentDetails (req) {
   return function (callback) {
     contentProvider.getContent(req.params.contentId, req.headers, function (err, result) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
@@ -256,7 +256,7 @@ function getContentDetails(req) {
  * Below function is used to fetch email template using Form API
  * @param {object} formRequest
  */
-function getTemplateConfig(formRequest) {
+function getTemplateConfig (formRequest) {
   return function (callback) {
     contentProvider.getForm(formRequest, {}, function (err, result) {
       if (err || result.responseCode !== responseCode.SUCCESS) {
@@ -277,7 +277,7 @@ function getTemplateConfig(formRequest) {
  * Below function is used to fetch user details
  * @param {object} formRequest
  */
-function getUserDetails(req) {
+function getUserDetails (req) {
   return function (callback) {
     delete req.headers['accept-encoding']
     var data = {
@@ -307,7 +307,7 @@ function getUserDetails(req) {
  * content creator after the content is published
  * @param {object} content
  */
-function getPublishedContentUrl(content) {
+function getPublishedContentUrl (content) {
   var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL')
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     if (content.contentType !== 'Course') {
@@ -326,7 +326,7 @@ function getPublishedContentUrl(content) {
  * after the content is rejected
  * @param {object} content
  */
-function getDraftContentUrl(content) {
+function getDraftContentUrl (content) {
   var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/workspace/content/edit'
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     return baseUrl + '/collection/' + content.identifier + '/' + content.contentType +
@@ -342,7 +342,7 @@ function getDraftContentUrl(content) {
  * Below function is used construct content link which will be sent to reviewers
  * @param {object} content
  */
-function getReviewContentUrl(content) {
+function getReviewContentUrl (content) {
   var baseUrl = configUtil.getConfig('SUNBIRD_PORTAL_BASE_URL') + '/workspace/content'
   if (content.mimeType === 'application/vnd.ekstep.content-collection') {
     return baseUrl + '/edit/collection/' + content.identifier + '/' + content.contentType +
@@ -360,7 +360,7 @@ function getReviewContentUrl(content) {
  * @param {function} action
  * @param {function} callback
  */
-function sendContentEmail(req, action, callback) {
+function sendContentEmail (req, action, callback) {
   if (!req.params.contentId) {
     logger.error({ msg: 'content Id is missing', additionalInfo: { contentId: req.params.contentId } }, req)
     callback(new Error('Content id is missing'), null)
@@ -453,7 +453,7 @@ function sendContentEmail(req, action, callback) {
  * @param {object} req
  * @param {function} callback
  */
-function publishedContentEmail(req, callback) {
+function publishedContentEmail (req, callback) {
   sendContentEmail(req, 'publish', callback)
 }
 
@@ -462,7 +462,7 @@ function publishedContentEmail(req, callback) {
  * @param {object} req
  * @param {function} callback
  */
-function reviewContentEmail(req, callback) {
+function reviewContentEmail (req, callback) {
   if (!req.params.contentId) {
     logger.error({ msg: 'content Id is missing' }, req)
     callback(new Error('Content id is missing'), null)
@@ -562,7 +562,7 @@ function reviewContentEmail(req, callback) {
  * @param {object} data
  * @param {function} callback
  */
-function getReviwerUserIds(req, userdata, contentType, callback) {
+function getReviwerUserIds (req, userdata, contentType, callback) {
   var reviewerRoles = contentType === 'TextBook' ? ['BOOK_REVIEWER'] : ['CONTENT_REVIEWER', 'CONTENT_REVIEW']
   var creatorRoles = contentType === 'TextBook' ? ['BOOK_CREATOR'] : ['CONTENT_CREATOR',
     'CONTENT_CREATION', 'CONTENT_REVIEWER', 'CONTENT_REVIEW']
@@ -623,7 +623,7 @@ function getReviwerUserIds(req, userdata, contentType, callback) {
  * @param {object} body
  * @param {boolean} fetchDetailsFlag
  */
-function getUserIds(req, body, fetchDetailsFlag) {
+function getUserIds (req, body, fetchDetailsFlag) {
   if (fetchDetailsFlag) {
     return function (CBW) {
       async.waterfall([
@@ -696,7 +696,7 @@ function getUserIds(req, body, fetchDetailsFlag) {
  * @param {object} req
  * @param {function} callback
  */
-function rejectContentEmail(req, callback) {
+function rejectContentEmail (req, callback) {
   sendContentEmail(req, 'requestForChanges', callback)
 }
 
@@ -721,7 +721,7 @@ var getUnlistedShareUrl = function (cData, baseUri) {
  * @param {object} req
  * @param {function} callback
  */
-function unlistedPublishContentEmail(req, callback) {
+function unlistedPublishContentEmail (req, callback) {
   var data = req.body
   data.contentId = req.params.contentId
   var rspObj = req.rspObj

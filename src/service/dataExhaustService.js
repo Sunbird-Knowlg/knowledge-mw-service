@@ -21,7 +21,7 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {object} req
  * @param {object} response
  */
-function submitDataSetRequest(req, response) {
+function submitDataSetRequest (req, response) {
   var data = req.body
   var rspObj = req.rspObj
 
@@ -53,7 +53,7 @@ function submitDataSetRequest(req, response) {
  * @param {object} req
  * @param {object} response
  */
-function getListOfDataSetRequest(req, response) {
+function getListOfDataSetRequest (req, response) {
   var query = req.query
   var rspObj = req.rspObj
   var clientKey = req.params.clientKey
@@ -93,7 +93,7 @@ function getListOfDataSetRequest(req, response) {
  * @param {object} req
  * @param {object} response
  */
-function getDataSetDetailRequest(req, response) {
+function getDataSetDetailRequest (req, response) {
   var rspObj = req.rspObj
   var clientKey = req.params.clientKey
   var requestId = req.params.requestId
@@ -132,7 +132,7 @@ function getDataSetDetailRequest(req, response) {
  * @param {object} req
  * @param {object} response
  */
-function getChannelDataSetRequest(req, response) {
+function getChannelDataSetRequest (req, response) {
   var query = req.query
   var rspObj = req.rspObj
   var dataSetId = req.params.dataSetId
