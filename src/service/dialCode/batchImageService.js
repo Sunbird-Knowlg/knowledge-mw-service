@@ -16,24 +16,24 @@ var batchModelProperties = ['processid', 'dialcodes', 'config', 'status', 'chann
 var KafkaService = require('./../../helpers/qrCodeKafkaProducer.js')
 
 const defaultConfig = {
-  "errorCorrectionLevel": "H",
-  "pixelsPerBlock": 2,
-  "qrCodeMargin": 3,
-  "textFontName": "Verdana",
-  "textFontSize": 11,
-  "textCharacterSpacing": 0.1,
-  "imageFormat": "png",
-  "colourModel": "Grayscale",
-  "imageBorderSize": 1
+  'errorCorrectionLevel': 'H',
+  'pixelsPerBlock': 2,
+  'qrCodeMargin': 3,
+  'textFontName': 'Verdana',
+  'textFontSize': 11,
+  'textCharacterSpacing': 0.1,
+  'imageFormat': 'png',
+  'colourModel': 'Grayscale',
+  'imageBorderSize': 1
 }
 
-function BatchImageService(config) {
-  this.config = _.merge(defaultConfig, config);
+function BatchImageService (config) {
+  this.config = _.merge(defaultConfig, config)
 }
 
 BatchImageService.prototype.createRequest = function (data, channel, publisher, rspObj, callback) {
   var processId = dbModel.uuid()
-  var dialcodes = _.map(data.dialcodes, 'text');
+  var dialcodes = _.map(data.dialcodes, 'text')
   // Below line added for ignore eslint camel case issue.
   /* eslint new-cap: ["error", { "newIsCap": false }] */
   var batch = new dbModel.instance.dialcode_batch({
@@ -60,7 +60,7 @@ BatchImageService.prototype.createRequest = function (data, channel, publisher, 
       logger.error({ msg: 'Error while inserting record', error })
       callback(error, null)
     } else {
-      data.processId = processId;
+      data.processId = processId
       KafkaService.sendRecord(data, function (err, res) {
         if (err) {
           logger.error({ msg: 'Error while sending record to kafka', err, additionalInfo: { data } })
@@ -69,8 +69,7 @@ BatchImageService.prototype.createRequest = function (data, channel, publisher, 
           callback(null, processId)
         }
       })
-      //TODO: Send to Kafka
-
+      // TODO: Send to Kafka
     }
   })
 }
@@ -78,6 +77,5 @@ BatchImageService.prototype.createRequest = function (data, channel, publisher, 
 BatchImageService.prototype.configToString = function () {
   return _.mapValues(this.config, _.method('toString'))
 }
-
 
 module.exports = BatchImageService

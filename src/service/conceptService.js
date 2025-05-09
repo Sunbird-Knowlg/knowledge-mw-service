@@ -21,7 +21,7 @@ var responseCode = messageUtils.RESPONSE_CODE
  * @param {Object} req
  * @param {Object} response
  */
-function getDomainsAPI(req, response) {
+function getDomainsAPI (req, response) {
   logger.debug({ msg: 'conceptService.getDomainAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
@@ -67,7 +67,7 @@ function getDomainsAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function getDomainByIDAPI(req, response) {
+function getDomainByIDAPI (req, response) {
   logger.debug({ msg: 'conceptService.getDomainByIDAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
@@ -130,7 +130,7 @@ function getDomainByIDAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function getObjectTypesAPI(req, response) {
+function getObjectTypesAPI (req, response) {
   logger.debug({ msg: 'conceptService.getObjectTypesAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
@@ -192,7 +192,7 @@ function getObjectTypesAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function getObjectTypeByIDAPI(req, response) {
+function getObjectTypeByIDAPI (req, response) {
   logger.debug({ msg: 'conceptService.getObjectTypeByIDAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
@@ -257,7 +257,7 @@ function getObjectTypeByIDAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function getConceptByIdAPI(req, response) {
+function getConceptByIdAPI (req, response) {
   logger.debug({ msg: 'conceptService.getConceptByIdAPI() called' }, req)
   var data = {}
   var rspObj = req.rspObj
@@ -319,7 +319,7 @@ function getConceptByIdAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function searchObjectTypeAPI(req, response) {
+function searchObjectTypeAPI (req, response) {
   logger.debug({ msg: 'conceptService.searchObjectTypeAPI() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -387,7 +387,7 @@ function searchObjectTypeAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function createObjectTypeAPI(req, response) {
+function createObjectTypeAPI (req, response) {
   var rspObj = req.rspObj
   logger.debug({ msg: 'conceptService.createObjectTypeAPI() called' }, req)
   var data = req.body
@@ -454,7 +454,7 @@ function createObjectTypeAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function updateObjectTypeAPI(req, response) {
+function updateObjectTypeAPI (req, response) {
   logger.debug({ msg: 'conceptService.updateObjectTypeAPI() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -523,7 +523,7 @@ function updateObjectTypeAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function retireObjectTypeAPI(req, response) {
+function retireObjectTypeAPI (req, response) {
   logger.debug({ msg: 'conceptService.retireObjectTypeAPI() called' }, req)
   var rspObj = req.rspObj
   var data = req.body
@@ -590,7 +590,7 @@ function retireObjectTypeAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function listTermsAPI(req, response) {
+function listTermsAPI (req, response) {
   logger.debug({ msg: 'conceptService.listTermsAPI() called' }, req)
   var rspObj = req.rspObj
   async.waterfall([
@@ -616,7 +616,7 @@ function listTermsAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function listResourceBundlesAPI(req, response) {
+function listResourceBundlesAPI (req, response) {
   logger.debug({ msg: 'conceptService.listResourceBundlesAPI() called' }, req)
   var rspObj = req.rspObj
   async.waterfall([
@@ -642,7 +642,7 @@ function listResourceBundlesAPI(req, response) {
  * @param {Object} req
  * @param {Object} response
  */
-function listOrdinalsAPI(req, response) {
+function listOrdinalsAPI (req, response) {
   logger.debug({ msg: 'conceptService.listOrdinalsAPI() called' }, req)
   var rspObj = req.rspObj
   async.waterfall([

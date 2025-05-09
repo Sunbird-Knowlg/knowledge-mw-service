@@ -230,14 +230,14 @@ function createLock (req, response) {
     function (CBW) {
       var ekStepReqData = {
         request: {}
-      };
+      }
       const lockData = {
         'lockKey': lockId,
         'versionKey': versionKey
-      };
-      const resourceInfo = JSON.parse(data.request.resourceInfo);
+      }
+      const resourceInfo = JSON.parse(data.request.resourceInfo)
       if (lodash.has(resourceInfo, 'mimeType') && resourceInfo.mimeType === 'application/vnd.sunbird.questionset') {
-        ekStepReqData.request = {'questionset': lockData};
+        ekStepReqData.request = {'questionset': lockData}
         contentProvider.updateQuestionset(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             rspObj.result = res && res.result ? res.result : {}
@@ -250,7 +250,7 @@ function createLock (req, response) {
           }
         })
       } else {
-        ekStepReqData.request = {'content': lockData };
+        ekStepReqData.request = {'content': lockData }
         contentProvider.updateContent(ekStepReqData, data.request.resourceId, req.headers, function (err, res) {
           if (err || res.responseCode !== responseCode.SUCCESS) {
             rspObj.result = res && res.result ? res.result : {}

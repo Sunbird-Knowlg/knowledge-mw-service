@@ -1750,8 +1750,8 @@ function copyContentAPI (req, response) {
   data.contentId = req.params.contentId
   var rspObj = req.rspObj
   var query = {}
-  if (req.query){
-    query = req.query;
+  if (req.query) {
+    query = req.query
   }
 
   logger.debug({
@@ -1908,7 +1908,7 @@ function searchPluginsAPI (req, response, objectType) {
 function validateContentLock (req, response) {
   var rspObj = req.rspObj
   var userId = req.get('x-authenticated-userid')
-  var isRootOrgAdmin = lodash.has(req.body.request, "isRootOrgAdmin") ? req.body.request.isRootOrgAdmin : false
+  var isRootOrgAdmin = lodash.has(req.body.request, 'isRootOrgAdmin') ? req.body.request.isRootOrgAdmin : false
   logger.debug({ msg: 'contentService.validateContentLock() called', additionalInfo: { rspObj } }, req)
   var qs = {
     mode: 'edit'

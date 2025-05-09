@@ -11,7 +11,7 @@ var orgDataHelper = require('./orgHelper')
  * data asynchronously and return back a promise
  * @returns promise
  */
-function getAllChannelsFromAPI() {
+function getAllChannelsFromAPI () {
   return new Promise(function (resolve, reject) {
     var limit = 200
     var offset = 0

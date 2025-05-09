@@ -19,7 +19,7 @@ function includeLicenseDetails (req, res, cb) {
     let contents = inputContentIsArray ? res.result.content : [res.result.content]
     if (_.size(fieldsToPopulate) && _.size(contents)) {
       populateLicenseDetailsByName(contents, fieldsToPopulate, function
-        (err, contentWithLicenseDetails) {
+      (err, contentWithLicenseDetails) {
         if (!err) {
           res.result.content = inputContentIsArray ? contentWithLicenseDetails : contentWithLicenseDetails[0]
         }

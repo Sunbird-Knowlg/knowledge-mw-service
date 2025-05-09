@@ -11,7 +11,7 @@ var logger = require('sb_logger_util_v2')
 
 // Logic to get the dialcodes for request count
 
-function DialCodeServiceHelper() { }
+function DialCodeServiceHelper () { }
 
 DialCodeServiceHelper.prototype.generateDialcodes = function (req, headers, callback) {
   this.totalCount = req.request.dialcodes.count > dialcodeMaxCount ? dialcodeMaxCount : req.request.dialcodes.count

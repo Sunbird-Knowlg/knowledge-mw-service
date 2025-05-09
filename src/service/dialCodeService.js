@@ -54,12 +54,11 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
   } else {
     _.forIn(dialcodes, function (index, dialcode) {
       tasks[dialcode] = function (callback) {
-        var fileName = index + '_' + dialcode;
+        var fileName = index + '_' + dialcode
         imageService.insertImg(dialcode, channel, publisher, fileName, callback)
       }
     })
   }
-
 
   async.parallelLimit(tasks, 100, function (err, results) {
     if (err) {
@@ -83,8 +82,8 @@ function prepareQRCodeRequestData (dialcodes, config, channel, publisher, conten
 
       // if content id present then we will send zip file name
       if (contentId) {
-        data['storage']['fileName'] = contentId + '_' + Date.now();
-        cb(null, data);
+        data['storage']['fileName'] = contentId + '_' + Date.now()
+        cb(null, data)
       } else {
         logger.warn({ msg: 'contentId not present', additionalInfo: { data } })
         cb(null, data)
@@ -389,7 +388,7 @@ function updateDialCodeV2API (req, response) {
  * @returns {object} return response object with http status
  */
 function getDialCodeAPI (req, response) {
-  logger.info("dialCodeService.js:: getDialCodeAPI function invoked!")
+  logger.info('dialCodeService.js:: getDialCodeAPI function invoked!')
   var data = {}
   data.body = req.body
   data.dialCodeId = _.get(req, 'body.request.dialcode.identifier')
@@ -465,7 +464,7 @@ function getDialCodeAPI (req, response) {
  * @returns {object} return response object with http status
  */
 function getDialCodeV2API (req, response) {
-  logger.info("dialCodeService.js:: getDialCodeV2API function invoked!")
+  logger.info('dialCodeService.js:: getDialCodeV2API function invoked!')
   var data = {}
   data.dialCodeId = req.params.dialCodeId
   var rspObj = req.rspObj
