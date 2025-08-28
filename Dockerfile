@@ -1,6 +1,7 @@
 FROM node:12.20.1
 MAINTAINER "Manojvv" "manojv@ilimi.in"
 USER root
+RUN git submodule update --init --recursive src/libs
 COPY src /opt/content/
 WORKDIR /opt/content/
 RUN npm install --unsafe-perm
