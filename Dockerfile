@@ -1,4 +1,4 @@
-FROM node:12.20.1
+FROM debian:bookworm
 RUN apt-get update && apt-get install -y git
 COPY . /opt/content/
 WORKDIR /opt/content/
@@ -7,7 +7,7 @@ RUN git submodule init && \
     git submodule update
 RUN cd src && npm install --unsafe-perm --production
 
-FROM node:12.20.1
+FROM debian:bookworm
 
 RUN useradd -m sunbird
 COPY --from=0 --chown=sunbird /opt/content /home/sunbird/mw/content
