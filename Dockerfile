@@ -1,15 +1,14 @@
-FROM debian:bookworm
-RUN apt-get update && apt-get install -y git
-COPY . /opt/content/
+FROM node:12.20.1
+LABEL maintainer="Manojvv <manojv@ilimi.in>"
+USER root
+COPY src /opt/content/
 WORKDIR /opt/content/
-RUN git config --global --add safe.directory /opt/content
-RUN git submodule init && \
-    git submodule update
-RUN cd src && npm install --unsafe-perm --production
+RUN npm install --unsafe-perm
 
-FROM debian:bookworm
+FROM node:12.20.1
+LABEL maintainer="Manojvv <manojv@ilimi.in>"
 
 RUN useradd -m sunbird
 COPY --from=0 --chown=sunbird /opt/content /home/sunbird/mw/content
-WORKDIR /home/sunbird/mw/content/src
+WORKDIR /home/sunbird/mw/content/
 CMD ["node", "app.js", "&"]
