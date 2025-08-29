@@ -11,9 +11,8 @@ var messageUtils = require('./messageUtil')
 var utilsService = require('./utilsService')
 var _ = require('lodash')
 var configUtil = require('sb-config-util')
-var contentProvider = require('sb_content_provider_util')
 var responseCode = messageUtils.RESPONSE_CODE
-const questionAllFields = "name,code,description,mimeType,primaryCategory,additionalCategories,visibility,copyright,license,lockKey,assets,audience,author,owner,attributions,consumerId,contentEncoding,contentDisposition,appIcon,publishCheckList,publishComment,compatibilityLevel,status,prevState,prevStatus,lastStatusChangedOn,keywords,pkgVersion,version,versionKey,language,channel,framework,subject,medium,board,gradeLevel,topic,boardIds,gradeLevelIds,subjectIds,mediumIds,topicsIds,targetFWIds,targetBoardIds,targetGradeLevelIds,targetSubjectIds,targetMediumIds,targetTopicIds,createdOn,createdFor,createdBy,lastUpdatedOn,lastUpdatedBy,lastSubmittedOn,lastSubmittedBy,publisher,lastPublishedOn,lastPublishedBy,publishError,reviewError,body,editorState,answer,solutions,instructions,hints,media,responseDeclaration,interactions,qType,scoringMode,qumlVersion,timeLimit,maxScore,showTimer,showFeedback,showSolutions,interactionTypes,templateId,bloomsLevel,feedback,responseProcessing,templateDeclaration,dailySummaryReportEnabled,allowAnonymousAccess,termsAndConditions,expectedDuration,completionCriteria,collaborators,semanticVersion,schemaVersion"
+const questionAllFields = 'name,code,description,mimeType,primaryCategory,additionalCategories,visibility,copyright,license,lockKey,assets,audience,author,owner,attributions,consumerId,contentEncoding,contentDisposition,appIcon,publishCheckList,publishComment,compatibilityLevel,status,prevState,prevStatus,lastStatusChangedOn,keywords,pkgVersion,version,versionKey,language,channel,framework,topic,boardIds,gradeLevelIds,subjectIds,mediumIds,topicsIds,targetFWIds,targetBoardIds,targetGradeLevelIds,targetSubjectIds,targetMediumIds,targetTopicIds,createdOn,createdFor,createdBy,lastUpdatedOn,lastUpdatedBy,lastSubmittedOn,lastSubmittedBy,publisher,lastPublishedOn,lastPublishedBy,publishError,reviewError,body,editorState,answer,solutions,instructions,hints,media,responseDeclaration,interactions,qType,scoringMode,qumlVersion,timeLimit,maxScore,showTimer,showFeedback,showSolutions,interactionTypes,templateId,bloomsLevel,feedback,responseProcessing,templateDeclaration,dailySummaryReportEnabled,allowAnonymousAccess,termsAndConditions,expectedDuration,completionCriteria,collaborators,semanticVersion,schemaVersion'
 
 /**
  * This function helps to get all domain from ekstep
@@ -37,6 +36,64 @@ function readQuestion(identifier, query, headers) {
   }))
 }
 
+function getUpdatedQuestionFields(channelId, req, response) {
+  contentProviderUtil.getChannelValuesById(channelId, req.headers, (channelError, channelRes) => {
+    if (channelError) {
+      rspObj.responseCode = responseCode.SERVER_ERROR;
+      logger.error({ 
+        msg: 'Error - channel details', 
+        error: channelError, 
+        additionalInfo: {channelId}
+      }, req);
+      return response.status(500).send(respUtil.errorResponse(rspObj));
+    }
+    
+    logger.debug({msg: 'channel details', additionalInfo: {result: channelRes.result}}, req);
+    
+    const defaultFramework = _.get(channelRes, 'result.channel.defaultFramework');
+    if (!defaultFramework) {
+      rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND;
+      rspObj.errMsg = 'Default framework not found for channel';
+      logger.error({
+        msg: 'Default framework not found for channel',
+        additionalInfo: { channelId, channelData: channelRes.result }
+      }, req);
+      return response.status(404).send(respUtil.errorResponse(rspObj));
+    }
+    
+    contentProviderUtil.getFrameworkById(defaultFramework, '', req.headers, (frameworkError, frameworkRes) => {
+      if (frameworkError) {
+        rspObj.responseCode = responseCode.SERVER_ERROR;
+        logger.error({ 
+          msg: 'Error - framework details', 
+          error: frameworkError, 
+          additionalInfo: {framework: defaultFramework}
+        }, req);
+        return response.status(500).send(respUtil.errorResponse(rspObj));
+      }
+      
+      const frameworkValues = frameworkRes.result;
+      logger.debug({msg: 'framework details', additionalInfo: {result: frameworkValues}}, req);
+      
+      if (!frameworkValues.framework || !Array.isArray(frameworkValues.framework.categories)) {
+        rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
+        logger.error({ 
+          msg: 'Invalid framework data structure', 
+          additionalInfo: { frameworkValues }
+        }, req)
+        return response.status(404).send(respUtil.errorResponse(rspObj))
+      }
+
+      const categories = frameworkValues.framework.categories
+
+      const updatedQuestionAllFields = Array.from(new Set(
+        questionAllFields.split(',').concat(categories.map(c => c.code))
+      )).join(',')
+
+      return updatedQuestionAllFields
+    })
+  })
+}
 
 function getList(req, response) {
   delete req.headers['accept-encoding']
@@ -44,39 +101,8 @@ function getList(req, response) {
   let data = {}
   let rspObj = req.rspObj
   data.body = req.body
-  const channelId = req.get('X-Channel-Id') || req.get('x-channel-id') || configUtil.getConfig('DEFAULT_CHANNEL');
-  let channelValues = {}
-  contentProvider.getChannelValuesById(channelId, req, response, (error, res) => {
-    if (error) {
-      rspObj.responseCode = responseCode.SERVER_ERROR
-      logger.error({ msg: 'Error - channel details', err, additionalInfo: {channelId}}, req)
-      return response.status(500).send(respUtil.errorResponse(rspObj))
-    } else {
-      channelValues = res.result
-      console.log('channelValues', channelValues)
-      logger.debug({msg: 'channel details', additionalInfo: {result: rspObj.result}}, req)
-    }
-  })
-  const defaultFramework = channelValues?.result?.channel?.defaultFramework;
-  let frameworkValues = {}
-  contentProvider.getFrameworkById(defaultFramework, '', req.headers, (error, res) => {
-    if (error) {
-      rspObj.responseCode = responseCode.SERVER_ERROR
-      logger.error({ msg: 'Error - framework details', err, additionalInfo: {framework: defaultFramework}}, req)
-      return response.status(500).send(respUtil.errorResponse(rspObj))
-    } else {
-      frameworkValues = res.result
-      console.log('frameworkValues', frameworkValues);
-      logger.debug({msg: 'framework details', additionalInfo: {result: rspObj.result}}, req)
-    }
-  })
-  const categories = frameworkValues.result.framework.categories;
-
-  const updatedQuestionAllFields = Array.from(new Set(
-    questionAllFields.split(',').concat(categories.map(c => c.code))
-  )).join(',');
-
-  console.log('updatedQuestionAllFields:', updatedQuestionAllFields);
+  const channelId = req.get('X-Channel-Id') || req.get('x-channel-id') || configUtil.getConfig('DEFAULT_CHANNEL')
+  const updatedQuestionAllFields = getUpdatedQuestionFields(channelId, req, response)
 
   req.query.fields = req.query.fields || updatedQuestionAllFields
   data.query = req.query
