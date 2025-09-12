@@ -36,63 +36,59 @@ function readQuestion(identifier, query, headers) {
   }))
 }
 
-function getUpdatedQuestionFields(channelId, req, response) {
-  contentProviderUtil.getChannelValuesById(channelId, req.headers, (channelError, channelRes) => {
-    if (channelError) {
-      rspObj.responseCode = responseCode.SERVER_ERROR;
-      logger.error({ 
-        msg: 'Error - channel details', 
-        error: channelError, 
-        additionalInfo: {channelId}
-      }, req);
-      return response.status(500).send(respUtil.errorResponse(rspObj));
-    }
-    
-    logger.debug({msg: 'channel details', additionalInfo: {result: channelRes.result}}, req);
-    
-    const defaultFramework = _.get(channelRes, 'result.channel.defaultFramework');
-    if (!defaultFramework) {
-      rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND;
-      rspObj.errMsg = 'Default framework not found for channel';
-      logger.error({
-        msg: 'Default framework not found for channel',
-        additionalInfo: { channelId, channelData: channelRes.result }
-      }, req);
-      return response.status(404).send(respUtil.errorResponse(rspObj));
-    }
-    
-    contentProviderUtil.getFrameworkById(defaultFramework, '', req.headers, (frameworkError, frameworkRes) => {
-      if (frameworkError) {
-        rspObj.responseCode = responseCode.SERVER_ERROR;
+function getUpdatedQuestionFields(channelId, req) {
+  return new Promise((resolve, reject) => {
+    contentProviderUtil.getChannelValuesById(channelId, req.headers, (channelError, channelRes) => {
+      if (channelError) {
         logger.error({ 
-          msg: 'Error - framework details', 
-          error: frameworkError, 
-          additionalInfo: {framework: defaultFramework}
+          msg: 'Error - channel details', 
+          error: channelError, 
+          additionalInfo: {channelId}
         }, req);
-        return response.status(500).send(respUtil.errorResponse(rspObj));
+        return reject(new Error('Failed to get channel details'));
       }
       
-      const frameworkValues = frameworkRes.result;
-      logger.debug({msg: 'framework details', additionalInfo: {result: frameworkValues}}, req);
+      logger.debug({msg: 'channel details', additionalInfo: {result: channelRes.result}}, req);
       
-      if (!frameworkValues.framework || !Array.isArray(frameworkValues.framework.categories)) {
-        rspObj.responseCode = responseCode.RESOURCE_NOT_FOUND
-        logger.error({ 
-          msg: 'Invalid framework data structure', 
-          additionalInfo: { frameworkValues }
-        }, req)
-        return response.status(404).send(respUtil.errorResponse(rspObj))
+      const defaultFramework = _.get(channelRes, 'result.channel.defaultFramework');
+      if (!defaultFramework) {
+        logger.error({
+          msg: 'Default framework not found for channel',
+          additionalInfo: { channelId, channelData: channelRes.result }
+        }, req);
+        return reject(new Error('Default framework not found for channel'));
       }
+      
+      contentProviderUtil.getFrameworkById(defaultFramework, '', req.headers, (frameworkError, frameworkRes) => {
+        if (frameworkError) {
+          logger.error({ 
+            msg: 'Error - framework details', 
+            error: frameworkError, 
+            additionalInfo: {framework: defaultFramework}
+          }, req);
+          return reject(new Error('Failed to get framework details'));
+        }
+        
+        const frameworkValues = frameworkRes.result;
+        logger.debug({msg: 'framework details', additionalInfo: {result: frameworkValues}}, req);
+        
+        if (!frameworkValues.framework || !Array.isArray(frameworkValues.framework.categories)) {
+          logger.error({ 
+            msg: 'Invalid framework data structure', 
+            additionalInfo: { frameworkValues }
+          }, req);
+          return reject(new Error('Invalid framework data structure'));
+        }
 
-      const categories = frameworkValues.framework.categories
+        const categories = frameworkValues.framework.categories;
+        const updatedQuestionAllFields = Array.from(new Set(
+          questionAllFields.split(',').concat(categories.map(c => c.code))
+        )).join(',');
 
-      const updatedQuestionAllFields = Array.from(new Set(
-        questionAllFields.split(',').concat(categories.map(c => c.code))
-      )).join(',')
-
-      return updatedQuestionAllFields
-    })
-  })
+        resolve(updatedQuestionAllFields);
+      });
+    });
+  });
 }
 
 function getList(req, response) {
@@ -102,7 +98,17 @@ function getList(req, response) {
   let rspObj = req.rspObj
   data.body = req.body
   const channelId = req.get('X-Channel-Id') || req.get('x-channel-id') || configUtil.getConfig('DEFAULT_CHANNEL')
-  const updatedQuestionAllFields = getUpdatedQuestionFields(channelId, req, response)
+  let updatedQuestionAllFields;
+  getUpdatedQuestionFields(channelId, req).then((res) => {
+    updatedQuestionAllFields = res;
+  }).catch((err) => {
+    logger.error({
+      msg: 'Error - getting updated question fields',
+      error: err,
+      additionalInfo: { channelId }
+    }, req);
+    updatedQuestionAllFields = questionAllFields;
+  });
 
   req.query.fields = req.query.fields || updatedQuestionAllFields
   data.query = req.query
