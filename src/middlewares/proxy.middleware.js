@@ -598,6 +598,23 @@ module.exports = function (app) {
   )
 
   app.use(
+    '/action/collection/v3/dialcode/link/*',
+    requestMiddleware.validateUserToken,
+    proxy(contentServiceBaseUrl, {
+      limit: reqDataLimitOfContentUpload,
+      proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['Authorization'] = contentRepoApiKey
+        return proxyReqOpts
+      },
+      proxyReqPathResolver: function (req) {
+        var originalUrl = req.originalUrl
+        originalUrl = originalUrl.replace('action/', '')
+        return require('url').parse(contentServiceBaseUrl + originalUrl).path
+      }
+    })
+  )
+
+  app.use(
     '/action/*',
     requestMiddleware.validateUserToken,
     proxy(contentRepoBaseUrl, {
