@@ -564,7 +564,7 @@ module.exports = function (app) {
   )
 
   app.use(
-    ['/action/itemset/*', '/action/assessment/*'],
+    ['/action/itemset/*'],
     requestMiddleware.validateUserToken,
     proxy(assessmentServiceBaseUrl, {
       limit: reqDataLimitOfContentUpload,
