@@ -1,5 +1,5 @@
 var async = require('async')
-var uuidV1 = require('uuid/v1')
+var { v1: uuidV1 } = require('uuid')
 var respUtil = require('response_util')
 var messageUtil = require('../service/messageUtil')
 var logger = require('sb_logger_util_v2')
@@ -39,7 +39,7 @@ var apiInterceptor = new ApiInterceptor(keyCloakConfig, cacheConfig)
  * @param {type} next
  * @returns {unresolved}
  */
-function createAndValidateRequestBody (req, res, next) {
+function createAndValidateRequestBody(req, res, next) {
   logger.debug({ msg: 'createAndValidateRequestBody() called' }, req)
   req.body.ts = new Date()
   req.body.url = req.url
@@ -91,7 +91,7 @@ function createAndValidateRequestBody (req, res, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function validateToken (req, res, next) {
+function validateToken(req, res, next) {
   logger.debug({ msg: 'validateToken() called, offline token validation enabled' }, req)
   if (configUtil.getConfig('ENABLE_USER_TOKEN_VALIDATION') === 'false') {
     next()
@@ -152,7 +152,7 @@ function validateToken (req, res, next) {
   })
 }
 
-function gzipCompression (req, res, next) {
+function gzipCompression(req, res, next) {
   return function (req, res, next) {
     if (configUtil.getConfig('ENABLE_GZIP') === 'true') {
       var comMidleware = compression()
@@ -168,7 +168,7 @@ function gzipCompression (req, res, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function validateUserToken (req, res, next) {
+function validateUserToken(req, res, next) {
   var token = req.get('x-authenticated-user-token')
   var rspObj = req.rspObj || {}
 
@@ -221,7 +221,7 @@ function validateUserToken (req, res, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForCreatorUser (req, response, next) {
+function apiAccessForCreatorUser(req, response, next) {
   logger.debug({ msg: 'apiAccessForCreatorUser() called' }, req)
   var userId = req.get('x-authenticated-userid')
   var data = {}
@@ -289,7 +289,7 @@ function apiAccessForCreatorUser (req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function apiAccessForReviewerUser (req, response, next) {
+function apiAccessForReviewerUser(req, response, next) {
   logger.debug({ msg: 'apiAccessForReviewerUser() called' }, req)
   var userId = req.get('x-authenticated-userid')
   var data = {}
@@ -355,7 +355,7 @@ function apiAccessForReviewerUser (req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
-function hierarchyUpdateApiAccess (req, response, next) {
+function hierarchyUpdateApiAccess(req, response, next) {
   logger.debug({ msg: 'hierarchyUpdateApiAccess() called' }, req)
   var userId = req.get('x-authenticated-userid')
   var data = req.body
@@ -441,7 +441,7 @@ function hierarchyUpdateApiAccess (req, response, next) {
  * @param  {[type]}   res
  * @param  {Function} next
  */
-function checkChannelID (req, res, next) {
+function checkChannelID(req, res, next) {
   logger.debug({ msg: 'checkChannelID() called' }, req)
   var channelID = req.get('x-channel-id')
   var rspObj = req.rspObj
@@ -463,7 +463,7 @@ function checkChannelID (req, res, next) {
   next()
 }
 
-function seteTextbook (req, res, next) {
+function seteTextbook(req, res, next) {
   if (!_.isEmpty(req.body.request) && !_.isEmpty(req.body.request.content)) {
     req.body.request.content['contentType'] = 'eTextBook'
   }
