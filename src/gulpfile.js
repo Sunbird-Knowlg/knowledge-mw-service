@@ -16,10 +16,11 @@ gulp.task('clean-coverage-report', function (cb) {
 })
 
 // Below task is used setup source files
-gulp.task('pre-test-node', function () {
+gulp.task('pre-test-node', function (done) {
   return gulp.src(paths.scripts)
     .pipe(istanbul({ includeUntested: true }))
     .pipe(istanbul.hookRequire())
+    .on('finish', done)
 })
 
 // Below task used to run the test cases
