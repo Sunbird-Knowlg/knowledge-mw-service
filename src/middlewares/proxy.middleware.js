@@ -626,8 +626,6 @@ module.exports = function (app) {
       proxyReqPathResolver: function (req) {
         var originalUrl = req.originalUrl
         originalUrl = originalUrl.replace('action/', '')
-        console.log('originalUrl', originalUrl)
-        console.log('contentRepoBaseUrl', contentRepoBaseUrl)
         return require('url').parse(contentRepoBaseUrl + originalUrl).path
       }
     })
