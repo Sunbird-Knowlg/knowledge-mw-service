@@ -10,8 +10,9 @@ var logger = require('sb_logger_util_v2')
 var messageUtils = require('./messageUtil')
 var utilsService = require('./utilsService')
 var _ = require('lodash')
+var configUtil = require('sb-config-util')
 var responseCode = messageUtils.RESPONSE_CODE
-const questionAllFields = "name,code,description,mimeType,primaryCategory,additionalCategories,visibility,copyright,license,lockKey,assets,audience,author,owner,attributions,consumerId,contentEncoding,contentDisposition,appIcon,publishCheckList,publishComment,compatibilityLevel,status,prevState,prevStatus,lastStatusChangedOn,keywords,pkgVersion,version,versionKey,language,channel,framework,subject,medium,board,gradeLevel,topic,boardIds,gradeLevelIds,subjectIds,mediumIds,topicsIds,targetFWIds,targetBoardIds,targetGradeLevelIds,targetSubjectIds,targetMediumIds,targetTopicIds,createdOn,createdFor,createdBy,lastUpdatedOn,lastUpdatedBy,lastSubmittedOn,lastSubmittedBy,publisher,lastPublishedOn,lastPublishedBy,publishError,reviewError,body,editorState,answer,solutions,instructions,hints,media,responseDeclaration,interactions,qType,scoringMode,qumlVersion,timeLimit,maxScore,showTimer,showFeedback,showSolutions,interactionTypes,templateId,bloomsLevel,feedback,responseProcessing,templateDeclaration,dailySummaryReportEnabled,allowAnonymousAccess,termsAndConditions,expectedDuration,completionCriteria,collaborators,semanticVersion,schemaVersion"
+const questionAllFields = 'name,code,description,mimeType,primaryCategory,additionalCategories,visibility,copyright,license,lockKey,assets,audience,author,owner,attributions,consumerId,contentEncoding,contentDisposition,appIcon,publishCheckList,publishComment,compatibilityLevel,status,prevState,prevStatus,lastStatusChangedOn,keywords,pkgVersion,version,versionKey,language,channel,framework,topic,boardIds,gradeLevelIds,subjectIds,mediumIds,topicsIds,targetFWIds,targetBoardIds,targetGradeLevelIds,targetSubjectIds,targetMediumIds,targetTopicIds,createdOn,createdFor,createdBy,lastUpdatedOn,lastUpdatedBy,lastSubmittedOn,lastSubmittedBy,publisher,lastPublishedOn,lastPublishedBy,publishError,reviewError,body,editorState,answer,solutions,instructions,hints,media,responseDeclaration,interactions,qType,scoringMode,qumlVersion,timeLimit,maxScore,showTimer,showFeedback,showSolutions,interactionTypes,templateId,bloomsLevel,feedback,responseProcessing,templateDeclaration,dailySummaryReportEnabled,allowAnonymousAccess,termsAndConditions,expectedDuration,completionCriteria,collaborators,semanticVersion,schemaVersion'
 
 /**
  * This function helps to get all domain from ekstep
@@ -35,6 +36,60 @@ function readQuestion(identifier, query, headers) {
   }))
 }
 
+function getUpdatedQuestionFields(channelId, req) {
+  return new Promise((resolve, reject) => {
+    contentProviderUtil.getChannelValuesById(channelId, req.headers, (channelError, channelRes) => {
+      if (channelError) {
+        logger.error({ 
+          msg: 'Error - channel details', 
+          error: channelError, 
+          additionalInfo: {channelId}
+        }, req);
+        return reject(new Error('Failed to get channel details'));
+      }
+      
+      logger.debug({msg: 'channel details', additionalInfo: {result: channelRes.result}}, req);
+      
+      const defaultFramework = _.get(channelRes, 'result.channel.defaultFramework');
+      if (!defaultFramework) {
+        logger.error({
+          msg: 'Default framework not found for channel',
+          additionalInfo: { channelId, channelData: channelRes.result }
+        }, req);
+        return reject(new Error('Default framework not found for channel'));
+      }
+      
+      contentProviderUtil.getFrameworkById(defaultFramework, '', req.headers, (frameworkError, frameworkRes) => {
+        if (frameworkError) {
+          logger.error({ 
+            msg: 'Error - framework details', 
+            error: frameworkError, 
+            additionalInfo: {framework: defaultFramework}
+          }, req);
+          return reject(new Error('Failed to get framework details'));
+        }
+        
+        const frameworkValues = frameworkRes.result;
+        logger.debug({msg: 'framework details', additionalInfo: {result: frameworkValues}}, req);
+        
+        if (!frameworkValues.framework || !Array.isArray(frameworkValues.framework.categories)) {
+          logger.error({ 
+            msg: 'Invalid framework data structure', 
+            additionalInfo: { frameworkValues }
+          }, req);
+          return reject(new Error('Invalid framework data structure'));
+        }
+
+        const categories = frameworkValues.framework.categories;
+        const updatedQuestionAllFields = Array.from(new Set(
+          questionAllFields.split(',').concat(categories.map(c => c.code))
+        )).join(',');
+
+        resolve(updatedQuestionAllFields);
+      });
+    });
+  });
+}
 
 function getList(req, response) {
   delete req.headers['accept-encoding']
@@ -42,7 +97,20 @@ function getList(req, response) {
   let data = {}
   let rspObj = req.rspObj
   data.body = req.body
-  req.query.fields = req.query.fields || questionAllFields
+  const channelId = req.get('X-Channel-Id') || req.get('x-channel-id') || configUtil.getConfig('DEFAULT_CHANNEL')
+  let updatedQuestionAllFields;
+  getUpdatedQuestionFields(channelId, req).then((res) => {
+    updatedQuestionAllFields = res;
+  }).catch((err) => {
+    logger.error({
+      msg: 'Error - getting updated question fields',
+      error: err,
+      additionalInfo: { channelId }
+    }, req);
+    updatedQuestionAllFields = questionAllFields;
+  });
+
+  req.query.fields = req.query.fields || updatedQuestionAllFields
   data.query = req.query
 
   let questionIds = _.get(data, 'body.request.search.identifier');

@@ -16,17 +16,18 @@ gulp.task('clean-coverage-report', function (cb) {
 })
 
 // Below task is used setup source files
-gulp.task('pre-test-node', function () {
+gulp.task('pre-test-node', function (done) {
   return gulp.src(paths.scripts)
-    .pipe(istanbul({includeUntested: true}))
+    .pipe(istanbul({ includeUntested: true }))
     .pipe(istanbul.hookRequire())
+    .on('finish', done)
 })
 
 // Below task used to run the test cases
-gulp.task('test', ['clean-coverage-report', 'pre-test-node'], function () {
+gulp.task('test', gulp.series('clean-coverage-report', 'pre-test-node', function () {
   return gulp.src(paths.tests)
     .pipe(jasmineNode({
       timeout: 10000
     }))
-    .pipe(istanbul.writeReports({dir: paths.coverage, reporters: ['html', 'text-summary']}))
-})
+    .pipe(istanbul.writeReports({ dir: paths.coverage, reporters: ['html', 'text-summary'] }))
+}))
