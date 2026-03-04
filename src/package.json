@@ -83,7 +83,12 @@
   "overrides": {
     "form-data": "2.5.4",
     "socket.io-parser": "3.4.2",
-    "xmlhttprequest-ssl": "1.6.2"
+    "xmlhttprequest-ssl": "1.6.2",
+    "minimist": "^1.2.6",
+    "underscore": "^1.13.1",
+    "grunt-karma": {
+      "lodash": "^4.17.21"
+    }
   },
   "standard": {
     "env": {
