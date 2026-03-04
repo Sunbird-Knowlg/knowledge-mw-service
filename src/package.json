@@ -80,6 +80,11 @@
     "rimraf": "^5.0.5",
     "sinon": "^17.0.1"
   },
+  "overrides": {
+    "form-data": "2.5.4",
+    "socket.io-parser": "3.4.2",
+    "xmlhttprequest-ssl": "1.6.2"
+  },
   "standard": {
     "env": {
       "node": true,
