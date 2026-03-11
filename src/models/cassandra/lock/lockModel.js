@@ -11,6 +11,5 @@ module.exports = {
     deviceId: 'text',
     expiresAt: 'timestamp'
   },
-  key: ['resourceId', 'resourceType'],
-  indexes: ['lockId']
+  key: ['resourceId', 'resourceType']
 }
