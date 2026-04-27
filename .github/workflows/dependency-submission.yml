@@ -28,7 +28,7 @@ jobs:
 
       - name: Generate SPDX SBOM
         working-directory: src
-        run: npm sbom --sbom-format spdx-json > sbom.spdx.json
+        run: npm sbom --sbom-format spdx > sbom.spdx.json
 
       - name: Submit npm Dependencies
         uses: advanced-security/spdx-dependency-submission-action@v0.2.0
