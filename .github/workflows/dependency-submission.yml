@@ -1,0 +1,30 @@
+name: Dependency Submission (npm)
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+permissions:
+  contents: write
+
+jobs:
+  dependency-submission:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies (ci install for full lock resolution)
+        working-directory: src
+        run: npm ci
+
+      - name: Submit npm Dependencies
+        uses: actions/dependency-review-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
