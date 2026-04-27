@@ -14,17 +14,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install dependencies (ci install for full lock resolution)
+      - name: Install dependencies
         working-directory: src
         run: npm ci
 
+      - name: Generate SPDX SBOM
+        working-directory: src
+        run: npm sbom --sbom-format spdx-json > sbom.spdx.json
+
       - name: Submit npm Dependencies
-        uses: actions/dependency-review-action@v4
+        uses: advanced-security/spdx-dependency-submission-action@v0.2.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          filePath: src/sbom.spdx.json
