@@ -1,0 +1,36 @@
+name: Dependency Submission (npm)
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+permissions:
+  contents: write
+
+jobs:
+  dependency-submission:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: src
+        run: npm ci
+
+      - name: Generate SPDX SBOM
+        working-directory: src
+        run: npm sbom --sbom-format spdx > sbom.spdx.json
+
+      - name: Submit npm Dependencies
+        uses: advanced-security/spdx-dependency-submission-action@v0.2.0
+        with:
+          filePath: src/sbom.spdx.json
