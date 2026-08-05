@@ -5,17 +5,28 @@ FROM dhi.io/busybox:1.38.0-alpine3.24 AS shell
 
 # ---- prep stage
 FROM ${DHI_IMAGE_DEV} AS build
-USER node
+RUN useradd -m sunbird
+USER sunbird
 WORKDIR /opt/content/
-COPY --chown=node src /opt/content/
+COPY --chown=sunbird src /opt/content/
 RUN npm install
 
 # ---- runtime stage
-FROM ${DHI_IMAGE_RUNTIME}
+FROM ${DHI_IMAGE_RUNTIME} AS runtime
+
+FROM ${DHI_IMAGE_DEV} AS useradd-prep
+COPY --from=runtime /etc/passwd /etc/passwd
+COPY --from=runtime /etc/group /etc/group
+RUN useradd -m -d /home/sunbird sunbird
+
+FROM runtime
 
 COPY --from=shell /bin/busybox /bin/busybox
-COPY --from=build --chown=node /opt/content /home/node/mw/content
-WORKDIR /home/node/mw/content/
+COPY --from=useradd-prep /etc/passwd /etc/passwd
+COPY --from=useradd-prep /etc/group /etc/group
+USER sunbird
+COPY --from=build --chown=sunbird /opt/content /home/sunbird/mw/content
+WORKDIR /home/sunbird/mw/content/
 CMD ["node", "app.js"]
 
 # RUN useradd -m sunbird
