@@ -28,8 +28,3 @@ USER sunbird
 COPY --from=build --chown=sunbird /opt/content /home/sunbird/mw/content
 WORKDIR /home/sunbird/mw/content/
 CMD ["node", "app.js"]
-
-# RUN useradd -m sunbird
-# COPY --from=0 --chown=sunbird /opt/content /home/sunbird/mw/content
-# WORKDIR /home/sunbird/mw/content/
-# CMD ["node", "app.js"]
