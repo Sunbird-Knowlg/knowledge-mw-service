@@ -1,8 +1,6 @@
 ARG DHI_IMAGE_DEV=dhi.io/node:22.17.1-debian12-dev
 ARG DHI_IMAGE_RUNTIME=dhi.io/node:22.17.1-debian12
 
-FROM dhi.io/busybox:1.38.0-alpine3.24 AS shell
-
 # ---- prep stage
 FROM ${DHI_IMAGE_DEV} AS build
 RUN useradd -m sunbird
@@ -21,7 +19,6 @@ RUN useradd -m -d /home/sunbird sunbird
 
 FROM runtime
 
-COPY --from=shell /bin/busybox /bin/busybox
 COPY --from=useradd-prep /etc/passwd /etc/passwd
 COPY --from=useradd-prep /etc/group /etc/group
 USER sunbird
