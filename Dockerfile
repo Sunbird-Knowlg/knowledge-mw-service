@@ -7,7 +7,7 @@ RUN useradd -m sunbird
 USER sunbird
 WORKDIR /opt/content/
 COPY --chown=sunbird src /opt/content/
-RUN npm install
+RUN npm run preinstall && npm ci --ignore-scripts
 
 # ---- runtime stage
 FROM ${DHI_IMAGE_RUNTIME} AS runtime
