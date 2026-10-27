@@ -2,6 +2,7 @@ var cassandra = require('express-cassandra')
 var _ = require('lodash')
 var contactPoints = process.env.sunbird_cassandra_urls.split(',')
 var cassandraDriver = require('cassandra-driver')
+var cassandraSecurity = require('./cassandraSecurity')
 var consistency = getConsistencyLevel(process.env.sunbird_cassandra_consistency_level)
 var envReplicationStrategy = process.env.sunbird_cassandra_replication_strategy ||
 '{"class":"SimpleStrategy","replication_factor":1}'
@@ -18,7 +19,7 @@ var keyspaceConfig = [{
 var connection = {}
 _.forEach(keyspaceConfig, config => {
   var models = cassandra.createClient({
-    clientOptions: {
+    clientOptions: _.assign({
       contactPoints: contactPoints,
       keyspace: config.name,
       queryOptions: { consistency: consistency },
@@ -29,7 +30,7 @@ _.forEach(keyspaceConfig, config => {
         interval: 30,
         timeout: 10
       }
-    },
+    }, cassandraSecurity.getSecurityOptions(cassandra.driver)),
     ormOptions: {
       defaultReplicationStrategy: replicationStrategy,
       migration: 'safe'
@@ -52,7 +53,13 @@ function getConnections (keyspace) {
 }
 
 function checkCassandraDBHealth (callback) {
-  const client = new cassandraDriver.Client({ contactPoints: contactPoints })
+  // cassandra-driver 4.x needs the local datacenter; it names the datacenter in its error otherwise
+  const options = { contactPoints: contactPoints }
+  if (process.env.sunbird_cassandra_local_datacenter) {
+    options.localDataCenter = process.env.sunbird_cassandra_local_datacenter
+  }
+  const client = new cassandraDriver.Client(
+    _.assign(options, cassandraSecurity.getSecurityOptions(cassandraDriver)))
   client.connect()
     .then(function () {
       client.shutdown()
